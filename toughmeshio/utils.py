@@ -32,7 +32,7 @@ def extrude_to_3d(mesh, height = 1., axis = 2, inplace = False):
     ----------
     mesh : Mesh
         Input mesh to convert.
-    height : float, optional, default 1.
+    height : scalar or array_like, optional, default 1.
         Height of extrusion.
     axis : int (0, 1 or 2), optional, default 2
         Axis along which extrusion is performed.
@@ -46,9 +46,10 @@ def extrude_to_3d(mesh, height = 1., axis = 2, inplace = False):
         Extruded mesh (only if ``inplace == False``).
     """
     assert axis in [ 0, 1, 2 ], "axis must be 0, 1 or 2."
-    msh = mesh if inplace else deepcopy(mesh) 
+    msh = mesh if inplace else deepcopy(mesh)
+    height = [ height ] if isinstance(height, (int, float)) else height
 
-    npts = len(msh.points)
+    npts, nh = len(msh.points), len(height)
     if msh.points.shape[1] == 3:
         assert len(set(msh.points[:,axis])) == 1, \
         "Cannot extrude mesh along axis {}.".format(axis)
@@ -58,20 +59,29 @@ def extrude_to_3d(mesh, height = 1., axis = 2, inplace = False):
             msh.points[:,[axis,2]] = msh.points[:,[2,axis]]
 
     extra_points = np.array(msh.points)
-    extra_points[:,axis] += height
-    msh.points = np.r_[msh.points,extra_points]
+    for h in height:
+        extra_points[:,axis] += h
+        msh.points = np.r_[msh.points,extra_points]
 
     extruded_types = {
         "triangle": "wedge",
         "quad": "hexahedron",
     }
-    for k, v in msh.cells.items():
+    for k in msh.cells.keys():
         if k in extruded_types.keys():
             extruded_type = extruded_types[k]
-            msh.cells[extruded_type] = msh.cells.pop(k)
-            msh.cells[extruded_type] = np.c_[v,v+npts]
+            v = msh.cells.pop(k)
+            nr, nc = v.shape
+            msh.cells[extruded_type] = np.tile(v, (nh, 2))
+            for i in range(nh):
+                ibeg, iend = i*nr, (i+1)*nr
+                msh.cells[extruded_type][ibeg:iend,:nc] += i*npts
+                msh.cells[extruded_type][ibeg:iend,nc:] += (i+1)*npts
+
             if k in msh.cell_data.keys():
                 msh.cell_data[extruded_type] = msh.cell_data.pop(k)
+                for kk, vv in msh.cell_data[extruded_type].items():
+                    msh.cell_data[extruded_type][kk] = np.tile(vv, nh)
 
     if msh.field_data:
         for k in msh.field_data.keys():
