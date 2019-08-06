@@ -8,7 +8,11 @@ Author: Keurfon Luu <keurfonluu@lbl.gov>
 License: MIT
 """
 
-from . import meshio
+import sys
+if sys.version_info[0] < 3:
+    from . import meshio2 as meshio
+else:
+    from . import meshio
 
 __all__ = [
     "meshio",
