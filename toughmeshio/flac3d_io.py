@@ -78,6 +78,7 @@ def read_buffer(f):
     points = []
     zones = {}
     zgroups = {}
+    count = { k: 0 for k in meshio_to_flac3d_type.keys() }
 
     line = f.readline()
     while line:
@@ -86,10 +87,10 @@ def read_buffer(f):
         elif line.startswith("G"):
             _read_point(line, points)
         elif line.startswith("Z"):
-            _read_cell(line, zones)
+            _read_cell(line, zones, count)
         line = f.readline()
 
-    cells, cell_data, field_data = _translate_cells(zones, zgroups)
+    cells, cell_data, field_data = _translate_cells(zones, zgroups, count)
     return Mesh(
         points = np.array(points), 
         cells = cells,
@@ -106,7 +107,7 @@ def _read_point(line, points):
     points.append([ float(l) for l in line[2:] ])
 
 
-def _read_cell(line, zones):
+def _read_cell(line, zones, count):
     """
     Read cell corners.
     """
@@ -116,9 +117,11 @@ def _read_cell(line, zones):
     if line[1] == "B7":
         cell.append(cell[-1])
     zones[int(line[2])] = {
+        "meshio_id": count[meshio_type],
         "meshio_type": meshio_type,
         "cell": [ cell[i] for i in flac3d_to_meshio_order[meshio_type] ],
     }
+    count[meshio_type] += 1
 
 
 def _read_zgroup(f, line, zgroups):
@@ -141,12 +144,13 @@ def _read_zgroup(f, line, zgroups):
         line = f.readline()
 
 
-def _translate_cells(zones, zgroups):
+def _translate_cells(zones, zgroups, count):
     """
     Convert FLAC3D zones and groups as meshio cells and cell_data.
     """
-    cells = { k: [] for k in meshio_to_flac3d_type.keys() }
-    cell_data = { k: { "flac3d:zone": [] } for k in meshio_to_flac3d_type.keys() }
+    meshio_types = [ k for k in meshio_to_flac3d_type.keys() if count[k] ]
+    cells = { k: [] for k in meshio_types }
+    cell_data = { k: np.zeros(count[k]) for k in meshio_types }
     field_data = {}
 
     for v in zones.values():
@@ -155,11 +159,12 @@ def _translate_cells(zones, zgroups):
     for zid, (k, v) in enumerate(zgroups.items()):
         field_data[k] = np.array([ zid+1, 3 ])
         for i in v:
-            cell_data[zones[i]["meshio_type"]]["flac3d:zone"].append(zid+1)
+            mid = zones[i]["meshio_id"]
+            mt = zones[i]["meshio_type"]
+            cell_data[mt][mid] = zid + 1
 
-    cells = { k: np.array(v) for k, v in cells.items() if v }
-    cell_data = { k: { "flac3d:zone": np.array(v["flac3d:zone"]) }
-                    for k, v in cell_data.items() if v["flac3d:zone"] }
+    cells = { k: np.array(v) for k, v in cells.items() }
+    cell_data = { k: { "flac3d:zone": v } for k, v in cell_data.items() }
     return cells, cell_data, field_data
 
 
