@@ -38,9 +38,9 @@ meshio_to_flac3d_type = {
 
 flac3d_to_meshio_order = {
     "tetra": [ 0, 1, 2, 3 ],
-    "pyramid": [ 0, 2, 4, 1, 3 ],
+    "pyramid": [ 0, 1, 4, 2, 3 ],
     "wedge": [ 0, 1, 3, 2, 4, 5 ],
-    "hexahedron": [ 0, 2, 4, 1, 3, 5, 7, 6 ],
+    "hexahedron": [ 0, 1, 4, 2, 3, 6, 7, 5 ],
 }
 
 
