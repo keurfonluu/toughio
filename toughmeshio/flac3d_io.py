@@ -261,7 +261,8 @@ def _translate_zgroups(cells, cell_data):
         return zgroups
     else:
         logging.warning(
-            "'flac3d:zone' not found in cell_data. All cells assumed in the same zone group."
+            "Keyword 'flac3d:zone' not found in cell_data. "
+            "All cells assumed in the same zone group."
         )
         n_cells = sum([ len(v) for v in cells.values() ])
         return { 1: np.arange(1, n_cells+1).tolist() }
