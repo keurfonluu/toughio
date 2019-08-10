@@ -124,7 +124,8 @@ def _translate_rocks(mesh):
             return { k: [ str(int(vv)) for vv in v ] for k, v in rocks.items() }
     else:
         logging.warning(
-            "'tough:rock' not found in cell_data. All cells assumed in the same rock group."
+            "Keyword 'tough:rock' not found in cell_data. "
+            "All cells assumed in the same rock group."
         )
         return { k: [ "    1" ]*len(v) for k, v in mesh.cells.items() }
 
