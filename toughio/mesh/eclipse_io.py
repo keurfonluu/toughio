@@ -8,10 +8,8 @@ License: MIT
 from __future__ import division, with_statement, unicode_literals
 
 import numpy as np
-try:
-    from meshio import Mesh
-except ImportError:
-    from .externals.meshio import Mesh
+
+from .meshio import Mesh
 
 __all__ = [
     "read",

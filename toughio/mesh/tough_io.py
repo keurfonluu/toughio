@@ -8,7 +8,9 @@ License: MIT
 from __future__ import division, with_statement, unicode_literals
 
 import logging
+
 import numpy as np
+
 from .spatial import (
     cell_area,
     cell_volume,

@@ -8,12 +8,11 @@ License: MIT
 from __future__ import division, with_statement, unicode_literals
 
 import logging
+
 import numpy as np
+
 from copy import deepcopy
-try:
-    from meshio import Mesh
-except ImportError:
-    from .externals.meshio import Mesh
+from . import meshio
 
 __all__ = [
     "extrude_to_3d",
@@ -322,7 +321,7 @@ def create_grid(dx, dy, dz = None):
         Cartesian mesh.
     """
     points, cells = _grid_3d(dx, dy, dz) if dz else _grid_2d(dx, dy)
-    return Mesh(
+    return meshio.Mesh(
         points = points,
         cells = cells,
     )

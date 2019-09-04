@@ -7,13 +7,13 @@ License: MIT
 
 from __future__ import division, with_statement, unicode_literals
 
-import logging, time
+import logging
+import time
+
 import numpy as np
-from .__about__ import __version__ as version
-try:
-    from meshio import Mesh
-except ImportError:
-    from .externals.meshio import Mesh
+
+from .meshio import Mesh
+from ..__about__ import __version__ as version
 
 __all__ = [
     "read",
@@ -176,7 +176,7 @@ def write(filename, mesh):
         "FLAC3D requires 3D points, but 2D points given"
 
     with open(filename, "w") as f:
-        f.write("* FLAC3D grid produced by ToughMeshio v{}\n".format(version))
+        f.write("* FLAC3D grid produced by ToughIO v{}\n".format(version))
         f.write("* {}\n".format(time.ctime()))
         f.write("* GRIDPOINTS\n")
         _write_points(f, mesh.points)

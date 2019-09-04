@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
  
 from setuptools import setup, find_packages
-import toughmeshio
+import toughio
 
 
-DISTNAME = "toughmeshio"
-DESCRIPTION = "ToughMeshio"
-LONG_DESCRIPTION = "ToughMeshio"
-AUTHOR = toughmeshio.__author__
-AUTHOR_EMAIL = toughmeshio.__author_email__
-URL = toughmeshio.__website__
-LICENSE = toughmeshio.__license__
+DISTNAME = "toughio"
+DESCRIPTION = "ToughIO"
+LONG_DESCRIPTION = "ToughIO"
+AUTHOR = toughio.__author__
+AUTHOR_EMAIL = toughio.__author_email__
+URL = toughio.__website__
+LICENSE = toughio.__license__
 REQUIREMENTS = []
 EXTRA_REQUIREMENTS = {
     "all": [
@@ -46,7 +46,7 @@ if __name__ == "__main__":
         install_requires = REQUIREMENTS,
         extras_require = EXTRA_REQUIREMENTS,
         classifiers = CLASSIFIERS,
-        version = toughmeshio.__version__,
+        version = toughio.__version__,
         packages = find_packages(),
         include_package_data = True,
     )

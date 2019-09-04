@@ -8,10 +8,7 @@ License: MIT
 from . import tough_io
 from . import flac3d_io
 from . import eclipse_io
-try:
-    import meshio
-except ImportError:
-    from .externals import meshio
+from . import meshio
 
 __all__ = [
     "read",
