@@ -90,127 +90,89 @@ def extrude_to_3d(mesh, height = 1., axis = 2, inplace = False):
         return msh
 
 
-def build_connectivity(mesh, leaf_size = 40, n_jobs = 1):
+def build_connectivity(mesh):
     """
     Build mesh connectivity assuming conformity and that points and cells
-    are uniquely defined in mesh (use prune_duplicates otherwise). In 3D,
-    non-conformal meshes are handled if and only if connected cells share
-    at least 3 common points (1 quad with 2 triangle faces).
-
-    Scikit-learn BallTree algorithm is used to build cell neighborhood
-    topology following a custom distance function.
+    are uniquely defined in mesh (use prune_duplicates otherwise).
 
     Parameters
     ----------
     mesh : Mesh
         Input mesh.
-    leaf_size : int, optional, default 40
-        Number of points at which to switch to brute-force.
-    n_jobs : int, optional, default 1
-        Number of processes to create to query cell connectivity in
-        parallel (requires joblib).
 
     Note
     ----
-    Custom distance functions for BallTree are reaaaaaaally slow.
-    - https://github.com/scikit-learn/scikit-learn/issues/6256
-    - https://blog.sicara.com/fast-custom-knn-sklearn-cython-de92e5a325c
+    Only for 3D meshes.
     """
-    from sklearn.neighbors import BallTree
-    from numba import njit, int32, float64
-    from joblib import Parallel, delayed
-
-    # Custom distance function for BallTree neighboring algorithm
-    @njit(int32(float64[:], float64[:], int32), nogil = True)
-    def distance(x, y, ndim):
-        """
-        Return 0 if connected 1 otherwise given that:
-        - 2D neighboring cells have at least 2 common corner points
-        - 3D neighboring cells have at least 3 common corner points
-        Apply threshold to ignore the cell itself (all its points are in
-        common).
-        """
-        xs, ys = set(x), set(y)
-        return 0 if ndim <= len(xs.intersection(ys)) < min(len(xs), len(ys)) else 1
-    
-    # Determine if mesh is 2D or 3D
-    ndim = 2 if any([ k in mesh.cells.keys() for k in [ "triangle", "quad" ] ]) else 3
-
-    # Maximum number of connections per cell
-    ncon_max = {
-        "triangle": 3,
-        "quad": 4,
-        "tetra": 4,
-        "pyramid": 6,
-        "wedge": 8,
-        "hexahedron": 12,
+    # Reconstruct all the faces
+    _faces = {
+        "tetra": {
+            "triangle": [
+                [ 0, 1, 2 ],
+                [ 0, 1, 3 ],
+                [ 1, 2, 3 ],
+                [ 0, 2, 3 ],
+            ],
+        },
+        "pyramid": {
+            "triangle": [
+                [ 0, 1, 4 ],
+                [ 1, 2, 4 ],
+                [ 2, 3, 4 ],
+                [ 0, 3, 4 ],
+            ],
+            "quad": [
+                [ 0, 1, 2, 3 ],
+            ],
+        },
+        "wedge": {
+            "triangle": [
+                [ 0, 1, 2 ],
+                [ 3, 4, 5 ],
+            ],
+            "quad": [
+                [ 0, 1, 3, 4 ],
+                [ 1, 2, 4, 5 ],
+                [ 0, 2, 3, 5 ],
+            ],
+        },
+        "hexahedron": {
+            "quad": [
+                [ 0, 1, 2, 3 ],
+                [ 4, 5, 6, 7 ],
+                [ 0, 1, 4, 5 ],
+                [ 1, 2, 5, 6 ],
+                [ 2, 3, 6, 7 ],
+                [ 0, 3, 4, 7 ],
+            ],
+        },
     }
-    k_max = max([ ncon_max[k] for k in mesh.cells.keys() ])
 
-    # Maximum number of corner points in mesh
-    nvert = {
-        "triangle": 3,
-        "quad": 4,
-        "tetra": 4,
-        "pyramid": 5,
-        "wedge": 6,
-        "hexahedron": 8,
-    }
-    nvert_max = max([ nvert[k] for k in mesh.cells.keys() ])
+    faces = { "triangle": [], "quad": [] }
+    face_cells = { "triangle": [], "quad": [] }
+    elem_list, count = [], 0
+    for k, v in mesh.cells.items():
+        for i, vv in enumerate(v):
+            for mt, mi in _faces[k].items():
+                faces[mt] += [ vv[ii] for ii in mi ]
+                face_cells[mt] += [ count for _ in range(len(mi)) ]
+            elem_list.append(( k, i ))
+            count += 1
+    faces = { k: np.sort(v, axis = 1) for k, v in faces.items() }
 
-    # If hybrid mesh, duplicate last corner point
-    corners = np.array([
-        np.r_[corner,[ corner[-1] ] * ( nvert_max - nvert[k] )]
-        for k, v in mesh.cells.items() for corner in v
-    ])
+    # Prune duplicate faces
+    uf, tmp = {}, {}
+    for k, v in faces.items():
+        up, uf[k] = np.unique(v, axis = 0, return_inverse = True)
+        tmp[k] = [ [] for _ in range(len(up)) ]
 
-    # BallTree neighboring algorithm
-    tree = BallTree(
-        corners,
-        leaf_size = leaf_size,
-        metric = "pyfunc",
-        func = distance,
-        ndim = ndim,
-    )
+    # Make connections
+    for k, v in uf.items():
+        for i, j in enumerate(v):
+            tmp[k][j].append(face_cells[k][i])
+    conn = [ vv for v in tmp.values() for vv in v if len(vv) == 2 ]
 
-    k = min(k_max, len(corners))
-    if n_jobs and n_jobs > 1:
-        # Split corners for parallel query
-        nrow = corners.shape[0] // n_jobs
-        par_corners = corners[:n_jobs*nrow].reshape(
-            (n_jobs, nrow, corners.shape[1]),
-        ).tolist()
-        if corners[n_jobs*nrow:].size:
-            par_corners[-1].extend(corners[n_jobs*nrow:].tolist())
-
-        with Parallel(n_jobs = n_jobs) as parallel:
-            dist_idx = parallel(delayed(tree.query)(
-                    np.array(corner),
-                    k = k,
-                    dualtree = True,
-                ) for corner in par_corners
-            )
-        
-        # Reconstruct arrays from parallel results
-        dist = [ dd for d in dist_idx for dd in d[0] ]
-        idx = [ ii for i in dist_idx for ii in i[1] ]
-    else:
-        dist, idx = tree.query(
-            corners,
-            k = k,
-            dualtree = True,
-        )
-
-    # Connected cells have 0 distance values, others have 1
-    conn = [ sorted([ i for i in ma if isinstance(i, np.int32) ])
-                for ma in np.ma.array(idx, mask = dist, dtype = np.int32) ]
-    
     # Reorganize output
-    meshio_types = [ [ k ] * len(v) for k, v in mesh.cells.items() ]
-    meshio_types = [ m for mtype in meshio_types for m in mtype ]
-    meshio_index = np.concatenate(
-        [ np.arange(len(v), dtype = int) for v in mesh.cells.values() ]
-    ).tolist()
     out = {
         k: { i: { kk: [] for kk in mesh.cells.keys() }
         for i in range(len(v)) } for k, v in mesh.cells.items()
@@ -219,10 +181,13 @@ def build_connectivity(mesh, leaf_size = 40, n_jobs = 1):
         k: { i: { kk: 0 for kk in mesh.cells.keys() }
         for i in range(len(v)) } for k, v in mesh.cells.items()
     }
-    for co, mt, mi in zip(conn, meshio_types, meshio_index):
-        for c in co:
-            out[mt][mi][meshio_types[c]].append(meshio_index[c])
-            counter[mt][mi][meshio_types[c]] += 1
+    for i, j in conn:
+        i1, i2 = elem_list[i]
+        j1, j2 = elem_list[j]
+        out[i1][i2][j1].append(j2)
+        out[j1][j2][i1].append(i2)
+        counter[i1][i2][j1] += 1
+        counter[j1][j2][i1] += 1
 
     # Sanity check and tidy up
     for k, v in counter.items():

@@ -35,7 +35,7 @@ def read(filename):
     )
 
 
-def write(filename, mesh, rotation_angle, leaf_size, n_jobs):
+def write(filename, mesh, rotation_angle):
     """
     Write TOUGH MESH file.
     """
@@ -46,7 +46,7 @@ def write(filename, mesh, rotation_angle, leaf_size, n_jobs):
         _write_eleme(f, mesh, labels)
         f.write("\n")
         f.write("{}{}\n".format("CONNE", header))
-        _write_conne(f, mesh, labels, rotation_angle, leaf_size, n_jobs)
+        _write_conne(f, mesh, labels, rotation_angle)
 
 
 def _labeler(mesh):
@@ -132,11 +132,11 @@ def _translate_rocks(mesh):
         return { k: [ "    1" ]*len(v) for k, v in mesh.cells.items() }
 
 
-def _write_conne(f, mesh, labels, rotation_angle, leaf_size, n_jobs):
+def _write_conne(f, mesh, labels, rotation_angle):
     """
     Write CONNE block.
     """
-    conn = build_connectivity(mesh, leaf_size, n_jobs)
+    conn = build_connectivity(mesh)
     fmt = "{:5.5}{:5.5}{:>5}{:>5}{:>5}{:>5g}{:10.4e}{:10.4e}{:10.4e}{:10.3e}\n"
 
     # Loop over cell types

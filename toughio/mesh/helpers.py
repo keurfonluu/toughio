@@ -123,13 +123,6 @@ def write(filename, mesh, file_format = None, **kwargs):
     rotation_angle : float, optional, default 0.
         Only if ``file_format == 'tough'``. Angle to rotate cell
         connection line for calculation of angle with gravity force.
-    leaf_size : int, optional, default 40
-        Only if ``file_format == 'tough'``. Number of points at which to
-        switch to brute-force to reconstruct cell neighborhood topology
-        when building mesh connectivity.
-    n_jobs : int, optional, default 1
-        Only if ``file_format == 'tough'``. Number of processes to create
-        to query cell connectivity in parallel (requires ``joblib``).
 
     Note
     ----
@@ -147,8 +140,6 @@ def write(filename, mesh, file_format = None, **kwargs):
             tough_io, (),
             {
                 "rotation_angle": 0.,
-                "leaf_size": 40,
-                "n_jobs": 1,
             },
         ),
         "flac3d": ( flac3d_io, (), {} ),
