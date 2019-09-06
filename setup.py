@@ -15,13 +15,7 @@ REQUIREMENTS = []
 EXTRA_REQUIREMENTS = {
     "all": [
         "meshio",
-        "sklearn",
-        "numba",
-        "joblib",
     ],
-    "meshio": [
-        "meshio",
-    ]
 }
 CLASSIFIERS = [
     "Programming Language :: Python",
