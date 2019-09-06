@@ -43,8 +43,16 @@ def write(filename = "INFILE"):
     if Parameters["flac"]:
         out += _write_flac(Parameters)
     out += _write_multi(Parameters)
+    if Parameters["eos"] in { "eco2n", "eco2n_v2", "eco2m" }:
+        out += _write_selec(Parameters)
     out += _write_start()
     out += _write_param(Parameters)
+    if Parameters["times"]:
+        out += _write_times(Parameters)
+    out += _write_gener(Parameters)
+    if Parameters["nover"]:
+        out += _write_nover()
+    out += _write_endcy()
     return out
 
 
@@ -66,6 +74,16 @@ def _write_record(data):
     Return a list with a single string.
     """
     return [ "{:80}\n".format("".join(data)) ]
+
+
+def _write_multi_record(data, ncol = 8):
+    """
+    Return a list with multiple strings.
+    """
+    n = len(data)
+    rec = [ data[ncol*i:min(ncol*i+ncol, n)]
+            for i in range(int(np.ceil(n/ncol))) ]
+    return [ _write_record(r)[0] for r in rec ]
 
 
 def _add_record(data, id_fmt = "{:>5g}     "):
@@ -163,6 +181,31 @@ def _write_multi(Parameters):
     return [ ("{:>5d}"*4 + "\n").format(*out) ]
 
 
+@block("SELEC", multi = False)
+def _write_selec(Parameters):
+    """
+    Block SELEC.
+    """
+    out = []
+
+    # Load data
+    data = Parameters["selections"]
+
+    # Record 1
+    out += _write_record(_format_data([
+        ( v, "{:>5}" ) for v in data.values()
+    ]))
+
+    # Record 2
+    data = Parameters["extra_selections"]
+    if data:
+        n = len(data)
+        out += _write_multi_record(_format_data([
+            ( i, "{:>10.3e}" ) for i in data
+        ]))
+    return out
+
+
 @block("START", multi = False)
 def _write_start():
     """
@@ -181,11 +224,14 @@ def _write_param(Parameters):
     out = []
 
     # Load data
-    data = Parameters["options"]
+    from .common import options
+    data = default.copy()
+    data.update(Parameters["options"])
 
     # Record 1
-    mop = _format_data([ ( data["MOP"][k], "{:>1g}" )
-                            for k in sorted(data["MOP"].keys()) ])
+    _mop = Parameters["extra_options"]
+    mop = _format_data([ ( _mop[k], "{:>1g}" )
+                            for k in sorted(_mop.keys()) ])
     out += _write_record(_format_data([
         ( data["n_iteration"], "{:>2g}" ),
         ( data["verbosity"], "{:>2g}" ),
@@ -226,3 +272,65 @@ def _write_param(Parameters):
         ( i, "{:>20.4e}" ) for i in data["incon"][:min(n, 4)]
     ]))
     return out
+
+
+@block("TIMES", multi = False)
+def  _write_times(Parameters):
+    """
+    Block TIMES.
+    """
+    data = Parameters["times"]
+    n = len(data)
+    out = _write_record(_format_data([
+        ( n, "{:>5g}" ),
+    ]))
+    out += _write_multi_record(_format_data([
+        ( i, "{:>10.4e}" ) for i in data
+    ]))
+    return out
+
+
+@block("GENER", multi = True)
+def _write_gener(Parameters):
+    """
+    Block GENER.
+    """
+    from .common import generators
+
+    out = []
+    for k, v in Parameters["generators"].items():    
+        # Load data
+        data = generators.copy()
+        data.update(v)
+
+        # Record 1
+        out += _write_record(_format_data([
+            ( k, "{:5.5}" ),
+            ( None, "{:>5g}" ),
+            ( None, "{:>5g}" ),
+            ( None, "{:>5g}" ),
+            ( None, "{:>5g}" ),
+            ( None, "{:>5g}" ),
+            ( None, "{:>5g}" ),
+            ( data["type"], "{:4g} " ),
+            ( data["rate"], "{:>10.3e}" ),
+            ( data["specific_enthalpy"], "{:>10.3e}" ),
+            ( data["layer_thickness"], "{:>10.3e}" ),
+        ]))
+    return out
+
+
+@block("NOVER", multi = False)
+def _write_nover():
+    """
+    Block NOVER.
+    """
+    return []
+
+
+@block("ENDCY", multi = False)
+def _write_endcy():
+    """
+    Block ENDCY.
+    """
+    return []

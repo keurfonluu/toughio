@@ -10,6 +10,8 @@ from functools import wraps
 
 __all__ = [
     "Parameters",
+    "options",
+    "generators",
     "default",
     "eos",
     "header",
@@ -24,13 +26,14 @@ _mop = { k+1: v for k, v in enumerate([
     None, None, None, None, 3, None, None, None, 
 ]) }
 
+_select = { k+1: None for k in range(16) }
+
 _options = {
     "n_iteration": None,
     "n_cycle": None,
     "n_second": None,
     "n_cycle_print": None,
     "verbosity": None,
-    "MOP": dict(_mop),
     "temperature_dependance_gas": None,
     "effective_strength_vapor": None,
     "t_ini": None,
@@ -55,16 +58,29 @@ _Parameters = {
     "isothermal": False,
     "nover": False,
     "rocks": {},
-    "options": dict(_options),
+    "options": {},
+    "extra_options": dict(_mop),
+    "selections": dict(_select),
+    "extra_selections": None,
     "solver": None,
+    "generators": {},
     "times": None,
-    "foft": None,
-    "coft": None,
-    "goft": None,
+    "element_history": None,
+    "connection_history": None,
+    "generator_history": None,
     "default": {},
 }
 
+options = dict(_options)
+
 Parameters = dict(_Parameters)
+
+generators = {
+    "type": None,
+    "rate": None,
+    "specific_enthalpy": None,
+    "layer_thickness": None,
+}
 
 default = {
     "density": None,
@@ -123,7 +139,8 @@ def new():
     Parameters.update(_Parameters)
     Parameters["rocks"] = {}
     Parameters["options"].update(_options)
-    Parameters["options"]["MOP"].update(_mop)
+    Parameters["extra_options"].update(_mop)
+    Parameters["selections"].update(_select)
 
 
 def block(keyword, multi = False):
