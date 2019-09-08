@@ -27,7 +27,13 @@ def write(filename = "INFILE"):
         Output file name.
     """
     assert isinstance(filename, str)
+    
+    with open(filename, "w") as f:
+        for record in write_buffer():
+            f.write(record)
 
+
+def write_buffer():
     # Import current parameter settings
     from .common import Parameters, eos
 
