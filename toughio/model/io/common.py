@@ -48,7 +48,7 @@ _options = {
     "w_upstream": None,
     "w_newton": None,
     "derivative_factor": None,
-    "incon": [ None ] * 4,
+    "incon": [ None for _ in range(4) ],
 }
 
 _Parameters = {
