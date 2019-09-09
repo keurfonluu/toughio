@@ -211,7 +211,6 @@ def _write_selec(Parameters):
     # Record 2
     data = Parameters["extra_selections"]
     if data:
-        n = len(data)
         out += _write_multi_record(_format_data([
             ( i, "{:>10.3e}" ) for i in data
         ]))
