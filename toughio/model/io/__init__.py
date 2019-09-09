@@ -8,6 +8,7 @@ License: MIT
 from .common import (
     Parameters,
     new,
+    set_parameters,
 )
 from .write import (
     to_file,
@@ -17,6 +18,7 @@ from .write import (
 __all__ = [
     "Parameters",
     "new",
+    "set_parameters",
     "to_file",
     "to_json",
 ]

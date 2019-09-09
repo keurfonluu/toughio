@@ -8,6 +8,7 @@ License: MIT
 from .io import (
     Parameters,
     new,
+    set_parameters,
     to_file,
     to_json
 )
@@ -15,6 +16,7 @@ from .io import (
 __all__ = [
     "Parameters",
     "new",
+    "set_parameters",
     "to_file",
     "to_json",
 ]
