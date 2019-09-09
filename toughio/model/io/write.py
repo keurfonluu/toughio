@@ -51,6 +51,8 @@ def write_buffer():
     out += _write_multi(Parameters)
     if Parameters["eos"] in { "eco2n", "eco2n_v2", "eco2m" }:
         out += _write_selec(Parameters)
+    if Parameters["solver"]:
+        out += _write_solvr(Parameters)
     out += _write_start()
     out += _write_param(Parameters)
     if Parameters["times"]:
@@ -113,7 +115,8 @@ def _write_rocks(Parameters):
     """
     TOUGH input ROCKS block data.
     
-    Introduces material parameters for up to 27 different reservoir domains.
+    Introduces material parameters for up to 27 different reservoir
+    domains.
     """
     out = []
     for k, v in Parameters["rocks"].items():
@@ -191,11 +194,11 @@ def _write_multi(Parameters):
     """
     TOUGH input MULTI block (optional).
 
-    Permits the user to select the number and nature of balance equations that
-    will be solved. The keyword MULTI is followed by a single data record. For
-    most EOS modules, this data block is not needed, as default values are
-    provided internally. Available parameter choices are different for
-    different EOS modules.
+    Permits the user to select the number and nature of balance equations
+    that will be solved. The keyword MULTI is followed by a single data
+    record. For most EOS modules, this data block is not needed, as
+    default values are provided internally. Available parameter choices
+    are different for different EOS modules.
     """
     from .common import eos
     out = eos[Parameters["eos"]].copy()
@@ -208,9 +211,9 @@ def _write_selec(Parameters):
     """
     TOUGH input SELEC block (optional).
 
-    Introduces a number of integer and floating point parameters that are used
-    for different purposes in different TOUGH modules (EOS7, EOS7R, EWASG,
-    T2DM, ECO2N).
+    Introduces a number of integer and floating point parameters that are
+    used for different purposes in different TOUGH modules (EOS7, EOS7R,
+    EWASG, T2DM, ECO2N).
     """
     out = []
 
@@ -231,15 +234,35 @@ def _write_selec(Parameters):
     return out
 
 
+@block("SOLVR", multi = False)
+def _write_solvr(Parameters):
+    """
+    TOUGH input SOLVR block (optional).
+
+    Introduces computation parameters, time stepping information, and
+    default initial conditions.
+    """
+    from .common import solver
+    data = solver.copy()
+    data.update(Parameters["solver"])
+    return _write_record(_format_data([
+        ( data["method"], "{:1g}  " ),
+        ( data["z_precond"], "{:>2g}   " ),
+        ( data["o_precond"], "{:>2g}" ),
+        ( data["rel_iter_max"], "{:>10.4e}" ),
+        ( data["eps"], "{:>10.4e}" ),
+    ]))
+
+
 @block("START", multi = False)
 def _write_start():
     """
     TOUGH input START block (optional).
 
     A record with START typed in columns 1-5 allows a more flexible
-    initialization. More specifically, when START is present, INCON data can
-    be in arbitrary order, and need not be present for all grid blocks (in
-    which case defaults will be used). Without START, there must be a
+    initialization. More specifically, when START is present, INCON data
+    can be in arbitrary order, and need not be present for all grid blocks 
+    (in which case defaults will be used). Without START, there must be a
     one-to-one correspondence between the data in blocks ELEME and INCON.
     """
     from .common import header
@@ -252,8 +275,8 @@ def _write_param(Parameters):
     """
     TOUGH input PARAM block data.
     
-    Introduces computation parameters, time stepping information, and default
-    initial conditions.
+    Introduces computation parameters, time stepping information, and
+    default initial conditions.
     """
     out = []
 
@@ -331,9 +354,9 @@ def _write_foft(Parameters):
     """
     TOUGH input FOFT block data (optional).
     
-    Introduces a list of elements (grid blocks) for which time-dependent data
-    are to be written out for plotting to a file called FOFT during the
-    simulation.
+    Introduces a list of elements (grid blocks) for which time-dependent
+    data are to be written out for plotting to a file called FOFT during
+    the simulation.
     """
     return _write_record(_format_data([
         ( i, "{:>5g}" ) for i in Parameters["element_history"]
@@ -345,8 +368,9 @@ def _write_coft(Parameters):
     """
     TOUGH input COFT block data (optional).
     
-    Introduces a list of connections for which time-dependent data are to be
-    written out for plotting to a file called COFT during the simulation.
+    Introduces a list of connections for which time-dependent data are to
+    be written out for plotting to a file called COFT during the
+    simulation.
     """
     return _write_record(_format_data([
         ( i, "{:>5g}" ) for i in Parameters["connection_history"]
@@ -358,8 +382,9 @@ def _write_goft(Parameters):
     """
     TOUGH input GOFT block data (optional).
     
-    Introduces a list of sinks/sources for which time-dependent data are to be
-    written out for plotting to a file called GOFT during the simulation.
+    Introduces a list of sinks/sources for which time-dependent data are
+    to be written out for plotting to a file called GOFT during the
+    simulation.
     """
     return _write_record(_format_data([
         ( i, "{:>5g}" ) for i in Parameters["generator_history"]

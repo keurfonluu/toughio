@@ -11,6 +11,7 @@ from functools import wraps
 __all__ = [
     "Parameters",
     "options",
+    "solver",
     "generators",
     "default",
     "eos",
@@ -62,7 +63,7 @@ _Parameters = {
     "extra_options": dict(_mop),
     "selections": dict(_select),
     "extra_selections": None,
-    "solver": None,
+    "solver": {},
     "generators": {},
     "times": None,
     "element_history": None,
@@ -74,6 +75,14 @@ _Parameters = {
 options = dict(_options)
 
 Parameters = dict(_Parameters)
+
+solver = {
+    "method": 3,
+    "z_precond": "Z0",
+    "o_precond": "O0",
+    "rel_iter_max": 0.1,
+    "eps": 1.e-6,
+}
 
 generators = {
     "type": None,
