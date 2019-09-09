@@ -9,10 +9,14 @@ from .common import (
     Parameters,
     new,
 )
-from .write import write
+from .write import (
+    to_file,
+    to_json,
+)
 
 __all__ = [
     "Parameters",
     "new",
-    "write",
+    "to_file",
+    "to_json",
 ]
