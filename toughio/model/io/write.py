@@ -5,6 +5,8 @@ Author: Keurfon Luu <keurfonluu@lbl.gov>
 License: MIT
 """
 
+from __future__ import division
+
 import json
 import numpy as np
 
@@ -348,7 +350,7 @@ def _write_param(Parameters):
     return out
 
 
-@block("TIMES", multi = False)
+@block("TIMES", multi = True)
 def  _write_times(Parameters):
     """
     TOUGH input TIMES block data (optional).
@@ -448,7 +450,7 @@ def _write_nover():
     return []
 
 
-@block("ENDCY", multi = False)
+@block("ENDCY", multi = False, noend = True)
 def _write_endcy():
     """
     TOUGH input ENDCY block data (optional).
