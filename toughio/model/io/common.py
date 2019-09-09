@@ -28,6 +28,8 @@ __all__ = [
 _Parameters = {
     "title": "",
     "eos": "",
+    "n_component": None,
+    "n_phase": None,
     "flac": False,
     "isothermal": False,
     "start": True,
@@ -128,22 +130,24 @@ default = {
 }
 
 eos = {
-    "eos1": [],
-    "eos2": [],
-    "eos3": [],
-    "eos4": [],
-    "eos5": [],
-    "eos7": [],
-    "eos8": [],
-    "eos9": [],
-    "eosmvoc": [],
-    "eoswasg": [],
+    "eos1": [ 1, 2, 2, 6 ],
+    "eos2": [ 2, 3, 2, 6 ],
+    "eos3": [ 2, 3, 2, 6 ],
+    "eos4": [ 2, 3, 2, 6 ],
+    "eos5": [ 2, 3, 2, 6 ],
+    "eos7": [ 3, 3, 2, 6 ],
+    "eos8": [ 3, 3, 3, 6 ],
+    "eos9": [ 1, 1, 1, 6 ],
+    "eoswasg": [ 3, 4, 3, 6 ],
     "eco2n": [ 3, 4, 3, 6 ],
     "eco2n_v2": [ 3, 4, 3, 6 ],
-    "eco2m": [ 3, 4, 3, 6 ],
+    "eco2m": [ 3, 4, 4, 6 ],
 }
 
 eos_select = {
+    "eos7",
+    "eos8",
+    "eoswasg",
     "eco2n",
     "eco2n_v2",
     "eco2m",

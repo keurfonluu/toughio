@@ -229,8 +229,10 @@ def _write_multi(Parameters):
     """
     from .common import eos
     out = list(eos[Parameters["eos"]])
-    out[1] -= 1 if Parameters["isothermal"] else 0
-    return [ ("{:>5d}"*4 + "\n").format(*out) ]
+    out[0] = Parameters["n_component"] if Parameters["n_component"] else out[0]
+    out[1] = out[0] if Parameters["isothermal"] else out[0]+1
+    out[2] = Parameters["n_phase"] if Parameters["n_phase"] else out[2]
+    return [ ("{:>5d}"*len(out) + "\n").format(*out) ]
 
 
 @block("SELEC")
