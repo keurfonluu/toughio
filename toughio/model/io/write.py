@@ -55,6 +55,12 @@ def write_buffer():
     out += _write_param(Parameters)
     if Parameters["times"]:
         out += _write_times(Parameters)
+    if Parameters["element_history"]:
+        out += _write_foft(Parameters)
+    if Parameters["connection_history"]:
+        out += _write_coft(Parameters)
+    if Parameters["generator_history"]:
+        out += _write_goft(Parameters)
     out += _write_gener(Parameters)
     if Parameters["nover"]:
         out += _write_nover()
@@ -294,6 +300,36 @@ def  _write_times(Parameters):
         ( i, "{:>10.4e}" ) for i in data
     ]))
     return out
+
+
+@block("FOFT ", multi = True)
+def _write_foft(Parameters):
+    """
+    Block FOFT.
+    """
+    return _write_record(_format_data([
+        ( i, "{:>5g}" ) for i in Parameters["element_history"]
+    ]))
+
+
+@block("COFT ", multi = True)
+def _write_coft(Parameters):
+    """
+    Block COFT.
+    """
+    return _write_record(_format_data([
+        ( i, "{:>5g}" ) for i in Parameters["connection_history"]
+    ]))
+
+
+@block("GOFT ", multi = True)
+def _write_goft(Parameters):
+    """
+    Block GOFT.
+    """
+    return _write_record(_format_data([
+        ( i, "{:>5g}" ) for i in Parameters["generator_history"]
+    ]))
 
 
 @block("GENER", multi = True)
