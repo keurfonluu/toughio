@@ -141,12 +141,18 @@ def _write_rocks(Parameters):
     Introduces material parameters for up to 27 different reservoir
     domains.
     """
+    # Reorder rocks
+    if Parameters["rocks_order"]:
+        order = Parameters["rocks_order"]
+    else:
+        order = Parameters["rocks"].keys()
+
     out = []
-    for k, v in Parameters["rocks"].items():
+    for k in order:
         # Load data
         data = default.copy()
         data.update(Parameters["default"])
-        data.update(v)
+        data.update(Parameters["rocks"][k])
 
         # Number of additional lines to write per rock
         nad = 0
@@ -197,12 +203,18 @@ def _write_flac(Parameters):
 
     Introduces mechanical parameters for each material in ROCKS block data.
     """
+    # Reorder rocks
+    if Parameters["rocks_order"]:
+        order = Parameters["rocks_order"]
+    else:
+        order = Parameters["rocks"].keys()
+    
     out = [ "\n" ]
-    for v in Parameters["rocks"].values():
+    for k in order:
         # Load data
         data = default.copy()
         data.update(Parameters["default"])
-        data.update(v)
+        data.update(Parameters["rocks"][k])
 
         # Permeability law
         out += _add_record(data["permeability_law"], "{:>10g}")

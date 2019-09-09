@@ -59,6 +59,7 @@ _Parameters = {
     "isothermal": False,
     "nover": False,
     "rocks": {},
+    "rocks_order": None,
     "options": {},
     "extra_options": dict(_mop),
     "selections": dict(_select),
