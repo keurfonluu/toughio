@@ -5,6 +5,7 @@ Author: Keurfon Luu <keurfonluu@lbl.gov>
 License: MIT
 """
 
+import json
 import numpy as np
 
 from .common import (
@@ -13,11 +14,12 @@ from .common import (
 )
 
 __all__ = [
-    "write",
+    "to_file",
+    "to_json",
 ]
 
 
-def write(filename = "INFILE"):
+def to_file(filename = "INFILE"):
     """
     Write TOUGH input file.
 
@@ -30,6 +32,23 @@ def write(filename = "INFILE"):
     with open(filename, "w") as f:
         for record in write_buffer():
             f.write(record)
+
+
+def to_json(filename = "INFILE.json"):
+    """
+    Export TOUGH input file to json format.
+
+    Parameters
+    ----------
+    filename : str, optional, default 'INFILE.json'
+        Output file name.
+    """
+    assert isinstance(filename, str)
+
+    # Dump dict to json
+    from .common import Parameters
+    with open(filename, "w") as f:
+        json.dump(Parameters, f, indent = 4)
 
 
 def write_buffer():

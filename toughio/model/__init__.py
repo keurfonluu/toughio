@@ -8,11 +8,13 @@ License: MIT
 from .io import (
     Parameters,
     new,
-    write,
+    to_file,
+    to_json
 )
 
 __all__ = [
     "Parameters",
     "new",
-    "write",
+    "to_file",
+    "to_json",
 ]
