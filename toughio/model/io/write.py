@@ -111,7 +111,9 @@ def _add_record(data, id_fmt = "{:>5g}     "):
 @block("ROCKS", multi = True)
 def _write_rocks(Parameters):
     """
-    Block ROCKS.
+    TOUGH input ROCKS block data.
+    
+    Introduces material parameters for up to 27 different reservoir domains.
     """
     out = []
     for k, v in Parameters["rocks"].items():
@@ -165,7 +167,9 @@ def _write_rocks(Parameters):
 @block("FLAC", multi = True)
 def _write_flac(Parameters):
     """
-    Block FLAC.
+    TOUGH input FLAC block data (optional).
+
+    Introduces mechanical parameters for each material in ROCKS block data.
     """
     out = [ "\n" ]
     for v in Parameters["rocks"].values():
@@ -185,7 +189,13 @@ def _write_flac(Parameters):
 @block("MULTI", multi = False)
 def _write_multi(Parameters):
     """
-    Block MULTI.
+    TOUGH input MULTI block (optional).
+
+    Permits the user to select the number and nature of balance equations that
+    will be solved. The keyword MULTI is followed by a single data record. For
+    most EOS modules, this data block is not needed, as default values are
+    provided internally. Available parameter choices are different for
+    different EOS modules.
     """
     from .common import eos
     out = eos[Parameters["eos"]].copy()
@@ -196,7 +206,11 @@ def _write_multi(Parameters):
 @block("SELEC", multi = False)
 def _write_selec(Parameters):
     """
-    Block SELEC.
+    TOUGH input SELEC block (optional).
+
+    Introduces a number of integer and floating point parameters that are used
+    for different purposes in different TOUGH modules (EOS7, EOS7R, EWASG,
+    T2DM, ECO2N).
     """
     out = []
 
@@ -220,7 +234,13 @@ def _write_selec(Parameters):
 @block("START", multi = False)
 def _write_start():
     """
-    Block START.
+    TOUGH input START block (optional).
+
+    A record with START typed in columns 1-5 allows a more flexible
+    initialization. More specifically, when START is present, INCON data can
+    be in arbitrary order, and need not be present for all grid blocks (in
+    which case defaults will be used). Without START, there must be a
+    one-to-one correspondence between the data in blocks ELEME and INCON.
     """
     from .common import header
     out = "{:5}{}\n".format("----*", header)
@@ -230,7 +250,10 @@ def _write_start():
 @block("PARAM", multi = False)
 def _write_param(Parameters):
     """
-    Block PARAM.
+    TOUGH input PARAM block data.
+    
+    Introduces computation parameters, time stepping information, and default
+    initial conditions.
     """
     out = []
 
@@ -288,7 +311,9 @@ def _write_param(Parameters):
 @block("TIMES", multi = False)
 def  _write_times(Parameters):
     """
-    Block TIMES.
+    TOUGH input TIMES block data (optional).
+    
+    Permits the user to obtain printout at specified times.
     """
     data = Parameters["times"]
     n = len(data)
@@ -304,7 +329,11 @@ def  _write_times(Parameters):
 @block("FOFT ", multi = True)
 def _write_foft(Parameters):
     """
-    Block FOFT.
+    TOUGH input FOFT block data (optional).
+    
+    Introduces a list of elements (grid blocks) for which time-dependent data
+    are to be written out for plotting to a file called FOFT during the
+    simulation.
     """
     return _write_record(_format_data([
         ( i, "{:>5g}" ) for i in Parameters["element_history"]
@@ -314,7 +343,10 @@ def _write_foft(Parameters):
 @block("COFT ", multi = True)
 def _write_coft(Parameters):
     """
-    Block COFT.
+    TOUGH input COFT block data (optional).
+    
+    Introduces a list of connections for which time-dependent data are to be
+    written out for plotting to a file called COFT during the simulation.
     """
     return _write_record(_format_data([
         ( i, "{:>5g}" ) for i in Parameters["connection_history"]
@@ -324,7 +356,10 @@ def _write_coft(Parameters):
 @block("GOFT ", multi = True)
 def _write_goft(Parameters):
     """
-    Block GOFT.
+    TOUGH input GOFT block data (optional).
+    
+    Introduces a list of sinks/sources for which time-dependent data are to be
+    written out for plotting to a file called GOFT during the simulation.
     """
     return _write_record(_format_data([
         ( i, "{:>5g}" ) for i in Parameters["generator_history"]
@@ -334,7 +369,9 @@ def _write_goft(Parameters):
 @block("GENER", multi = True)
 def _write_gener(Parameters):
     """
-    Block GENER.
+    TOUGH input GENER block data (optional).
+    
+    Introduces sinks and/or sources.
     """
     from .common import generators
 
@@ -364,7 +401,7 @@ def _write_gener(Parameters):
 @block("NOVER", multi = False)
 def _write_nover():
     """
-    Block NOVER.
+    TOUGH input NOVER block data (optional).
     """
     return []
 
@@ -372,6 +409,6 @@ def _write_nover():
 @block("ENDCY", multi = False)
 def _write_endcy():
     """
-    Block ENDCY.
+    TOUGH input ENDCY block data (optional).
     """
     return []
