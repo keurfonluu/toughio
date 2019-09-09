@@ -10,26 +10,49 @@ from functools import wraps
 
 __all__ = [
     "Parameters",
+    "select",
     "options",
+    "extra_options",
     "solver",
     "generators",
     "default",
     "eos",
+    "eos_select",
     "header",
     "new",
+    "set_parameters",
     "block",
 ]
 
 
-_mop = { k+1: v for k, v in enumerate([
-    None, 0, 0, 0, None, 0, 2, None,
-    0, 0, 0, 0, 0, None, None, 4,
-    None, None, None, None, 3, None, None, None, 
-]) }
+_Parameters = {
+    "title": "",
+    "eos": "",
+    "flac": False,
+    "isothermal": False,
+    "start": True,
+    "nover": False,
+    "endfi": False,
+    "rocks": {},
+    "rocks_order": [],
+    "options": {},
+    "extra_options": {},
+    "selections": {},
+    "extra_selections": [],
+    "solver": {},
+    "generators": {},
+    "times": [],
+    "element_history": [],
+    "connection_history": [],
+    "generator_history": [],
+    "default": {},
+}
 
-_select = { k+1: None for k in range(16) }
+Parameters = dict(_Parameters)
 
-_options = {
+select = { k+1: None for k in range(16) }
+
+options = {
     "n_iteration": None,
     "n_cycle": None,
     "n_second": None,
@@ -52,30 +75,11 @@ _options = {
     "incon": [ None for _ in range(4) ],
 }
 
-_Parameters = {
-    "title": "",
-    "eos": "",
-    "flac": False,
-    "isothermal": False,
-    "nover": False,
-    "rocks": {},
-    "rocks_order": None,
-    "options": {},
-    "extra_options": dict(_mop),
-    "selections": dict(_select),
-    "extra_selections": None,
-    "solver": {},
-    "generators": {},
-    "times": None,
-    "element_history": None,
-    "connection_history": None,
-    "generator_history": None,
-    "default": {},
-}
-
-options = dict(_options)
-
-Parameters = dict(_Parameters)
+extra_options = { k+1: v for k, v in enumerate([
+    None, 0, 0, 0, None, 0, 2, None,
+    0, 0, 0, 0, 0, None, None, 4,
+    None, None, None, None, 3, None, None, None, 
+]) }
 
 solver = {
     "method": 3,
@@ -139,6 +143,12 @@ eos = {
     "eco2m": [ 3, 4, 3, 6 ],
 }
 
+eos_select = {
+    "eco2n",
+    "eco2n_v2",
+    "eco2m",
+}
+
 header = "----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8"
 
 
@@ -147,10 +157,20 @@ def new():
     Reset parameter values to default.
     """
     Parameters.update(_Parameters)
-    Parameters["rocks"] = {}
-    Parameters["options"].update(_options)
-    Parameters["extra_options"].update(_mop)
-    Parameters["selections"].update(_select)
+
+
+def set_parameters(parameters):
+    """
+    Set parameter values.
+
+    Parameters
+    ----------
+    parameters : dict
+        Input parameter values.
+    """
+    assert isinstance(parameters, dict)
+    Parameters.update(_Parameters)
+    Parameters.update(parameters)
 
 
 def block(keyword, multi = False, noend = False):

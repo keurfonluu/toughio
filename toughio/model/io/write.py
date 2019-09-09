@@ -55,13 +55,13 @@ def to_json(filename = "INFILE.json"):
 
 def write_buffer():
     """
-    Write TOUGH input file content as a list of 80-character long record strings.
+    Write TOUGH input file as a list of 80-character long record strings.
     """
     # Import current parameter settings
-    from .common import Parameters, eos
+    from .common import Parameters, eos, eos_select
 
     # Check that EOS is defined (for block MULTI)
-    if Parameters["eos"] not in eos.keys():
+    if Parameters["isothermal"] and Parameters["eos"] not in eos.keys():
         raise ValueError(
             "EOS '{}' is unknown or not supported.".format(Parameters["eos"])
         )
@@ -69,27 +69,19 @@ def write_buffer():
     # Define input file contents
     out = [ "* {:78}\n".format(Parameters["title"]) ]
     out += _write_rocks(Parameters)
-    if Parameters["flac"]:
-        out += _write_flac(Parameters)
-    out += _write_multi(Parameters)
-    if Parameters["eos"] in { "eco2n", "eco2n_v2", "eco2m" }:
-        out += _write_selec(Parameters)
-    if Parameters["solver"]:
-        out += _write_solvr(Parameters)
-    out += _write_start()
+    out += _write_flac(Parameters) if Parameters["flac"] else []
+    out += _write_multi(Parameters) if Parameters["eos"] else []
+    out += _write_selec(Parameters) if Parameters["eos"] in eos_select else []
+    out += _write_solvr(Parameters) if Parameters["solver"] else []
+    out += _write_start() if Parameters["start"] else []
     out += _write_param(Parameters)
-    if Parameters["times"]:
-        out += _write_times(Parameters)
-    if Parameters["element_history"]:
-        out += _write_foft(Parameters)
-    if Parameters["connection_history"]:
-        out += _write_coft(Parameters)
-    if Parameters["generator_history"]:
-        out += _write_goft(Parameters)
-    out += _write_gener(Parameters)
-    if Parameters["nover"]:
-        out += _write_nover()
-    out += _write_endcy()
+    out += _write_times(Parameters) if Parameters["times"] else []
+    out += _write_foft(Parameters) if Parameters["element_history"] else []
+    out += _write_coft(Parameters) if Parameters["connection_history"] else []
+    out += _write_goft(Parameters) if Parameters["generator_history"] else []
+    out += _write_gener(Parameters) if Parameters["generators"] else []
+    out += _write_nover() if Parameters["nover"] else []
+    out += _write_endfi() if Parameters["endfi"] else _write_endcy()
     return out
 
 
@@ -224,7 +216,7 @@ def _write_flac(Parameters):
     return out
 
 
-@block("MULTI", multi = False)
+@block("MULTI")
 def _write_multi(Parameters):
     """
     TOUGH input MULTI block (optional).
@@ -241,7 +233,7 @@ def _write_multi(Parameters):
     return [ ("{:>5d}"*4 + "\n").format(*out) ]
 
 
-@block("SELEC", multi = False)
+@block("SELEC")
 def _write_selec(Parameters):
     """
     TOUGH input SELEC block (optional).
@@ -251,7 +243,9 @@ def _write_selec(Parameters):
     EWASG, T2DM, ECO2N).
     """
     # Load data
-    data = Parameters["selections"]
+    from .common import select
+    data = select.copy()
+    data.update(Parameters["selections"])
 
     # Record 1
     out = _write_record(_format_data([
@@ -266,7 +260,7 @@ def _write_selec(Parameters):
     return out
 
 
-@block("SOLVR", multi = False)
+@block("SOLVR")
 def _write_solvr(Parameters):
     """
     TOUGH input SOLVR block (optional).
@@ -286,7 +280,7 @@ def _write_solvr(Parameters):
     ]))
 
 
-@block("START", multi = False)
+@block("START")
 def _write_start():
     """
     TOUGH input START block (optional).
@@ -302,7 +296,7 @@ def _write_start():
     return [ out[:11] + "MOP: 123456789*123456789*1234" + out[40:] ]
 
 
-@block("PARAM", multi = False)
+@block("PARAM")
 def _write_param(Parameters):
     """
     TOUGH input PARAM block data.
@@ -310,14 +304,15 @@ def _write_param(Parameters):
     Introduces computation parameters, time stepping information, and
     default initial conditions.
     """
-    from .common import options
-
     # Load data
+    from .common import options
     data = options.copy()
     data.update(Parameters["options"])
 
     # Record 1
-    _mop = Parameters["extra_options"]
+    from .common import extra_options
+    _mop = extra_options.copy()
+    _mop.update(Parameters["extra_options"])
     mop = _format_data([ ( _mop[k], "{:>1g}" )
                             for k in sorted(_mop.keys()) ])
     out = _write_record(_format_data([
@@ -454,7 +449,7 @@ def _write_gener(Parameters):
     return out
 
 
-@block("NOVER", multi = False)
+@block("NOVER")
 def _write_nover():
     """
     TOUGH input NOVER block data (optional).
@@ -462,7 +457,15 @@ def _write_nover():
     return []
 
 
-@block("ENDCY", multi = False, noend = True)
+@block("ENDFI", noend = True)
+def _write_endfi():
+    """
+    TOUGH input ENDFI block data (optional).
+    """
+    return []
+
+
+@block("ENDCY", noend = True)
 def _write_endcy():
     """
     TOUGH input ENDCY block data (optional).
