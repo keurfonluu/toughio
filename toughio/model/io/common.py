@@ -152,14 +152,15 @@ def new():
     Parameters["selections"].update(_select)
 
 
-def block(keyword, multi = False):
+def block(keyword, multi = False, noend = False):
     """
     Decorator for block writing functions.
     """
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            out = [ "{:5}{}\n".format(keyword, header) ]
+            head_fmt = "{:5}{}" if noend else "{:5}{}\n"
+            out = [ head_fmt.format(keyword, header) ]
             out += func(*args, **kwargs)
             out += [ "\n" ] if multi else []
             return out
