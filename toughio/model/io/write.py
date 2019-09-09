@@ -371,7 +371,7 @@ def _write_coft(Parameters):
     simulation.
     """
     return _write_record(_format_data([
-        ( i, "{:>5g}" ) for i in Parameters["connection_history"]
+        ( i, "{:>10g}" ) for i in Parameters["connection_history"]
     ]))
 
 
