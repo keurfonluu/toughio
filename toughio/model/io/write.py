@@ -203,7 +203,7 @@ def _write_multi(Parameters):
     are different for different EOS modules.
     """
     from .common import eos
-    out = eos[Parameters["eos"]].copy()
+    out = list(eos[Parameters["eos"]])
     out[1] -= 1 if Parameters["isothermal"] else 0
     return [ ("{:>5d}"*4 + "\n").format(*out) ]
 
@@ -280,7 +280,7 @@ def _write_param(Parameters):
     from .common import options
 
     # Load data
-    data = default.copy()
+    data = options.copy()
     data.update(Parameters["options"])
 
     # Record 1
