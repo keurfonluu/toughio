@@ -27,13 +27,15 @@ def write(filename = "INFILE"):
         Output file name.
     """
     assert isinstance(filename, str)
-    
     with open(filename, "w") as f:
         for record in write_buffer():
             f.write(record)
 
 
 def write_buffer():
+    """
+    Write TOUGH input file content as a list of 80-character long record strings.
+    """
     # Import current parameter settings
     from .common import Parameters, eos
 
@@ -121,17 +123,17 @@ def _write_rocks(Parameters):
     out = []
     for k, v in Parameters["rocks"].items():
         # Load data
-        tmp = default.copy()
-        tmp.update(Parameters["default"])
-        tmp.update(v)
+        data = default.copy()
+        data.update(Parameters["default"])
+        data.update(v)
 
         # Number of additional lines to write per rock
         nad = 0
-        nad += 1 if tmp["relative_permeability"]["id"] is not None else 0
-        nad += 1 if tmp["capillary_pressure"]["id"] is not None else 0
+        nad += 1 if data["relative_permeability"]["id"] is not None else 0
+        nad += 1 if data["capillary_pressure"]["id"] is not None else 0
 
         # Permeability
-        per = tmp["permeability"]
+        per = data["permeability"]
         per = [ per ] * 3 if isinstance(per, float) else per
         assert isinstance(per, (list, tuple, np.ndarray)) and len(per) == 3
 
@@ -139,31 +141,31 @@ def _write_rocks(Parameters):
         out += _write_record(_format_data([
             ( k, "{:5.5}" ),
             ( nad if nad else None, "{:>5g}" ),
-            ( tmp["density"], "{:>10.4e}" ) ,
-            ( tmp["porosity"], "{:>10.4e}" ),
+            ( data["density"], "{:>10.4e}" ) ,
+            ( data["porosity"], "{:>10.4e}" ),
             ( per[0], "{:>10.4e}" ),
             ( per[1], "{:>10.4e}" ),
             ( per[2], "{:>10.4e}" ),
-            ( tmp["conductivity"], "{:>10.4e}" ),
-            ( tmp["specific_heat"], "{:>10.4e}" ),
+            ( data["conductivity"], "{:>10.4e}" ),
+            ( data["specific_heat"], "{:>10.4e}" ),
         ]))
 
         # Record 2
         out += _write_record(_format_data([
-            ( tmp["compressibility"], "{:>10.4e}" ),
-            ( tmp["expansivity"], "{:>10.4e}" ),
-            ( tmp["conductivity_dry"], "{:>10.4e}" ),
-            ( tmp["tortuosity"], "{:>10.4e}" ),
-            ( tmp["b_coeff"], "{:>10.4e}" ),
-            ( tmp["xkd3"], "{:>10.4e}" ),
-            ( tmp["xkd4"], "{:>10.4e}" ),
+            ( data["compressibility"], "{:>10.4e}" ),
+            ( data["expansivity"], "{:>10.4e}" ),
+            ( data["conductivity_dry"], "{:>10.4e}" ),
+            ( data["tortuosity"], "{:>10.4e}" ),
+            ( data["b_coeff"], "{:>10.4e}" ),
+            ( data["xkd3"], "{:>10.4e}" ),
+            ( data["xkd4"], "{:>10.4e}" ),
         ]))
 
         # Relative permeability
-        out += _add_record(tmp["relative_permeability"]) if nad >= 1 else []
+        out += _add_record(data["relative_permeability"]) if nad >= 1 else []
 
         # Capillary pressure
-        out += _add_record(tmp["capillary_pressure"]) if nad >= 2 else []
+        out += _add_record(data["capillary_pressure"]) if nad >= 2 else []
     return out
 
 
@@ -177,15 +179,15 @@ def _write_flac(Parameters):
     out = [ "\n" ]
     for v in Parameters["rocks"].values():
         # Load data
-        tmp = default.copy()
-        tmp.update(Parameters["default"])
-        tmp.update(v)
+        data = default.copy()
+        data.update(Parameters["default"])
+        data.update(v)
 
         # Permeability law
-        out += _add_record(tmp["permeability_law"], "{:>10g}")
+        out += _add_record(data["permeability_law"], "{:>10g}")
 
         # Equivalent pore pressure
-        out += _add_record(tmp["equivalent_pore_pressure"])
+        out += _add_record(data["equivalent_pore_pressure"])
     return out
 
 
@@ -215,21 +217,18 @@ def _write_selec(Parameters):
     used for different purposes in different TOUGH modules (EOS7, EOS7R,
     EWASG, T2DM, ECO2N).
     """
-    out = []
-
     # Load data
     data = Parameters["selections"]
 
     # Record 1
-    out += _write_record(_format_data([
+    out = _write_record(_format_data([
         ( v, "{:>5}" ) for v in data.values()
     ]))
 
     # Record 2
-    data = Parameters["extra_selections"]
-    if data:
+    if Parameters["extra_selections"]:
         out += _write_multi_record(_format_data([
-            ( i, "{:>10.3e}" ) for i in data
+            ( i, "{:>10.3e}" ) for i in Parameters["extra_selections"]
         ]))
     return out
 
@@ -278,10 +277,9 @@ def _write_param(Parameters):
     Introduces computation parameters, time stepping information, and
     default initial conditions.
     """
-    out = []
+    from .common import options
 
     # Load data
-    from .common import options
     data = default.copy()
     data.update(Parameters["options"])
 
@@ -289,7 +287,7 @@ def _write_param(Parameters):
     _mop = Parameters["extra_options"]
     mop = _format_data([ ( _mop[k], "{:>1g}" )
                             for k in sorted(_mop.keys()) ])
-    out += _write_record(_format_data([
+    out = _write_record(_format_data([
         ( data["n_iteration"], "{:>2g}" ),
         ( data["verbosity"], "{:>2g}" ),
         ( data["n_cycle"], "{:>4g}" ),
