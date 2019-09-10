@@ -377,7 +377,7 @@ def  _write_times(Parameters):
     return out
 
 
-@block("FOFT ", multi = True)
+@block("FOFT", multi = True)
 def _write_foft(Parameters):
     """
     TOUGH input FOFT block data (optional).
@@ -391,7 +391,7 @@ def _write_foft(Parameters):
     ]))
 
 
-@block("COFT ", multi = True)
+@block("COFT", multi = True)
 def _write_coft(Parameters):
     """
     TOUGH input COFT block data (optional).
@@ -405,7 +405,7 @@ def _write_coft(Parameters):
     ]))
 
 
-@block("GOFT ", multi = True)
+@block("GOFT", multi = True)
 def _write_goft(Parameters):
     """
     TOUGH input GOFT block data (optional).
