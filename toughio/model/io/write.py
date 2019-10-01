@@ -201,7 +201,13 @@ def _write_flac(Parameters):
     else:
         order = Parameters["rocks"].keys()
     
-    out = [ "\n" ]
+    # Record 1
+    out = _write_record(_format_data([
+        ( 1 if Parameters["creep"] else 0, "{:5g}" ),
+        ( Parameters["porosity_model"], "{:5g}" ),
+    ]))
+
+    # Additional records
     for k in order:
         # Load data
         data = default.copy()

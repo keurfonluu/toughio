@@ -31,6 +31,8 @@ _Parameters = {
     "n_component": None,
     "n_phase": None,
     "flac": False,
+    "creep": False,
+    "porosity_model": 0,
     "isothermal": False,
     "start": True,
     "nover": False,
