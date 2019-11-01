@@ -67,7 +67,7 @@ def write_buffer():
         )
 
     # Define input file contents
-    out = [ "* {:78}\n".format(Parameters["title"]) ]
+    out = [ "{:80}\n".format(Parameters["title"]) ]
     out += _write_rocks(Parameters)
     out += _write_flac(Parameters) if Parameters["flac"] else []
     out += _write_multi(Parameters) if Parameters["eos"] else []
