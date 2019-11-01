@@ -62,7 +62,7 @@ options = {
     "n_second": None,
     "n_cycle_print": None,
     "verbosity": None,
-    "temperature_dependance_gas": None,
+    "temperature_dependence_gas": None,
     "effective_strength_vapor": None,
     "t_ini": None,
     "t_max": None,
@@ -80,13 +80,13 @@ options = {
 }
 
 extra_options = { k+1: v for k, v in enumerate([
-    None, 0, 0, 0, None, 0, 2, None,
+    None, 0, 0, 0, None, 0, 0, None,
     0, 0, 0, 0, 0, None, None, 4,
     None, None, None, None, 3, None, None, None, 
 ]) }
 
 solver = {
-    "method": 3,
+    "id": 3,
     "z_precond": "Z0",
     "o_precond": "O0",
     "rel_iter_max": 0.1,
@@ -118,11 +118,11 @@ default = {
         "id": None,
         "parameters": [],
     },
-    "capillary_pressure": {
+    "capillarity": {
         "id": None,
         "parameters": [],
     },
-    "permeability_law": {
+    "permeability_model": {
         "id": 1,
         "parameters": [],
     },
