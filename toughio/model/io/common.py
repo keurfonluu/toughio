@@ -95,7 +95,8 @@ solver = {
 
 generators = {
     "type": None,
-    "rate": None,
+    "times": None,
+    "rates": None,
     "specific_enthalpy": None,
     "layer_thickness": None,
 }

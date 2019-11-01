@@ -439,6 +439,13 @@ def _write_gener(Parameters):
         # Load data
         data = generators.copy()
         data.update(v)
+        
+        # Table
+        ltab, itab = None, None
+        if data["times"] and isinstance(data["times"], (list, tuple, np.ndarray)):
+            ltab, itab = len(data["times"]), 1
+            assert isinstance(data["rates"], (list, tuple, np.ndarray))
+            assert ltab > 1 and ltab == len(data["rates"])
 
         # Record 1
         out += _write_record(_format_data([
@@ -447,13 +454,36 @@ def _write_gener(Parameters):
             ( None, "{:>5g}" ),
             ( None, "{:>5g}" ),
             ( None, "{:>5g}" ),
+            ( ltab, "{:>5g}" ),
             ( None, "{:>5g}" ),
-            ( None, "{:>5g}" ),
-            ( data["type"], "{:4g} " ),
-            ( data["rate"], "{:>10.3e}" ),
-            ( data["specific_enthalpy"], "{:>10.3e}" ),
+            ( data["type"], "{:4g}" ),
+            ( itab, "{:>1g}" ),
+            ( None if ltab else data["rates"], "{:>10.3e}" ),
+            ( None if ltab else data["specific_enthalpy"], "{:>10.3e}" ),
             ( data["layer_thickness"], "{:>10.3e}" ),
         ]))
+
+        # Record 2
+        if ltab:
+            out += _write_multi_record(_format_data([
+                ( i, "{:>14.7e}" ) for i in data["times"]
+            ]), ncol = 4)
+
+        # Record 3
+        if ltab:
+            out += _write_multi_record(_format_data([
+                ( i, "{:>14.7e}" ) for i in data["rates"]
+            ]), ncol = 4)
+
+        # Record 4
+        if ltab and data["specific_enthalpy"]:
+            if isinstance(data["specific_enthalpy"], (list, tuple, np.ndarray)):
+                specific_enthalpy = data["specific_enthalpy"]
+            else:
+                specific_enthalpy = np.full(ltab, data["specific_enthalpy"])
+            out += _write_multi_record(_format_data([
+                ( i, "{:>14.7e}" ) for i in specific_enthalpy
+            ]), ncol = 4)
     return out
 
 
