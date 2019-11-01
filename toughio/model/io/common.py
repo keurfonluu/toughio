@@ -66,7 +66,7 @@ options = {
     "effective_strength_vapor": None,
     "t_ini": None,
     "t_max": None,
-    "t_step": None,
+    "t_steps": None,
     "t_step_max": None,
     "t_reduce_factor": None,
     "gravity": 9.81,
