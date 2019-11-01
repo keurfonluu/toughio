@@ -451,7 +451,7 @@ def _write_gener(Parameters):
         
         # Table
         ltab, itab = None, None
-        if data["times"] and isinstance(data["times"], (list, tuple, np.ndarray)):
+        if data["times"] is not None and isinstance(data["times"], (list, tuple, np.ndarray)):
             ltab, itab = len(data["times"]), 1
             assert isinstance(data["rates"], (list, tuple, np.ndarray))
             assert ltab > 1 and ltab == len(data["rates"])
@@ -485,7 +485,7 @@ def _write_gener(Parameters):
             ]), ncol = 4)
 
         # Record 4
-        if ltab and data["specific_enthalpy"]:
+        if ltab and data["specific_enthalpy"] is not None:
             if isinstance(data["specific_enthalpy"], (list, tuple, np.ndarray)):
                 specific_enthalpy = data["specific_enthalpy"]
             else:
