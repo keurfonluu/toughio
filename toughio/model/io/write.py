@@ -317,6 +317,10 @@ def _write_param(Parameters):
     data = options.copy()
     data.update(Parameters["options"])
 
+    # Table
+    if not isinstance(data["t_steps"], (list, tuple, np.ndarray)):
+        data["t_steps"] = [ data["t_steps"] ]
+
     # Record 1
     from .common import extra_options
     _mop = extra_options.copy()
@@ -331,7 +335,7 @@ def _write_param(Parameters):
         ( data["n_cycle_print"], "{:>4g}" ),
         ( "{}".format("".join(mop)), "{:>24}" ),
         ( None, "{:>10}" ),
-        ( data["temperature_dependance_gas"], "{:>10.4e}" ),
+        ( data["temperature_dependence_gas"], "{:>10.4e}" ),
         ( data["effective_strength_vapor"], "{:>10.4e}" ),
     ]))
 
@@ -339,12 +343,17 @@ def _write_param(Parameters):
     out += _write_record(_format_data([
         ( data["t_ini"], "{:>10.4e}" ),
         ( data["t_max"], "{:>10.4e}" ),
-        ( data["t_step"], "{:>10.4e}" ),
+        ( -len(data["t_steps"]), "{:>9g}." ),
         ( data["t_step_max"], "{:>10.4e}" ),
         ( None, "{:>10g}" ),
         ( data["gravity"], "{:>10.4e}" ),
         ( data["t_reduce_factor"], "{:>10.4e}" ),
         ( data["mesh_scale_factor"], "{:>10.4e}" ),
+    ]))
+
+    # Record 2.1
+    out += _write_multi_record(_format_data([
+        ( i, "{:>10.4e}" ) for i in data["t_steps"]
     ]))
 
     # Record 3
