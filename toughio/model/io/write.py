@@ -149,7 +149,7 @@ def _write_rocks(Parameters):
         # Number of additional lines to write per rock
         nad = 0
         nad += 1 if data["relative_permeability"]["id"] is not None else 0
-        nad += 1 if data["capillary_pressure"]["id"] is not None else 0
+        nad += 1 if data["capillarity"]["id"] is not None else 0
 
         # Permeability
         per = data["permeability"]
@@ -184,7 +184,7 @@ def _write_rocks(Parameters):
         out += _add_record(data["relative_permeability"]) if nad >= 1 else []
 
         # Capillary pressure
-        out += _add_record(data["capillary_pressure"]) if nad >= 2 else []
+        out += _add_record(data["capillarity"]) if nad >= 2 else []
     return out
 
 
@@ -215,7 +215,7 @@ def _write_flac(Parameters):
         data.update(Parameters["rocks"][k])
 
         # Permeability law
-        out += _add_record(data["permeability_law"], "{:>10g}")
+        out += _add_record(data["permeability_model"], "{:>10g}")
 
         # Equivalent pore pressure
         out += _add_record(data["equivalent_pore_pressure"])
