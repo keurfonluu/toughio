@@ -108,7 +108,7 @@ default = {
     "conductivity": None,
     "specific_heat": None,
     "compressibility": None,
-    "expansivity": None,
+    "expansion": None,
     "conductivity_dry": None,
     "tortuosity": None,
     "b_coeff": None,
