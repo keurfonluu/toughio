@@ -75,10 +75,10 @@ def write_buffer():
     out += _write_solvr(Parameters) if Parameters["solver"] else []
     out += _write_start() if Parameters["start"] else []
     out += _write_param(Parameters)
-    out += _write_times(Parameters) if Parameters["times"] else []
-    out += _write_foft(Parameters) if Parameters["element_history"] else []
-    out += _write_coft(Parameters) if Parameters["connection_history"] else []
-    out += _write_goft(Parameters) if Parameters["generator_history"] else []
+    out += _write_times(Parameters) if Parameters["times"] is not None else []
+    out += _write_foft(Parameters) if Parameters["element_history"] is not None else []
+    out += _write_coft(Parameters) if Parameters["connection_history"] is not None else []
+    out += _write_goft(Parameters) if Parameters["generator_history"] is not None else []
     out += _write_gener(Parameters) if Parameters["generators"] else []
     out += _write_nover() if Parameters["nover"] else []
     out += _write_endfi() if Parameters["endfi"] else _write_endcy()
@@ -134,7 +134,7 @@ def _write_rocks(Parameters):
     domains.
     """
     # Reorder rocks
-    if Parameters["rocks_order"]:
+    if Parameters["rocks_order"] is not None:
         order = Parameters["rocks_order"]
     else:
         order = Parameters["rocks"].keys()
@@ -261,7 +261,7 @@ def _write_selec(Parameters):
     ]))
 
     # Record 2
-    if Parameters["extra_selections"]:
+    if Parameters["extra_selections"] is not None:
         out += _write_multi_record(_format_data([
             ( i, "{:>10.3e}" ) for i in Parameters["extra_selections"]
         ]))
