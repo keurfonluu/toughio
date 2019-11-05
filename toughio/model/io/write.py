@@ -172,7 +172,7 @@ def _write_rocks(Parameters):
         # Record 2
         out += _write_record(_format_data([
             ( data["compressibility"], "{:>10.4e}" ),
-            ( data["expansivity"], "{:>10.4e}" ),
+            ( data["expansion"], "{:>10.4e}" ),
             ( data["conductivity_dry"], "{:>10.4e}" ),
             ( data["tortuosity"], "{:>10.4e}" ),
             ( data["b_coeff"], "{:>10.4e}" ),
