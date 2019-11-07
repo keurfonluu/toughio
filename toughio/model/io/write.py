@@ -343,7 +343,7 @@ def _write_param(Parameters):
     out += _write_record(_format_data([
         ( data["t_ini"], "{:>10.4e}" ),
         ( data["t_max"], "{:>10.4e}" ),
-        ( -len(data["t_steps"]), "{:>9g}." ),
+        ( -((len(data["t_steps"])-1)//8+1), "{:>9g}." ),
         ( data["t_step_max"], "{:>10.4e}" ),
         ( None, "{:>10g}" ),
         ( data["gravity"], "{:>10.4e}" ),
