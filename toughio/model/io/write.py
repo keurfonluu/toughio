@@ -401,9 +401,9 @@ def _write_foft(Parameters):
     data are to be written out for plotting to a file called FOFT during
     the simulation.
     """
-    return _write_record(_format_data([
+    return _write_multi_record(_format_data([
         ( i, "{:>5g}" ) for i in Parameters["element_history"]
-    ]))
+    ]), ncol = 1)
 
 
 @block("COFT", multi = True)
@@ -415,9 +415,9 @@ def _write_coft(Parameters):
     be written out for plotting to a file called COFT during the
     simulation.
     """
-    return _write_record(_format_data([
+    return _write_multi_record(_format_data([
         ( i, "{:>10g}" ) for i in Parameters["connection_history"]
-    ]))
+    ]), ncol = 1)
 
 
 @block("GOFT", multi = True)
@@ -429,9 +429,9 @@ def _write_goft(Parameters):
     to be written out for plotting to a file called GOFT during the
     simulation.
     """
-    return _write_record(_format_data([
+    return _write_multi_record(_format_data([
         ( i, "{:>5g}" ) for i in Parameters["generator_history"]
-    ]))
+    ]), ncol = 1)
 
 
 @block("GENER", multi = True)
