@@ -75,6 +75,7 @@ def write_buffer():
     out += _write_solvr(Parameters) if Parameters["solver"] else []
     out += _write_start() if Parameters["start"] else []
     out += _write_param(Parameters)
+    out += _write_momop(Parameters) if Parameters["more_options"] else []
     out += _write_times(Parameters) if Parameters["times"] is not None else []
     out += _write_foft(Parameters) if Parameters["element_history"] is not None else []
     out += _write_coft(Parameters) if Parameters["connection_history"] is not None else []
@@ -370,6 +371,17 @@ def _write_param(Parameters):
     n = len(data["incon"])
     out += _write_record(_format_data([
         ( i, "{:>20.4e}" ) for i in data["incon"][:min(n, 4)]
+    ]))
+    return out
+
+
+@block("MOMOP")
+def _write_momop(Parameters):
+    from .common import more_options
+    _momop = more_options.copy()
+    _momop.update(Parameters["more_options"])
+    out = _write_record(_format_data([
+        ( _momop[k], "{:>1g}" ) for k in sorted(_momop.keys())
     ]))
     return out
 

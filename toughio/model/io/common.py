@@ -13,6 +13,7 @@ __all__ = [
     "select",
     "options",
     "extra_options",
+    "more_options",
     "solver",
     "generators",
     "default",
@@ -41,6 +42,7 @@ _Parameters = {
     "rocks_order": None,
     "options": {},
     "extra_options": {},
+    "more_options": {},
     "selections": {},
     "extra_selections": None,
     "solver": {},
@@ -84,6 +86,9 @@ extra_options = { k+1: v for k, v in enumerate([
     0, 0, 0, 0, 0, None, None, 4,
     None, None, None, None, 3, None, None, None, 
 ]) }
+
+more_options = { k+1: None for k in range(27) }
+more_options[2] = 5
 
 solver = {
     "id": 3,
