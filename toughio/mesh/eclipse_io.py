@@ -9,7 +9,7 @@ from __future__ import division, with_statement, unicode_literals
 
 import numpy as np
 
-from .meshio import Mesh
+from meshio import Mesh
 
 __all__ = [
     "read",

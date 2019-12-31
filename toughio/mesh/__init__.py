@@ -12,11 +12,21 @@ from .helpers import (
     write,
     write_points_cells,
 )
-from .meshio import (
+
+from meshio import (
     Mesh,
-    XdmfTimeSeriesReader,
-    XdmfTimeSeriesWriter,
+    __version__,
 )
+version = tuple(int(i) for i in __version__.split("."))
+if version < (3,3,0):
+    from meshio import (
+        XdmfTimeSeriesReader,
+        XdmfTimeSeriesWriter,
+    )
+else:
+    from meshio.xdmf import TimeSeriesReader as XdmfTimeSeriesReader
+    from meshio.xdmf import TimeSeriesWriter as XdmfTimeSeriesWriter
+
 
 __all__ = [
     "read",
