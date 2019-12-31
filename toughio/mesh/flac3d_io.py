@@ -12,7 +12,7 @@ import time
 
 import numpy as np
 
-from .meshio import Mesh
+from meshio import Mesh
 from ..__about__ import __version__ as version
 
 __all__ = [
