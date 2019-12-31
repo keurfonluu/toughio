@@ -17,7 +17,7 @@ EXTRA_REQUIREMENTS = {
         "meshio==2.3.10",
     ],
     ":python_version > '2.7'": [
-        "meshio==3.0.0",
+        "meshio>=3.0.0",
     ],
 }
 CLASSIFIERS = [
