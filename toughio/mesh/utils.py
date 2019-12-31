@@ -12,7 +12,7 @@ import logging
 import numpy as np
 
 from copy import deepcopy
-from . import meshio
+import meshio
 
 __all__ = [
     "extrude_to_3d",
