@@ -13,8 +13,11 @@ URL = toughio.__website__
 LICENSE = toughio.__license__
 REQUIREMENTS = []
 EXTRA_REQUIREMENTS = {
-    "all": [
-        "meshio",
+    ":python_version <= '2.7'": [
+        "meshio==2.3.10",
+    ],
+    ":python_version > '2.7'": [
+        "meshio==3.0.0",
     ],
 }
 CLASSIFIERS = [
