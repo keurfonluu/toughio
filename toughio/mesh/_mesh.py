@@ -62,6 +62,19 @@ class Mesh(meshio.Mesh):
 
         return "\n".join(lines)
 
+    def itercells(self):
+        """
+        Iterate over cells as namedtuples.
+
+        Returns
+        -------
+        generator
+            An object to iterate over namedtuples for each cell in the mesh.
+        """
+        for cell in self.cells:
+            for c in cell.data:
+                yield Cells(cell.type, c)
+
     def extrude_to_3d(self, height = 1., axis = 2, inplace = True):
         """
         Convert a 2D mesh to 3D by extruding cells along given axis.
