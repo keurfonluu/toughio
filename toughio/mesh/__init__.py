@@ -5,6 +5,8 @@ Author: Keurfon Luu <keurfonluu@lbl.gov>
 License: MIT
 """
 
+import meshio
+
 from . import utils
 from . import spatial
 from .helpers import (
@@ -12,13 +14,10 @@ from .helpers import (
     write,
     write_points_cells,
 )
+from ._mesh import Mesh
+from ._common import get_meshio_version
 
-from meshio import (
-    Mesh,
-    __version__,
-)
-version = tuple(int(i) for i in __version__.split("."))
-if version < (3,3,0):
+if get_meshio_version() < (3,3,0):
     from meshio import (
         XdmfTimeSeriesReader,
         XdmfTimeSeriesWriter,
