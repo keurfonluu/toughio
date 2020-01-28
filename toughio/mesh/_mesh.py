@@ -95,7 +95,6 @@ class Mesh(meshio.Mesh):
         toughio.Mesh
             Extruded mesh (only if ``inplace == False``).
         """
-        assert numpy.shape(self.points)[1] == 2, "Can only extrude 2D mesh."
         assert axis in [ 0, 1, 2 ], "axis must be 0, 1 or 2."
         mesh = self if inplace else deepcopy(self)
         height = [ height ] if isinstance(height, (int, float)) else height
@@ -120,12 +119,11 @@ class Mesh(meshio.Mesh):
             "quad": "hexahedron",
         }
         cells = []
-        for c in mesh.cells:
+        for ic, c in enumerate(mesh.cells):
             if c.type in extruded_types.keys():
                 extruded_type = extruded_types[c.type]
-                v = c.data
-                nr, nc = v.shape
-                cell = Cells(extruded_type, numpy.tile(v, (nh, 2)))
+                nr, nc = c.data.shape
+                cell = Cells(extruded_type, numpy.tile(c.data, (nh, 2)))
                 for i in range(nh):
                     ibeg, iend = i*nr, (i+1)*nr
                     cell.data[ibeg:iend,:nc] += i*npts
@@ -134,8 +132,7 @@ class Mesh(meshio.Mesh):
 
                 if mesh.cell_data:
                     for k, v in mesh.cell_data.items():
-                        v[extruded_type] = v.pop(c.type)
-                        v[extruded_type] = numpy.tile(v[extruded_type], nh)
+                        v[ic] = numpy.tile(v[ic], nh)
         mesh.cells = cells
 
         if mesh.field_data:
@@ -182,13 +179,13 @@ class Mesh(meshio.Mesh):
                 cells[k] = pinv[v]
 
         # Prune duplicate cells
-        for k, v in cells.items():
+        for ic, (k, v) in enumerate(cells.items()):
             vsort = numpy.sort(v, axis = 1)
             _, order = numpy.unique(vsort, axis = 0, return_index = True)
             cells[k] = cells[k][order]
             if mesh.cell_data:
                 for kk, vv in mesh.cell_data.items():
-                    mesh.cell_data[kk][k] = vv[k][order]
+                    mesh.cell_data[kk][ic] = vv[ic][order]
         mesh.cells = cells
 
         if not inplace:
@@ -229,16 +226,15 @@ class Mesh(meshio.Mesh):
                 "cell_sets": self.cell_sets,
             })
         else:
-            cells = self.cells_dict
+            cell_data = {}
             if self.cell_data:
-                cell_data = {k: {} for k in cells.keys()}
-                for k, v in self.cell_data.items():
-                    for kk, vv in v.items():
-                        cell_data[kk][k] = vv
-            else:
-                cell_data = {}
+                for ic, c in enumerate(self.cells):
+                    if c.type not in cell_data.keys():
+                        cell_data[c.type] = {}
+                    for k, v in self.cell_data.items():
+                        cell_data[c.type][k] = v[ic]
             kwargs.update({
-                "cells": cells,
+                "cells": self.cells_dict,
                 "cell_data": cell_data,
                 "node_sets": self.point_sets,
             })
@@ -281,7 +277,7 @@ class Mesh(meshio.Mesh):
             next_offset = offset[-1] + numnodes + 1
 
         # Extract cell data from toughio.Mesh object
-        cell_data = {k: numpy.concatenate([vv for vv in v.values()]) for k, v in self.cell_data.items()}
+        cell_data = {k: numpy.concatenate(v) for k, v in self.cell_data.items()}
 
         # Create pyvista.UnstructuredGrid object
         points = self.points
@@ -495,11 +491,11 @@ def _meshio_to_toughio_mesh(mesh):
         if version[0] >= 4:
             cell_data = mesh.cell_data
         else:
-            labels = {kk for k, v in mesh.cell_data.items() for kk in v.keys()}
-            cell_data = {k: {} for k in list(labels)}
-            for k, v in mesh.cell_data.items():
-                for kk, vv in v.items():
-                    cell_data[kk][k] = vv
+            labels = numpy.unique([kk for k, v in mesh.cell_data.items() for kk in v.keys()])
+            cell_data = {k: [] for k in labels}
+            for k in cell_data.keys():
+                for kk in mesh.cells.keys():
+                    cell_data[k].append(mesh.cell_data[kk][k])
     else:
         cell_data = {}
 
