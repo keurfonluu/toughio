@@ -5,6 +5,7 @@ Author: Keurfon Luu <keurfonluu@lbl.gov>
 License: MIT
 """
 
+from ._mesh import Mesh, _meshio_to_toughio_mesh
 from . import tough_io
 from . import flac3d_io
 from . import eclipse_io
@@ -98,9 +99,10 @@ def read(filename, file_format = None, **kwargs):
         interface, args, default_kwargs = format_to_reader[fmt]
         _kwargs = default_kwargs.copy()
         _kwargs.update(kwargs)
-        return interface.read(filename, *args, **_kwargs)
+        mesh = interface.read(filename, *args, **_kwargs)
     else:
-        return meshio.read(filename, file_format)
+        mesh = meshio.read(filename, file_format)
+    return _meshio_to_toughio_mesh(mesh)
 
 
 def write(filename, mesh, file_format = None, **kwargs):
@@ -146,6 +148,8 @@ def write(filename, mesh, file_format = None, **kwargs):
         "flac3d-ascii": ( flac3d_io, (), {} ),
         "eclipse": ( eclipse_io, (), {} ),
     }
+
+    mesh = mesh.to_meshio()
     if fmt in format_to_writer.keys():
         interface, args, default_kwargs = format_to_writer[fmt]
         _kwargs = default_kwargs.copy()
@@ -184,7 +188,7 @@ def write_points_cells(filename, points, cells, point_data = None,
     kwargs : dict
         Refer to function ``write`` for additional information.
     """
-    mesh = meshio.Mesh(
+    mesh = Mesh(
         points = points,
         cells = cells,
         point_data = point_data,
