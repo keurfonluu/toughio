@@ -183,6 +183,69 @@ class Mesh(meshio.Mesh):
 
         return meshio.Mesh(**kwargs)
 
+    def to_pyvista(self):
+        """
+        Convert mesh to pyvista.UnstructuredGrid.
+
+        Returns
+        -------
+        pyvista.UnstructuredGrid
+            Output mesh.
+        """
+        try:
+            import pyvista
+            from ._common import (
+                meshio_to_vtk_type,
+                vtk_type_to_numnodes,
+            )
+        except ImportError:
+            raise ModuleNotFoundError(
+                "Converting to pyvista.UnstructuredGrid requires pyvista to be installed."
+            )
+
+        # Extract cells from toughio.Mesh object
+        offset = []
+        cells = []
+        cell_type = []
+        next_offset = 0
+        for c in self.cells:
+            vtk_type = meshio_to_vtk_type[c.type]
+            numnodes = vtk_type_to_numnodes[vtk_type]
+            offset += [next_offset+i*(numnodes+1) for i in range(len(c.data))]
+            cells.append(numpy.hstack((numpy.full((len(c.data), 1), numnodes), c.data)).ravel())
+            cell_type += [vtk_type] * len(c.data)
+            next_offset = offset[-1] + numnodes + 1
+
+        # Extract cell data from toughio.Mesh object
+        cell_data = {k: numpy.concatenate([vv for vv in v.values()]) for k, v in self.cell_data.items()}
+
+        # Create pyvista.UnstructuredGrid object
+        points = self.points
+        if points.shape[1] == 2:
+            points = numpy.hstack((points, numpy.zeros((len(points),1))))
+
+        mesh = pyvista.UnstructuredGrid(
+            numpy.array(offset),
+            numpy.concatenate(cells),
+            numpy.array(cell_type),
+            numpy.array(points, numpy.float64),
+        )
+
+        # Set point data
+        mesh.point_arrays.update({k: numpy.array(v, numpy.float64) for k, v in self.point_data.items()})
+
+        # Set cell data
+        mesh.cell_arrays.update(cell_data)
+
+        return mesh
+
+    def plot(self, *args, **kwargs):
+        """
+        Display mesh using method ``pyvista.UnstructuredGrid.plot``.
+        """
+        mesh = self.to_pyvista()
+        mesh.plot(*args, **kwargs)
+
     @property
     def points(self):
         return self._points
