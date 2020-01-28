@@ -14,8 +14,10 @@ from .__about__ import (
 )
 from . import mesh
 from . import model
+from .mesh import Mesh
 
 __all__ = [
+    "Mesh",
     "mesh",
     "model",
     "__version__",
