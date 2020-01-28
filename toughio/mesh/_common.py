@@ -4,6 +4,7 @@ __all__ = [
     "vtk_to_meshio_type",
     "meshio_to_vtk_type",
     "vtk_type_to_numnodes",
+    "meshio_type_to_ndim",
     "get_meshio_version",
 ]
 
@@ -82,6 +83,17 @@ vtk_type_to_numnodes = {
     34: 7,      # triangle7
     35: 4,      # line4
 }
+
+
+meshio_type_to_ndim = {k: 3 for k in meshio_to_vtk_type.keys()}
+meshio_type_to_ndim.update({
+    "empty": 0,
+    "vertex": 1,
+    "line": 2,
+    "triangle": 2,
+    "polygon": 2,
+    "quad": 2,
+})
 
 
 def get_meshio_version():
