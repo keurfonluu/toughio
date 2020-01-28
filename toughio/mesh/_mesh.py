@@ -1,4 +1,5 @@
 import collections
+import logging
 import numpy
 import meshio
 from copy import deepcopy
@@ -398,6 +399,91 @@ class Mesh(meshio.Mesh):
     @info.setter
     def info(self, value):
         self._info = value
+
+    @property
+    def connectivity(self):
+        """
+        Returns mesh connectivity assuming conformity and that points and
+        cells are uniquely defined in mesh (use ``prune_duplicates`` otherwise).
+
+        Note
+        ----
+        Only for 3D meshes and first order cells.
+        """
+        assert numpy.shape(self.points)[1] == 3, (
+            "Connectivity for 2D mesh has not been implemented yet."
+        )
+
+        # Reconstruct all the faces
+        _faces = {
+            "tetra": {
+                "triangle": [
+                    [ 0, 1, 2 ],
+                    [ 0, 1, 3 ],
+                    [ 1, 2, 3 ],
+                    [ 0, 2, 3 ],
+                ],
+            },
+            "pyramid": {
+                "triangle": [
+                    [ 0, 1, 4 ],
+                    [ 1, 2, 4 ],
+                    [ 2, 3, 4 ],
+                    [ 0, 3, 4 ],
+                ],
+                "quad": [
+                    [ 0, 1, 2, 3 ],
+                ],
+            },
+            "wedge": {
+                "triangle": [
+                    [ 0, 1, 2 ],
+                    [ 3, 4, 5 ],
+                ],
+                "quad": [
+                    [ 0, 1, 3, 4 ],
+                    [ 1, 2, 4, 5 ],
+                    [ 0, 2, 3, 5 ],
+                ],
+            },
+            "hexahedron": {
+                "quad": [
+                    [ 0, 1, 2, 3 ],
+                    [ 4, 5, 6, 7 ],
+                    [ 0, 1, 4, 5 ],
+                    [ 1, 2, 5, 6 ],
+                    [ 2, 3, 6, 7 ],
+                    [ 0, 3, 4, 7 ],
+                ],
+            },
+        }
+
+        faces = { "triangle": [], "quad": [] }
+        face_cells = { "triangle": [], "quad": [] }
+        for i, cell in enumerate(self.itercells()):
+            for mt, mi in _faces[cell.type].items():
+                faces[mt] += [cell.data[ii] for ii in mi]
+                face_cells[mt] += [i] * len(mi)
+        faces = {k: numpy.sort(v, axis = 1) for k, v in faces.items()}
+
+        # Prune duplicate faces
+        uf, tmp = {}, {}
+        for k, v in faces.items():
+            up, uf[k] = numpy.unique(v, axis = 0, return_inverse = True)
+            tmp[k] = [[] for _ in range(len(up))]
+
+        # Make connections
+        for k, v in uf.items():
+            for i, j in enumerate(v):
+                tmp[k][j].append(face_cells[k][i])
+        conn = [vv for v in tmp.values() for vv in v if len(vv) == 2]
+
+        # Reorganize output
+        out = [[] for _ in range(sum(len(c.data) for c in self.cells))]
+        for i1, i2 in conn:
+            out[i1].append(i2)
+            out[i2].append(i1)
+        return out
 
 
 def _meshio_to_toughio_mesh(mesh):
