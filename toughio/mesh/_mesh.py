@@ -72,7 +72,7 @@ class Mesh(meshio.Mesh):
             Height of extrusion.
         axis : int (0, 1 or 2), optional, default 2
             Axis along which extrusion is performed.
-        inplace : bool, optional, default False
+        inplace : bool, optional, default True
             If `True`, overwrite input Mesh object. Otherwise, return a new
             Mesh.
 
@@ -81,6 +81,7 @@ class Mesh(meshio.Mesh):
         toughio.Mesh
             Extruded mesh (only if ``inplace == False``).
         """
+        assert numpy.shape(self.points)[1] == 2, "Can only extrude 2D mesh."
         assert axis in [ 0, 1, 2 ], "axis must be 0, 1 or 2."
         mesh = self if inplace else deepcopy(self)
         height = [ height ] if isinstance(height, (int, float)) else height
@@ -126,6 +127,55 @@ class Mesh(meshio.Mesh):
         if mesh.field_data:
             for k in mesh.field_data.keys():
                 mesh.field_data[k][1] = 3
+
+        if not inplace:
+            return mesh
+
+    def prune_duplicates(self, inplace = True):
+        """
+        Delete duplicate points and cells.
+
+        Parameters
+        ----------
+        inplace : bool, optional, default True
+            If `True`, overwrite input Mesh object. Otherwise, return a new
+            Mesh.
+
+        Returns
+        -------
+        toughio.Mesh
+            Pruned mesh (only if ``inplace == False``).
+        
+        Note
+        ----
+        Does not preserve points order from original array in mesh.
+        """
+        mesh = self if inplace else deepcopy(self)
+        cells = mesh.cells_dict
+
+        # Prune duplicate points
+        unique_points, pind, pinv = numpy.unique(
+            mesh.points,
+            axis = 0,
+            return_index = True,
+            return_inverse = True,
+        )
+        if len(unique_points) < len(mesh.points):
+            mesh.points = unique_points
+            for k, v in mesh.point_data.items():
+                mesh.point_data[k] = v[pind]
+            for k, v in cells.items():
+                cells[k] = pinv[v]
+
+        # Prune duplicate cells
+        for k, v in cells.items():
+            vsort = numpy.sort(v, axis = 1)
+            _, order = numpy.unique(vsort, axis = 0, return_index = True)
+            cells[k] = cells[k][order]
+            if mesh.cell_data:
+                for kk, vv in mesh.cell_data.items():
+                    mesh.cell_data[kk][k] = vv[k][order]
+        mesh.cells = cells
 
         if not inplace:
             return mesh
