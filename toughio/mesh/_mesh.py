@@ -397,6 +397,14 @@ class Mesh(meshio.Mesh):
         self._info = value
 
     @property
+    def n_points(self):
+        return len(self.points)
+
+    @property
+    def n_cells(self):
+        return sum(len(c.data) for c in self.cells)
+
+    @property
     def connectivity(self):
         """
         Returns mesh connectivity assuming conformity and that points and
