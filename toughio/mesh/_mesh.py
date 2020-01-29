@@ -487,7 +487,9 @@ class Mesh(meshio.Mesh):
         for i1, i2 in conn:
             out[i1].append(i2)
             out[i2].append(i1)
-        return out
+
+        idx = numpy.concatenate(([0], numpy.cumsum([len(c.data) for c in self.cells])))
+        return [out[ibeg:iend] for ibeg, iend in zip(idx[:-1], idx[1:])]
 
     @property
     def volumes(self):
