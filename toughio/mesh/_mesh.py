@@ -4,7 +4,7 @@ import numpy
 import meshio
 from copy import deepcopy
 
-from ._common import get_meshio_version
+from ._common import get_meshio_version, split
 
 __all__ = [
     "Cells",
@@ -405,6 +405,59 @@ class Mesh(meshio.Mesh):
         return sum(len(c.data) for c in self.cells)
 
     @property
+    def faces(self):
+        meshio_type_to_faces = {
+            "tetra": {
+                "triangle": numpy.array([
+                    [ 0, 1, 2 ],
+                    [ 0, 1, 3 ],
+                    [ 1, 2, 3 ],
+                    [ 0, 2, 3 ],
+                ]),
+            },
+            "pyramid": {
+                "triangle": numpy.array([
+                    [ 0, 1, 4 ],
+                    [ 1, 2, 4 ],
+                    [ 2, 3, 4 ],
+                    [ 0, 3, 4 ],
+                ]),
+                "quad": numpy.array([
+                    [ 0, 1, 2, 3 ],
+                ]),
+            },
+            "wedge": {
+                "triangle": numpy.array([
+                    [ 0, 1, 2 ],
+                    [ 3, 4, 5 ],
+                ]),
+                "quad": numpy.array([
+                    [ 0, 1, 3, 4 ],
+                    [ 1, 2, 4, 5 ],
+                    [ 0, 2, 3, 5 ],
+                ]),
+            },
+            "hexahedron": {
+                "quad": numpy.array([
+                    [ 0, 1, 2, 3 ],
+                    [ 4, 5, 6, 7 ],
+                    [ 0, 1, 4, 5 ],
+                    [ 1, 2, 5, 6 ],
+                    [ 2, 3, 6, 7 ],
+                    [ 0, 3, 4, 7 ],
+                ]),
+            },
+        }
+        
+        out = []
+        for cell in self.cells:
+            out.append([
+                [Cells(k, c[v]) for k, v in meshio_type_to_faces[cell.type].items()]
+                for c in cell.data
+            ])
+        return out
+
+    @property
     def labels(self):
         """
         Create five-character long element labels following:
@@ -429,10 +482,15 @@ class Mesh(meshio.Mesh):
             q3, r3 = divmod(q2, len(nomen))
             _, r4 = divmod(q3, len(nomen))
             return "".join([alpha[r4], nomen[r3], nomen[r2], numer[r1]])
+        
+        return split([_labeler(i) for i in range(self.n_cells)], self)
 
-        out = [_labeler(i) for i in range(self.n_cells)]
-        idx = numpy.concatenate(([0], numpy.cumsum([len(c.data) for c in self.cells])))
-        return [out[ibeg:iend] for ibeg, iend in zip(idx[:-1], idx[1:])]
+    @property
+    def centers(self):
+        """
+        Return center of each cell in mesh.
+        """
+        return [self.points[c.data].mean(axis = 1) for c in self.cells]
 
     @property
     def connectivity(self):
@@ -449,56 +507,15 @@ class Mesh(meshio.Mesh):
         )
 
         # Reconstruct all the faces
-        _faces = {
-            "tetra": {
-                "triangle": [
-                    [ 0, 1, 2 ],
-                    [ 0, 1, 3 ],
-                    [ 1, 2, 3 ],
-                    [ 0, 2, 3 ],
-                ],
-            },
-            "pyramid": {
-                "triangle": [
-                    [ 0, 1, 4 ],
-                    [ 1, 2, 4 ],
-                    [ 2, 3, 4 ],
-                    [ 0, 3, 4 ],
-                ],
-                "quad": [
-                    [ 0, 1, 2, 3 ],
-                ],
-            },
-            "wedge": {
-                "triangle": [
-                    [ 0, 1, 2 ],
-                    [ 3, 4, 5 ],
-                ],
-                "quad": [
-                    [ 0, 1, 3, 4 ],
-                    [ 1, 2, 4, 5 ],
-                    [ 0, 2, 3, 5 ],
-                ],
-            },
-            "hexahedron": {
-                "quad": [
-                    [ 0, 1, 2, 3 ],
-                    [ 4, 5, 6, 7 ],
-                    [ 0, 1, 4, 5 ],
-                    [ 1, 2, 5, 6 ],
-                    [ 2, 3, 6, 7 ],
-                    [ 0, 3, 4, 7 ],
-                ],
-            },
-        }
+        import itertools
 
-        faces = { "triangle": [], "quad": [] }
-        face_cells = { "triangle": [], "quad": [] }
-        for i, cell in enumerate(self.itercells()):
-            for mt, mi in _faces[cell.type].items():
-                faces[mt] += [cell.data[ii] for ii in mi]
-                face_cells[mt] += [i] * len(mi)
-        faces = {k: numpy.sort(v, axis = 1) for k, v in faces.items()}
+        faces = {"triangle": [], "quad": []}
+        face_cells = {"triangle": [], "quad": []}
+        for i, face in enumerate(itertools.chain.from_iterable(self.faces)):
+            for f in face:
+                faces[f.type].append(f.data)
+                face_cells[f.type] += [i] * len(f.data)
+        faces = {k: numpy.sort(numpy.concatenate(v), axis = 1) for k, v in faces.items()}
 
         # Prune duplicate faces
         uf, tmp = {}, {}
@@ -517,9 +534,8 @@ class Mesh(meshio.Mesh):
         for i1, i2 in conn:
             out[i1].append(i2)
             out[i2].append(i1)
-
-        idx = numpy.concatenate(([0], numpy.cumsum([len(c.data) for c in self.cells])))
-        return [out[ibeg:iend] for ibeg, iend in zip(idx[:-1], idx[1:])]
+        
+        return split(out, self)
 
     @property
     def volumes(self):
