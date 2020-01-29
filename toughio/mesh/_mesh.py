@@ -489,6 +489,50 @@ class Mesh(meshio.Mesh):
             out[i2].append(i1)
         return out
 
+    @property
+    def volumes(self):
+        """
+        Returns volume for each cell in mesh.
+        """
+        def scalar_triple_product(a, b, c):
+            c0 = b[:, 1] * c[:, 2] - b[:, 2] * c[:, 1]
+            c1 = b[:, 2] * c[:, 0] - b[:, 0] * c[:, 2]
+            c2 = b[:, 0] * c[:, 1] - b[:, 1] * c[:, 0]
+            return a[:, 0] * c0 + a[:, 1] * c1 + a[:, 2] * c2
+
+        meshio_type_to_tetra = {
+            "tetra": numpy.array([
+                [0, 1, 2, 3],
+            ]),
+            "pyramid": numpy.array([
+                [0, 1, 3, 4],
+                [1, 2, 3, 4],
+            ]),
+            "wedge": numpy.array([
+                [0, 1, 2, 5],
+                [0, 1, 4, 5],
+                [0, 3, 4, 5],
+            ]),
+            "hexahedron": numpy.array([
+                [0, 1, 3, 4],
+                [1, 4, 5, 6],
+                [1, 2, 3, 6],
+                [3, 4, 6, 7],
+                [1, 3, 4, 6],
+            ]),
+        }
+
+        out = []
+        for cell in self.cells:
+            tetras = numpy.vstack([c[meshio_type_to_tetra[cell.type]] for c in cell.data])
+            tetras = self.points[tetras]
+            out.append(numpy.sum(numpy.split(numpy.abs(scalar_triple_product(
+                tetras[:,1] - tetras[:,0],
+                tetras[:,2] - tetras[:,0],
+                tetras[:,3] - tetras[:,0],
+            )), len(cell.data)), axis = 1) / 6.)
+        return out
+
 
 def _meshio_to_toughio_mesh(mesh):
     """
