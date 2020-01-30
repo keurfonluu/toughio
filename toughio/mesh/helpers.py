@@ -120,12 +120,6 @@ def write(filename, mesh, file_format = None, **kwargs):
         extension. To write TOUGH MESH, `file_format` must be specified
         as 'tough' (no specific extension exists for TOUGH MESH).
 
-    Other Parameters
-    ----------------
-    rotation_angle : float, optional, default 0.
-        Only if ``file_format == 'tough'``. Angle to rotate cell
-        connection line for calculation of angle with gravity force.
-
     Note
     ----
     This function wraps functions ``meshio.write`` by adding support to
@@ -138,12 +132,7 @@ def write(filename, mesh, file_format = None, **kwargs):
 
     # Call custom writer for TOUGH, FLAC3D and Eclipse
     format_to_writer = {
-        "tough": (
-            tough, (),
-            {
-                "rotation_angle": 0.,
-            },
-        ),
+        "tough": ( tough, (), {} ),
         "flac3d": ( flac3d_io, (), {} ),
         "flac3d-ascii": ( flac3d_io, (), {} ),
         "eclipse": ( eclipse_io, (), {} ),
