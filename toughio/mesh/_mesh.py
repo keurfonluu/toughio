@@ -280,6 +280,23 @@ class Mesh:
 
         return mesh
 
+    def write(self, filename, file_format = None, **kwargs):
+        """
+        Write mesh to file.
+
+        Parameters
+        ----------
+        filename : str
+            Output file name.
+        file_format : str or None, optional, default None
+            Output file format. If `None`, it will be guessed from file's
+            extension. To write TOUGH MESH, `file_format` must be specified
+            as 'tough' (no specific extension exists for TOUGH MESH).
+        """
+        from .helpers import write
+
+        write(filename, self, file_format, **kwargs)
+
     def plot(self, *args, **kwargs):
         """
         Display mesh using method ``pyvista.UnstructuredGrid.plot``.
