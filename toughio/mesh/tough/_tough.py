@@ -193,9 +193,11 @@ def _get_faces(faces):
                 faces_dict[face_type].append(f[:n])
                 faces_cell[face_type].append(i)
     
-    for k, v in faces_dict.items():
-        if len(v):
-            faces_dict[k] = numpy.sort(numpy.vstack(v), axis = 1)
+    # Stack arrays or remove empty cells
+    faces_dict = {
+        k: numpy.sort(numpy.vstack(v), axis = 1) for k, v in faces_dict.items() if len(v)
+    }
+    faces_cell = {k: v for k, v in faces_cell.items() if len(v)}
 
     return faces_dict, faces_cell
 
