@@ -5,9 +5,9 @@ Author: Keurfon Luu <keurfonluu@lbl.gov>
 License: MIT
 """
 
-from ._mesh import Mesh, _meshio_to_toughio_mesh
+from ._mesh import Mesh, from_meshio
 from . import tough
-from . import flac3d_io
+from . import flac3d
 import meshio
 
 __all__ = [
@@ -58,17 +58,17 @@ def read(filename, file_format = None, **kwargs):
     # Call custom readers for TOUGH and FLAC3D
     format_to_reader = {
         "tough": ( tough, (), {} ),
-        "flac3d": ( flac3d_io, (), {} ),
-        "flac3d-ascii": ( flac3d_io, (), {} ),
+        "flac3d": ( flac3d, (), {} ),
+        "flac3d-ascii": ( flac3d, (), {} ),
     }
     if fmt in format_to_reader.keys():
         interface, args, default_kwargs = format_to_reader[fmt]
         _kwargs = default_kwargs.copy()
         _kwargs.update(kwargs)
-        mesh = interface.read(filename, *args, **_kwargs)
+        return interface.read(filename, *args, **_kwargs)
     else:
         mesh = meshio.read(filename, file_format)
-    return _meshio_to_toughio_mesh(mesh)
+        return from_meshio(mesh)
 
 
 def write(filename, mesh, file_format = None, **kwargs):
@@ -93,8 +93,8 @@ def write(filename, mesh, file_format = None, **kwargs):
     # Call custom writer for TOUGH and FLAC3D
     format_to_writer = {
         "tough": ( tough, (), {} ),
-        "flac3d": ( flac3d_io, (), {} ),
-        "flac3d-ascii": ( flac3d_io, (), {} ),
+        "flac3d": ( flac3d, (), {} ),
+        "flac3d-ascii": ( flac3d, (), {} ),
     }
     if fmt in format_to_writer.keys():
         interface, args, default_kwargs = format_to_writer[fmt]

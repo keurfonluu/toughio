@@ -9,7 +9,7 @@ from ._common import get_meshio_version
 __all__ = [
     "Cells",
     "Mesh",
-    "_meshio_to_toughio_mesh",
+    "from_meshio",
 ]
 
 
@@ -308,7 +308,7 @@ class Mesh:
             self._cells = []
             self._cells_dict = value
         else:
-            self._cells = value
+            self._cells = [Cells(k, v) for k, v in value]
             self._cells_dict = {}
 
     @property
@@ -580,9 +580,19 @@ class Mesh:
         return out
 
 
-def _meshio_to_toughio_mesh(mesh):
+def from_meshio(mesh):
     """
     Convert a meshio.Mesh to toughio.Mesh.
+
+    Parameters
+    ----------
+    mesh : meshio.Mesh
+        Input mesh.
+
+    Returns
+    -------
+    toughio.Mesh
+        Output mesh.
     """
     if mesh.cell_data:
         version = get_meshio_version()
