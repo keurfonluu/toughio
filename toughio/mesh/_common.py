@@ -8,7 +8,6 @@ __all__ = [
     "vtk_type_to_numnodes",
     "meshio_type_to_ndim",
     "get_meshio_version",
-    "split",
 ]
 
 
@@ -101,8 +100,3 @@ meshio_type_to_ndim.update({
 
 def get_meshio_version():
     return tuple(int(i) for i in meshio.__version__.split("."))
-
-
-def split(arr, mesh):
-    idx = numpy.concatenate(([0], numpy.cumsum([len(c.data) for c in mesh.cells])))
-    return [arr[ibeg:iend] for ibeg, iend in zip(idx[:-1], idx[1:])]
