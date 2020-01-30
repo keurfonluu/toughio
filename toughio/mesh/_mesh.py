@@ -4,7 +4,7 @@ import numpy
 import meshio
 from copy import deepcopy
 
-from ._common import get_meshio_version, split
+from ._common import get_meshio_version
 
 __all__ = [
     "Cells",
@@ -204,6 +204,14 @@ class Mesh(meshio.Mesh):
         for old, new in key.items():
             if old in self.cell_data.keys():
                 self.cell_data[new] = self._cell_data.pop(old)
+
+    def split(self, arr):
+        """
+        Split input array into subarrays for each cell block in mesh.
+        """
+        assert len(arr) == self.n_cells
+        sizes = numpy.cumsum([len(c.data) for c in self.cells])
+        return numpy.split(numpy.asarray(arr), sizes[:-1])
 
     def to_meshio(self):
         """
@@ -448,14 +456,20 @@ class Mesh(meshio.Mesh):
                 ]),
             },
         }
-        
-        out = []
-        for cell in self.cells:
-            out.append([
-                [Cells(k, c[v]) for k, v in meshio_type_to_faces[cell.type].items()]
-                for c in cell.data
-            ])
-        return out
+
+        out = [
+            [c[v] for v in meshio_type_to_faces[cell.type].values()]
+            for cell in self.cells for c in cell.data
+        ]
+
+        # Convert to numpy.array
+        arr = numpy.full((self.n_cells, 6, 4), -1)
+        for i, x in enumerate(out):
+            arr[i,:len(x[0]),:x[0].shape[1]] = x[0]
+            if len(x) > 1:
+                arr[i,len(x[0]):len(x[0])+len(x[1]),:x[1].shape[1]] = x[1]
+
+        return self.split(arr)
 
     @property
     def labels(self):
@@ -483,7 +497,7 @@ class Mesh(meshio.Mesh):
             _, r4 = divmod(q3, len(nomen))
             return "".join([alpha[r4], nomen[r3], nomen[r2], numer[r1]])
         
-        return split([_labeler(i) for i in range(self.n_cells)], self)
+        return self.split([_labeler(i) for i in range(self.n_cells)])
 
     @property
     def centers(self):
@@ -507,35 +521,46 @@ class Mesh(meshio.Mesh):
         )
 
         # Reconstruct all the faces
-        import itertools
+        faces_dict = {"triangle": [], "quad": []}
+        faces_cell = {"triangle": [], "quad": []}
+        faces_index = {"triangle": [], "quad": []}
+        numvert_to_face_type = {3: "triangle", 4: "quad"}
 
-        faces = {"triangle": [], "quad": []}
-        face_cells = {"triangle": [], "quad": []}
-        for i, face in enumerate(itertools.chain.from_iterable(self.faces)):
-            for f in face:
-                faces[f.type].append(f.data)
-                face_cells[f.type] += [i] * len(f.data)
-        faces = {k: numpy.sort(numpy.concatenate(v), axis = 1) for k, v in faces.items()}
+        for i, face in enumerate(numpy.concatenate(self.faces)):
+            numvert = (face >= 0).sum(axis=-1)
+            for j, (f, n) in enumerate(zip(face, numvert)):
+                if n > 0:
+                    face_type = numvert_to_face_type[n]
+                    faces_dict[face_type].append(f[:n])
+                    faces_cell[face_type].append(i)
+                    faces_index[face_type].append(j)
+        
+        for k, v in faces_dict.items():
+            if len(v):
+                faces_dict[k] = numpy.sort(numpy.vstack(v), axis = 1)
 
         # Prune duplicate faces
-        uf, tmp = {}, {}
-        for k, v in faces.items():
+        uf, tmp1, tmp2 = {}, {}, {}
+        for k, v in faces_dict.items():
             up, uf[k] = numpy.unique(v, axis = 0, return_inverse = True)
-            tmp[k] = [[] for _ in range(len(up))]
+            tmp1[k] = [[] for _ in range(len(up))]
+            tmp2[k] = [[] for _ in range(len(up))]
 
         # Make connections
         for k, v in uf.items():
             for i, j in enumerate(v):
-                tmp[k][j].append(face_cells[k][i])
-        conn = [vv for v in tmp.values() for vv in v if len(vv) == 2]
+                tmp1[k][j].append(faces_cell[k][i])
+                tmp2[k][j].append(faces_index[k][i])
+        conne = [vv for v in tmp1.values() for vv in v if len(vv) == 2]
+        iface = [vv for v in tmp2.values() for vv in v if len(vv) == 2]
 
         # Reorganize output
-        out = [[] for _ in range(sum(len(c.data) for c in self.cells))]
-        for i1, i2 in conn:
-            out[i1].append(i2)
-            out[i2].append(i1)
-        
-        return split(out, self)
+        out = numpy.full((self.n_cells, 6), -1)
+        for (i1, i2), (j1, j2) in zip(conne, iface):
+            out[i1,j1] = i2
+            out[i2,j2] = i1
+
+        return self.split(out)
 
     @property
     def volumes(self):
