@@ -16,7 +16,7 @@ __all__ = [
 Cells = collections.namedtuple("Cells", ["type", "data"])
 
 
-class Mesh(meshio.Mesh):
+class Mesh:
 
     def __init__(
         self,
@@ -62,19 +62,6 @@ class Mesh(meshio.Mesh):
             lines.append("  Cell data: {}".format(", ".join(self.cell_data.keys())))
 
         return "\n".join(lines)
-
-    def itercells(self):
-        """
-        Iterate over cells as namedtuples.
-
-        Returns
-        -------
-        generator
-            An object to iterate over namedtuples for each cell in the mesh.
-        """
-        for cell in self.cells:
-            for c in cell.data:
-                yield Cells(cell.type, c)
 
     def extrude_to_3d(self, height = 1., axis = 2, inplace = True):
         """
@@ -190,20 +177,6 @@ class Mesh(meshio.Mesh):
 
         if not inplace:
             return mesh
-
-    def rename_cell_data(self, key):
-        """
-        Rename cell_data keywords.
-
-        Parameters
-        ----------
-        key : dict
-            Keywords to rename in the form ``{old: new}`` where ``old`` and
-            ``new`` are both strings.
-        """
-        for old, new in key.items():
-            if old in self.cell_data.keys():
-                self.cell_data[new] = self._cell_data.pop(old)
 
     def split(self, arr):
         """
