@@ -25,7 +25,7 @@ def read(filename):
     )
 
 
-def write(filename, mesh, rotation_angle):
+def write(filename, mesh):
     """
     Write TOUGH MESH file.
     """
@@ -33,7 +33,7 @@ def write(filename, mesh, rotation_angle):
     labels = numpy.concatenate(mesh.labels)
     with open(filename, "w") as f:
         _write_eleme(f, mesh, labels, nodes)
-        _write_conne(f, mesh, labels, nodes, rotation_angle)
+        _write_conne(f, mesh, labels, nodes)
 
 
 def block(keyword):
@@ -106,7 +106,7 @@ def _get_rocks(mesh):
 
 
 @block("CONNE")
-def _write_conne(f, mesh, labels, nodes, rotation_angle):
+def _write_conne(f, mesh, labels, nodes):
     """
     Write CONNE block.
     """
