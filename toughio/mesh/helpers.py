@@ -6,7 +6,7 @@ License: MIT
 """
 
 from ._mesh import Mesh, _meshio_to_toughio_mesh
-from . import tough_io
+from . import tough
 from . import flac3d_io
 from . import eclipse_io
 import meshio
@@ -82,7 +82,7 @@ def read(filename, file_format = None, **kwargs):
 
     # Call custom readers for TOUGH, FLAC3D and Eclipse
     format_to_reader = {
-        "tough": ( tough_io, (), {} ),
+        "tough": ( tough, (), {} ),
         "flac3d": ( flac3d_io, (), {} ),
         "flac3d-ascii": ( flac3d_io, (), {} ),
         "eclipse": (
@@ -139,7 +139,7 @@ def write(filename, mesh, file_format = None, **kwargs):
     # Call custom writer for TOUGH, FLAC3D and Eclipse
     format_to_writer = {
         "tough": (
-            tough_io, (),
+            tough, (),
             {
                 "rotation_angle": 0.,
             },
@@ -148,14 +148,13 @@ def write(filename, mesh, file_format = None, **kwargs):
         "flac3d-ascii": ( flac3d_io, (), {} ),
         "eclipse": ( eclipse_io, (), {} ),
     }
-
-    mesh = mesh.to_meshio()
     if fmt in format_to_writer.keys():
         interface, args, default_kwargs = format_to_writer[fmt]
         _kwargs = default_kwargs.copy()
         _kwargs.update(kwargs)
         interface.write(filename, mesh, *args, **_kwargs)
     else:
+        mesh = mesh.to_meshio()
         meshio.write(filename, mesh, file_format = file_format, **kwargs)
 
 
