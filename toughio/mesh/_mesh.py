@@ -280,6 +280,17 @@ class Mesh:
 
         return mesh
 
+    def to_tough(self, filename = "MESH", **kwargs):
+        """
+        Write TOUGH MESH file.
+
+        Parameters
+        ----------
+        filename : str, default 'MESH'
+            Output file name.
+        """
+        self.write(filename, file_format = "tough", **kwargs)
+
     def write(self, filename, file_format = None, **kwargs):
         """
         Write mesh to file.
@@ -525,9 +536,12 @@ class Mesh:
                     faces_cell[face_type].append(i)
                     faces_index[face_type].append(j)
         
-        for k, v in faces_dict.items():
-            if len(v):
-                faces_dict[k] = numpy.sort(numpy.vstack(v), axis = 1)
+        # Stack arrays or remove empty cells
+        faces_dict = {
+            k: numpy.sort(numpy.vstack(v), axis = 1) for k, v in faces_dict.items() if len(v)
+        }
+        faces_cell = {k: v for k, v in faces_cell.items() if len(v)}
+        faces_index = {k: v for k, v in faces_index.items() if len(v)}
 
         # Prune duplicate faces
         uf, tmp1, tmp2 = {}, {}, {}
