@@ -5,10 +5,12 @@ Author: Keurfon Luu <keurfonluu@lbl.gov>
 License: MIT
 """
 
-from .io import (
+from ._common import (
     Parameters,
     new,
     set_parameters,
+)
+from ._io import (
     read_json,
     to_file,
     to_json,
