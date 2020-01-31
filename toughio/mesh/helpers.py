@@ -92,7 +92,7 @@ def write(filename, mesh, file_format = None, **kwargs):
 
     # Call custom writer for TOUGH and FLAC3D
     format_to_writer = {
-        "tough": ( tough, (), {"nodal_distance": "line"} ),
+        "tough": ( tough, (), {"nodal_distance": "line", "incon_eos": None} ),
         "flac3d": ( flac3d, (), {} ),
         "flac3d-ascii": ( flac3d, (), {} ),
     }
