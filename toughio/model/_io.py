@@ -1,27 +1,60 @@
-# -*- coding: utf-8 -*-
-
-"""
-Author: Keurfon Luu <keurfonluu@lbl.gov>
-License: MIT
-"""
-
 from __future__ import division
 
-import json
-import numpy as np
+import numpy
 
-from .common import (
-    block,
+import json
+
+from ._common import (
     default,
+    set_parameters
 )
 
 __all__ = [
+    "read_json",
     "to_file",
     "to_json",
 ]
 
 
-def to_file(filename = "INFILE"):
+def read_json(filename, return_parameters = False):
+    """
+    Import TOUGH input file.
+    
+    Parameters
+    ----------
+    filename : str
+        Input file name.
+    return_parameters : bool, optional, default False
+        If `True`, return parameters as a dict. Otherwise, overwrite
+        current `toughio.model.Parameters`.
+    
+    Returns
+    -------
+    dict
+        TOUGH input parameters. Only if ``return_parameters == True``.
+    """
+    def to_int(data):
+        """
+        Return dict with integer keys instead of strings.
+        """
+        return { int(k): data[k] for k in sorted(data.keys()) }
+    
+    assert isinstance(filename, str)
+    with open(filename, "r") as f:
+        parameters = json.load(f)
+
+    if "extra_options" in parameters.keys():
+        parameters["extra_options"] = to_int(parameters["extra_options"])
+    if "selections" in parameters.keys():
+        parameters["selections"] = to_int(parameters["selections"])
+
+    if return_parameters:
+        return parameters
+    else:
+        set_parameters(parameters)
+
+
+def to_file(filename = "INFILE", parameters = None):
     """
     Write TOUGH input file.
 
@@ -29,14 +62,21 @@ def to_file(filename = "INFILE"):
     ----------
     filename : str, optional, default 'INFILE'
         Output file name.
+    parameters : dict or None, optional, default None
+        Parameters to export.
     """
     assert isinstance(filename, str)
+    assert parameters is None or isinstance(parameters, dict)
+
+    if parameters is None:
+        from ._common import Parameters as parameters
+
     with open(filename, "w") as f:
-        for record in write_buffer():
+        for record in write_buffer(parameters):
             f.write(record)
 
 
-def to_json(filename = "INFILE.json"):
+def to_json(filename = "INFILE.json", parameters = None):
     """
     Export TOUGH input file to json format.
 
@@ -44,44 +84,47 @@ def to_json(filename = "INFILE.json"):
     ----------
     filename : str, optional, default 'INFILE.json'
         Output file name.
+    parameters : dict or None, optional, default None
+        Parameters to export.
     """
     assert isinstance(filename, str)
+    assert parameters is None or isinstance(parameters, dict)
 
-    # Dump dict to json
-    from .common import Parameters
+    if parameters is None:
+        from ._common import Parameters as parameters
+
     with open(filename, "w") as f:
-        json.dump(Parameters, f, indent = 4)
+        json.dump(parameters, f, indent = 4)
 
 
-def write_buffer():
+def write_buffer(parameters):
     """
     Write TOUGH input file as a list of 80-character long record strings.
     """
-    # Import current parameter settings
-    from .common import Parameters, eos, eos_select
+    from ._common import eos, eos_select
 
     # Check that EOS is defined (for block MULTI)
-    if Parameters["isothermal"] and Parameters["eos"] not in eos.keys():
+    if parameters["isothermal"] and parameters["eos"] not in eos.keys():
         raise ValueError(
-            "EOS '{}' is unknown or not supported.".format(Parameters["eos"])
+            "EOS '{}' is unknown or not supported.".format(parameters["eos"])
         )
 
     # Define input file contents
-    out = [ "{:80}\n".format(Parameters["title"]) ]
-    out += _write_rocks(Parameters)
-    out += _write_flac(Parameters) if Parameters["flac"] else []
-    out += _write_multi(Parameters) if Parameters["eos"] else []
-    out += _write_selec(Parameters) if Parameters["eos"] in eos_select else []
-    out += _write_solvr(Parameters) if Parameters["solver"] else []
-    out += _write_start() if Parameters["start"] else []
-    out += _write_param(Parameters)
-    out += _write_times(Parameters) if Parameters["times"] is not None else []
-    out += _write_foft(Parameters) if Parameters["element_history"] is not None else []
-    out += _write_coft(Parameters) if Parameters["connection_history"] is not None else []
-    out += _write_goft(Parameters) if Parameters["generator_history"] is not None else []
-    out += _write_gener(Parameters) if Parameters["generators"] else []
-    out += _write_nover() if Parameters["nover"] else []
-    out += _write_endfi() if Parameters["endfi"] else _write_endcy()
+    out = [ "{:80}\n".format(parameters["title"]) ]
+    out += _write_rocks(parameters)
+    out += _write_flac(parameters) if parameters["flac"] else []
+    out += _write_multi(parameters) if parameters["eos"] else []
+    out += _write_selec(parameters) if parameters["eos"] in eos_select else []
+    out += _write_solvr(parameters) if parameters["solver"] else []
+    out += _write_start() if parameters["start"] else []
+    out += _write_param(parameters)
+    out += _write_times(parameters) if parameters["times"] is not None else []
+    out += _write_foft(parameters) if parameters["element_history"] is not None else []
+    out += _write_coft(parameters) if parameters["connection_history"] is not None else []
+    out += _write_goft(parameters) if parameters["generator_history"] is not None else []
+    out += _write_gener(parameters) if parameters["generators"] else []
+    out += _write_nover() if parameters["nover"] else []
+    out += _write_endfi() if parameters["endfi"] else _write_endcy()
     return out
 
 
@@ -111,7 +154,7 @@ def _write_multi_record(data, ncol = 8):
     """
     n = len(data)
     rec = [ data[ncol*i:min(ncol*i+ncol, n)]
-            for i in range(int(np.ceil(n/ncol))) ]
+            for i in range(int(numpy.ceil(n/ncol))) ]
     return [ _write_record(r)[0] for r in rec ]
 
 
@@ -125,8 +168,32 @@ def _add_record(data, id_fmt = "{:>5g}     "):
     return _write_record(_format_data(rec))
 
 
+def block(keyword, multi = False, noend = False):
+    """
+    Decorator for block writing functions.
+    """
+
+    def decorator(func):
+        from functools import wraps
+
+        from ._common import header
+
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            head_fmt = "{:5}{}" if noend else "{:5}{}\n"
+            out = [ head_fmt.format(keyword, header) ]
+            out += func(*args, **kwargs)
+            out += [ "\n" ] if multi else []
+
+            return out
+
+        return wrapper
+        
+    return decorator
+
+
 @block("ROCKS", multi = True)
-def _write_rocks(Parameters):
+def _write_rocks(parameters):
     """
     TOUGH input ROCKS block data.
     
@@ -134,17 +201,17 @@ def _write_rocks(Parameters):
     domains.
     """
     # Reorder rocks
-    if Parameters["rocks_order"] is not None:
-        order = Parameters["rocks_order"]
+    if parameters["rocks_order"] is not None:
+        order = parameters["rocks_order"]
     else:
-        order = Parameters["rocks"].keys()
+        order = parameters["rocks"].keys()
 
     out = []
     for k in order:
         # Load data
         data = default.copy()
-        data.update(Parameters["default"])
-        data.update(Parameters["rocks"][k])
+        data.update(parameters["default"])
+        data.update(parameters["rocks"][k])
 
         # Number of additional lines to write per rock
         nad = 0
@@ -154,7 +221,7 @@ def _write_rocks(Parameters):
         # Permeability
         per = data["permeability"]
         per = [ per ] * 3 if isinstance(per, float) else per
-        assert isinstance(per, (list, tuple, np.ndarray)) and len(per) == 3
+        assert isinstance(per, (list, tuple, numpy.ndarray)) and len(per) == 3
 
         # Record 1
         out += _write_record(_format_data([
@@ -189,30 +256,30 @@ def _write_rocks(Parameters):
 
 
 @block("FLAC", multi = True)
-def _write_flac(Parameters):
+def _write_flac(parameters):
     """
     TOUGH input FLAC block data (optional).
 
     Introduces mechanical parameters for each material in ROCKS block data.
     """
     # Reorder rocks
-    if Parameters["rocks_order"]:
-        order = Parameters["rocks_order"]
+    if parameters["rocks_order"]:
+        order = parameters["rocks_order"]
     else:
-        order = Parameters["rocks"].keys()
+        order = parameters["rocks"].keys()
     
     # Record 1
     out = _write_record(_format_data([
-        ( 1 if Parameters["creep"] else 0, "{:5g}" ),
-        ( Parameters["porosity_model"], "{:5g}" ),
+        ( 1 if parameters["creep"] else 0, "{:5g}" ),
+        ( parameters["porosity_model"], "{:5g}" ),
     ]))
 
     # Additional records
     for k in order:
         # Load data
         data = default.copy()
-        data.update(Parameters["default"])
-        data.update(Parameters["rocks"][k])
+        data.update(parameters["default"])
+        data.update(parameters["rocks"][k])
 
         # Permeability law
         out += _add_record(data["permeability_model"], "{:>10g}")
@@ -223,7 +290,7 @@ def _write_flac(Parameters):
 
 
 @block("MULTI")
-def _write_multi(Parameters):
+def _write_multi(parameters):
     """
     TOUGH input MULTI block (optional).
 
@@ -233,16 +300,16 @@ def _write_multi(Parameters):
     default values are provided internally. Available parameter choices
     are different for different EOS modules.
     """
-    from .common import eos
-    out = list(eos[Parameters["eos"]])
-    out[0] = Parameters["n_component"] if Parameters["n_component"] else out[0]
-    out[1] = out[0] if Parameters["isothermal"] else out[0]+1
-    out[2] = Parameters["n_phase"] if Parameters["n_phase"] else out[2]
+    from ._common import eos
+    out = list(eos[parameters["eos"]])
+    out[0] = parameters["n_component"] if parameters["n_component"] else out[0]
+    out[1] = out[0] if parameters["isothermal"] else out[0]+1
+    out[2] = parameters["n_phase"] if parameters["n_phase"] else out[2]
     return [ ("{:>5d}"*len(out) + "\n").format(*out) ]
 
 
 @block("SELEC")
-def _write_selec(Parameters):
+def _write_selec(parameters):
     """
     TOUGH input SELEC block (optional).
 
@@ -251,9 +318,9 @@ def _write_selec(Parameters):
     EWASG, T2DM, ECO2N).
     """
     # Load data
-    from .common import select
+    from ._common import select
     data = select.copy()
-    data.update(Parameters["selections"])
+    data.update(parameters["selections"])
 
     # Record 1
     out = _write_record(_format_data([
@@ -261,24 +328,24 @@ def _write_selec(Parameters):
     ]))
 
     # Record 2
-    if Parameters["extra_selections"] is not None:
+    if parameters["extra_selections"] is not None:
         out += _write_multi_record(_format_data([
-            ( i, "{:>10.3e}" ) for i in Parameters["extra_selections"]
+            ( i, "{:>10.3e}" ) for i in parameters["extra_selections"]
         ]))
     return out
 
 
 @block("SOLVR")
-def _write_solvr(Parameters):
+def _write_solvr(parameters):
     """
     TOUGH input SOLVR block (optional).
 
     Introduces computation parameters, time stepping information, and
     default initial conditions.
     """
-    from .common import solver
+    from ._common import solver
     data = solver.copy()
-    data.update(Parameters["solver"])
+    data.update(parameters["solver"])
     return _write_record(_format_data([
         ( data["method"], "{:1g}  " ),
         ( data["z_precond"], "{:>2g}   " ),
@@ -299,13 +366,13 @@ def _write_start():
     (in which case defaults will be used). Without START, there must be a
     one-to-one correspondence between the data in blocks ELEME and INCON.
     """
-    from .common import header
+    from ._common import header
     out = "{:5}{}\n".format("----*", header)
     return [ out[:11] + "MOP: 123456789*123456789*1234" + out[40:] ]
 
 
 @block("PARAM")
-def _write_param(Parameters):
+def _write_param(parameters):
     """
     TOUGH input PARAM block data.
     
@@ -313,18 +380,18 @@ def _write_param(Parameters):
     default initial conditions.
     """
     # Load data
-    from .common import options
+    from ._common import options
     data = options.copy()
-    data.update(Parameters["options"])
+    data.update(parameters["options"])
 
     # Table
-    if not isinstance(data["t_steps"], (list, tuple, np.ndarray)):
+    if not isinstance(data["t_steps"], (list, tuple, numpy.ndarray)):
         data["t_steps"] = [ data["t_steps"] ]
 
     # Record 1
-    from .common import extra_options
+    from ._common import extra_options
     _mop = extra_options.copy()
-    _mop.update(Parameters["extra_options"])
+    _mop.update(parameters["extra_options"])
     mop = _format_data([ ( _mop[k], "{:>1g}" )
                             for k in sorted(_mop.keys()) ])
     out = _write_record(_format_data([
@@ -375,13 +442,13 @@ def _write_param(Parameters):
 
 
 @block("TIMES", multi = True)
-def  _write_times(Parameters):
+def  _write_times(parameters):
     """
     TOUGH input TIMES block data (optional).
     
     Permits the user to obtain printout at specified times.
     """
-    data = Parameters["times"]
+    data = parameters["times"]
     n = len(data)
     out = _write_record(_format_data([
         ( n, "{:>5g}" ),
@@ -393,7 +460,7 @@ def  _write_times(Parameters):
 
 
 @block("FOFT", multi = True)
-def _write_foft(Parameters):
+def _write_foft(parameters):
     """
     TOUGH input FOFT block data (optional).
     
@@ -402,12 +469,12 @@ def _write_foft(Parameters):
     the simulation.
     """
     return _write_record(_format_data([
-        ( i, "{:>5g}" ) for i in Parameters["element_history"]
+        ( i, "{:>5g}" ) for i in parameters["element_history"]
     ]))
 
 
 @block("COFT", multi = True)
-def _write_coft(Parameters):
+def _write_coft(parameters):
     """
     TOUGH input COFT block data (optional).
     
@@ -416,12 +483,12 @@ def _write_coft(Parameters):
     simulation.
     """
     return _write_record(_format_data([
-        ( i, "{:>10g}" ) for i in Parameters["connection_history"]
+        ( i, "{:>10g}" ) for i in parameters["connection_history"]
     ]))
 
 
 @block("GOFT", multi = True)
-def _write_goft(Parameters):
+def _write_goft(parameters):
     """
     TOUGH input GOFT block data (optional).
     
@@ -430,30 +497,30 @@ def _write_goft(Parameters):
     simulation.
     """
     return _write_record(_format_data([
-        ( i, "{:>5g}" ) for i in Parameters["generator_history"]
+        ( i, "{:>5g}" ) for i in parameters["generator_history"]
     ]))
 
 
 @block("GENER", multi = True)
-def _write_gener(Parameters):
+def _write_gener(parameters):
     """
     TOUGH input GENER block data (optional).
     
     Introduces sinks and/or sources.
     """
-    from .common import generators
+    from ._common import generators
 
     out = []
-    for k, v in Parameters["generators"].items():    
+    for k, v in parameters["generators"].items():    
         # Load data
         data = generators.copy()
         data.update(v)
         
         # Table
         ltab, itab = None, None
-        if data["times"] is not None and isinstance(data["times"], (list, tuple, np.ndarray)):
+        if data["times"] is not None and isinstance(data["times"], (list, tuple, numpy.ndarray)):
             ltab, itab = len(data["times"]), 1
-            assert isinstance(data["rates"], (list, tuple, np.ndarray))
+            assert isinstance(data["rates"], (list, tuple, numpy.ndarray))
             assert ltab > 1 and ltab == len(data["rates"])
 
         # Record 1
@@ -486,10 +553,10 @@ def _write_gener(Parameters):
 
         # Record 4
         if ltab and data["specific_enthalpy"] is not None:
-            if isinstance(data["specific_enthalpy"], (list, tuple, np.ndarray)):
+            if isinstance(data["specific_enthalpy"], (list, tuple, numpy.ndarray)):
                 specific_enthalpy = data["specific_enthalpy"]
             else:
-                specific_enthalpy = np.full(ltab, data["specific_enthalpy"])
+                specific_enthalpy = numpy.full(ltab, data["specific_enthalpy"])
             out += _write_multi_record(_format_data([
                 ( i, "{:>14.7e}" ) for i in specific_enthalpy
             ]), ncol = 4)

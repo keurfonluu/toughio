@@ -5,9 +5,6 @@ Author: Keurfon Luu <keurfonluu@lbl.gov>
 License: MIT
 """
 
-import numpy as np
-from functools import wraps
-
 __all__ = [
     "Parameters",
     "select",
@@ -21,7 +18,6 @@ __all__ = [
     "header",
     "new",
     "set_parameters",
-    "block",
 ]
 
 
@@ -178,19 +174,3 @@ def set_parameters(parameters):
     assert isinstance(parameters, dict)
     Parameters.update(_Parameters)
     Parameters.update(parameters)
-
-
-def block(keyword, multi = False, noend = False):
-    """
-    Decorator for block writing functions.
-    """
-    def decorator(func):
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            head_fmt = "{:5}{}" if noend else "{:5}{}\n"
-            out = [ head_fmt.format(keyword, header) ]
-            out += func(*args, **kwargs)
-            out += [ "\n" ] if multi else []
-            return out
-        return wrapper
-    return decorator
