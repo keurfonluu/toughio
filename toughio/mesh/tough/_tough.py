@@ -66,6 +66,11 @@ def _write_eleme(f, mesh, labels, nodes):
     rocks = _get_rocks(mesh)
     volumes = numpy.concatenate(mesh.volumes)
 
+    # Apply time-independent Dirichlet boundary conditions
+    if "dirichlet_bc" in mesh.cell_data.keys():
+        bc = numpy.concatenate(mesh.cell_data["dirichlet_bc"])
+        volumes *= numpy.where(bc, 1.0e50, 1.0)
+
     # Write ELEME block
     fmt = "{:5.5}{:>5}{:>5}{:>5}{:10.4e}{:>10}{:>10}{:10.3e}{:10.3e}{:10.3e}\n"
     iterables = zip(labels, rocks, volumes, nodes)
@@ -120,9 +125,16 @@ def _write_conne(f, mesh, labels, nodes):
     faces_dict, faces_cell = _get_faces(faces)
     face_normals, face_areas = _get_face_normals_areas(mesh, faces_dict, faces_cell)
 
+    # Define boundary elements
+    bc = (
+        numpy.concatenate(mesh.cell_data["dirichlet_bc"])
+        if "dirichlet_bc" in mesh.cell_data.keys()
+        else numpy.zeros(mesh.n_cells)
+    )
+
     # Define unique connection variables
     cell_list = set()
-    clabels, centers, int_points, int_normals, areas = [], [], [], [], []
+    clabels, centers, int_points, int_normals, areas, bounds = [], [], [], [], [], []
     for i, neighbor in enumerate(neighbors):
         if (neighbor >= 0).any():
             for iface, j in enumerate(neighbor):
@@ -140,6 +152,9 @@ def _write_conne(f, mesh, labels, nodes):
 
                     # Area of common face
                     areas.append(face_areas[i][iface])
+
+                    # Boundary conditions
+                    bounds.append([bc[i], bc[j]])
         else:
             logging.warning(
                 "\nElement '{}' is not connected to the grid.".format(labels[i])
@@ -149,6 +164,7 @@ def _write_conne(f, mesh, labels, nodes):
     centers = numpy.array(centers)
     int_points = numpy.array(int_points)
     int_normals = numpy.array(int_normals)
+    bounds = numpy.array(bounds)
 
     # Calculate remaining variables not available in itasca module
     lines = numpy.diff(centers, axis=1)[:, 0]
@@ -156,8 +172,8 @@ def _write_conne(f, mesh, labels, nodes):
     angles = numpy.dot(lines, g_vec) / numpy.linalg.norm(lines, axis=1)
 
     fp = _intersection_line_plane(centers[:, 0], lines, int_points, int_normals)
-    d1 = numpy.linalg.norm(centers[:, 0] - fp, axis=1)
-    d2 = numpy.linalg.norm(centers[:, 1] - fp, axis=1)
+    d1 = numpy.where(bounds[:, 0], 1.0e-9, numpy.linalg.norm(centers[:, 0] - fp, axis=1))
+    d2 = numpy.where(bounds[:, 1], 1.0e-9, numpy.linalg.norm(centers[:, 1] - fp, axis=1))
 
     # Write CONNE block
     fmt = "{:10.10}{:>5}{:>5}{:>5}{:>5g}{:10.4e}{:10.4e}{:10.4e}{:10.3e}\n"
