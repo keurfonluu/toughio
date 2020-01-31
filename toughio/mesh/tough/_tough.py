@@ -30,7 +30,7 @@ def write(filename, mesh, nodal_distance):
     Write TOUGH MESH file.
     """
     assert nodal_distance in {"line", "orthogonal"}
-    
+
     nodes = numpy.concatenate(mesh.centers)
     labels = numpy.concatenate(mesh.labels)
     with open(filename, "w") as f:
@@ -69,8 +69,8 @@ def _write_eleme(f, mesh, labels, nodes):
     volumes = numpy.concatenate(mesh.volumes)
 
     # Apply time-independent Dirichlet boundary conditions
-    if "dirichlet_bc" in mesh.cell_data.keys():
-        bc = numpy.concatenate(mesh.cell_data["dirichlet_bc"])
+    if "boundary_condition" in mesh.cell_data.keys():
+        bc = numpy.concatenate(mesh.cell_data["boundary_condition"])
         volumes *= numpy.where(bc, 1.0e50, 1.0)
 
     # Write ELEME block
@@ -129,8 +129,8 @@ def _write_conne(f, mesh, labels, nodes, nodal_distance):
 
     # Define boundary elements
     bc = (
-        numpy.concatenate(mesh.cell_data["dirichlet_bc"])
-        if "dirichlet_bc" in mesh.cell_data.keys()
+        numpy.concatenate(mesh.cell_data["boundary_condition"])
+        if "boundary_condition" in mesh.cell_data.keys()
         else numpy.zeros(mesh.n_cells)
     )
 
