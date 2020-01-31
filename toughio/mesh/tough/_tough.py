@@ -51,6 +51,35 @@ def write(filename, mesh, nodal_distance, incon_eos):
         incon_eos is None or incon_eos in _eos_to_neq.keys()
     ), "EOS '{}' is unknown or not supported.".format(incon_eos)
 
+    # Check porosity
+    if "porosity" in mesh.cell_data.keys():
+        porosity = numpy.concatenate(mesh.cell_data["porosity"])
+        if not incon_eos:
+            logging.warning("\nPorosity is only exported if incon_eos is provided.")
+        else:
+            assert (
+                len(porosity) == mesh.n_cells and porosity.ndim == 1
+            ), "Inconsistent porosity array."
+    else:
+        porosity = None
+
+    # Check permeability
+    if "permeability" in mesh.cell_data.keys():
+        permeability = numpy.concatenate(mesh.cell_data["permeability"])
+        if not incon_eos:
+            logging.warning(
+                "\nPermeability modifiers are only exported if incon_eos is provided."
+            )
+        else:
+            assert permeability.ndim in {1, 2}
+            assert (
+                permeability.shape == (mesh.n_cells, 3)
+                if permeability.ndim == 2
+                else len(permeability) == mesh.n_cells
+            ), "Inconsistent permeability modifiers array."
+    else:
+        permeability = None
+
     # Write MESH file
     nodes = numpy.concatenate(mesh.centers)
     labels = numpy.concatenate(mesh.labels)
@@ -62,7 +91,7 @@ def write(filename, mesh, nodal_distance, incon_eos):
     if incon_eos:
         try:
             with open("INCON", "w") as f:
-                _write_incon(f, incon_eos, mesh, labels)
+                _write_incon(f, incon_eos, mesh, labels, porosity, permeability)
         except AssertionError:
             logging.warning(
                 (
@@ -345,7 +374,7 @@ def _dot(A, B):
 
 
 @block("INCON")
-def _write_incon(f, incon_eos, mesh, labels):
+def _write_incon(f, incon_eos, mesh, labels, porosity, permeability):
     # Import initial conditions array
     assert "initial_condition" in mesh.cell_data.keys()
     pvars = numpy.concatenate(mesh.cell_data["initial_condition"])
@@ -354,8 +383,29 @@ def _write_incon(f, incon_eos, mesh, labels):
     if (pvars[:,0] < 0.0).any():
         logging.warning("\nNegative pore pressures found in 'INCON'.")
 
-    # Write INCON block
+    # Write label, porosity and permeability
     buffer = ["{:5.5}".format(label) for label in labels]
+    if porosity is not None:
+        buffer = [
+            buf + "{:10}{:15.9e}".format("", phi) for buf, phi in zip(buffer, porosity)
+        ]
+    else:
+        buffer = [buf + "{:10}{:15}".format("", "") for buf in buffer]
+    if permeability is not None:
+        if permeability.ndim == 1:
+            buffer = [
+                buf + "{:10.3e}{:10}{:10}".format(k, "", "")
+                for buf, k in zip(buffer, permeability)
+            ]
+        else:
+            buffer = [
+                buf + "{:10.3e}{:10.3e}{:10.3e}".format(*k)
+                for buf, k in zip(buffer, permeability)
+            ]
+    else:
+        buffer = [buf + "{:10}{:10}{:10}".format("", "", "") for buf in buffer]
+
+    # Write INCON block
     for pvar, buf in zip(pvars, buffer):
         f.write(buf + "\n")
         for v in pvar:
