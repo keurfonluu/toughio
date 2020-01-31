@@ -12,6 +12,23 @@ __all__ = [
 ]
 
 
+_eos_to_neq = {
+    "eos1": 2,
+    "eos2": 3,
+    "eos3": 3,
+    "eos4": 3,
+    "eos5": 3,
+    "eos7": 3,
+    "eos8": 3,
+    "eos9": 1,
+    "eosmvoc": 4,
+    "eoswasg": 4,
+    "eco2n": 4,
+    "eco2n_v2": 4,
+    "eco2m": 4,
+}
+
+
 meshio_data = {"avsucd:material", "flac3d:zone", "gmsh:physical", "medit:ref", "tough:material"}
 
 
@@ -25,17 +42,34 @@ def read(filename):
     )
 
 
-def write(filename, mesh, nodal_distance):
+def write(filename, mesh, nodal_distance, incon_eos):
     """
     Write TOUGH MESH file.
     """
     assert nodal_distance in {"line", "orthogonal"}
+    assert (
+        incon_eos is None or incon_eos in _eos_to_neq.keys()
+    ), "EOS '{}' is unknown or not supported.".format(incon_eos)
 
+    # Write MESH file
     nodes = numpy.concatenate(mesh.centers)
     labels = numpy.concatenate(mesh.labels)
     with open(filename, "w") as f:
         _write_eleme(f, mesh, labels, nodes)
         _write_conne(f, mesh, labels, nodes, nodal_distance)
+
+    # Write INCON file
+    if incon_eos:
+        try:
+            with open("INCON", "w") as f:
+                _write_incon(f, incon_eos, mesh, labels)
+        except AssertionError:
+            logging.warning(
+                (
+                    "\nInitial conditions are not defined or incorrectly defined for EOS '{}'."
+                    "\nWriting INCON is ignored."
+                ).format(incon_eos)
+            )
 
 
 def block(keyword):
@@ -308,3 +342,22 @@ def _dot(A, B):
     Custom dot product when arrays A and B have the same shape.
     """
     return (A * B).sum(axis=1)
+
+
+@block("INCON")
+def _write_incon(f, incon_eos, mesh, labels):
+    # Import initial conditions array
+    assert "initial_condition" in mesh.cell_data.keys()
+    pvars = numpy.concatenate(mesh.cell_data["initial_condition"])
+
+    # Check initial pore pressures
+    if (pvars[:,0] < 0.0).any():
+        logging.warning("\nNegative pore pressures found in 'INCON'.")
+
+    # Write INCON block
+    buffer = ["{:5.5}".format(label) for label in labels]
+    for pvar, buf in zip(pvars, buffer):
+        f.write(buf + "\n")
+        for v in pvar:
+            f.write("{:20.4e}".format(v) if v > -1.0e9 else "{:20}".format(""))
+        f.write("\n")
