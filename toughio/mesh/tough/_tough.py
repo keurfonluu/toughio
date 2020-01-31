@@ -25,15 +25,17 @@ def read(filename):
     )
 
 
-def write(filename, mesh):
+def write(filename, mesh, nodal_distance):
     """
     Write TOUGH MESH file.
     """
+    assert nodal_distance in {"line", "orthogonal"}
+    
     nodes = numpy.concatenate(mesh.centers)
     labels = numpy.concatenate(mesh.labels)
     with open(filename, "w") as f:
         _write_eleme(f, mesh, labels, nodes)
-        _write_conne(f, mesh, labels, nodes)
+        _write_conne(f, mesh, labels, nodes, nodal_distance)
 
 
 def block(keyword):
@@ -111,7 +113,7 @@ def _get_rocks(mesh):
 
 
 @block("CONNE")
-def _write_conne(f, mesh, labels, nodes):
+def _write_conne(f, mesh, labels, nodes, nodal_distance):
     """
     Write CONNE block.
     """
@@ -171,10 +173,14 @@ def _write_conne(f, mesh, labels, nodes):
     isot = _isot(lines)
     angles = numpy.dot(lines, g_vec) / numpy.linalg.norm(lines, axis=1)
 
-    fp = _intersection_line_plane(centers[:, 0], lines, int_points, int_normals)
-    d1 = numpy.where(bounds[:, 0], 1.0e-9, numpy.linalg.norm(centers[:, 0] - fp, axis=1))
-    d2 = numpy.where(bounds[:, 1], 1.0e-9, numpy.linalg.norm(centers[:, 1] - fp, axis=1))
-
+    if nodal_distance == "line":
+        fp = _intersection_line_plane(centers[:, 0], lines, int_points, int_normals)
+        d1 = numpy.where(bounds[:, 0], 1.0e-9, numpy.linalg.norm(centers[:, 0] - fp, axis=1))
+        d2 = numpy.where(bounds[:, 1], 1.0e-9, numpy.linalg.norm(centers[:, 1] - fp, axis=1))
+    elif nodal_distance == "orthogonal":
+        d1 = _distance_point_plane(centers[:, 0], int_points, int_normals, bounds[:, 0])
+        d2 = _distance_point_plane(centers[:, 1], int_points, int_normals, bounds[:, 1])
+    
     # Write CONNE block
     fmt = "{:10.10}{:>5}{:>5}{:>5}{:>5g}{:10.4e}{:10.4e}{:10.4e}{:10.3e}\n"
     iterables = zip(clabels, isot, d1, d2, areas, angles)
