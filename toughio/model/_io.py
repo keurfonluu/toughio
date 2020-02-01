@@ -110,22 +110,21 @@ def write_buffer(parameters):
         )
 
     # Define input file contents
-    out = [ "{:80}\n".format(Parameters["title"]) ]
-    out += _write_rocks(Parameters)
-    out += _write_flac(Parameters) if Parameters["flac"] else []
-    out += _write_multi(Parameters) if Parameters["eos"] else []
-    out += _write_selec(Parameters) if Parameters["eos"] in eos_select else []
-    out += _write_solvr(Parameters) if Parameters["solver"] else []
-    out += _write_start() if Parameters["start"] else []
-    out += _write_param(Parameters)
-    out += _write_momop(Parameters) if Parameters["more_options"] else []
-    out += _write_times(Parameters) if Parameters["times"] is not None else []
-    out += _write_foft(Parameters) if Parameters["element_history"] is not None else []
-    out += _write_coft(Parameters) if Parameters["connection_history"] is not None else []
-    out += _write_goft(Parameters) if Parameters["generator_history"] is not None else []
-    out += _write_gener(Parameters) if Parameters["generators"] else []
-    out += _write_nover() if Parameters["nover"] else []
-    out += _write_endfi() if Parameters["endfi"] else _write_endcy()
+    out = [ "{:80}\n".format(parameters["title"]) ]
+    out += _write_rocks(parameters)
+    out += _write_flac(parameters) if parameters["flac"] else []
+    out += _write_multi(parameters) if parameters["eos"] else []
+    out += _write_selec(parameters) if parameters["eos"] in eos_select else []
+    out += _write_solvr(parameters) if parameters["solver"] else []
+    out += _write_start() if parameters["start"] else []
+    out += _write_param(parameters)
+    out += _write_times(parameters) if parameters["times"] is not None else []
+    out += _write_foft(parameters) if parameters["element_history"] is not None else []
+    out += _write_coft(parameters) if parameters["connection_history"] is not None else []
+    out += _write_goft(parameters) if parameters["generator_history"] is not None else []
+    out += _write_gener(parameters) if parameters["generators"] else []
+    out += _write_nover() if parameters["nover"] else []
+    out += _write_endfi() if parameters["endfi"] else _write_endcy()
     return out
 
 
@@ -480,9 +479,15 @@ def _write_foft(parameters):
     data are to be written out for plotting to a file called FOFT during
     the simulation.
     """
+<<<<<<< HEAD:toughio/model/_io.py
     return _write_multi_record(_format_data([
         ( i, "{:>5g}" ) for i in Parameters["element_history"]
     ]), ncol = 1)
+=======
+    return _write_record(_format_data([
+        ( i, "{:>5g}" ) for i in parameters["element_history"]
+    ]))
+>>>>>>> 8f4e5c8e3004cec528922be5263b8eacfd641a56:toughio/model/io/write.py
 
 
 @block("COFT", multi = True)
@@ -494,9 +499,9 @@ def _write_coft(parameters):
     be written out for plotting to a file called COFT during the
     simulation.
     """
-    return _write_multi_record(_format_data([
-        ( i, "{:>10g}" ) for i in Parameters["connection_history"]
-    ]), ncol = 1)
+    return _write_record(_format_data([
+        ( i, "{:>10g}" ) for i in parameters["connection_history"]
+    ]))
 
 
 @block("GOFT", multi = True)
@@ -508,9 +513,9 @@ def _write_goft(parameters):
     to be written out for plotting to a file called GOFT during the
     simulation.
     """
-    return _write_multi_record(_format_data([
-        ( i, "{:>5g}" ) for i in Parameters["generator_history"]
-    ]), ncol = 1)
+    return _write_record(_format_data([
+        ( i, "{:>5g}" ) for i in parameters["generator_history"]
+    ]))
 
 
 @block("GENER", multi = True)
