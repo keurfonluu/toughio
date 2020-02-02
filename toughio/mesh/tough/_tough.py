@@ -89,8 +89,12 @@ def write(filename, mesh, nodal_distance, incon_eos):
 
     # Write INCON file
     if incon_eos:
+        import os
+
+        head = os.path.split(filename)[0]
+        head += "/" if head else ""
         try:
-            with open("INCON", "w") as f:
+            with open(head + "INCON", "w") as f:
                 _write_incon(f, incon_eos, mesh, labels, porosity, permeability)
         except AssertionError:
             logging.warning(
