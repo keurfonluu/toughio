@@ -508,9 +508,9 @@ class Mesh:
         return [self.points[c.data].mean(axis = 1) for c in self.cells]
 
     @property
-    def connectivity(self):
+    def connections(self):
         """
-        Returns mesh connectivity assuming conformity and that points and
+        Returns mesh connections assuming conformity and that points and
         cells are uniquely defined in mesh (use ``prune_duplicates`` otherwise).
 
         Note
@@ -518,7 +518,7 @@ class Mesh:
         Only for 3D meshes and first order cells.
         """
         assert numpy.shape(self.points)[1] == 3, (
-            "Connectivity for 2D mesh has not been implemented yet."
+            "Connections for 2D mesh has not been implemented yet."
         )
 
         # Reconstruct all the faces
