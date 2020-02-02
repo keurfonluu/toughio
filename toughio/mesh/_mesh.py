@@ -4,7 +4,7 @@ import numpy
 import meshio
 from copy import deepcopy
 
-from ._common import get_meshio_version
+from ._common import meshio_data, get_meshio_version
 
 __all__ = [
     "Cells",
@@ -567,6 +567,21 @@ class Mesh:
         return self.split(out)
 
     @property
+    def materials(self):
+        """
+        Returns material for each cell in mesh.
+        """
+        if "material" in self.cell_data.keys():
+            if self.field_data:
+                out = numpy.concatenate(self.cell_data["material"])
+                field_data_dict = {v[0]: k for k, v in self.field_data.items()}
+                return self.split([field_data_dict[mat] for mat in out])
+            else:
+                return self.cell_data["material"]
+        else:
+            return []
+
+    @property
     def volumes(self):
         """
         Returns volume for each cell in mesh.
@@ -635,6 +650,11 @@ def from_meshio(mesh):
             for k in cell_data.keys():
                 for kk in mesh.cells.keys():
                     cell_data[k].append(mesh.cell_data[kk][k])
+
+        for k in cell_data.keys():
+            if k in meshio_data:
+                cell_data["material"] = cell_data.pop(k)
+                break
     else:
         cell_data = {}
 
