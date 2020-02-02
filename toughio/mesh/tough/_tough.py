@@ -2,7 +2,6 @@ from __future__ import division, with_statement, unicode_literals
 
 import logging
 
-import itertools
 
 import numpy
 
