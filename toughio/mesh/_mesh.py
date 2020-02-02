@@ -579,7 +579,7 @@ class Mesh:
             else:
                 return self.cell_data["material"]
         else:
-            return self.split(numpy.ones(mesh.n_cells, dtype=int))
+            return self.split(numpy.ones(self.n_cells, dtype=int))
 
     @property
     def volumes(self):
