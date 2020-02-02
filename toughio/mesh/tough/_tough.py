@@ -110,7 +110,7 @@ def write(filename, mesh, nodal_distance, incon_eos):
         else numpy.zeros(num_cells, dtype = int)
     )
     points = mesh.points
-    connections = numpy.concatenate(mesh.connectivity)
+    connections = numpy.concatenate(mesh.connections)
     gravity = numpy.array([0., 0., 1.])
 
     # Define parameters related to faces
