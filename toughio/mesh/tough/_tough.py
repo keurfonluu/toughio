@@ -2,8 +2,9 @@ from __future__ import division, with_statement, unicode_literals
 
 import logging
 
-
 import numpy
+
+from .._common import meshio_data
 
 __all__ = [
     "read",
@@ -26,9 +27,6 @@ _eos_to_neq = {
     "eco2n_v2": 4,
     "eco2m": 4,
 }
-
-
-meshio_data = {"avsucd:material", "flac3d:zone", "gmsh:physical", "medit:ref", "tough:material"}
 
 
 def read(filename):

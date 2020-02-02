@@ -4,6 +4,7 @@ import time
 
 import numpy
 
+from .._common import meshio_data
 from .._mesh import Cells, Mesh
 from ...__about__ import __version__ as version
 
@@ -21,9 +22,6 @@ meshio_only = {
     "hexahedron24": "hexahedron",
     "hexahedron27": "hexahedron",
 }
-
-
-meshio_data = {"avsucd:material", "flac3d:zone", "gmsh:physical", "medit:ref", "tough:material"}
 
 
 numnodes_to_meshio_type = {

@@ -7,6 +7,7 @@ __all__ = [
     "meshio_to_vtk_type",
     "vtk_type_to_numnodes",
     "meshio_type_to_ndim",
+    "meshio_data",
     "get_meshio_version",
 ]
 
@@ -96,6 +97,15 @@ meshio_type_to_ndim.update({
     "polygon": 2,
     "quad": 2,
 })
+
+
+meshio_data = {
+    "material",
+    "avsucd:material",
+    "flac3d:zone",
+    "gmsh:physical",
+    "medit:ref",
+}
 
 
 def get_meshio_version():
