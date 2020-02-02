@@ -29,6 +29,27 @@ _eos_to_neq = {
 }
 
 
+def block(keyword):
+    """
+    Decorator for block writing functions.
+    """
+
+    def decorator(func):
+        from functools import wraps
+
+        header = "----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8"
+
+        @wraps(func)
+        def wrapper(f, *args):
+            f.write("{}{}\n".format(keyword, header))
+            func(f, *args)
+            f.write("\n")
+
+        return wrapper
+
+    return decorator
+
+
 def read(filename):
     """
     Read TOUGH MESH file is not supported yet. MESH file does not store
@@ -77,75 +98,173 @@ def write(filename, mesh, nodal_distance, incon_eos):
     else:
         permeability = None
 
-    # Write MESH file
-    nodes = numpy.concatenate(mesh.centers)
+    # Required variables for blocks ELEME and CONNE
+    num_cells = mesh.n_cells
     labels = numpy.concatenate(mesh.labels)
+    nodes = numpy.concatenate(mesh.centers)
+    materials = numpy.concatenate(mesh.materials)
+    volumes = numpy.concatenate(mesh.volumes)
+    boundary_conditions = (
+        numpy.concatenate(mesh.cell_data["boundary_condition"])
+        if "boundary_condition" in mesh.cell_data.keys()
+        else numpy.zeros(num_cells, dtype = int)
+    )
+    points = mesh.points
+    connections = numpy.concatenate(mesh.connectivity)
+    gravity = numpy.array([0., 0., 1.])
+
+    # Define parameters related to faces
+    faces = numpy.concatenate(mesh.faces)
+    faces_dict, faces_cell = _get_faces(faces)
+    face_normals, face_areas = _get_face_normals_areas(mesh, faces_dict, faces_cell)
+
+    # Required variables for block INCON
+    if incon_eos:
+        primary_variables = (
+            numpy.concatenate(mesh.cell_data["initial_condition"])
+            if "initial_condition" in mesh.cell_data.keys()
+            else None
+        )
+        porosities = (
+            numpy.concatenate(mesh.cell_data["porosity"])
+            if "porosity" in mesh.cell_data.keys()
+            else None
+        )
+        permeabilities = (
+            numpy.concatenate(mesh.cell_data["permeability"])
+            if "permeability" in mesh.cell_data.keys()
+            else None
+        )
+
+    # Write MESH and INCON files
+    write_buffer(
+        filename,
+        num_cells,
+        labels,
+        nodes,
+        materials,
+        volumes,
+        boundary_conditions,
+        points,
+        connections,
+        gravity,
+        faces,
+        face_normals,
+        face_areas,
+        nodal_distance,
+        incon_eos,
+        primary_variables,
+        porosities,
+        permeabilities,
+    )
+
+
+def write_buffer(
+        filename,
+        num_cells,
+        labels,
+        nodes,
+        materials,
+        volumes,
+        boundary_conditions,
+        points,
+        connections,
+        gravity,
+        faces,
+        face_normals,
+        face_areas,
+        nodal_distance,
+        incon_eos,
+        primary_variables,
+        porosities,
+        permeabilities,
+    ):
+    # Check porosity and permeability arrays and show warnings if necessary
+    if porosities is not None:
+        if not incon_eos:
+            logging.warning("\nPorosity is only exported if incon_eos is provided.")
+        else:
+            assert (
+                len(porosities) == num_cells and porosities.ndim == 1
+            ), "Inconsistent porosity array."
+
+    if permeabilities is not None:
+        if not incon_eos:
+            logging.warning(
+                "\nPermeability modifiers are only exported if incon_eos is provided."
+            )
+        else:
+            assert permeabilities.ndim in {1, 2}
+            assert (
+                permeabilities.shape == (num_cells, 3)
+                if permeabilities.ndim == 2
+                else len(permeabilities) == num_cells
+            ), "Inconsistent permeability modifiers array."
+
+    # Write MESH file
     with open(filename, "w") as f:
-        _write_eleme(f, mesh, labels, nodes)
-        _write_conne(f, mesh, labels, nodes, nodal_distance)
+        _write_eleme(
+            f,
+            labels,
+            nodes,
+            materials,
+            volumes,
+            boundary_conditions,
+        )
+        _write_conne(
+            f,
+            labels,
+            nodes,
+            points,
+            connections,
+            gravity,
+            boundary_conditions,
+            faces,
+            face_normals,
+            face_areas,
+            nodal_distance,
+        )
 
     # Write INCON file
     if incon_eos:
         import os
 
         head = os.path.split(filename)[0]
-        head += "/" if head else ""
-        try:
-            with open(head + "INCON", "w") as f:
-                _write_incon(f, incon_eos, mesh, labels, porosity, permeability)
-        except AssertionError:
-            logging.warning(
-                (
-                    "\nInitial conditions are not defined or incorrectly defined for EOS '{}'."
-                    "\nWriting INCON is ignored."
-                ).format(incon_eos)
+        with open(head + "/" if head else "" + "INCON", "w") as f:
+            _write_incon(
+                f,
+                incon_eos,
+                labels,
+                primary_variables,
+                porosities,
+                permeabilities,
             )
 
 
-def block(keyword):
-    """
-    Decorator for block writing functions.
-    """
-
-    def decorator(func):
-        from functools import wraps
-
-        header = "----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8"
-
-        @wraps(func)
-        def wrapper(f, *args):
-            f.write("{}{}\n".format(keyword, header))
-            func(f, *args)
-            f.write("\n")
-
-        return wrapper
-
-    return decorator
-
-
 @block("ELEME")
-def _write_eleme(f, mesh, labels, nodes):
+def _write_eleme(
+    f,
+    labels,
+    nodes,
+    materials,
+    volumes,
+    boundary_conditions,
+    ):
     """
     Write ELEME block.
     """
-    # Define materials and volumes
-    rocks = _get_rocks(mesh)
-    volumes = numpy.concatenate(mesh.volumes)
-
     # Apply time-independent Dirichlet boundary conditions
-    if "boundary_condition" in mesh.cell_data.keys():
-        bc = numpy.concatenate(mesh.cell_data["boundary_condition"])
-        volumes *= numpy.where(bc, 1.0e50, 1.0)
+    volumes *= numpy.where(boundary_conditions, 1.0e50, 1.0)
 
     # Write ELEME block
     fmt = "{:5.5}{:>5}{:>5}{:>5}{:10.4e}{:>10}{:>10}{:10.3e}{:10.3e}{:10.3e}\n"
-    iterables = zip(labels, rocks, volumes, nodes)
-    for label, rock, volume, node in iterables:
+    iterables = zip(labels, materials, volumes, nodes)
+    for label, material, volume, node in iterables:
         record = fmt.format(
             label,  # ID
             "",  # NSEQ
             "",  # NADD
-            rock,  # MAT
+            material,  # MAT
             volume,  # VOLX
             "",  # AHTX
             "",  # PMX
@@ -156,54 +275,29 @@ def _write_eleme(f, mesh, labels, nodes):
         f.write(record)
 
 
-def _get_rocks(mesh):
-    """
-    Returns material type for each cell in mesh.
-    """
-    mat_data = None
-    for k in mesh.cell_data.keys():
-        if k in meshio_data:
-            mat_data = k
-            break
-
-    if mat_data:
-        rocks = numpy.concatenate(mesh.cell_data[mat_data])
-        if mesh.field_data:
-            field_data = {v[0]: k for k, v in mesh.field_data.items() if v[1] == 3}
-            rocks = [field_data[rock] for rock in rocks]
-    else:
-        rocks = numpy.ones(mesh.n_cells, dtype=int)
-    return rocks
-
-
 @block("CONNE")
-def _write_conne(f, mesh, labels, nodes, nodal_distance):
+def _write_conne(
+        f,
+        labels,
+        nodes,
+        points,
+        connections,
+        gravity,
+        boundary_conditions,
+        faces,
+        face_normals,
+        face_areas,
+        nodal_distance,
+    ):
     """
     Write CONNE block.
     """
-    # Define points, connections and normalized gravity vector
-    points = mesh.points
-    neighbors = numpy.concatenate(mesh.connectivity)
-    g_vec = numpy.array([0., 0., 1.])
-
-    # Define parameters related to faces
-    faces = numpy.concatenate(mesh.faces)
-    faces_dict, faces_cell = _get_faces(faces)
-    face_normals, face_areas = _get_face_normals_areas(mesh, faces_dict, faces_cell)
-
-    # Define boundary elements
-    bc = (
-        numpy.concatenate(mesh.cell_data["boundary_condition"])
-        if "boundary_condition" in mesh.cell_data.keys()
-        else numpy.zeros(mesh.n_cells)
-    )
-
     # Define unique connection variables
     cell_list = set()
     clabels, centers, int_points, int_normals, areas, bounds = [], [], [], [], [], []
-    for i, neighbor in enumerate(neighbors):
-        if (neighbor >= 0).any():
-            for iface, j in enumerate(neighbor):
+    for i, connection in enumerate(connections):
+        if (connection >= 0).any():
+            for iface, j in enumerate(connection):
                 if j >= 0 and j not in cell_list:
                     # Label
                     clabels.append("{:5.5}{:5.5}".format(labels[i], labels[j]))
@@ -220,7 +314,9 @@ def _write_conne(f, mesh, labels, nodes, nodal_distance):
                     areas.append(face_areas[i][iface])
 
                     # Boundary conditions
-                    bounds.append([bc[i], bc[j]])
+                    bounds.append(
+                        (boundary_conditions[i], boundary_conditions[j])
+                    )
         else:
             logging.warning(
                 "\nElement '{}' is not connected to the grid.".format(labels[i])
@@ -235,7 +331,7 @@ def _write_conne(f, mesh, labels, nodes, nodal_distance):
     # Calculate remaining variables not available in itasca module
     lines = numpy.diff(centers, axis=1)[:, 0]
     isot = _isot(lines)
-    angles = numpy.dot(lines, g_vec) / numpy.linalg.norm(lines, axis=1)
+    angles = numpy.dot(lines, gravity) / numpy.linalg.norm(lines, axis=1)
 
     if nodal_distance == "line":
         fp = _intersection_line_plane(centers[:, 0], lines, int_points, int_normals)
@@ -261,6 +357,55 @@ def _write_conne(f, mesh, labels, nodes, nodal_distance):
             angle,  # BETAX
         )
         f.write(record)
+
+
+@block("INCON")
+def _write_incon(
+        f,
+        incon_eos,
+        labels,
+        primary_variables,
+        porosities,
+        permeabilities,
+    ):
+    # Check initial pore pressures
+    cond = numpy.logical_and(
+        primary_variables[:,0] > -1.0e9,
+        primary_variables[:,0] < 0.0,
+    )
+    if cond.any():
+        logging.warning("\nNegative pore pressures found in 'INCON'.")
+
+    # Write label, porosity and permeability
+    buffer = ["{:5.5}".format(label) for label in labels]
+
+    if porosities is not None:
+        buffer = [
+            buf + "{:10}{:15.9e}".format("", phi) for buf, phi in zip(buffer, porosities)
+        ]
+    else:
+        buffer = [buf + "{:10}{:15}".format("", "") for buf in buffer]
+        
+    if permeabilities is not None:
+        if permeabilities.ndim == 1:
+            buffer = [
+                buf + "{:10.3e}{:10}{:10}".format(k, "", "")
+                for buf, k in zip(buffer, permeabilities)
+            ]
+        else:
+            buffer = [
+                buf + "{:10.3e}{:10.3e}{:10.3e}".format(*k)
+                for buf, k in zip(buffer, permeabilities)
+            ]
+    else:
+        buffer = [buf + "{:10}{:10}{:10}".format("", "", "") for buf in buffer]
+
+    # Write INCON block
+    for pvar, buf in zip(primary_variables, buffer):
+        f.write(buf + "\n")
+        for v in pvar:
+            f.write("{:20.4e}".format(v) if v > -1.0e9 else "{:20}".format(""))
+        f.write("\n")
 
 
 def _get_faces(faces):
@@ -372,43 +517,3 @@ def _dot(A, B):
     Custom dot product when arrays A and B have the same shape.
     """
     return (A * B).sum(axis=1)
-
-
-@block("INCON")
-def _write_incon(f, incon_eos, mesh, labels, porosity, permeability):
-    # Import initial conditions array
-    assert "initial_condition" in mesh.cell_data.keys()
-    pvars = numpy.concatenate(mesh.cell_data["initial_condition"])
-
-    # Check initial pore pressures
-    if (pvars[:,0] < 0.0).any():
-        logging.warning("\nNegative pore pressures found in 'INCON'.")
-
-    # Write label, porosity and permeability
-    buffer = ["{:5.5}".format(label) for label in labels]
-    if porosity is not None:
-        buffer = [
-            buf + "{:10}{:15.9e}".format("", phi) for buf, phi in zip(buffer, porosity)
-        ]
-    else:
-        buffer = [buf + "{:10}{:15}".format("", "") for buf in buffer]
-    if permeability is not None:
-        if permeability.ndim == 1:
-            buffer = [
-                buf + "{:10.3e}{:10}{:10}".format(k, "", "")
-                for buf, k in zip(buffer, permeability)
-            ]
-        else:
-            buffer = [
-                buf + "{:10.3e}{:10.3e}{:10.3e}".format(*k)
-                for buf, k in zip(buffer, permeability)
-            ]
-    else:
-        buffer = [buf + "{:10}{:10}{:10}".format("", "", "") for buf in buffer]
-
-    # Write INCON block
-    for pvar, buf in zip(pvars, buffer):
-        f.write(buf + "\n")
-        for v in pvar:
-            f.write("{:20.4e}".format(v) if v > -1.0e9 else "{:20}".format(""))
-        f.write("\n")
