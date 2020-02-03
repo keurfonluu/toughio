@@ -69,35 +69,6 @@ def write(filename, mesh, nodal_distance, incon_eos):
         incon_eos is None or incon_eos in _eos_to_neq.keys()
     ), "EOS '{}' is unknown or not supported.".format(incon_eos)
 
-    # Check porosity
-    if "porosity" in mesh.cell_data.keys():
-        porosity = numpy.concatenate(mesh.cell_data["porosity"])
-        if not incon_eos:
-            logging.warning("\nPorosity is only exported if incon_eos is provided.")
-        else:
-            assert (
-                len(porosity) == mesh.n_cells and porosity.ndim == 1
-            ), "Inconsistent porosity array."
-    else:
-        porosity = None
-
-    # Check permeability
-    if "permeability" in mesh.cell_data.keys():
-        permeability = numpy.concatenate(mesh.cell_data["permeability"])
-        if not incon_eos:
-            logging.warning(
-                "\nPermeability modifiers are only exported if incon_eos is provided."
-            )
-        else:
-            assert permeability.ndim in {1, 2}
-            assert (
-                permeability.shape == (mesh.n_cells, 3)
-                if permeability.ndim == 2
-                else len(permeability) == mesh.n_cells
-            ), "Inconsistent permeability modifiers array."
-    else:
-        permeability = None
-
     # Required variables for blocks ELEME and CONNE
     num_cells = mesh.n_cells
     labels = numpy.concatenate(mesh.labels)
