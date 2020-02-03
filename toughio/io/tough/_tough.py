@@ -1,107 +1,87 @@
-from __future__ import division
+from __future__ import division, with_statement
 
 import numpy
 
-import json
+from copy import deepcopy
 
-from ._common import (
-    default,
-    set_parameters
-)
+from .._common import default
 
 __all__ = [
-    "read_json",
-    "to_file",
-    "to_json",
+    "read",
+    "write",
 ]
 
 
-def read_json(filename, return_parameters = False):
+def block(keyword, multi = False, noend = False):
     """
-    Import TOUGH input file.
-    
+    Decorator for block writing functions.
+    """
+
+    def decorator(func):
+        from functools import wraps
+
+        from .._common import header
+
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            head_fmt = "{:5}{}" if noend else "{:5}{}\n"
+            out = [ head_fmt.format(keyword, header) ]
+            out += func(*args, **kwargs)
+            out += [ "\n" ] if multi else []
+
+            return out
+
+        return wrapper
+        
+    return decorator
+
+
+def read(filename):
+    """
+    Read TOUGH input file.
+
     Parameters
     ----------
     filename : str
         Input file name.
-    return_parameters : bool, optional, default False
-        If `True`, return parameters as a dict. Otherwise, overwrite
-        current `toughio.model.Parameters`.
     
     Returns
     -------
     dict
-        TOUGH input parameters. Only if ``return_parameters == True``.
+        TOUGH input parameters.
     """
-    def to_int(data):
-        """
-        Return dict with integer keys instead of strings.
-        """
-        return { int(k): data[k] for k in sorted(data.keys()) }
-    
-    assert isinstance(filename, str)
-    with open(filename, "r") as f:
-        parameters = json.load(f)
-
-    if "extra_options" in parameters.keys():
-        parameters["extra_options"] = to_int(parameters["extra_options"])
-    if "selections" in parameters.keys():
-        parameters["selections"] = to_int(parameters["selections"])
-
-    if return_parameters:
-        return parameters
-    else:
-        set_parameters(parameters)
+    raise NotImplementedError(
+        "Reading TOUGH input file is not implemented yet."
+    )
 
 
-def to_file(filename = "INFILE", parameters = None):
+def write(filename, parameters):
     """
     Write TOUGH input file.
 
     Parameters
     ----------
-    filename : str, optional, default 'INFILE'
+    filename : str
         Output file name.
-    parameters : dict or None, optional, default None
+    parameters : dict
         Parameters to export.
     """
-    assert isinstance(filename, str)
-    assert parameters is None or isinstance(parameters, dict)
+    from .._common import Parameters
 
-    if parameters is None:
-        from ._common import Parameters as parameters
+    params = deepcopy(Parameters)
+    if params:
+        params.update(parameters)
 
     with open(filename, "w") as f:
-        for record in write_buffer(parameters):
+        for record in write_buffer(params):
             f.write(record)
-
-
-def to_json(filename = "INFILE.json", parameters = None):
-    """
-    Export TOUGH input file to json format.
-
-    Parameters
-    ----------
-    filename : str, optional, default 'INFILE.json'
-        Output file name.
-    parameters : dict or None, optional, default None
-        Parameters to export.
-    """
-    assert isinstance(filename, str)
-    assert parameters is None or isinstance(parameters, dict)
-
-    if parameters is None:
-        from ._common import Parameters as parameters
-
-    with open(filename, "w") as f:
-        json.dump(parameters, f, indent = 4)
 
 
 def write_buffer(parameters):
     """
     Write TOUGH input file as a list of 80-character long record strings.
     """
-    from ._common import eos, eos_select
+    from .._common import eos, eos_select
 
     # Check that EOS is defined (for block MULTI)
     if parameters["isothermal"] and parameters["eos"] not in eos.keys():
@@ -118,6 +98,7 @@ def write_buffer(parameters):
     out += _write_solvr(parameters) if parameters["solver"] else []
     out += _write_start() if parameters["start"] else []
     out += _write_param(parameters)
+    out += _write_momop(parameters) if parameters["more_options"] else []
     out += _write_times(parameters) if parameters["times"] is not None else []
     out += _write_foft(parameters) if parameters["element_history"] is not None else []
     out += _write_coft(parameters) if parameters["connection_history"] is not None else []
@@ -166,30 +147,6 @@ def _add_record(data, id_fmt = "{:>5g}     "):
     rec = [ ( data["id"], id_fmt ) ]
     rec += [ ( v, "{:>10.3e}" ) for v in data["parameters"][:min(n, 7)] ]
     return _write_record(_format_data(rec))
-
-
-def block(keyword, multi = False, noend = False):
-    """
-    Decorator for block writing functions.
-    """
-
-    def decorator(func):
-        from functools import wraps
-
-        from ._common import header
-
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            head_fmt = "{:5}{}" if noend else "{:5}{}\n"
-            out = [ head_fmt.format(keyword, header) ]
-            out += func(*args, **kwargs)
-            out += [ "\n" ] if multi else []
-
-            return out
-
-        return wrapper
-        
-    return decorator
 
 
 @block("ROCKS", multi = True)
@@ -300,7 +257,7 @@ def _write_multi(parameters):
     default values are provided internally. Available parameter choices
     are different for different EOS modules.
     """
-    from ._common import eos
+    from .._common import eos
     out = list(eos[parameters["eos"]])
     out[0] = parameters["n_component"] if parameters["n_component"] else out[0]
     out[1] = out[0] if parameters["isothermal"] else out[0]+1
@@ -318,7 +275,7 @@ def _write_selec(parameters):
     EWASG, T2DM, ECO2N).
     """
     # Load data
-    from ._common import select
+    from .._common import select
     data = select.copy()
     data.update(parameters["selections"])
 
@@ -343,7 +300,7 @@ def _write_solvr(parameters):
     Introduces computation parameters, time stepping information, and
     default initial conditions.
     """
-    from ._common import solver
+    from .._common import solver
     data = solver.copy()
     data.update(parameters["solver"])
     return _write_record(_format_data([
@@ -366,7 +323,7 @@ def _write_start():
     (in which case defaults will be used). Without START, there must be a
     one-to-one correspondence between the data in blocks ELEME and INCON.
     """
-    from ._common import header
+    from .._common import header
     out = "{:5}{}\n".format("----*", header)
     return [ out[:11] + "MOP: 123456789*123456789*1234" + out[40:] ]
 
@@ -380,7 +337,7 @@ def _write_param(parameters):
     default initial conditions.
     """
     # Load data
-    from ._common import options
+    from .._common import options
     data = options.copy()
     data.update(parameters["options"])
 
@@ -389,8 +346,8 @@ def _write_param(parameters):
         data["t_steps"] = [ data["t_steps"] ]
 
     # Record 1
-    from ._common import extra_options
-    _mop = extra_options.copy()
+    from .._common import extra_options
+    _mop = deepcopy(extra_options)
     _mop.update(parameters["extra_options"])
     mop = _format_data([ ( _mop[k], "{:>1g}" )
                             for k in sorted(_mop.keys()) ])
@@ -442,10 +399,10 @@ def _write_param(parameters):
 
 
 @block("MOMOP")
-def _write_momop(Parameters):
-    from .common import more_options
+def _write_momop(parameters):
+    from .._common import more_options
     _momop = more_options.copy()
-    _momop.update(Parameters["more_options"])
+    _momop.update(parameters["more_options"])
     out = _write_record(_format_data([
         ( _momop[k], "{:>1g}" ) for k in sorted(_momop.keys())
     ]))
@@ -479,15 +436,9 @@ def _write_foft(parameters):
     data are to be written out for plotting to a file called FOFT during
     the simulation.
     """
-<<<<<<< HEAD:toughio/model/_io.py
     return _write_multi_record(_format_data([
-        ( i, "{:>5g}" ) for i in Parameters["element_history"]
-    ]), ncol = 1)
-=======
-    return _write_record(_format_data([
         ( i, "{:>5g}" ) for i in parameters["element_history"]
-    ]))
->>>>>>> 8f4e5c8e3004cec528922be5263b8eacfd641a56:toughio/model/io/write.py
+    ]), ncol = 1)
 
 
 @block("COFT", multi = True)
@@ -499,9 +450,9 @@ def _write_coft(parameters):
     be written out for plotting to a file called COFT during the
     simulation.
     """
-    return _write_record(_format_data([
+    return _write_multi_record(_format_data([
         ( i, "{:>10g}" ) for i in parameters["connection_history"]
-    ]))
+    ]), ncol = 1)
 
 
 @block("GOFT", multi = True)
@@ -513,9 +464,9 @@ def _write_goft(parameters):
     to be written out for plotting to a file called GOFT during the
     simulation.
     """
-    return _write_record(_format_data([
+    return _write_multi_record(_format_data([
         ( i, "{:>5g}" ) for i in parameters["generator_history"]
-    ]))
+    ]), ncol = 1)
 
 
 @block("GENER", multi = True)
@@ -525,7 +476,7 @@ def _write_gener(parameters):
     
     Introduces sinks and/or sources.
     """
-    from ._common import generators
+    from .._common import generators
 
     out = []
     for k, v in parameters["generators"].items():    
