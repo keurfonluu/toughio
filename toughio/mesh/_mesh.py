@@ -291,6 +291,32 @@ class Mesh:
         """
         self.write(filename, file_format = "tough", **kwargs)
 
+    def read_output(self, filename, time_step = -1):
+        """
+        Read TOUGH output file for a given time step.
+
+        Parameters
+        ----------
+        filename : str
+            Input file name.
+        time_step : int, optional, default -1
+            Data for given time step to import.
+        """
+        from .._helpers import read_output
+
+        assert isinstance(time_step, int)
+
+        out = read_output(filename)
+        assert -len(out) <= time_step < len(out)
+
+        _, labels, data = out[time_step]
+        assert len(labels) == self.n_cells
+
+        mapper = {k: v for v, k in enumerate(labels)}
+        idx = [mapper[label] for label in numpy.concatenate(self.labels)]
+        for k, v in data.items():
+            self.cell_data[k] = self.split(v[idx])
+
     def write(self, filename, file_format = None, **kwargs):
         """
         Write mesh to file.
