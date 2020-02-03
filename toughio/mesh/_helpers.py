@@ -1,14 +1,8 @@
-# -*- coding: utf-8 -*-
+import meshio
 
-"""
-Author: Keurfon Luu <keurfonluu@lbl.gov>
-License: MIT
-"""
-
-from ._mesh import Mesh, from_meshio
 from . import tough
 from . import flac3d
-import meshio
+from ._mesh import Mesh, from_meshio
 
 __all__ = [
     "read",
@@ -27,11 +21,13 @@ def _filetype_from_filename(filename):
     Determine file type from its extension.
     """
     import os
-    ext = os.path.split(filename)[1].split(".")[-1]
-    try:
-        return _extension_to_filetype[".{}".format(ext.lower())]
-    except KeyError:
-        return ""
+
+    ext = os.path.splitext(filename)[1].lower()
+    return (
+        _extension_to_filetype[ext]
+        if ext in _extension_to_filetype.keys()
+        else ""
+    )
 
 
 def read(filename, file_format = None, **kwargs):
@@ -43,8 +39,7 @@ def read(filename, file_format = None, **kwargs):
     filename : str
         Input file name.
     file_format : str or None, optional, default None
-        Input file format. If `None`, it will be guessed from file's
-        extension.
+        Input file format.
 
     Returns
     -------
@@ -82,9 +77,7 @@ def write(filename, mesh, file_format = None, **kwargs):
     mesh : toughio.Mesh
         Mesh to export.
     file_format : str or None, optional, default None
-        Output file format. If `None`, it will be guessed from file's
-        extension. To write TOUGH MESH, `file_format` must be specified
-        as 'tough' (no specific extension exists for TOUGH MESH).
+        Output file format.
     """
     # Check file format
     assert isinstance(filename, str)
@@ -126,9 +119,7 @@ def write_points_cells(filename, points, cells, point_data = None,
     field_data : dict or None, optional, default None
         Data names.
     file_format : str or None, optional, default None
-        Output file format. If `None`, it will be guessed from file's
-        extension. To write TOUGH MESH, `file_format` must be specified
-        as 'tough' (no specific extension exists for TOUGH MESH).
+        Output file format.
 
     Other Parameters
     ----------------

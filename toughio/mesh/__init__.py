@@ -1,14 +1,7 @@
-# -*- coding: utf-8 -*-
-
-"""
-Author: Keurfon Luu <keurfonluu@lbl.gov>
-License: MIT
-"""
-
 import meshio
 
 from . import utils
-from .helpers import (
+from ._helpers import (
     read,
     write,
     write_points_cells,
