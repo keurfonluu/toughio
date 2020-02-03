@@ -330,7 +330,7 @@ class Mesh:
         time_step : int, optional, default -1
             Data for given time step to import.
         """
-        from .._helpers import read_output
+        from .. import read_output
 
         assert isinstance(time_step, int)
 

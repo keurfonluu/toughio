@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-
-"""
-Author: Keurfon Luu <keurfonluu@lbl.gov>
-License: MIT
-"""
-
 from .__about__ import (
     __version__,
     __author__,
@@ -12,15 +5,22 @@ from .__about__ import (
     __website__,
     __license__,
 )
+
 from . import mesh
-from . import model
+
 from .mesh import Mesh
-from ._helpers import read_output
+
+from .io import (
+    read_input,
+    write_input,
+    read_output,
+)
 
 __all__ = [
     "Mesh",
     "mesh",
-    "model",
+    "read_input",
+    "write_input",
     "read_output",
     "__version__",
     "__author__",

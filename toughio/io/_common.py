@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-
-"""
-Author: Keurfon Luu <keurfonluu@lbl.gov>
-License: MIT
-"""
-
 __all__ = [
     "Parameters",
     "select",
@@ -17,8 +10,6 @@ __all__ = [
     "eos",
     "eos_select",
     "header",
-    "new",
-    "set_parameters",
 ]
 
 
@@ -158,24 +149,3 @@ eos_select = {
 }
 
 header = "----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8"
-
-
-def new():
-    """
-    Reset parameter values to default.
-    """
-    Parameters.update(_Parameters)
-
-
-def set_parameters(parameters):
-    """
-    Set parameter values.
-
-    Parameters
-    ----------
-    parameters : dict
-        Input parameter values.
-    """
-    assert isinstance(parameters, dict)
-    Parameters.update(_Parameters)
-    Parameters.update(parameters)
