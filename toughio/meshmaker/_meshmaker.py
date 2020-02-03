@@ -1,20 +1,13 @@
-# -*- coding: utf-8 -*-
-
-"""
-Author: Keurfon Luu <keurfonluu@lbl.gov>
-License: MIT
-"""
-
 import numpy
 
-from ._mesh import Mesh, Cells
+from ..mesh._mesh import Mesh, Cells
 
 __all__ = [
-    "create_grid",
+    "meshmaker",
 ]
 
 
-def create_grid(dx, dy, dz = None):
+def meshmaker(dx, dy, dz = None):
     """
     Generate 2D or 3D irregular cartesian grid.
 
@@ -29,14 +22,22 @@ def create_grid(dx, dy, dz = None):
 
     Returns
     -------
-    Mesh
-        Cartesian mesh.
+    toughio.Mesh
+        Output irregular cartesian mesh.
     """
-    points, cells = _grid_3d(dx, dy, dz) if dz else _grid_2d(dx, dy)
-    return Mesh(
-        points = points,
-        cells = cells,
-    )
+    assert isinstance(dx, (list, tuple, numpy.ndarray))
+    assert isinstance(dy, (list, tuple, numpy.ndarray))
+    assert dz is None or isinstance(dz, (list, tuple, numpy.ndarray))
+
+    if dz is None:
+        points, cells = _grid_2d(dx, dy)
+    else:
+        points, cells = _grid_3d(dx, dy, dz)
+
+    mesh = Mesh(points, cells)
+    mesh.cell_data["material"] = mesh.split(numpy.ones(mesh.n_cells))
+    
+    return mesh
 
 
 def _grid_3d(dx, dy, dz):
@@ -72,6 +73,7 @@ def _grid_3d(dx, dy, dz):
     cells = [ [ numpy.ravel_multi_index(vertex, xyz_shape, order = "F")
                 for vertex in mesh_vertices(i, j, k) ]
                 for i, j, k in zip(I, J, K) ]
+
     return numpy.array(points), [Cells("hexahedron", numpy.array(cells))]
 
 
@@ -104,4 +106,8 @@ def _grid_2d(dx, dy):
     cells = [ [ numpy.ravel_multi_index(vertex, xy_shape, order = "F")
                 for vertex in mesh_vertices(i, j) ]
                 for i, j in zip(I, J) ]
+
     return numpy.array(points), [Cells("quad", numpy.array(cells))]
+
+
+
