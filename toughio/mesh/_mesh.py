@@ -50,8 +50,6 @@ class Mesh:
         field_data = None,
         point_sets = None,
         cell_sets = None,
-        gmsh_periodic = None,
-        info = None,
         ):
         self.points = points
         self.cells = cells
@@ -60,8 +58,6 @@ class Mesh:
         self.field_data = field_data if field_data else {}
         self.point_sets = point_sets if point_sets else {}
         self.cell_sets = cell_sets if cell_sets else {}
-        self.gmsh_periodic = gmsh_periodic
-        self.info = info
 
     def __repr__(self):
         lines = [
@@ -229,7 +225,7 @@ class Mesh:
         meshio.Mesh
             Output mesh.
         """
-        keys = ["points", "point_data", "field_data", "gmsh_periodic"]
+        keys = ["points", "point_data", "field_data"]
         kwargs = {key: getattr(self, key) for key in keys}
 
         version = get_meshio_version()
@@ -253,8 +249,6 @@ class Mesh:
                 "cell_data": cell_data,
                 "node_sets": self.point_sets,
             })
-        if version[0] >= 3:
-            kwargs["info"] = self.info
 
         return meshio.Mesh(**kwargs)
 
@@ -472,22 +466,6 @@ class Mesh:
     @cell_sets.setter
     def cell_sets(self, value):
         self._cell_sets = value
-
-    @property
-    def gmsh_periodic(self):
-        return self._gmsh_periodic
-
-    @gmsh_periodic.setter
-    def gmsh_periodic(self, value):
-        self._gmsh_periodic = value
-
-    @property
-    def info(self):
-        return self._info
-
-    @info.setter
-    def info(self, value):
-        self._info = value
 
     @property
     def n_points(self):
@@ -763,6 +741,4 @@ def from_meshio(mesh):
             else None
         ),
         cell_sets = mesh.cell_sets if hasattr(mesh, "cell_sets") else None,
-        gmsh_periodic = mesh.gmsh_periodic,
-        info = mesh.info if hasattr(mesh, "info") else None,
     )
