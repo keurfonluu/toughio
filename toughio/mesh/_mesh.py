@@ -729,7 +729,7 @@ def from_meshio(mesh):
     else:
         cell_data = {}
 
-    return Mesh(
+    out = Mesh(
         points = mesh.points,
         cells = mesh.cells,
         point_data = mesh.point_data,
@@ -742,3 +742,8 @@ def from_meshio(mesh):
         ),
         cell_sets = mesh.cell_sets if hasattr(mesh, "cell_sets") else None,
     )
+
+    if "material" not in out.cell_data.keys():
+        out.cell_data["material"] = out.split(numpy.ones(out.n_cells, dtype=int))
+
+    return out

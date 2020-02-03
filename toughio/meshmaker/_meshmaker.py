@@ -35,7 +35,7 @@ def meshmaker(dx, dy, dz = None):
         points, cells = _grid_3d(dx, dy, dz)
 
     mesh = Mesh(points, cells)
-    mesh.cell_data["material"] = mesh.split(numpy.ones(mesh.n_cells))
+    mesh.cell_data["material"] = mesh.split(numpy.ones(mesh.n_cells, dtype=int))
     
     return mesh
 
