@@ -1,6 +1,5 @@
 import meshio
 
-from . import utils
 from ._helpers import (
     read,
     write,
@@ -25,5 +24,4 @@ __all__ = [
     "TimeSeriesReader",
     "TimeSeriesWriter",
     "from_meshio",
-    "utils",
 ]

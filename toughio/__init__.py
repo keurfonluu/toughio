@@ -6,19 +6,21 @@ from .__about__ import (
     __license__,
 )
 
-from . import mesh
-
-from .mesh import Mesh
-
 from .io import (
     read_input,
     write_input,
     read_output,
 )
 
+from . import mesh
+from .mesh import Mesh
+
+from .meshmaker import meshmaker
+
 __all__ = [
     "Mesh",
     "mesh",
+    "meshmaker",
     "read_input",
     "write_input",
     "read_output",
