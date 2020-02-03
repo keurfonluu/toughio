@@ -230,7 +230,7 @@ def write_buffer(
         import os
 
         head = os.path.split(filename)[0]
-        with open(head + "/" if head else "" + "INCON", "w") as f:
+        with open(head + ("/" if head else "") + "INCON", "w") as f:
             _write_incon(
                 f,
                 incon_eos,
