@@ -17,6 +17,29 @@ Cells = collections.namedtuple("Cells", ["type", "data"])
 
 
 class Mesh:
+    """
+    ToughIO mesh.
+
+    This class is updated following the latest ``meshio`` version and
+    brings backward compatibility with its previous versions.
+
+    Parameters
+    ----------
+    points : array_like (n_points, 3)
+        Cooordinates of points.
+    cells : list of tuples (cell_type, data)
+        Topology of cells.
+    point_data : dict or None, optional, default None
+        Point data arrays.
+    cell_data : dict or None, optional, default None
+        Cell data arrays.
+    field_data : dict or None, optional, default None
+        Field data names.
+    point_sets : dict or None, optional, default None
+        Sets of points.
+    cell_sets : dict or None, optional, default None
+        Sets of cells.
+    """
 
     def __init__(
         self,
@@ -181,9 +204,20 @@ class Mesh:
     def split(self, arr):
         """
         Split input array into subarrays for each cell block in mesh.
+
+        Parameters
+        ----------
+        arr : array_like
+            Input array.
+
+        Returns
+        -------
+        list of array_like
+            List of subarrays.
         """
         assert len(arr) == self.n_cells
         sizes = numpy.cumsum([len(c.data) for c in self.cells])
+
         return numpy.split(numpy.asarray(arr), sizes[:-1])
 
     def to_meshio(self):
@@ -286,7 +320,7 @@ class Mesh:
 
         Parameters
         ----------
-        filename : str, default 'MESH'
+        filename : str, optional, default 'MESH'
             Output file name.
         """
         self.write(filename, file_format = "tough", **kwargs)
@@ -343,6 +377,9 @@ class Mesh:
 
     @property
     def points(self):
+        """
+        Coordinates of points.
+        """
         return self._points
 
     @points.setter
@@ -351,6 +388,9 @@ class Mesh:
 
     @property
     def cells(self):
+        """
+        Topology of cells.
+        """
         if self._cells:
             return self._cells
         else:
@@ -367,6 +407,9 @@ class Mesh:
 
     @property
     def cells_dict(self):
+        """
+        Topology of cells (``meshio < 4.0.0``).
+        """
         if self._cells:
             assert len(self._cells) == len(
                 numpy.unique([c.type for c in self._cells])
@@ -377,6 +420,9 @@ class Mesh:
 
     @property
     def point_data(self):
+        """
+        Point data arrays.
+        """
         return self._point_data
 
     @point_data.setter
@@ -385,6 +431,9 @@ class Mesh:
 
     @property
     def cell_data(self):
+        """
+        Cell data arrays.
+        """
         return self._cell_data
 
     @cell_data.setter
@@ -393,6 +442,9 @@ class Mesh:
 
     @property
     def field_data(self):
+        """
+        Field data names.
+        """
         return self._field_data
 
     @field_data.setter
@@ -401,6 +453,9 @@ class Mesh:
 
     @property
     def point_sets(self):
+        """
+        Sets of points.
+        """
         return self._point_sets
 
     @point_sets.setter
@@ -409,6 +464,9 @@ class Mesh:
 
     @property
     def cell_sets(self):
+        """
+        Sets of cells.
+        """
         return self._cell_sets
 
     @cell_sets.setter
@@ -433,14 +491,23 @@ class Mesh:
 
     @property
     def n_points(self):
+        """
+        Number of points.
+        """
         return len(self.points)
 
     @property
     def n_cells(self):
+        """
+        Number of cells.
+        """
         return sum(len(c.data) for c in self.cells)
 
     @property
     def faces(self):
+        """
+        Topology of faces for each cell in mesh.
+        """
         meshio_type_to_faces = {
             "tetra": {
                 "triangle": numpy.array([
@@ -501,7 +568,7 @@ class Mesh:
     @property
     def labels(self):
         """
-        Create five-character long element labels following:
+        Five-character long cell labels following:
         - 1st: from A to Z
         - 2nd and 3rd: from 1 to 9 then A to Z
         - 4th and 5th: from 00 to 99
@@ -509,7 +576,7 @@ class Mesh:
 
         Note
         ----
-        Currently support up to 3,185,000 different elements.
+        Currently support up to 3,185,000 different cells.
         """
         from string import ascii_uppercase
 
@@ -529,15 +596,15 @@ class Mesh:
     @property
     def centers(self):
         """
-        Return center of each cell in mesh.
+        Center of each cell in mesh.
         """
         return [self.points[c.data].mean(axis = 1) for c in self.cells]
 
     @property
     def connections(self):
         """
-        Returns mesh connections assuming conformity and that points and
-        cells are uniquely defined in mesh (use ``prune_duplicates`` otherwise).
+        Mesh connections assuming conformity and that points and cells are
+        are uniquely defined in mesh (use ``prune_duplicates`` otherwise).
 
         Note
         ----
@@ -595,7 +662,7 @@ class Mesh:
     @property
     def materials(self):
         """
-        Returns material for each cell in mesh.
+        Material for each cell in mesh.
         """
         if "material" in self.cell_data.keys():
             if self.field_data:
@@ -610,7 +677,7 @@ class Mesh:
     @property
     def volumes(self):
         """
-        Returns volume for each cell in mesh.
+        Volumes for each cell in mesh.
         """
         def scalar_triple_product(a, b, c):
             c0 = b[:, 1] * c[:, 2] - b[:, 2] * c[:, 1]
