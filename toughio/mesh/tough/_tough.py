@@ -90,21 +90,24 @@ def write(filename, mesh, nodal_distance, incon_eos):
     face_normals, face_areas = _get_face_normals_areas(mesh, faces_dict, faces_cell)
 
     # Required variables for block INCON
+    primary_variables = None
+    porosities = None
+    permeabilities = None
     if incon_eos:
         primary_variables = (
             numpy.concatenate(mesh.cell_data["initial_condition"])
             if "initial_condition" in mesh.cell_data.keys()
-            else None
+            else primary_variables
         )
         porosities = (
             numpy.concatenate(mesh.cell_data["porosity"])
             if "porosity" in mesh.cell_data.keys()
-            else None
+            else porosities
         )
         permeabilities = (
             numpy.concatenate(mesh.cell_data["permeability"])
             if "permeability" in mesh.cell_data.keys()
-            else None
+            else permeabilities
         )
 
     # Write MESH and INCON files
