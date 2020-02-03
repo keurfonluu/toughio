@@ -358,7 +358,7 @@ class Mesh:
             extension. To write TOUGH MESH, `file_format` must be specified
             as 'tough' (no specific extension exists for TOUGH MESH).
         """
-        from .helpers import write
+        from ._helpers import write
 
         write(filename, self, file_format, **kwargs)
 
