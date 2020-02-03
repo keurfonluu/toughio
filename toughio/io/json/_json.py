@@ -31,10 +31,10 @@ def read(filename):
     with open(filename, "r") as f:
         parameters = json.load(f)
 
-    if "extra_options" in parameters.keys():
-        parameters["extra_options"] = to_int(parameters["extra_options"])
-    if "selections" in parameters.keys():
-        parameters["selections"] = to_int(parameters["selections"])
+    keys = {"extra_options", "more_options", "selections"}
+    for key in keys:
+        if key in parameters.keys():
+            parameters[key] = to_int(parameters[key])
 
     return parameters
 
