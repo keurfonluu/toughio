@@ -153,7 +153,13 @@ def write_buffer(
         porosities,
         permeabilities,
     ):
-    # Check porosity and permeability arrays and show warnings if necessary
+    # Check INCON inputs and show warnings if necessary
+    if incon_eos and primary_variables is None:
+        logging.warning((
+            "\nInitial conditions are not defined. "
+            "Writing INCON will be ignored."
+        ))
+
     if porosities is not None:
         if not incon_eos:
             logging.warning("\nPorosity is only exported if incon_eos is provided.")
@@ -200,7 +206,7 @@ def write_buffer(
         )
 
     # Write INCON file
-    if incon_eos:
+    if incon_eos and primary_variables is not None:
         import os
 
         head = os.path.split(filename)[0]
