@@ -2,6 +2,8 @@ import numpy
 
 import meshio
 
+from string import ascii_uppercase
+
 __all__ = [
     "vtk_to_meshio_type",
     "meshio_to_vtk_type",
@@ -9,6 +11,7 @@ __all__ = [
     "meshio_type_to_ndim",
     "meshio_data",
     "get_meshio_version",
+    "labeler",
 ]
 
 
@@ -108,5 +111,34 @@ meshio_data = {
 }
 
 
+alpha = list(ascii_uppercase)
+numer = ["{:0>2}".format(i) for i in range(100)]
+nomen = ["{:1}".format(i + 1) for i in range(9)] + alpha
+
+
 def get_meshio_version():
     return tuple(int(i) for i in meshio.__version__.split("."))
+
+
+def labeler(i):
+    """
+    Return five-character long cell labels following:
+    - 1st: from A to Z
+    - 2nd and 3rd: from 1 to 9 then A to Z
+    - 4th and 5th: from 00 to 99
+    Incrementation is performed from right to left.
+
+    Parameters
+    ----------
+    i : int
+        Cell index.
+
+    Note
+    ----
+    Currently support up to 3,185,000 different cells.
+    """
+    q1, r1 = divmod(i, len(numer))
+    q2, r2 = divmod(q1, len(nomen))
+    q3, r3 = divmod(q2, len(nomen))
+    _, r4 = divmod(q3, len(nomen))
+    return "".join([alpha[r4], nomen[r3], nomen[r2], numer[r1]])
