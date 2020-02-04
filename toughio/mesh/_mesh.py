@@ -369,6 +369,23 @@ class Mesh:
         mesh = self.to_pyvista()
         mesh.plot(*args, **kwargs)
 
+    def add_scalar(self, scalar, data):
+        """
+        Add a new cell data array.
+
+        Parameters
+        ----------
+        scalar : str
+            Scalar name.
+        data : array_like
+            Scalar data.
+        """
+        assert isinstance(scalar, str)
+        assert isinstance(data, (list, tuple, numpy.ndarray))
+        assert len(data) == self.n_cells
+
+        self.cell_data[scalar] = self.split(data)
+
     def set_material(self, material, range_x = None, range_y = None, range_z = None):
         """
         Set material for cells within box selection defined by `range_x`,
@@ -417,7 +434,7 @@ class Mesh:
                 else data.max() + 1
             )
             data[mask] = imat
-            self.cell_data["material"] = self.split(data)
+            self.add_scalar("material", data)
             self.field_data[material] = numpy.array([imat, 3])
 
     @property
