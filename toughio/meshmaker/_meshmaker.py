@@ -7,7 +7,7 @@ __all__ = [
 ]
 
 
-def meshmaker(dx, dy, dz = None, origin = None, material = "rock1"):
+def meshmaker(dx, dy, dz = None, origin = None, material = "dfalt"):
     """
     Generate 2D or 3D irregular cartesian grid.
 
@@ -21,7 +21,7 @@ def meshmaker(dx, dy, dz = None, origin = None, material = "rock1"):
         Grid spacing along Z axis. If `None`, generate 2D grid.
     origin : array_like or None, optional, default None
         Origin point coordinate.
-    material : str, optional, default 'rock1'
+    material : str, optional, default 'dfalt'
         Default material name.
 
     Returns
