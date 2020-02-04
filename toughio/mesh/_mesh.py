@@ -597,30 +597,10 @@ class Mesh:
     @property
     def labels(self):
         """
-        Five-character long cell labels following:
-        - 1st: from A to Z
-        - 2nd and 3rd: from 1 to 9 then A to Z
-        - 4th and 5th: from 00 to 99
-        Incrementation is performed from right to left.
-
-        Note
-        ----
-        Currently support up to 3,185,000 different cells.
+        Label of each cell in mesh.
         """
-        from string import ascii_uppercase
-
-        alpha = list(ascii_uppercase)
-        numer = ["{:0>2}".format(i) for i in range(100)]
-        nomen = ["{:1}".format(i + 1) for i in range(9)] + alpha
-
-        def _labeler(i):
-            q1, r1 = divmod(i, len(numer))
-            q2, r2 = divmod(q1, len(nomen))
-            q3, r3 = divmod(q2, len(nomen))
-            _, r4 = divmod(q3, len(nomen))
-            return "".join([alpha[r4], nomen[r3], nomen[r2], numer[r1]])
-        
-        return self.split([_labeler(i) for i in range(self.n_cells)])
+        from ._common import labeler
+        return self.split([labeler(i) for i in range(self.n_cells)])
 
     @property
     def centers(self):
