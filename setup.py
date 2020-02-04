@@ -1,4 +1,5 @@
 import os
+import sys
 
 from setuptools import find_packages, setup
 
@@ -16,22 +17,8 @@ AUTHOR = about["__author__"]
 AUTHOR_EMAIL = about["__author_email__"]
 URL = about["__website__"]
 LICENSE = about["__license__"]
-REQUIREMENTS = [
-    "meshio == 2.3.10; python_version <= '2.7'",
-    "meshio >= 3.0.0; python_version > '2.7'",
-]
-EXTRA_REQUIREMENTS = {
-    "full": [
-        "pyvista == 0.22.4; python_version <= '2.7'",
-        "pyvista >= 0.23.1; python_version > '2.7'",
-    ],
-}
 CLASSIFIERS = [
-    "Programming Language :: Python :: 2.7",
-    "Programming Language :: Python :: 3.5",
-    "Programming Language :: Python :: 3.6",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python",
     "Development Status :: 5 - Production/Stable",
     "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
@@ -41,6 +28,24 @@ CLASSIFIERS = [
     "Intended Audience :: Science/Research",
     "Topic :: Scientific/Engineering",
 ]
+
+# TODO: use new environment markers when dropping support for python < 3
+# REQUIREMENTS = [
+#     "meshio == 2.3.10; python_version <= '2.7'",
+#     "meshio >= 3.0.0; python_version > '2.7'",
+# ]
+# EXTRA_REQUIREMENTS = {
+#     "full": [
+#         "pyvista == 0.22.4; python_version <= '2.7'",
+#         "pyvista >= 0.23.1; python_version > '2.7'",
+#     ],
+# }
+if sys.version_info < (3,):
+    REQUIREMENTS = ["meshio == 2.3.10"]
+    EXTRA_REQUIREMENTS = {"full": ["pyvista == 0.22.4"]}
+else:
+    REQUIREMENTS = ["meshio >= 3.0.0"]
+    EXTRA_REQUIREMENTS = {"full": ["pyvista >= 0.23.1"]}
 
 
 if __name__ == "__main__":
