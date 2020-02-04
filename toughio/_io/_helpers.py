@@ -4,8 +4,7 @@ import collections
 
 import numpy
 
-from . import tough
-from . import json
+from . import json, tough
 
 __all__ = [
     "read_input",
@@ -28,13 +27,11 @@ def _filetype_from_filename(filename):
 
     ext = os.path.splitext(filename)[1].lower()
     return (
-        _extension_to_filetype[ext]
-        if ext in _extension_to_filetype.keys()
-        else "tough"
+        _extension_to_filetype[ext] if ext in _extension_to_filetype.keys() else "tough"
     )
 
 
-def read_input(filename, file_format = "json", **kwargs):
+def read_input(filename, file_format="json", **kwargs):
     """
     Read TOUGH input file.
 
@@ -51,13 +48,13 @@ def read_input(filename, file_format = "json", **kwargs):
         TOUGH input parameters.
     """
     assert isinstance(filename, str)
-    assert file_format in {'tough', 'json'}
+    assert file_format in {"tough", "json"}
 
     fmt = file_format if file_format else _filetype_from_filename(filename)
 
     format_to_reader = {
-        "tough": ( tough, (), {} ),
-        "json": ( json, (), {} ),
+        "tough": (tough, (), {}),
+        "json": (json, (), {}),
     }
     interface, args, default_kwargs = format_to_reader[fmt]
     _kwargs = default_kwargs.copy()
@@ -65,7 +62,7 @@ def read_input(filename, file_format = "json", **kwargs):
     return interface.read(filename, *args, **_kwargs)
 
 
-def write_input(filename, parameters, file_format = "tough", **kwargs):
+def write_input(filename, parameters, file_format="tough", **kwargs):
     """
     Write TOUGH input file.
 
@@ -80,13 +77,13 @@ def write_input(filename, parameters, file_format = "tough", **kwargs):
     """
     assert isinstance(filename, str)
     assert isinstance(parameters, dict)
-    assert file_format in {'tough', 'json'}
+    assert file_format in {"tough", "json"}
 
     fmt = file_format if file_format else _filetype_from_filename(filename)
 
     format_to_writer = {
-        "tough": ( tough, (), {} ),
-        "json": ( json, (), {} ),
+        "tough": (tough, (), {}),
+        "json": (json, (), {}),
     }
     interface, args, default_kwargs = format_to_writer[fmt]
     _kwargs = default_kwargs.copy()
@@ -141,9 +138,10 @@ def read_output(filename):
     Output = collections.namedtuple("Output", ["time", "labels", "data"])
 
     return [
-        Output(time, label, {
-            k: v for k, v in zip(headers[1:], numpy.transpose(variable))
-        }) for time, label, variable in zip(times, labels, variables)
+        Output(
+            time, label, {k: v for k, v in zip(headers[1:], numpy.transpose(variable))}
+        )
+        for time, label, variable in zip(times, labels, variables)
     ]
 
 
@@ -175,9 +173,7 @@ def read_save(filename):
     with open(filename, "r") as f:
         # Check first line
         line = f.readline()
-        assert line.startswith("INCON"), (
-            "Invalid SAVE file '{}'.".format(filename)
-        )
+        assert line.startswith("INCON"), "Invalid SAVE file '{}'.".format(filename)
 
         # Read data
         labels, variables = [], []
@@ -197,6 +193,7 @@ def read_save(filename):
 
     Save = collections.namedtuple("Save", ["labels", "data"])
 
-    return Save(labels, {
-        "X{}".format(i+1): x for i, x in enumerate(numpy.transpose(variables))
-    })
+    return Save(
+        labels,
+        {"X{}".format(i + 1): x for i, x in enumerate(numpy.transpose(variables))},
+    )

@@ -1,4 +1,4 @@
-from __future__ import division, with_statement, unicode_literals
+from __future__ import division, unicode_literals, with_statement
 
 import logging
 
@@ -55,9 +55,7 @@ def read(filename):
     Read TOUGH MESH file is not supported yet. MESH file does not store
     any geometrical information except node centers.
     """
-    raise NotImplementedError(
-        "Reading TOUGH MESH file is not supported."
-    )
+    raise NotImplementedError("Reading TOUGH MESH file is not supported.")
 
 
 def write(filename, mesh, nodal_distance, incon_eos):
@@ -78,11 +76,11 @@ def write(filename, mesh, nodal_distance, incon_eos):
     boundary_conditions = (
         numpy.concatenate(mesh.cell_data["boundary_condition"])
         if "boundary_condition" in mesh.cell_data.keys()
-        else numpy.zeros(num_cells, dtype = int)
+        else numpy.zeros(num_cells, dtype=int)
     )
     points = mesh.points
     connections = numpy.concatenate(mesh.connections)
-    gravity = numpy.array([0., 0., 1.])
+    gravity = numpy.array([0.0, 0.0, 1.0])
 
     # Define parameters related to faces
     faces = numpy.concatenate(mesh.faces)
@@ -134,31 +132,30 @@ def write(filename, mesh, nodal_distance, incon_eos):
 
 
 def write_buffer(
-        filename,
-        num_cells,
-        labels,
-        nodes,
-        materials,
-        volumes,
-        boundary_conditions,
-        points,
-        connections,
-        gravity,
-        faces,
-        face_normals,
-        face_areas,
-        nodal_distance,
-        incon_eos,
-        primary_variables,
-        porosities,
-        permeabilities,
-    ):
+    filename,
+    num_cells,
+    labels,
+    nodes,
+    materials,
+    volumes,
+    boundary_conditions,
+    points,
+    connections,
+    gravity,
+    faces,
+    face_normals,
+    face_areas,
+    nodal_distance,
+    incon_eos,
+    primary_variables,
+    porosities,
+    permeabilities,
+):
     # Check INCON inputs and show warnings if necessary
     if incon_eos and primary_variables is None:
-        logging.warning((
-            "\nInitial conditions are not defined. "
-            "Writing INCON will be ignored."
-        ))
+        logging.warning(
+            ("\nInitial conditions are not defined. " "Writing INCON will be ignored.")
+        )
 
     if porosities is not None:
         if not incon_eos:
@@ -184,12 +181,7 @@ def write_buffer(
     # Write MESH file
     with open(filename, "w") as f:
         _write_eleme(
-            f,
-            labels,
-            nodes,
-            materials,
-            volumes,
-            boundary_conditions,
+            f, labels, nodes, materials, volumes, boundary_conditions,
         )
         _write_conne(
             f,
@@ -212,24 +204,14 @@ def write_buffer(
         head = os.path.split(filename)[0]
         with open(head + ("/" if head else "") + "INCON", "w") as f:
             _write_incon(
-                f,
-                incon_eos,
-                labels,
-                primary_variables,
-                porosities,
-                permeabilities,
+                f, incon_eos, labels, primary_variables, porosities, permeabilities,
             )
 
 
 @block("ELEME")
 def _write_eleme(
-    f,
-    labels,
-    nodes,
-    materials,
-    volumes,
-    boundary_conditions,
-    ):
+    f, labels, nodes, materials, volumes, boundary_conditions,
+):
     """
     Write ELEME block.
     """
@@ -257,18 +239,18 @@ def _write_eleme(
 
 @block("CONNE")
 def _write_conne(
-        f,
-        labels,
-        nodes,
-        points,
-        connections,
-        gravity,
-        boundary_conditions,
-        faces,
-        face_normals,
-        face_areas,
-        nodal_distance,
-    ):
+    f,
+    labels,
+    nodes,
+    points,
+    connections,
+    gravity,
+    boundary_conditions,
+    faces,
+    face_normals,
+    face_areas,
+    nodal_distance,
+):
     """
     Write CONNE block.
     """
@@ -286,7 +268,7 @@ def _write_conne(
                     centers.append([nodes[i], nodes[j]])
 
                     # Common interface defined by single point and normal vector
-                    face = faces[i,iface]
+                    face = faces[i, iface]
                     int_points.append(points[face[face >= 0][0]])
                     int_normals.append(face_normals[i][iface])
 
@@ -294,9 +276,7 @@ def _write_conne(
                     areas.append(face_areas[i][iface])
 
                     # Boundary conditions
-                    bounds.append(
-                        (boundary_conditions[i], boundary_conditions[j])
-                    )
+                    bounds.append((boundary_conditions[i], boundary_conditions[j]))
         else:
             logging.warning(
                 "\nElement '{}' is not connected to the grid.".format(labels[i])
@@ -315,12 +295,16 @@ def _write_conne(
 
     if nodal_distance == "line":
         fp = _intersection_line_plane(centers[:, 0], lines, int_points, int_normals)
-        d1 = numpy.where(bounds[:, 0], 1.0e-9, numpy.linalg.norm(centers[:, 0] - fp, axis=1))
-        d2 = numpy.where(bounds[:, 1], 1.0e-9, numpy.linalg.norm(centers[:, 1] - fp, axis=1))
+        d1 = numpy.where(
+            bounds[:, 0], 1.0e-9, numpy.linalg.norm(centers[:, 0] - fp, axis=1)
+        )
+        d2 = numpy.where(
+            bounds[:, 1], 1.0e-9, numpy.linalg.norm(centers[:, 1] - fp, axis=1)
+        )
     elif nodal_distance == "orthogonal":
         d1 = _distance_point_plane(centers[:, 0], int_points, int_normals, bounds[:, 0])
         d2 = _distance_point_plane(centers[:, 1], int_points, int_normals, bounds[:, 1])
-    
+
     # Write CONNE block
     fmt = "{:10.10}{:>5}{:>5}{:>5}{:>5g}{:10.4e}{:10.4e}{:10.4e}{:10.3e}\n"
     iterables = zip(clabels, isot, d1, d2, areas, angles)
@@ -341,17 +325,11 @@ def _write_conne(
 
 @block("INCON")
 def _write_incon(
-        f,
-        incon_eos,
-        labels,
-        primary_variables,
-        porosities,
-        permeabilities,
-    ):
+    f, incon_eos, labels, primary_variables, porosities, permeabilities,
+):
     # Check initial pore pressures
     cond = numpy.logical_and(
-        primary_variables[:,0] > -1.0e9,
-        primary_variables[:,0] < 0.0,
+        primary_variables[:, 0] > -1.0e9, primary_variables[:, 0] < 0.0,
     )
     if cond.any():
         logging.warning("\nNegative pore pressures found in 'INCON'.")
@@ -361,11 +339,12 @@ def _write_incon(
 
     if porosities is not None:
         buffer = [
-            buf + "{:10}{:15.9e}".format("", phi) for buf, phi in zip(buffer, porosities)
+            buf + "{:10}{:15.9e}".format("", phi)
+            for buf, phi in zip(buffer, porosities)
         ]
     else:
         buffer = [buf + "{:10}{:15}".format("", "") for buf in buffer]
-        
+
     if permeabilities is not None:
         if permeabilities.ndim == 1:
             buffer = [
@@ -403,30 +382,28 @@ def _get_faces(faces):
                 face_type = numvert_to_face_type[n]
                 faces_dict[face_type].append(f[:n])
                 faces_cell[face_type].append(i)
-    
+
     # Stack arrays or remove empty cells
     faces_dict = {
-        k: numpy.sort(numpy.vstack(v), axis = 1) for k, v in faces_dict.items() if len(v)
+        k: numpy.sort(numpy.vstack(v), axis=1) for k, v in faces_dict.items() if len(v)
     }
     faces_cell = {k: v for k, v in faces_cell.items() if len(v)}
 
     return faces_dict, faces_cell
 
 
-def _get_triangle_normals(mesh, faces, islice = [0, 1, 2]):
+def _get_triangle_normals(mesh, faces, islice=[0, 1, 2]):
     """
     Calculate normal vectors of triangular faces.
     """
+
     def cross(a, b):
-        return a[:,[1,2,0]]*b[:,[2,0,1]] - a[:,[2,0,1]]*b[:,[1,2,0]]
-    
+        return a[:, [1, 2, 0]] * b[:, [2, 0, 1]] - a[:, [2, 0, 1]] * b[:, [1, 2, 0]]
+
     triangles = numpy.vstack([c[islice] for c in faces])
     triangles = mesh.points[triangles]
 
-    return cross(
-        triangles[:,1] - triangles[:,0],
-        triangles[:,2] - triangles[:,0],
-    )
+    return cross(triangles[:, 1] - triangles[:, 0], triangles[:, 2] - triangles[:, 0],)
 
 
 def _get_face_normals_areas(mesh, faces_dict, faces_cell):
@@ -434,22 +411,24 @@ def _get_face_normals_areas(mesh, faces_dict, faces_cell):
     Calculate face normal vectors and areas.
     """
     # Face normal vectors
-    normals = numpy.concatenate([
-        _get_triangle_normals(mesh, v) for k, v in faces_dict.items()
-    ])
-    normals_mag = numpy.linalg.norm(normals, axis = -1)
-    normals /= normals_mag[:,None]
+    normals = numpy.concatenate(
+        [_get_triangle_normals(mesh, v) for k, v in faces_dict.items()]
+    )
+    normals_mag = numpy.linalg.norm(normals, axis=-1)
+    normals /= normals_mag[:, None]
 
     # Face areas
     areas = numpy.array(normals_mag)
     if len(faces_dict["quad"]):
-        tmp = numpy.concatenate([
-            _get_triangle_normals(mesh, v, [0, 2, 3])
-            if k == "quad"
-            else numpy.zeros((len(v), 3))
-            for k, v in faces_dict.items()
-        ])
-        areas += numpy.linalg.norm(tmp, axis = -1)
+        tmp = numpy.concatenate(
+            [
+                _get_triangle_normals(mesh, v, [0, 2, 3])
+                if k == "quad"
+                else numpy.zeros((len(v), 3))
+                for k, v in faces_dict.items()
+            ]
+        )
+        areas += numpy.linalg.norm(tmp, axis=-1)
     areas *= 0.5
 
     # Reorganize outputs
