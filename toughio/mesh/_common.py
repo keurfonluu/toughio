@@ -117,6 +117,14 @@ nomen = ["{:1}".format(i + 1) for i in range(9)] + alpha
 
 
 def get_meshio_version():
+    """
+    Return ``meshio`` version as a tuple.
+
+    Returns
+    -------
+    tuple
+        ``meshio`` version as tuple (major, minor, patch).
+    """
     return tuple(int(i) for i in meshio.__version__.split("."))
 
 
@@ -131,7 +139,12 @@ def labeler(i):
     Parameters
     ----------
     i : int
-        Cell index.
+        Cell general index in mesh.
+
+    Returns
+    -------
+    str
+        Label for cell `i`.
 
     Note
     ----
