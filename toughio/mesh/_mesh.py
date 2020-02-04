@@ -703,7 +703,7 @@ class Mesh:
                     return self.split([field_data_dict[mat] for mat in out])
                 except KeyError:
                     logging.warning((
-                        "field_data is not defined for all materials. "
+                        "\nfield_data is not defined for all materials. "
                         "Returns materials as integers."
                     ))
                     return self.cell_data["material"]
