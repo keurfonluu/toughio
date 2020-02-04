@@ -7,7 +7,7 @@ __all__ = [
 ]
 
 
-def meshmaker(dx, dy, dz = None):
+def meshmaker(dx, dy, dz = None, origin = None, material = "rock1"):
     """
     Generate 2D or 3D irregular cartesian grid.
 
@@ -19,6 +19,10 @@ def meshmaker(dx, dy, dz = None):
         Grid spacing along Y axis.
     dz : array_like or None, optional, default None
         Grid spacing along Z axis. If `None`, generate 2D grid.
+    origin : array_like or None, optional, default None
+        Origin point coordinate.
+    material : str, optional, default 'rock1'
+        Default material name.
 
     Returns
     -------
@@ -28,14 +32,30 @@ def meshmaker(dx, dy, dz = None):
     assert isinstance(dx, (list, tuple, numpy.ndarray))
     assert isinstance(dy, (list, tuple, numpy.ndarray))
     assert dz is None or isinstance(dz, (list, tuple, numpy.ndarray))
+    assert isinstance(material, str)
 
     if dz is None:
+        ndim = 2
         points, cells = _grid_2d(dx, dy)
     else:
+        ndim = 3
         points, cells = _grid_3d(dx, dy, dz)
+
+    assert origin is None or (
+        isinstance(origin, (list, tuple, numpy.ndarray)) and len(origin) == ndim
+    )
+    origin = numpy.asarray(origin) if origin is not None else numpy.zeros(ndim)
+    points += origin
+
+    points = (
+        points
+        if ndim == 3
+        else numpy.column_stack((points, numpy.zeros(len(points))))
+    )
 
     mesh = Mesh(points, cells)
     mesh.cell_data["material"] = mesh.split(numpy.ones(mesh.n_cells, dtype=int))
+    mesh.field_data[material] = numpy.array([1, 3])
     
     return mesh
 
