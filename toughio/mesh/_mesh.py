@@ -803,6 +803,14 @@ def from_meshio(mesh):
     )
 
     if "material" not in out.cell_data.keys():
-        out.cell_data["material"] = out.split(numpy.ones(out.n_cells, dtype=int))
+        imat = (
+            numpy.max([v[0] for v in mesh.field_data.values() if v[1] == 3 ]) + 1
+            if mesh.field_data
+            else 1
+        )
+        out.cell_data["material"] = out.split(
+            numpy.full(out.n_cells, imat, dtype=int)
+        )
+        out.field_data["dfalt"] = numpy.array([imat, 3])
 
     return out
