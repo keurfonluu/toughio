@@ -1,12 +1,12 @@
-from __future__ import division, with_statement, unicode_literals
+from __future__ import division, unicode_literals, with_statement
 
 import time
 
 import numpy
 
+from ...__about__ import __version__ as version
 from .._common import meshio_data
 from .._mesh import Cells, Mesh
-from ...__about__ import __version__ as version
 
 meshio_only = {
     "tetra": "tetra",
@@ -271,13 +271,12 @@ def _translate_zgroups(cells, cell_data, field_data):
 
     num_cells = sum(len(c.data) for c in cells)
     zone_data = (
-        numpy.concatenate(cell_data[mat_data]) if mat_data
+        numpy.concatenate(cell_data[mat_data])
+        if mat_data
         else numpy.zeros(num_cells, dtype=int)
     )
 
-    zgroups = {
-        k: numpy.nonzero(zone_data == k)[0] + 1 for k in numpy.unique(zone_data)
-    }
+    zgroups = {k: numpy.nonzero(zone_data == k)[0] + 1 for k in numpy.unique(zone_data)}
 
     labels = {k: str(k) for k in zgroups.keys()}
     labels[0] = "None"

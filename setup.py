@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
  
-from setuptools import setup, find_packages
-import toughio
+from setuptools import find_packages, setup
 
+import toughio
 
 DISTNAME = "toughio"
 DESCRIPTION = "ToughIO"

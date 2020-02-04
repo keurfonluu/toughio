@@ -22,11 +22,12 @@ def read(filename):
     dict
         TOUGH input parameters.
     """
+
     def to_int(data):
         """
         Return dict with integer keys instead of strings.
         """
-        return { int(k): data[k] for k in sorted(data.keys()) }
+        return {int(k): data[k] for k in sorted(data.keys())}
 
     with open(filename, "r") as f:
         parameters = json.load(f)
@@ -51,4 +52,4 @@ def write(filename, parameters):
         Parameters to export.
     """
     with open(filename, "w") as f:
-        json.dump(parameters, f, indent = 4)
+        json.dump(parameters, f, indent=4)

@@ -1,7 +1,6 @@
 import meshio
 
-from . import tough
-from . import flac3d
+from . import flac3d, pickle, tough
 from ._mesh import Mesh, from_meshio
 
 __all__ = [
@@ -13,6 +12,7 @@ __all__ = [
 
 _extension_to_filetype = {
     ".f3grid": "flac3d",
+    ".pickle": "pickle",
 }
 
 
@@ -23,14 +23,10 @@ def _filetype_from_filename(filename):
     import os
 
     ext = os.path.splitext(filename)[1].lower()
-    return (
-        _extension_to_filetype[ext]
-        if ext in _extension_to_filetype.keys()
-        else ""
-    )
+    return _extension_to_filetype[ext] if ext in _extension_to_filetype.keys() else ""
 
 
-def read(filename, file_format = None, **kwargs):
+def read(filename, file_format=None, **kwargs):
     """
     Read unstructured mesh from file.
 
@@ -52,9 +48,10 @@ def read(filename, file_format = None, **kwargs):
 
     # Call custom readers for TOUGH and FLAC3D
     format_to_reader = {
-        "tough": ( tough, (), {} ),
-        "flac3d": ( flac3d, (), {} ),
-        "flac3d-ascii": ( flac3d, (), {} ),
+        "tough": (tough, (), {}),
+        "flac3d": (flac3d, (), {}),
+        "flac3d-ascii": (flac3d, (), {}),
+        "pickle": (pickle, (), {}),
     }
     if fmt in format_to_reader.keys():
         interface, args, default_kwargs = format_to_reader[fmt]
@@ -66,7 +63,7 @@ def read(filename, file_format = None, **kwargs):
         return from_meshio(mesh)
 
 
-def write(filename, mesh, file_format = None, **kwargs):
+def write(filename, mesh, file_format=None, **kwargs):
     """
     Write unstructured mesh to file.
 
@@ -85,9 +82,10 @@ def write(filename, mesh, file_format = None, **kwargs):
 
     # Call custom writer for TOUGH and FLAC3D
     format_to_writer = {
-        "tough": ( tough, (), {"nodal_distance": "line", "incon_eos": None} ),
-        "flac3d": ( flac3d, (), {} ),
-        "flac3d-ascii": ( flac3d, (), {} ),
+        "tough": (tough, (), {"nodal_distance": "line", "incon_eos": None}),
+        "flac3d": (flac3d, (), {}),
+        "flac3d-ascii": (flac3d, (), {}),
+        "pickle": (pickle, (), {}),
     }
     if fmt in format_to_writer.keys():
         interface, args, default_kwargs = format_to_writer[fmt]
@@ -96,11 +94,19 @@ def write(filename, mesh, file_format = None, **kwargs):
         interface.write(filename, mesh, *args, **_kwargs)
     else:
         mesh = mesh.to_meshio()
-        meshio.write(filename, mesh, file_format = file_format, **kwargs)
+        meshio.write(filename, mesh, file_format=file_format, **kwargs)
 
 
-def write_points_cells(filename, points, cells, point_data = None,
-    cell_data = None, field_data = None, file_format = None, **kwargs):
+def write_points_cells(
+    filename,
+    points,
+    cells,
+    point_data=None,
+    cell_data=None,
+    field_data=None,
+    file_format=None,
+    **kwargs,
+):
     """
     Write unstructured mesh to file given points and cells data.
 
@@ -127,10 +133,10 @@ def write_points_cells(filename, points, cells, point_data = None,
         Refer to function ``write`` for additional information.
     """
     mesh = Mesh(
-        points = points,
-        cells = cells,
-        point_data = point_data,
-        cell_data = cell_data,
-        field_data = field_data,
+        points=points,
+        cells=cells,
+        point_data=point_data,
+        cell_data=cell_data,
+        field_data=field_data,
     )
-    write(filename, mesh, file_format = file_format, **kwargs)
+    write(filename, mesh, file_format=file_format, **kwargs)

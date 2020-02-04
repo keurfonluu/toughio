@@ -43,7 +43,7 @@ _Parameters = {
 
 Parameters = dict(_Parameters)
 
-select = { k+1: None for k in range(16) }
+select = {k + 1: None for k in range(16)}
 
 options = {
     "n_iteration": None,
@@ -65,16 +65,42 @@ options = {
     "w_upstream": None,
     "w_newton": None,
     "derivative_factor": None,
-    "incon": [ None for _ in range(4) ],
+    "incon": [None for _ in range(4)],
 }
 
-extra_options = { k+1: v for k, v in enumerate([
-    None, 0, 0, 0, None, 0, 0, None,
-    0, 0, 0, 0, 0, None, None, 4,
-    None, None, None, None, 3, None, None, None, 
-]) }
+extra_options = {
+    k + 1: v
+    for k, v in enumerate(
+        [
+            None,
+            0,
+            0,
+            0,
+            None,
+            0,
+            0,
+            None,
+            0,
+            0,
+            0,
+            0,
+            0,
+            None,
+            None,
+            4,
+            None,
+            None,
+            None,
+            None,
+            3,
+            None,
+            None,
+            None,
+        ]
+    )
+}
 
-more_options = { k+1: None for k in range(27) }
+more_options = {k + 1: None for k in range(27)}
 more_options[2] = 5
 
 solver = {
@@ -82,7 +108,7 @@ solver = {
     "z_precond": "Z0",
     "o_precond": "O0",
     "rel_iter_max": 0.1,
-    "eps": 1.e-6,
+    "eps": 1.0e-6,
 }
 
 generators = {
@@ -106,37 +132,25 @@ default = {
     "b_coeff": None,
     "xkd3": None,
     "xkd4": None,
-    "relative_permeability": {
-        "id": None,
-        "parameters": [],
-    },
-    "capillarity": {
-        "id": None,
-        "parameters": [],
-    },
-    "permeability_model": {
-        "id": 1,
-        "parameters": [],
-    },
-    "equivalent_pore_pressure": {
-        "id": 3,
-        "parameters": [ 0.2684e8, -0.1991e8, 0.3845 ],
-    },
+    "relative_permeability": {"id": None, "parameters": [],},
+    "capillarity": {"id": None, "parameters": [],},
+    "permeability_model": {"id": 1, "parameters": [],},
+    "equivalent_pore_pressure": {"id": 3, "parameters": [0.2684e8, -0.1991e8, 0.3845],},
 }
 
 eos = {
-    "eos1": [ 1, 2, 2, 6 ],
-    "eos2": [ 2, 3, 2, 6 ],
-    "eos3": [ 2, 3, 2, 6 ],
-    "eos4": [ 2, 3, 2, 6 ],
-    "eos5": [ 2, 3, 2, 6 ],
-    "eos7": [ 3, 3, 2, 6 ],
-    "eos8": [ 3, 3, 3, 6 ],
-    "eos9": [ 1, 1, 1, 6 ],
-    "eoswasg": [ 3, 4, 3, 6 ],
-    "eco2n": [ 3, 4, 3, 6 ],
-    "eco2n_v2": [ 3, 4, 3, 6 ],
-    "eco2m": [ 3, 4, 4, 6 ],
+    "eos1": [1, 2, 2, 6],
+    "eos2": [2, 3, 2, 6],
+    "eos3": [2, 3, 2, 6],
+    "eos4": [2, 3, 2, 6],
+    "eos5": [2, 3, 2, 6],
+    "eos7": [3, 3, 2, 6],
+    "eos8": [3, 3, 3, 6],
+    "eos9": [1, 1, 1, 6],
+    "eoswasg": [3, 4, 3, 6],
+    "eco2n": [3, 4, 3, 6],
+    "eco2n_v2": [3, 4, 3, 6],
+    "eco2m": [3, 4, 4, 6],
 }
 
 eos_select = {

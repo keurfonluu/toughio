@@ -1,4 +1,4 @@
-from ._tough import read, write
+from ._pickle import read, write
 
 __all__ = [
     "read",
