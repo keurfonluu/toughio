@@ -369,6 +369,56 @@ class Mesh:
         mesh = self.to_pyvista()
         mesh.plot(*args, **kwargs)
 
+    def set_material(self, material, range_x = None, range_y = None, range_z = None):
+        """
+        Set material for cells within box selection defined by `range_x`,
+        `range_y` and `range_z`.
+        
+        Parameters
+        ----------
+        material : str
+            Material name.
+        range_x : array_like or None, optional, default None
+            Minimum and maximum values in X direction.
+        range_y : array_like or None, optional, default None
+            Minimum and maximum values in Y direction.
+        range_z : array_like or None, optional, default None
+            Minimum and maximum values in Z direction.
+
+        Raises
+        ------
+        AssertionError
+            If any input argument is not valid.
+        """
+        def isinbounds(x, bounds):
+            return (
+                numpy.logical_and(x >= min(bounds), x <= max(bounds))
+                if bounds is not None
+                else numpy.ones(len(x), dtype = bool)
+            )
+
+        assert isinstance(material, str)
+        assert range_x is not None or range_y is not None or range_z is not None
+        assert range_x is None or (isinstance(range_x, (list, tuple, numpy.ndarray)) and len(range_x) == 2)
+        assert range_y is None or (isinstance(range_y, (list, tuple, numpy.ndarray)) and len(range_y) == 2)
+        assert range_z is None or (isinstance(range_z, (list, tuple, numpy.ndarray)) and len(range_z) == 2)
+
+        x, y, z = numpy.concatenate(self.centers).T
+        mask_x = isinbounds(x, range_x)
+        mask_y = isinbounds(y, range_y)
+        mask_z = isinbounds(z, range_z)
+        mask = numpy.logical_and(numpy.logical_and(mask_x, mask_y), mask_z)
+
+        data = numpy.concatenate(self.cell_data["material"])
+        imat = (
+            self.field_data[material][0]
+            if material in self.field_data.keys()
+            else data.max() + 1
+        )
+        data[mask] = imat
+        self.cell_data["material"] = self.split(data)
+        self.field_data[material] = numpy.array([imat, 3])
+
     @property
     def points(self):
         """
