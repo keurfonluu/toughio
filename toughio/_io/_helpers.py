@@ -11,6 +11,7 @@ __all__ = [
     "read_input",
     "write_input",
     "read_output",
+    "read_save",
 ]
 
 
@@ -118,8 +119,7 @@ def read_output(filename):
         line = f.readline()
 
         # Read data
-        times, variables = [], []
-        labels = []
+        times, labels, variables = [], [], []
         line = f.readline().replace('"', "").strip()
         while line:
             line = line.split(",")
@@ -145,3 +145,58 @@ def read_output(filename):
             k: v for k, v in zip(headers[1:], numpy.transpose(variable))
         }) for time, label, variable in zip(times, labels, variables)
     ]
+
+
+def read_save(filename):
+    """
+    Read TOUGH SAVE file.
+
+    Parameters
+    ----------
+    filename : str
+        Input file name.
+
+    Returns
+    -------
+    list of namedtuple
+        SAVE data as namedtuple (labels, data).
+    """
+
+    def str2float(s):
+        """
+        Convert primary variables string to float.
+        """
+        s = s.lower()
+        significand, exponent = s[:-4], s[-4:].replace("e", "")
+        return float("{}e{}".format(significand, exponent))
+
+    assert isinstance(filename, str)
+
+    with open(filename, "r") as f:
+        # Check first line
+        line = f.readline()
+        assert line.startswith("INCON"), (
+            "Invalid SAVE file '{}'.".format(filename)
+        )
+
+        # Read data
+        labels, variables = [], []
+        line = f.readline().strip()
+        while line:
+            # Label
+            line = line.split()
+            labels.append(line[0])
+
+            # Primary variables
+            line = f.readline().strip().split()
+            variables.append([str2float(l) for l in line])
+
+            line = f.readline().strip()
+            if line.startswith("+++"):
+                break
+
+    Save = collections.namedtuple("Save", ["labels", "data"])
+
+    return Save(labels, {
+        "X{}".format(i+1): x for i, x in enumerate(numpy.transpose(variables))
+    })
