@@ -2,6 +2,7 @@ import meshio
 
 from . import tough
 from . import flac3d
+from . import pickle
 from ._mesh import Mesh, from_meshio
 
 __all__ = [
@@ -13,6 +14,7 @@ __all__ = [
 
 _extension_to_filetype = {
     ".f3grid": "flac3d",
+    ".pickle": "pickle",
 }
 
 
@@ -55,6 +57,7 @@ def read(filename, file_format = None, **kwargs):
         "tough": ( tough, (), {} ),
         "flac3d": ( flac3d, (), {} ),
         "flac3d-ascii": ( flac3d, (), {} ),
+        "pickle": ( pickle, (), {} ),
     }
     if fmt in format_to_reader.keys():
         interface, args, default_kwargs = format_to_reader[fmt]
@@ -88,6 +91,7 @@ def write(filename, mesh, file_format = None, **kwargs):
         "tough": ( tough, (), {"nodal_distance": "line", "incon_eos": None} ),
         "flac3d": ( flac3d, (), {} ),
         "flac3d-ascii": ( flac3d, (), {} ),
+        "pickle": ( pickle, (), {} ),
     }
     if fmt in format_to_writer.keys():
         interface, args, default_kwargs = format_to_writer[fmt]
