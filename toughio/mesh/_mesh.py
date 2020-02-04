@@ -409,15 +409,16 @@ class Mesh:
         mask_z = isinbounds(z, range_z)
         mask = numpy.logical_and(numpy.logical_and(mask_x, mask_y), mask_z)
 
-        data = numpy.concatenate(self.cell_data["material"])
-        imat = (
-            self.field_data[material][0]
-            if material in self.field_data.keys()
-            else data.max() + 1
-        )
-        data[mask] = imat
-        self.cell_data["material"] = self.split(data)
-        self.field_data[material] = numpy.array([imat, 3])
+        if mask.any():
+            data = numpy.concatenate(self.cell_data["material"])
+            imat = (
+                self.field_data[material][0]
+                if material in self.field_data.keys()
+                else data.max() + 1
+            )
+            data[mask] = imat
+            self.cell_data["material"] = self.split(data)
+            self.field_data[material] = numpy.array([imat, 3])
 
     @property
     def points(self):
