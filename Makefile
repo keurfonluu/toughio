@@ -1,5 +1,5 @@
 format:
-		isort -rc .
+		isort -rc toughio
 		black -t py36 toughio
 
 black:
