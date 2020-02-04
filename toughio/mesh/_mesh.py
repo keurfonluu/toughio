@@ -695,8 +695,17 @@ class Mesh:
         if "material" in self.cell_data.keys():
             if self.field_data:
                 out = numpy.concatenate(self.cell_data["material"])
-                field_data_dict = {v[0]: k for k, v in self.field_data.items()}
-                return self.split([field_data_dict[mat] for mat in out])
+                try:
+                    field_data_dict = {
+                        v[0]: k for k, v in self.field_data.items()
+                    }
+                    return self.split([field_data_dict[mat] for mat in out])
+                except KeyError:
+                    logging.warning((
+                        "field_data is not defined for all materials. "
+                        "Returns materials as integers."
+                    ))
+                    return self.cell_data["material"]
             else:
                 return self.cell_data["material"]
         else:
