@@ -46,6 +46,7 @@ if sys.version_info < (3,):
 else:
     REQUIREMENTS = ["meshio >= 3.0.0"]
     EXTRA_REQUIREMENTS = {"full": ["pyvista >= 0.23.1"]}
+REQUIREMENTS += ["numpy >= 1.13.0"]
 
 
 if __name__ == "__main__":
