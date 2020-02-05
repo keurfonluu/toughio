@@ -1,6 +1,6 @@
 import meshio
 
-from . import flac3d, pickle, tough
+from . import avsucd, flac3d, pickle, tough
 from ._mesh import Mesh, from_meshio
 
 __all__ = [
@@ -49,6 +49,7 @@ def read(filename, file_format=None, **kwargs):
     # Call custom readers for TOUGH and FLAC3D
     format_to_reader = {
         "tough": (tough, (), {}),
+        "avsucd": (avsucd, (), {}),
         "flac3d": (flac3d, (), {}),
         "flac3d-ascii": (flac3d, (), {}),
         "pickle": (pickle, (), {}),
@@ -83,6 +84,7 @@ def write(filename, mesh, file_format=None, **kwargs):
     # Call custom writer for TOUGH and FLAC3D
     format_to_writer = {
         "tough": (tough, (), {"nodal_distance": "line", "incon_eos": None}),
+        "avsucd": (avsucd, (), {}),
         "flac3d": (flac3d, (), {}),
         "flac3d-ascii": (flac3d, (), {}),
         "pickle": (pickle, (), {}),
