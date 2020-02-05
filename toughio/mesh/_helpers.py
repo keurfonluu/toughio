@@ -51,7 +51,6 @@ def read(filename, file_format=None, **kwargs):
         "tough": (tough, (), {}),
         "avsucd": (avsucd, (), {}),
         "flac3d": (flac3d, (), {}),
-        "flac3d-ascii": (flac3d, (), {}),
         "pickle": (pickle, (), {}),
     }
     if fmt in format_to_reader.keys():
@@ -86,7 +85,6 @@ def write(filename, mesh, file_format=None, **kwargs):
         "tough": (tough, (), {"nodal_distance": "line", "incon_eos": None}),
         "avsucd": (avsucd, (), {}),
         "flac3d": (flac3d, (), {}),
-        "flac3d-ascii": (flac3d, (), {}),
         "pickle": (pickle, (), {}),
     }
     if fmt in format_to_writer.keys():
