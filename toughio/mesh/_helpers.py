@@ -1,6 +1,6 @@
 import meshio
 
-from . import avsucd, flac3d, pickle, tough
+from . import avsucd, flac3d, pickle, tecplot, tough
 from ._mesh import Mesh, from_meshio
 
 __all__ = [
@@ -11,6 +11,7 @@ __all__ = [
 
 
 _extension_to_filetype = {
+    ".dat": "tecplot",
     ".f3grid": "flac3d",
     ".pickle": "pickle",
 }
@@ -52,6 +53,7 @@ def read(filename, file_format=None, **kwargs):
         "avsucd": (avsucd, (), {}),
         "flac3d": (flac3d, (), {}),
         "pickle": (pickle, (), {}),
+        "tecplot": (tecplot, (), {}),
     }
     if fmt in format_to_reader.keys():
         interface, args, default_kwargs = format_to_reader[fmt]
@@ -86,6 +88,7 @@ def write(filename, mesh, file_format=None, **kwargs):
         "avsucd": (avsucd, (), {}),
         "flac3d": (flac3d, (), {}),
         "pickle": (pickle, (), {}),
+        "tecplot": (tecplot, (), {}),
     }
     if fmt in format_to_writer.keys():
         interface, args, default_kwargs = format_to_writer[fmt]
