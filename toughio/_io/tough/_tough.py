@@ -51,7 +51,7 @@ def write(filename, parameters):
     )
 
     params = deepcopy(Parameters)
-    params.update(parameters)
+    params.update(deepcopy(parameters))
 
     for k, v in default.items():
         if k not in params["default"].keys():
