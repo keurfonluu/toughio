@@ -351,6 +351,9 @@ def _write_conne(
 def _write_incon(
     f, incon_eos, labels, primary_variables, porosities, permeabilities,
 ):
+    """
+    Write INCON block.
+    """
     # Check initial pore pressures
     cond = numpy.logical_and(
         primary_variables[:, 0] > -1.0e9, primary_variables[:, 0] < 0.0,

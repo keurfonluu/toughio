@@ -21,7 +21,7 @@ class Mesh:
     """
     ToughIO mesh.
 
-    This class is updated following the latest ``meshio`` version and
+    This class is updated following the latest :module:`meshio` version and
     brings backward compatibility with its previous versions.
 
     Parameters
@@ -29,7 +29,7 @@ class Mesh:
     points : array_like (n_points, 3)
         Cooordinates of points.
     cells : list of tuples (cell_type, data)
-        Topology of cells.
+        Connectivity of cells.
     point_data : dict or None, optional, default None
         Point data arrays.
     cell_data : dict or None, optional, default None
@@ -89,13 +89,12 @@ class Mesh:
 
         Parameters
         ----------
-        height : scalar or array_like, optional, default 1.
+        height : scalar or array_like, optional, default 1.0
             Height of extrusion.
         axis : int (0, 1 or 2), optional, default 2
             Axis along which extrusion is performed.
         inplace : bool, optional, default True
-            If `True`, overwrite input Mesh object. Otherwise, return a new
-            Mesh.
+            If `False`, return a new :class:`toughio.Mesh`.
 
         Returns
         -------
@@ -156,8 +155,7 @@ class Mesh:
         Parameters
         ----------
         inplace : bool, optional, default True
-            If `True`, overwrite input Mesh object. Otherwise, return a new
-            Mesh.
+            If `False`, return a new :class:`toughio.Mesh`.
 
         Returns
         -------
@@ -216,7 +214,7 @@ class Mesh:
 
     def to_meshio(self):
         """
-        Convert mesh to meshio.Mesh.
+        Convert mesh to :class:`meshio.Mesh`.
 
         Returns
         -------
@@ -256,7 +254,7 @@ class Mesh:
 
     def to_pyvista(self):
         """
-        Convert mesh to pyvista.UnstructuredGrid.
+        Convert mesh to :class:`pyvista.UnstructuredGrid`.
 
         Returns
         -------
@@ -334,7 +332,7 @@ class Mesh:
         filename : str
             Input file name.
         time_step : int, optional, default -1
-            Data for given time step to import.
+            Data for given time step to import. Default is last time step.
         """
         from .. import read_output
 
@@ -370,7 +368,7 @@ class Mesh:
 
     def plot(self, *args, **kwargs):
         """
-        Display mesh using method ``pyvista.UnstructuredGrid.plot``.
+        Display mesh using :method:`pyvista.UnstructuredGrid.plot``.
         """
         mesh = self.to_pyvista()
         mesh.plot(*args, **kwargs)
@@ -489,7 +487,7 @@ class Mesh:
     @property
     def cells(self):
         """
-        Topology of cells.
+        Connectivity of cells.
         """
         if self._cells:
             return self._cells
@@ -508,7 +506,7 @@ class Mesh:
     @property
     def cells_dict(self):
         """
-        Topology of cells (``meshio < 4.0.0``).
+        Connectivity of cells (``meshio < 4.0.0``).
         """
         if self._cells:
             assert len(self._cells) == len(
@@ -590,7 +588,7 @@ class Mesh:
     @property
     def faces(self):
         """
-        Topology of faces for each cell in mesh.
+        Connectivity of faces for each cell in mesh.
         """
         meshio_type_to_faces = {
             "tetra": {
@@ -653,7 +651,7 @@ class Mesh:
     def connections(self):
         """
         Mesh connections assuming conformity and that points and cells are
-        are uniquely defined in mesh (use ``prune_duplicates`` otherwise).
+        are uniquely defined in mesh.
 
         Note
         ----
@@ -782,7 +780,7 @@ class Mesh:
 
 def from_meshio(mesh):
     """
-    Convert a meshio.Mesh to toughio.Mesh.
+    Convert a :class:`meshio.Mesh` to :class:`toughio.Mesh`.
 
     Parameters
     ----------

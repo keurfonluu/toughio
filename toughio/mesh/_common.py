@@ -113,12 +113,12 @@ nomen = ["{:1}".format(i + 1) for i in range(9)] + alpha
 
 def get_meshio_version():
     """
-    Return ``meshio`` version as a tuple.
+    Return :module:`meshio` version as a tuple.
 
     Returns
     -------
     tuple
-        ``meshio`` version as tuple (major, minor, patch).
+        :module:`meshio` version as tuple (major, minor, patch).
     """
     return tuple(int(i) for i in meshio.__version__.split("."))
 
@@ -166,4 +166,5 @@ def labeler(i):
     q2, r2 = divmod(q1, len(nomen))
     q3, r3 = divmod(q2, len(nomen))
     _, r4 = divmod(q3, len(nomen))
+    
     return "".join([alpha[r4], nomen[r3], nomen[r2], numer[r1]])
