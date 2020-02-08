@@ -5,7 +5,7 @@ from copy import deepcopy
 import meshio
 import numpy
 
-from ._common import get_meshio_version, meshio_data
+from ._common import get_meshio_version, get_local_index, meshio_data
 
 __all__ = [
     "Cells",
@@ -449,6 +449,31 @@ class Mesh:
             data[mask] = imat
             self.add_scalar("material", data)
             self.field_data[material] = numpy.array([imat, 3])
+
+    def near(self, point):
+        """
+        Return local index of cell nearest to query point.
+
+        Parameters
+        ----------
+        point : array_like
+            Coordinates of point to query.
+
+        Returns
+        -------
+        tuple
+            Local index of cell as a tuple (iblock, icell).
+        """
+        assert isinstance(point, (list, tuple, numpy.ndarray))
+        assert numpy.ndim(point) == 1
+        assert len(point) == self.points.shape[1]
+
+        centers = numpy.concatenate(self.centers)
+        idx = numpy.arange(self.n_cells)
+        idx = idx[numpy.argmin(numpy.linalg.norm(centers - point, axis=1))]
+
+        return get_local_index(self, idx)
+
 
     @property
     def points(self):
