@@ -47,7 +47,7 @@ def read(filename, file_format=None, **kwargs):
     assert isinstance(filename, str)
     fmt = file_format if file_format else _filetype_from_filename(filename)
 
-    # Call custom readers for TOUGH and FLAC3D
+    # Call custom readers
     format_to_reader = {
         "tough": (tough, (), {}),
         "avsucd": (avsucd, (), {}),
@@ -77,12 +77,31 @@ def write(filename, mesh, file_format=None, **kwargs):
         Mesh to export.
     file_format : str or None, optional, default None
         Output file format.
+
+    Other Parameters
+    ----------------
+    nodal_distance : str ('line' or 'orthogonal'), optional, default 'line'
+        Only if ``file_format = "tough"``. Method to calculate connection
+        nodal distances:
+        - 'line': distance between node and common face along connecting
+        line (distance is not normal),
+        - 'orthogonal' : distance between node and its orthogonal
+        projection onto common face (shortest distance).
+    material_name : dict or None, default None
+        Only if ``file_format = "tough"``. Rename cell material.
+    material_end : str, array_like or None, default None
+        Only if ``file_format = "tough"``. Move cells to bottom of block
+        'ELEME' if their materials is in `material_end`.
+    incon_eos : str or None, optional, default None
+        Equation-of-state identifier to determine the actual number of
+        primary variables to initialize. If `None`, TOUGH input `INCON`
+        file will not be written.
     """
     # Check file format
     assert isinstance(filename, str)
     fmt = file_format if file_format else _filetype_from_filename(filename)
 
-    # Call custom writer for TOUGH and FLAC3D
+    # Call custom writer
     format_to_writer = {
         "tough": (
             tough,
