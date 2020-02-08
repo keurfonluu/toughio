@@ -390,20 +390,20 @@ class Mesh:
 
         self.cell_data[scalar] = self.split(data)
 
-    def set_material(self, material, range_x=None, range_y=None, range_z=None):
+    def set_material(self, material, xlim=None, ylim=None, zlim=None):
         """
-        Set material for cells within box selection defined by `range_x`,
-        `range_y` and `range_z`.
+        Set material for cells within box selection defined by `xlim`,
+        `ylim` and `zlim`.
         
         Parameters
         ----------
         material : str
             Material name.
-        range_x : array_like or None, optional, default None
+        xlim : array_like or None, optional, default None
             Minimum and maximum values in X direction.
-        range_y : array_like or None, optional, default None
+        ylim : array_like or None, optional, default None
             Minimum and maximum values in Y direction.
-        range_z : array_like or None, optional, default None
+        zlim : array_like or None, optional, default None
             Minimum and maximum values in Z direction.
 
         Raises
@@ -420,21 +420,21 @@ class Mesh:
             )
 
         assert isinstance(material, str)
-        assert range_x is not None or range_y is not None or range_z is not None
-        assert range_x is None or (
-            isinstance(range_x, (list, tuple, numpy.ndarray)) and len(range_x) == 2
+        assert xlim is not None or ylim is not None or zlim is not None
+        assert xlim is None or (
+            isinstance(xlim, (list, tuple, numpy.ndarray)) and len(xlim) == 2
         )
-        assert range_y is None or (
-            isinstance(range_y, (list, tuple, numpy.ndarray)) and len(range_y) == 2
+        assert ylim is None or (
+            isinstance(ylim, (list, tuple, numpy.ndarray)) and len(ylim) == 2
         )
-        assert range_z is None or (
-            isinstance(range_z, (list, tuple, numpy.ndarray)) and len(range_z) == 2
+        assert zlim is None or (
+            isinstance(zlim, (list, tuple, numpy.ndarray)) and len(zlim) == 2
         )
 
         x, y, z = numpy.concatenate(self.centers).T
-        mask_x = isinbounds(x, range_x)
-        mask_y = isinbounds(y, range_y)
-        mask_z = isinbounds(z, range_z)
+        mask_x = isinbounds(x, xlim)
+        mask_y = isinbounds(y, ylim)
+        mask_z = isinbounds(z, zlim)
         mask = numpy.logical_and(numpy.logical_and(mask_x, mask_y), mask_z)
 
         if mask.any():
