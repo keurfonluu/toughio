@@ -4,36 +4,13 @@ from copy import deepcopy
 
 import numpy
 
+from ._helpers import dtypes, block, check_parameters
 from .._common import default
 
 __all__ = [
     "read",
     "write",
 ]
-
-
-def block(keyword, multi=False, noend=False):
-    """
-    Decorator for block writing functions.
-    """
-
-    def decorator(func):
-        from functools import wraps
-
-        from .._common import header
-
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            head_fmt = "{:5}{}" if noend else "{:5}{}\n"
-            out = [head_fmt.format(keyword, header)]
-            out += func(*args, **kwargs)
-            out += ["\n"] if multi else []
-
-            return out
-
-        return wrapper
-
-    return decorator
 
 
 def read(filename):
@@ -64,17 +41,34 @@ def write(filename, parameters):
     parameters : dict
         Parameters to export.
     """
-    from .._common import Parameters
+    from .._common import Parameters, default
+
+    assert "rocks" in parameters.keys(), (
+        "Block 'ROCKS' (key 'rocks') is not defined."
+    )
+    assert "options" in parameters.keys(), (
+        "Block 'PARAM' (key 'options') is not defined."
+    )
 
     params = deepcopy(Parameters)
-    if params:
-        params.update(parameters)
+    params.update(parameters)
 
+    for k, v in default.items():
+        if k not in params["default"].keys():
+            params["default"][k] = v
+
+    for rock in params["rocks"].keys():
+        for k, v in params["default"].items():
+            if k not in params["rocks"][rock].keys():
+                params["rocks"][rock][k] = v
+
+    buffer = write_buffer(params)
     with open(filename, "w") as f:
-        for record in write_buffer(params):
+        for record in buffer:
             f.write(record)
 
 
+@check_parameters(dtypes["PARAMETERS"])
 def write_buffer(parameters):
     """
     Write TOUGH input file as a list of 80-character long record strings.
@@ -155,6 +149,12 @@ def _add_record(data, id_fmt="{:>5g}     "):
     return _write_record(_format_data(rec))
 
 
+@check_parameters(dtypes["ROCKS"], keys="default")
+@check_parameters(dtypes["MODEL"], keys=("default", "relative_permeability"))
+@check_parameters(dtypes["MODEL"], keys=("default", "capillarity"))
+@check_parameters(dtypes["ROCKS"], keys="rocks", is_list=True)
+@check_parameters(dtypes["MODEL"], keys=("rocks", "relative_permeability"), is_list=True)
+@check_parameters(dtypes["MODEL"], keys=("rocks", "capillarity"), is_list=True)
 @block("ROCKS", multi=True)
 def _write_rocks(parameters):
     """
@@ -226,6 +226,10 @@ def _write_rocks(parameters):
     return out
 
 
+@check_parameters(dtypes["MODEL"], keys=("default", "permeability_model"))
+@check_parameters(dtypes["MODEL"], keys=("default", "equivalent_pore_pressure"))
+@check_parameters(dtypes["MODEL"], keys=("rocks", "permeability_model"), is_list=True)
+@check_parameters(dtypes["MODEL"], keys=("rocks", "equivalent_pore_pressure"), is_list=True)
 @block("FLAC", multi=True)
 def _write_flac(parameters):
     """
@@ -284,6 +288,7 @@ def _write_multi(parameters):
     return [("{:>5d}" * len(out) + "\n").format(*out)]
 
 
+@check_parameters(dtypes["SELEC"], keys="selections")
 @block("SELEC")
 def _write_selec(parameters):
     """
@@ -310,6 +315,7 @@ def _write_selec(parameters):
     return out
 
 
+@check_parameters(dtypes["SOLVR"], keys="solver")
 @block("SOLVR")
 def _write_solvr(parameters):
     """
@@ -352,6 +358,8 @@ def _write_start():
     return [out[:11] + "MOP: 123456789*123456789*1234" + out[40:]]
 
 
+@check_parameters(dtypes["PARAM"], keys="options")
+@check_parameters(dtypes["MOP"], keys="extra_options")
 @block("PARAM")
 def _write_param(parameters):
     """
@@ -435,6 +443,7 @@ def _write_param(parameters):
     return out
 
 
+@check_parameters(dtypes["MOMOP"], keys="more_options")
 @block("MOMOP")
 def _write_momop(parameters):
     from .._common import more_options
@@ -503,6 +512,7 @@ def _write_goft(parameters):
     )
 
 
+@check_parameters(dtypes["GENER"], keys="generators", is_list=True)
 @block("GENER", multi=True)
 def _write_gener(parameters):
     """
