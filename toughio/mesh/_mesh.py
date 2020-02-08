@@ -5,7 +5,7 @@ from copy import deepcopy
 import meshio
 import numpy
 
-from ._common import get_meshio_version, get_local_index, meshio_data
+from ._common import get_local_index, get_meshio_version, meshio_data
 
 __all__ = [
     "Cells",
@@ -471,7 +471,6 @@ class Mesh:
         idx = idx[numpy.argmin(numpy.linalg.norm(centers - point, axis=1))]
 
         return get_local_index(self, idx)
-
 
     @property
     def points(self):

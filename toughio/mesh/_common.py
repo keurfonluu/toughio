@@ -137,7 +137,7 @@ def get_local_index(mesh, i):
     n_cells = numpy.cumsum([len(c.data) for c in mesh.cells])
     idx = numpy.nonzero(n_cells > i)[0][0]
 
-    return (0, i) if not idx else (idx, i - n_cells[idx-1])
+    return (0, i) if not idx else (idx, i - n_cells[idx - 1])
 
 
 def labeler(i):
@@ -166,5 +166,5 @@ def labeler(i):
     q2, r2 = divmod(q1, len(nomen))
     q3, r3 = divmod(q2, len(nomen))
     _, r4 = divmod(q3, len(nomen))
-    
+
     return "".join([alpha[r4], nomen[r3], nomen[r2], numer[r1]])
