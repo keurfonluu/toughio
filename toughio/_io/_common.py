@@ -100,7 +100,7 @@ extra_options = {
     )
 }
 
-more_options = {k + 1: None for k in range(27)}
+more_options = {k + 1: None for k in range(40)}
 more_options[2] = 5
 
 solver = {
@@ -132,10 +132,10 @@ default = {
     "b_coeff": None,
     "xkd3": None,
     "xkd4": None,
-    "relative_permeability": {"id": None, "parameters": [],},
-    "capillarity": {"id": None, "parameters": [],},
-    "permeability_model": {"id": 1, "parameters": [],},
-    "equivalent_pore_pressure": {"id": 3, "parameters": [0.2684e8, -0.1991e8, 0.3845],},
+    "relative_permeability": {"id": None, "parameters": []},
+    "capillarity": {"id": None, "parameters": []},
+    "permeability_model": {"id": 1, "parameters": []},
+    "equivalent_pore_pressure": {"id": 3, "parameters": []},
 }
 
 eos = {
