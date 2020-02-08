@@ -10,6 +10,7 @@ __all__ = [
     "meshio_type_to_ndim",
     "meshio_data",
     "get_meshio_version",
+    "get_local_index",
     "labeler",
 ]
 
@@ -120,6 +121,23 @@ def get_meshio_version():
         ``meshio`` version as tuple (major, minor, patch).
     """
     return tuple(int(i) for i in meshio.__version__.split("."))
+
+
+def get_local_index(mesh, i):
+    """
+    Convert global cell index to local tuple index.
+
+    Parameters
+    ----------
+    mesh : toughio.Mesh
+        Input mesh.
+    i : int
+        Global cell index.
+    """
+    n_cells = numpy.cumsum([len(c.data) for c in mesh.cells])
+    idx = numpy.nonzero(n_cells > i)[0][0]
+
+    return (0, i) if not idx else (idx, i - n_cells[idx-1])
 
 
 def labeler(i):
