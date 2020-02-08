@@ -136,7 +136,7 @@ def write_points_cells(
     cell_data=None,
     field_data=None,
     file_format=None,
-    **kwargs,
+    **kwargs
 ):
     """
     Write unstructured mesh to file given points and cells data.
