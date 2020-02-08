@@ -58,11 +58,13 @@ def read(filename):
     raise NotImplementedError("Reading TOUGH MESH file is not supported.")
 
 
-def write(filename, mesh, nodal_distance, incon_eos):
+def write(filename, mesh, nodal_distance, material_name, material_end, incon_eos):
     """
     Write TOUGH MESH file.
     """
     assert nodal_distance in {"line", "orthogonal"}
+    assert material_name is None or isinstance(material_name, dict)
+    assert material_end is None or isinstance(material_end, (str, list, tuple))
     assert (
         incon_eos is None or incon_eos in _eos_to_neq.keys()
     ), "EOS '{}' is unknown or not supported.".format(incon_eos)
@@ -123,11 +125,13 @@ def write(filename, mesh, nodal_distance, incon_eos):
         faces,
         face_normals,
         face_areas,
-        nodal_distance,
-        incon_eos,
         primary_variables,
         porosities,
         permeabilities,
+        nodal_distance,
+        material_name,
+        material_end,
+        incon_eos,
     )
 
 
@@ -145,12 +149,18 @@ def write_buffer(
     faces,
     face_normals,
     face_areas,
-    nodal_distance,
-    incon_eos,
     primary_variables,
     porosities,
     permeabilities,
+    nodal_distance,
+    material_name,
+    material_end,
+    incon_eos,
 ):
+    material_name = material_name if material_name else {}
+    material_end = material_end if material_end else []
+    material_end = [material_end] if isinstance(material_end, str) else material_end
+
     # Check INCON inputs and show warnings if necessary
     if incon_eos and primary_variables is None:
         logging.warning(
@@ -181,7 +191,7 @@ def write_buffer(
     # Write MESH file
     with open(filename, "w") as f:
         _write_eleme(
-            f, labels, nodes, materials, volumes, boundary_conditions,
+            f, labels, nodes, materials, volumes, boundary_conditions, material_name, material_end,
         )
         _write_conne(
             f,
@@ -210,7 +220,7 @@ def write_buffer(
 
 @block("ELEME")
 def _write_eleme(
-    f, labels, nodes, materials, volumes, boundary_conditions,
+    f, labels, nodes, materials, volumes, boundary_conditions, material_name, material_end,
 ):
     """
     Write ELEME block.
@@ -220,13 +230,19 @@ def _write_eleme(
 
     # Write ELEME block
     fmt = "{:5.5}{:>5}{:>5}{:>5}{:10.4e}{:>10}{:>10}{:10.3e}{:10.3e}{:10.3e}\n"
+    ending = []
     iterables = zip(labels, materials, volumes, nodes)
     for label, material, volume, node in iterables:
+        mat = (
+            material_name[material]
+            if material in material_name.keys()
+            else material
+        )
         record = fmt.format(
             label,  # ID
             "",  # NSEQ
             "",  # NADD
-            material,  # MAT
+            mat,  # MAT
             volume,  # VOLX
             "",  # AHTX
             "",  # PMX
@@ -234,7 +250,15 @@ def _write_eleme(
             node[1],  # Y
             node[2],  # Z
         )
-        f.write(record)
+        if material not in material_end:
+            f.write(record)
+        else:
+            ending.append(record)
+
+    # Append ending cells at the end of the block
+    if material_end:
+        for record in ending:
+            f.write(record)
 
 
 @block("CONNE")
