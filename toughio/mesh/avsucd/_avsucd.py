@@ -109,7 +109,7 @@ def _read_cells(f, num_cells, point_ids):
 
     # Convert to numpy arrays
     for k, c in enumerate(cells):
-        cells[k] = Cells(c.type, numpy.array(c.data)[:,avsucd_to_meshio_order[c.type]])
+        cells[k] = Cells(c.type, numpy.array(c.data)[:, avsucd_to_meshio_order[c.type]])
         cell_data["avsucd:material"][k] = numpy.array(cell_data["avsucd:material"][k])
     return cell_ids, cells, cell_data
 
@@ -173,7 +173,9 @@ def write(filename, mesh):
         num_node_data_sum = sum(num_node_data)
         num_cell_data_sum = sum(num_cell_data)
         f.write(
-            "{} {} {} {} 0\n".format(num_nodes, num_cells, num_node_data_sum, num_cell_data_sum)
+            "{} {} {} {} 0\n".format(
+                num_nodes, num_cells, num_node_data_sum, num_cell_data_sum
+            )
         )
 
         # Write nodes
@@ -207,7 +209,7 @@ def write(filename, mesh):
 
 def _write_nodes(f, points):
     for i, (x, y, z) in enumerate(points):
-        f.write("{} {} {} {}\n".format(i+1, x, y, z))
+        f.write("{} {} {} {}\n".format(i + 1, x, y, z))
 
 
 def _write_cells(f, cells, cell_data, num_cells):
@@ -229,7 +231,11 @@ def _write_cells(f, cells, cell_data, num_cells):
     for k, v in cells:
         for cell in v[:, meshio_to_avsucd_order[k]]:
             cell_str = " ".join(str(c + 1) for c in cell)
-            f.write("{} {} {} {}\n".format(i+1, int(material[i]), meshio_to_avsucd_type[k], cell_str))
+            f.write(
+                "{} {} {} {}\n".format(
+                    i + 1, int(material[i]), meshio_to_avsucd_type[k], cell_str
+                )
+            )
             i += 1
 
 

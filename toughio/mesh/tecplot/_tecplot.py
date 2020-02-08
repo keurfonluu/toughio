@@ -217,7 +217,9 @@ def _read_zone(line, variables):
     # Check that the grid is unstructured
     if "F" in zone.keys():
         if zone["F"] not in {"FEPOINT", "FEBLOCK"}:
-            raise AssertionError("Tecplot reader can only read finite-element type grids")
+            raise AssertionError(
+                "Tecplot reader can only read finite-element type grids"
+            )
         if "ET" not in zone.keys():
             raise AssertionError("Element type 'ET' not found")
         zone_format = zone.pop("F")
@@ -299,7 +301,9 @@ def write(filename, mesh):
             cell_blocks.append(ic)
         else:
             logging.warning(
-                "Tecplot does not support cell type '{}'. Skipping cell block {}.".format(c.type, ic)
+                "Tecplot does not support cell type '{}'. Skipping cell block {}.".format(
+                    c.type, ic
+                )
             )
 
     # Define cells and zone type

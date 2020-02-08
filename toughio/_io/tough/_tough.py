@@ -4,8 +4,8 @@ from copy import deepcopy
 
 import numpy
 
-from ._helpers import dtypes, block, check_parameters
 from .._common import default
+from ._helpers import block, check_parameters, dtypes
 
 __all__ = [
     "read",
@@ -43,12 +43,10 @@ def write(filename, parameters):
     """
     from .._common import Parameters, default
 
-    assert "rocks" in parameters.keys(), (
-        "Block 'ROCKS' (key 'rocks') is not defined."
-    )
-    assert "options" in parameters.keys(), (
-        "Block 'PARAM' (key 'options') is not defined."
-    )
+    assert "rocks" in parameters.keys(), "Block 'ROCKS' (key 'rocks') is not defined."
+    assert (
+        "options" in parameters.keys()
+    ), "Block 'PARAM' (key 'options') is not defined."
 
     params = deepcopy(Parameters)
     params.update(deepcopy(parameters))
@@ -153,7 +151,9 @@ def _add_record(data, id_fmt="{:>5g}     "):
 @check_parameters(dtypes["MODEL"], keys=("default", "relative_permeability"))
 @check_parameters(dtypes["MODEL"], keys=("default", "capillarity"))
 @check_parameters(dtypes["ROCKS"], keys="rocks", is_list=True)
-@check_parameters(dtypes["MODEL"], keys=("rocks", "relative_permeability"), is_list=True)
+@check_parameters(
+    dtypes["MODEL"], keys=("rocks", "relative_permeability"), is_list=True
+)
 @check_parameters(dtypes["MODEL"], keys=("rocks", "capillarity"), is_list=True)
 @block("ROCKS", multi=True)
 def _write_rocks(parameters):
@@ -229,7 +229,9 @@ def _write_rocks(parameters):
 @check_parameters(dtypes["MODEL"], keys=("default", "permeability_model"))
 @check_parameters(dtypes["MODEL"], keys=("default", "equivalent_pore_pressure"))
 @check_parameters(dtypes["MODEL"], keys=("rocks", "permeability_model"), is_list=True)
-@check_parameters(dtypes["MODEL"], keys=("rocks", "equivalent_pore_pressure"), is_list=True)
+@check_parameters(
+    dtypes["MODEL"], keys=("rocks", "equivalent_pore_pressure"), is_list=True
+)
 @block("FLAC", multi=True)
 def _write_flac(parameters):
     """

@@ -191,7 +191,14 @@ def write_buffer(
     # Write MESH file
     with open(filename, "w") as f:
         _write_eleme(
-            f, labels, nodes, materials, volumes, boundary_conditions, material_name, material_end,
+            f,
+            labels,
+            nodes,
+            materials,
+            volumes,
+            boundary_conditions,
+            material_name,
+            material_end,
         )
         _write_conne(
             f,
@@ -220,7 +227,14 @@ def write_buffer(
 
 @block("ELEME")
 def _write_eleme(
-    f, labels, nodes, materials, volumes, boundary_conditions, material_name, material_end,
+    f,
+    labels,
+    nodes,
+    materials,
+    volumes,
+    boundary_conditions,
+    material_name,
+    material_end,
 ):
     """
     Write ELEME block.
@@ -233,11 +247,7 @@ def _write_eleme(
     ending = []
     iterables = zip(labels, materials, volumes, nodes)
     for label, material, volume, node in iterables:
-        mat = (
-            material_name[material]
-            if material in material_name.keys()
-            else material
-        )
+        mat = material_name[material] if material in material_name.keys() else material
         record = fmt.format(
             label,  # ID
             "",  # NSEQ

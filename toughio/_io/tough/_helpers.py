@@ -1,8 +1,6 @@
 import logging
-
-from functools import wraps
-
 from copy import deepcopy
+from functools import wraps
 
 import numpy
 
@@ -60,10 +58,7 @@ dtypes = {
         "permeability_model": "dict",
         "equivalent_pore_pressure": "dict",
     },
-    "MODEL": {
-        "id": "int",
-        "parameters": "array_like",
-    },
+    "MODEL": {"id": "int", "parameters": "array_like",},
     "PARAM": {
         "n_iteration": "int",
         "n_cycle": "int",
@@ -86,9 +81,9 @@ dtypes = {
         "derivative_factor": "scalar",
         "incon": "array_like",
     },
-    "MOP": {i+1: "int" for i in range(24)},
-    "MOMOP": {i+1: "int" for i in range(40)},
-    "SELEC": {i+1: "int" for i in range(16)},
+    "MOP": {i + 1: "int" for i in range(24)},
+    "MOMOP": {i + 1: "int" for i in range(40)},
+    "SELEC": {i + 1: "int" for i in range(16)},
     "SOLVR": {
         "id": "int",
         "z_precond": "str",
@@ -114,7 +109,16 @@ str_to_dtype = {
     "array_like": (list, tuple, numpy.ndarray),
     "dict": (dict,),
     "scalar": (int, float, numpy.int32, numpy.float32, numpy.float64),
-    "scalar_array_like": (int, float, list, tuple, numpy.int32, numpy.float32, numpy.float64, numpy.ndarray),
+    "scalar_array_like": (
+        int,
+        float,
+        list,
+        tuple,
+        numpy.int32,
+        numpy.float32,
+        numpy.float64,
+        numpy.ndarray,
+    ),
 }
 
 
@@ -144,6 +148,7 @@ def check_parameters(input_types, keys=None, is_list=False):
     """
     Decorator to check input parameters.
     """
+
     def _check_parameters(params, keys=None):
         for k, v in params.items():
             # Check whether parameters contain unknown keys
@@ -151,26 +156,22 @@ def check_parameters(input_types, keys=None, is_list=False):
             if k not in input_types.keys():
                 logging.warning(
                     "Unknown key '{}'{}. Skipping.".format(
-                        k,
-                        " in {}".format(keys) if keys else ""
+                        k, " in {}".format(keys) if keys else ""
                     )
                 )
                 continue
 
             # Check input types
             input_type = str_to_dtype[input_types[k]]
-            assert v is None or isinstance(v, input_type), (
-                "Invalid type for parameter '{}' {}(expected {}).".format(
-                    k,
-                    "in {} ".format(keys) if keys else "",
-                    input_types[k],
-                )
+            assert v is None or isinstance(
+                v, input_type
+            ), "Invalid type for parameter '{}' {}(expected {}).".format(
+                k, "in {} ".format(keys) if keys else "", input_types[k],
             )
 
     keys = [keys] if isinstance(keys, str) else keys
 
     def decorator(func):
-
         @wraps(func)
         def wrapper(parameters):
             if not keys:
