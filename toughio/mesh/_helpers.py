@@ -84,7 +84,16 @@ def write(filename, mesh, file_format=None, **kwargs):
 
     # Call custom writer for TOUGH and FLAC3D
     format_to_writer = {
-        "tough": (tough, (), {"nodal_distance": "line", "incon_eos": None}),
+        "tough": (
+            tough,
+            (),
+            {
+                "nodal_distance": "line",
+                "material_name": None,
+                "material_end": None,
+                "incon_eos": None,
+            },
+        ),
         "avsucd": (avsucd, (), {}),
         "flac3d": (flac3d, (), {}),
         "pickle": (pickle, (), {}),
