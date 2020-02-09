@@ -164,12 +164,12 @@ def write_buffer(
     # Check INCON inputs and show warnings if necessary
     if incon_eos and primary_variables is None:
         logging.warning(
-            ("\nInitial conditions are not defined. " "Writing INCON will be ignored.")
+            ("Initial conditions are not defined. " "Writing INCON will be ignored.")
         )
 
     if porosities is not None:
         if not incon_eos:
-            logging.warning("\nPorosity is only exported if incon_eos is provided.")
+            logging.warning("Porosity is only exported if incon_eos is provided.")
         else:
             assert (
                 len(porosities) == num_cells and porosities.ndim == 1
@@ -178,7 +178,7 @@ def write_buffer(
     if permeabilities is not None:
         if not incon_eos:
             logging.warning(
-                "\nPermeability modifiers are only exported if incon_eos is provided."
+                "Permeability modifiers are only exported if incon_eos is provided."
             )
         else:
             assert permeabilities.ndim in {1, 2}
@@ -313,7 +313,7 @@ def _write_conne(
                     bounds.append((boundary_conditions[i], boundary_conditions[j]))
         else:
             logging.warning(
-                "\nElement '{}' is not connected to the grid.".format(labels[i])
+                "Element '{}' is not connected to the grid.".format(labels[i])
             )
         cell_list.add(i)
 
@@ -369,7 +369,7 @@ def _write_incon(
         primary_variables[:, 0] > -1.0e9, primary_variables[:, 0] < 0.0,
     )
     if cond.any():
-        logging.warning("\nNegative pore pressures found in 'INCON'.")
+        logging.warning("Negative pore pressures found in 'INCON'.")
 
     # Write label, porosity and permeability
     buffer = ["{:5.5}".format(label) for label in labels]
