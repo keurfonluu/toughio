@@ -389,7 +389,6 @@ class Mesh:
         assert len(data) == self.n_points
         self.point_data[label] = numpy.asarray(data)
 
-
     def add_cell_data(self, label, data):
         """
         Add a new cell data array.

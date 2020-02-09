@@ -29,7 +29,7 @@ def triangulate(points, material="dfalt"):
         raise ModuleNotFoundError(
             "Triangulation requires scipy >= 0.9 to be installed."
         )
-    
+
     assert isinstance(points, (list, tuple, numpy.ndarray))
     assert numpy.ndim(points) == 2
     assert numpy.shape(points)[1] in {2, 3}
