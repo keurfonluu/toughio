@@ -3,13 +3,13 @@ import numpy
 from ..mesh._mesh import Cells, Mesh
 
 __all__ = [
-    "meshmaker",
+    "structured_grid",
 ]
 
 
-def meshmaker(dx, dy, dz=None, origin=None, material="dfalt"):
+def structured_grid(dx, dy, dz=None, origin=None, material="dfalt"):
     """
-    Generate 2D or 3D irregular cartesian grid.
+    Generate 2D or 3D non-uniform structured grid.
 
     Parameters
     ----------
@@ -27,7 +27,7 @@ def meshmaker(dx, dy, dz=None, origin=None, material="dfalt"):
     Returns
     -------
     toughio.Mesh
-        Output irregular cartesian mesh.
+        Output non-uniform structured mesh.
     """
     assert isinstance(dx, (list, tuple, numpy.ndarray))
     assert isinstance(dy, (list, tuple, numpy.ndarray))
@@ -60,7 +60,7 @@ def meshmaker(dx, dy, dz=None, origin=None, material="dfalt"):
 
 def _grid_3d(dx, dy, dz):
     """
-    Generate 3D cartesian grid.
+    Generate 3D structured grid.
     """
     # Internal functions
     def meshgrid(x, y, z, indexing="ij", order="F"):
@@ -101,7 +101,7 @@ def _grid_3d(dx, dy, dz):
 
 def _grid_2d(dx, dy):
     """
-    Generate 2D cartesian grid.
+    Generate 2D structured grid.
     """
     # Internal functions
     def meshgrid(x, y, indexing="ij", order="F"):

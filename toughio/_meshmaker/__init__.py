@@ -1,5 +1,5 @@
-from ._meshmaker import meshmaker
+from ._structured_grid import structured_grid
 
 __all__ = [
-    "meshmaker",
+    "structured_grid",
 ]
