@@ -4,7 +4,7 @@ import toughio
 
 
 # Import grid
-mesh = toughio.mesh.read("gmsh/mesh.msh")
+mesh = toughio.read_mesh("gmsh/mesh.msh")
 
 # Process grid
 mesh.points[:, [1, 2]] = mesh.points[:, [2, 1]]
