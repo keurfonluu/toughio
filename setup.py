@@ -47,6 +47,7 @@ else:
     REQUIREMENTS = ["meshio >= 3.0.0"]
     EXTRA_REQUIREMENTS = {"full": ["pyvista >= 0.23.1"]}
 REQUIREMENTS += ["numpy >= 1.13.0"]
+EXTRA_REQUIREMENTS["full"] += ["scipy>=0.9"]
 
 
 if __name__ == "__main__":
