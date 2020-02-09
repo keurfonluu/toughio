@@ -373,22 +373,38 @@ class Mesh:
         mesh = self.to_pyvista()
         mesh.plot(*args, **kwargs)
 
-    def add_scalar(self, scalar, data):
+    def add_point_data(self, label, data):
+        """
+        Add a new point data array.
+
+        Parameters
+        ----------
+        label : str
+            Point data array name.
+        data : array_like
+            Point data array.
+        """
+        assert isinstance(label, str)
+        assert isinstance(data, (list, tuple, numpy.ndarray))
+        assert len(data) == self.n_points
+        self.point_data[label] = numpy.asarray(data)
+
+
+    def add_cell_data(self, label, data):
         """
         Add a new cell data array.
 
         Parameters
         ----------
-        scalar : str
-            Scalar name.
+        label : str
+            Cell data array name.
         data : array_like
-            Scalar data.
+            Cell data array.
         """
-        assert isinstance(scalar, str)
+        assert isinstance(label, str)
         assert isinstance(data, (list, tuple, numpy.ndarray))
         assert len(data) == self.n_cells
-
-        self.cell_data[scalar] = self.split(data)
+        self.cell_data[label] = self.split(data)
 
     def set_material(self, material, xlim=None, ylim=None, zlim=None):
         """
@@ -445,7 +461,7 @@ class Mesh:
                 else data.max() + 1
             )
             data[mask] = imat
-            self.add_scalar("material", data)
+            self.add_cell_data("material", data)
             self.field_data[material] = numpy.array([imat, 3])
 
     def near(self, point):

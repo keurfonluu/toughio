@@ -52,7 +52,7 @@ def meshmaker(dx, dy, dz=None, origin=None, material="dfalt"):
     )
 
     mesh = Mesh(points, cells)
-    mesh.cell_data["material"] = mesh.split(numpy.ones(mesh.n_cells, dtype=int))
+    mesh.add_cell_data("material", numpy.ones(mesh.n_cells, dtype=int))
     mesh.field_data[material] = numpy.array([1, 3])
 
     return mesh
