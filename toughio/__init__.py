@@ -1,5 +1,4 @@
-from . import mesh
-from . import meshmaker
+from . import mesh, meshmaker
 from .__about__ import (
     __author__,
     __author_email__,
@@ -9,6 +8,8 @@ from .__about__ import (
 )
 from ._io import read_input, read_output, read_save, write_input
 from .mesh import Mesh
+from .mesh import read as read_mesh
+from .mesh import write as write_mesh
 
 __all__ = [
     "Mesh",
@@ -18,6 +19,8 @@ __all__ = [
     "write_input",
     "read_output",
     "read_save",
+    "read_mesh",
+    "write_mesh",
     "__version__",
     "__author__",
     "__author_email__",
