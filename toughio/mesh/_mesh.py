@@ -19,7 +19,7 @@ Cells = collections.namedtuple("Cells", ["type", "data"])
 
 class Mesh:
     """
-    ToughIO mesh.
+    toughio mesh.
 
     This class is updated following the latest :module:`meshio` version and
     brings backward compatibility with its previous versions.
@@ -314,7 +314,7 @@ class Mesh:
 
     def to_tough(self, filename="MESH", **kwargs):
         """
-        Write TOUGH MESH file.
+        Write TOUGH `MESH` file.
 
         Parameters
         ----------
@@ -666,7 +666,7 @@ class Mesh:
     def connections(self):
         """
         Mesh connections assuming conformity and that points and cells are
-        are uniquely defined in mesh.
+        uniquely defined in mesh.
 
         Note
         ----
@@ -737,7 +737,7 @@ class Mesh:
                 except KeyError:
                     logging.warning(
                         (
-                            "\nfield_data is not defined for all materials. "
+                            "field_data is not defined for all materials. "
                             "Returns materials as integers."
                         )
                     )
