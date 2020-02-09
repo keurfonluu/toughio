@@ -21,7 +21,7 @@ dz += [bnd_thick]                               # Bottom boundary
 origin = [-bnd_thick, 0.0, -2500.0 - bnd_thick]
 
 # Create grid
-mesh = toughio.meshmaker(
+mesh = toughio.meshmaker.structured_grid(
     dx = dx,
     dy = [1.0],
     dz = dz[::-1],
