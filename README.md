@@ -5,13 +5,15 @@
 
 [TOUGH](https://tough.lbl.gov/) (Transport Of Unsaturated Groundwater and Heat) is a general purpose numerical simulation software designed for fluid and heat flows of multiphase, multicomponent fluid mixtures in porous and fractured media developed at Lawrence Berkeley National Laboratory. It solves mass and energy balance equations that describe fluid and heat flow in multiphase and multicomponent systems. TOUGH handles all types of multiphase and multicomponent flow systems since the governing equations for fluid and heat flow have the same mathematical form. The nature and properties of fluid mixtures are described by thermophysical variables (e.g. density, viscosity, enthalpy) which are provided by an equation-of-state (EOS) module.
 
-**``toughio``** is an open-source library that provides tools to facilitate pre- and post-processing for TOUGH using the latest Python standards. It aims to make setting up of a TOUGH simulation user-friendly and not reinvent the wheel by relying on existing popular Python packages:
+**``toughio``** is an open-source library that provides tools to facilitate pre- and post-processing for TOUGH using the latest Python standards. It aims to make setting up of a TOUGH simulation user-friendly by relying on existing well-established Python packages:
+
+* [**``numpy``**](https://numpy.org/): vectorized calculation of N-dimensional arrays,
 
 * [**``meshio``**](https://github.com/nschloe/meshio): input/output for many mesh formats,
 
 * [**``pyvista``**](https://github.com/pyvista/pyvista): 3D plotting and mesh analysis through a streamlined interface for the Visualization Toolkit (VTK).
 
-Note that the results of a TOUGH simulation are sensitive to the quality of the mesh. A mesh that contains too many ill-shaped cells can potentially lead to wrong results although the simulation converged successfully. **``toughio``** does not verify the quality of the mesh which is left to the discretion of the user.
+Note that the results of a TOUGH simulation are sensitive to the quality of the mesh (ideally, it should satisfy the orthogonality condition). A mesh that contains too many ill-shaped cells can potentially lead to wrong results although the simulation converged successfully. **``toughio``** does not verify the quality of the mesh which is left to the discretion of the user.
 
 
 ## Features
