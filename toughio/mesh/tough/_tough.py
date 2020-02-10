@@ -398,10 +398,11 @@ def _write_incon(
 
     # Write INCON block
     for pvar, buf in zip(primary_variables, buffer):
-        f.write(buf + "\n")
-        for v in pvar:
-            f.write("{:20.4e}".format(v) if v > -1.0e9 else "{:20}".format(""))
-        f.write("\n")
+        if (pvar > -1.0e9).any():
+            f.write(buf + "\n")
+            for v in pvar:
+                f.write("{:20.4e}".format(v) if v > -1.0e9 else "{:20}".format(""))
+            f.write("\n")
 
 
 def _get_faces(faces):
