@@ -17,7 +17,7 @@ __all__ = [
 Cells = collections.namedtuple("Cells", ["type", "data"])
 
 
-class Mesh:
+class Mesh(object):
     """
     toughio mesh.
 
