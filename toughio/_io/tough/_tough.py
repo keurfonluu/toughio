@@ -448,6 +448,11 @@ def _write_param(parameters):
 @check_parameters(dtypes["MOMOP"], keys="more_options")
 @block("MOMOP")
 def _write_momop(parameters):
+    """
+    TOUGH input MOMOP block data (optional).
+
+    Provides additional options.
+    """
     from .._common import more_options
 
     _momop = more_options.copy()

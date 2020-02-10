@@ -158,6 +158,10 @@ def read_save(filename):
     -------
     list of namedtuple
         SAVE data as namedtuple (labels, data).
+
+    Note
+    ----
+    Does not support porosity, USERX and hysteresis values yet.
     """
 
     def str2float(s):
