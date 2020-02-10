@@ -1,30 +1,13 @@
-# -*- coding: utf-8 -*-
+import meshio
 
-"""
-Author: Keurfon Luu <keurfonluu@lbl.gov>
-License: MIT
-"""
-
-from . import utils
-from . import spatial
-from .helpers import (
-    read,
-    write,
-    write_points_cells,
-)
-from .meshio import (
-    Mesh,
-    XdmfTimeSeriesReader,
-    XdmfTimeSeriesWriter,
-)
+from ._common import get_meshio_version
+from ._helpers import read, write, write_points_cells
+from ._mesh import Mesh, from_meshio
 
 __all__ = [
     "read",
     "write",
     "write_points_cells",
     "Mesh",
-    "XdmfTimeSeriesReader",
-    "XdmfTimeSeriesWriter",
-    "utils",
-    "spatial",
+    "from_meshio",
 ]

@@ -1,0 +1,6 @@
+* text=auto
+*.sh text eol=lf
+*.html filter=lfs diff=lfs merge=lfs -text
+*.doctree filter=lfs diff=lfs merge=lfs -text
+*.msh filter=lfs diff=lfs merge=lfs -text
+*.geo filter=lfs diff=lfs merge=lfs -text
