@@ -472,7 +472,7 @@ def _write_times(parameters):
     """
     data = parameters["times"]
     n = len(data)
-    out = _write_record(_format_data([(n, "{:>5g}"),]))
+    out = _write_record(_format_data([(n, "{:>5g}")]))
     out += _write_multi_record(_format_data([(i, "{:>10.4e}") for i in data]))
     return out
 
