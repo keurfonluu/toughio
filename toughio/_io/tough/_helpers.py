@@ -91,7 +91,7 @@ dtypes = {
         "eps": "scalar",
     },
     "GENER": {
-        "type": "str",
+        "type": "str_array_like",
         "times": "scalar_array_like",
         "rates": "scalar_array_like",
         "specific_enthalpy": "scalar_array_like",
@@ -118,6 +118,7 @@ str_to_dtype = {
         numpy.float64,
         numpy.ndarray,
     ),
+    "str_array_like": (str, list, tuple, numpy.ndarray),
 }
 
 
