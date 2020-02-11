@@ -57,7 +57,7 @@ dtypes = {
         "permeability_model": "dict",
         "equivalent_pore_pressure": "dict",
     },
-    "MODEL": {"id": "int", "parameters": "array_like",},
+    "MODEL": {"id": "int", "parameters": "array_like"},
     "PARAM": {
         "n_iteration": "int",
         "n_cycle": "int",
