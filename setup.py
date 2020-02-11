@@ -6,7 +6,7 @@ from setuptools import find_packages, setup
 base_dir = os.path.abspath(os.path.dirname(__file__))
 about = {}
 with open(os.path.join(base_dir, "toughio", "__about__.py"), "rb") as f:
-    exec(f.read(), about)
+    exec (f.read(), about)
 
 
 DISTNAME = "toughio"
@@ -49,6 +49,10 @@ else:
 REQUIREMENTS += ["numpy >= 1.13.0"]
 EXTRA_REQUIREMENTS["full"] += ["scipy>=0.9"]
 
+ENTRY_POINTS = {
+    "console_scripts": ["toughio-merge = toughio._cli:merge",],
+}
+
 
 if __name__ == "__main__":
     setup(
@@ -65,4 +69,5 @@ if __name__ == "__main__":
         version=about["__version__"],
         packages=find_packages(),
         include_package_data=True,
+        entry_points=ENTRY_POINTS,
     )
