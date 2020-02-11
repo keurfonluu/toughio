@@ -17,7 +17,6 @@ dtypes = {
         "eos": "str",
         "n_component": "int",
         "n_phase": "int",
-        "n_phase": "int",
         "flac": "bool",
         "creep": "bool",
         "porosity_model": "int",
@@ -85,7 +84,7 @@ dtypes = {
     "MOMOP": {i + 1: "int" for i in range(40)},
     "SELEC": {i + 1: "int" for i in range(16)},
     "SOLVR": {
-        "id": "int",
+        "method": "int",
         "z_precond": "str",
         "o_precond": "str",
         "rel_iter_max": "scalar",
