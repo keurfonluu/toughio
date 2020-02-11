@@ -550,7 +550,15 @@ def _write_gener(parameters):
 
             # Split dict
             for i in range(num_comps):
-                generator_data.append((k, {key: (data[key][i] if data[key] is not None else None) for key in generators.keys()}))
+                generator_data.append(
+                    (
+                        k,
+                        {
+                            key: (data[key][i] if data[key] is not None else None)
+                            for key in generators.keys()
+                        },
+                    )
+                )
         else:
             # Only one component for this element
             # Check that values are scalar or 1D array_like
