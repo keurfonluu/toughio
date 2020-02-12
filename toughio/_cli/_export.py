@@ -14,6 +14,7 @@ format_to_ext = {
 
 def export(argv=None):
     import os
+    import sys
     from .. import read_mesh, read_output
 
     parser = _get_parser()
@@ -30,6 +31,7 @@ def export(argv=None):
 
     # Read output file
     print("Reading file '{}' ...".format(args.infile), end="")
+    sys.stdout.flush()
     out = read_output(args.infile)
     if args.time_step is not None:
         assert -len(out) <= args.time_step < len(out), "Inconsistent time step value."
@@ -41,9 +43,11 @@ def export(argv=None):
     # Triangulate if no mesh
     if not args.mesh:
         print("Mesh file not specified, performing triangulation...", end="")
+        sys.stdout.flush()
         mesh = _triangulate(out)
     else:
         print("Reading mesh file '{}' ...".format(args.mesh), end="")
+        sys.stdout.flush()
         try:
             mesh = read_mesh(args.mesh, file_format="pickle")
         except:
@@ -60,6 +64,7 @@ def export(argv=None):
 
     # Write output file
     print("Writing output file '{}' ...".format(filename), end="")
+    sys.stdout.flush()
     mesh.cell_data.pop("material")
     mesh.write(filename, file_format=args.file_format)
     print(" Done!")
