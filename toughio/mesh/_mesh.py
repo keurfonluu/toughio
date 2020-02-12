@@ -323,25 +323,36 @@ class Mesh(object):
         """
         self.write(filename, file_format="tough", **kwargs)
 
-    def read_output(self, filename, time_step=-1):
+    def read_output(self, file_or_output, time_step=-1):
         """
-        Read TOUGH output file for a given time step.
+        Import TOUGH results to the mesh.
 
         Parameters
         ----------
-        filename : str
-            Input file name.
+        file_or_output : str, namedtuple or list of namedtuple
+            Input file name or output data.
         time_step : int, optional, default -1
             Data for given time step to import. Default is last time step.
         """
         from .. import read_output
+        from .._io._helpers import Output, Save
 
+        assert isinstance(file_or_output, (str, list, tuple, Output, Save))
         assert isinstance(time_step, int)
 
-        out = read_output(filename)
-        assert -len(out) <= time_step < len(out)
+        if isinstance(file_or_output, str):
+            out = read_output(file_or_output)
+        else:
+            out = file_or_output
 
-        _, labels, data = out[time_step]
+        if not isinstance(out, (Output, Save)):
+            assert -len(out) <= time_step < len(out)
+            out = out[time_step]
+
+        if isinstance(out, Output):
+            _, labels, data = out
+        else:
+            labels, data = out
         assert len(labels) == self.n_cells
 
         mapper = {k: v for v, k in enumerate(labels)}
