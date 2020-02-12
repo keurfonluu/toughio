@@ -66,8 +66,7 @@ def _get_parser():
     # Initialize parser
     parser = argparse.ArgumentParser(
         description=(
-            "Extract results from TOUGH main output file and reformat as a TOUGH3 element output file. "
-            "The output and mesh files must be in the same directory."
+            "Extract results from TOUGH main output file and reformat as a TOUGH3 element output file."
         ),
         formatter_class=argparse.RawTextHelpFormatter,
     )
