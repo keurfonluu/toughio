@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 __all__ = [
     "export",
 ]
@@ -27,22 +29,27 @@ def export(argv=None):
         )
 
     # Read output file
+    print("Reading file '{}' ...".format(args.infile), end="")
     out = read_output(args.infile)
     if args.time_step is not None:
         assert -len(out) <= args.time_step < len(out), "Inconsistent time step value."
         out = out[args.time_step]
     else:
         out = out[-1]
+    print(" Done!")
 
     # Triangulate if no mesh
     if not args.mesh:
+        print("Mesh file not specified, performing triangulation...", end="")
         mesh = _triangulate(out)
     else:
+        print("Reading mesh file '{}' ...".format(args.mesh), end="")
         try:
             mesh = read_mesh(args.mesh, file_format="pickle")
         except:
             raise ValueError("Cannot unpickle mesh file {}.".format(args.mesh))
         mesh.read_output(out)
+    print(" Done!")
 
     # Output file name
     if args.output_file:
@@ -52,8 +59,10 @@ def export(argv=None):
         filename = "{}{}".format(head, format_to_ext[args.file_format])
 
     # Write output file
+    print("Writing output file '{}' ...".format(filename), end="")
     mesh.cell_data.pop("material")
     mesh.write(filename, file_format=args.file_format)
+    print(" Done!")
 
 
 def _get_parser():
