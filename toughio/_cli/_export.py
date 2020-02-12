@@ -22,14 +22,14 @@ def export(argv=None):
         args.infile
     )
     if args.mesh:
-        assert os.path.isfile(args.mesh), "Pickled mesh file '{}' not found.".format(args.mesh)
+        assert os.path.isfile(args.mesh), "Pickled mesh file '{}' not found.".format(
+            args.mesh
+        )
 
     # Read output file
     out = read_output(args.infile)
     if args.time_step is not None:
-        assert -len(out) <= args.time_step < len(out), (
-            "Inconsistent time step value."
-        )
+        assert -len(out) <= args.time_step < len(out), "Inconsistent time step value."
         out = out[args.time_step]
     else:
         out = out[-1]
@@ -39,11 +39,9 @@ def export(argv=None):
         mesh = _triangulate(out)
     else:
         try:
-            mesh = read_mesh(args.mesh, file_format = "pickle")
+            mesh = read_mesh(args.mesh, file_format="pickle")
         except:
-            raise ValueError(
-                "Cannot unpickle mesh file {}.".format(args.mesh)
-            )
+            raise ValueError("Cannot unpickle mesh file {}.".format(args.mesh))
         mesh.read_output(out)
 
     # Output file name
@@ -63,9 +61,7 @@ def _get_parser():
 
     # Initialize parser
     parser = argparse.ArgumentParser(
-        description=(
-            "Export TOUGH simulation results to a file for visualization."
-        ),
+        description=("Export TOUGH simulation results to a file for visualization."),
         formatter_class=argparse.RawTextHelpFormatter,
     )
 
@@ -76,29 +72,17 @@ def _get_parser():
 
     # Mesh file
     parser.add_argument(
-        "--mesh",
-        "-m",
-        type=str,
-        default=None,
-        help="Pickled toughio.Mesh",
+        "--mesh", "-m", type=str, default=None, help="Pickled toughio.Mesh",
     )
 
     # Time step
     parser.add_argument(
-        "--time-step",
-        "-t",
-        type=int,
-        default=None,
-        help="Time step to export",
+        "--time-step", "-t", type=int, default=None, help="Time step to export",
     )
 
     # Output file
     parser.add_argument(
-        "--output-file",
-        "-o",
-        type=str,
-        default=None,
-        help="Exported file",
+        "--output-file", "-o", type=str, default=None, help="Exported file",
     )
 
     # File format
@@ -134,9 +118,12 @@ def _triangulate(data):
 
     # Reconstruct points cloud
     points = (
-        numpy.column_stack((Y, Z)) if nx == 1
-        else numpy.column_stack((X, Z)) if ny == 1
-        else numpy.column_stack((X, Y)) if nz == 1
+        numpy.column_stack((Y, Z))
+        if nx == 1
+        else numpy.column_stack((X, Z))
+        if ny == 1
+        else numpy.column_stack((X, Y))
+        if nz == 1
         else numpy.column_stack((X, Y, Z))
     )
 
