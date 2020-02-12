@@ -5,7 +5,12 @@ from copy import deepcopy
 import meshio
 import numpy
 
-from ._common import get_local_index, get_meshio_version, meshio_data
+from ._common import (
+    get_local_index,
+    get_meshio_version,
+    get_old_meshio_cells,
+    meshio_data,
+)
 
 __all__ = [
     "Cells",
@@ -167,7 +172,7 @@ class Mesh(object):
         Does not preserve points order from original array in mesh.
         """
         mesh = self if inplace else deepcopy(self)
-        cells = mesh.cells_dict
+        cells = [[c.type, c.data] for c in mesh.cells]
 
         # Prune duplicate points
         unique_points, pind, pinv = numpy.unique(
@@ -177,14 +182,14 @@ class Mesh(object):
             mesh.points = unique_points
             for k, v in mesh.point_data.items():
                 mesh.point_data[k] = v[pind]
-            for k, v in cells.items():
-                cells[k] = pinv[v]
+            for ic, (k, v) in enumerate(cells):
+                cells[ic][1] = pinv[v]
 
         # Prune duplicate cells
-        for ic, (k, v) in enumerate(cells.items()):
+        for ic, (k, v) in enumerate(cells):
             vsort = numpy.sort(v, axis=1)
             _, order = numpy.unique(vsort, axis=0, return_index=True)
-            cells[k] = cells[k][order]
+            cells[ic][1] = v[order]
             if mesh.cell_data:
                 for kk, vv in mesh.cell_data.items():
                     mesh.cell_data[kk][ic] = vv[ic][order]
@@ -235,19 +240,9 @@ class Mesh(object):
                 }
             )
         else:
-            cell_data = {}
-            if self.cell_data:
-                for ic, c in enumerate(self.cells):
-                    if c.type not in cell_data.keys():
-                        cell_data[c.type] = {}
-                    for k, v in self.cell_data.items():
-                        cell_data[c.type][k] = v[ic]
+            cells, cell_data = get_old_meshio_cells(self.cells, self.cell_data)
             kwargs.update(
-                {
-                    "cells": self.cells_dict,
-                    "cell_data": cell_data,
-                    "node_sets": self.point_sets,
-                }
+                {"cells": cells, "cell_data": cell_data, "node_sets": self.point_sets,}
             )
 
         return meshio.Mesh(**kwargs)
@@ -534,10 +529,7 @@ class Mesh(object):
         Connectivity of cells (``meshio < 4.0.0``).
         """
         if self._cells:
-            assert len(self._cells) == len(
-                numpy.unique([c.type for c in self._cells])
-            ), "More than one block of the same type. Cannot create dictionary."
-            return dict(self._cells)
+            return get_old_meshio_cells(self._cells)
         else:
             return self._cells_dict
 
