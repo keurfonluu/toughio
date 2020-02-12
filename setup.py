@@ -53,7 +53,10 @@ REQUIREMENTS += ["numpy >= 1.13.0"]
 EXTRA_REQUIREMENTS["full"] += ["scipy>=0.9"]
 
 ENTRY_POINTS = {
-    "console_scripts": ["toughio-merge = toughio._cli:merge",],
+    "console_scripts": [
+        "toughio-merge = toughio._cli:merge",
+        "toughio-extract = toughio._cli:extract",
+    ],
 }
 
 
