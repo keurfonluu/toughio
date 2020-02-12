@@ -54,8 +54,9 @@ EXTRA_REQUIREMENTS["full"] += ["scipy>=0.9"]
 
 ENTRY_POINTS = {
     "console_scripts": [
-        "toughio-merge = toughio._cli:merge",
+        "toughio-export = toughio._cli:export",
         "toughio-extract = toughio._cli:extract",
+        "toughio-merge = toughio._cli:merge",
     ],
 }
 
