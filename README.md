@@ -13,7 +13,7 @@
 
 * [**``pyvista``**](https://github.com/pyvista/pyvista): 3D plotting and mesh analysis through a streamlined interface for the Visualization Toolkit (VTK).
 
-Note that the results of a TOUGH simulation are sensitive to the quality of the mesh (ideally, it should satisfy the orthogonality condition). A mesh that contains too many ill-shaped cells can potentially lead to wrong results although the simulation converged successfully. **``toughio``** does not verify the quality of the mesh which is left to the discretion of the user.
+Note that the results of a TOUGH simulation are sensitive to the quality of the mesh (ideally, it should satisfy the orthogonality condition). A mesh that contains too many ill-shaped cells can potentially lead to unexpected results although the simulation converged successfully. **``toughio``** does not verify the quality of the mesh which is left to the discretion of the user.
 
 
 ## Features
@@ -44,3 +44,63 @@ Otherwise, clone and extract the package, then run from the package location:
 ```bash
 pip install .[full]
 ```
+
+## Usage
+
+In Python, to read a mesh and write the corresponding TOUGH *MESH* file (without any pre-processing), simply do
+
+```python
+import toughio
+
+mesh = toughio.read_mesh(
+    filename,
+    file_format="flac3d",   # Optional, inferred from file extension otherwise
+)
+mesh.to_tough()             # Write MESH file
+```
+
+Parameters of a TOUGH simulation can be defined as a dictionary with specific keywords following the JSON standard, following
+
+```python
+parameters = {
+    "title": "Sample title",
+    "eos": "eco2n",
+    "isothermal":, False,
+    "default": {            # Default rock properties
+        "density": 2600.0,
+        "porosity": 0.1,
+        # "permeability", "conductivity", "specific_heat"...
+    },
+    "rocks": {
+        "shale": {          # To overwrite default rock properties
+            "capillarity": {
+                "id": 1,
+                "parameters": [0.0, 0.0, 1.0],
+            # same keywords as in "default"
+            },
+        },
+        # other materials
+    },
+    "options": {
+        "n_cycle": 100,
+        "t_max": 3.0 * 365.25 * 24.0 * 3600.0,
+        # "t_ini", "t_steps", "t_step_max", "gravity", "eps1", "eps2"...
+    },
+    # "extra_options", "selections", "solver", "generators"...
+}
+toughio.write_input("INFILE", parameters)
+```
+
+TOUGH simulation output can also be imported into Python as a list of *namedtuple* (``time``, ``labels``, ``data``)
+
+```python
+output = toughio.read_output(filename)  # Assume TOUGH3 CSV output file
+```
+
+**``toughio``** is mainly intended to be used as a Python scripting library for TOUGH. Nevertheless, several utility command scripts are available for users who are not familiar with Python. From a console or terminal, the user can execute the following scripts:
+
+* ``toughio-export``: export TOUGH simulation results to a file for visualization (VTK, VTU or Tecplot),
+
+* ``toughio-extract``: extract results from TOUGH main output file and reformat as a TOUGH3 element output file (mostly useful for TOUGH2 output *before* calling ``toughio-export``),
+
+* ``toughio-merge``: merge input file, MESH and/or INCON into a single file (for storage or sharing).
