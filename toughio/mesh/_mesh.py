@@ -5,7 +5,12 @@ from copy import deepcopy
 import meshio
 import numpy
 
-from ._common import get_local_index, get_meshio_version, meshio_data
+from ._common import (
+    get_local_index,
+    get_meshio_version,
+    get_old_meshio_cells,
+    meshio_data,
+)
 
 __all__ = [
     "Cells",
@@ -167,7 +172,7 @@ class Mesh(object):
         Does not preserve points order from original array in mesh.
         """
         mesh = self if inplace else deepcopy(self)
-        cells = mesh.cells_dict
+        cells = [[c.type, c.data] for c in mesh.cells]
 
         # Prune duplicate points
         unique_points, pind, pinv = numpy.unique(
@@ -177,14 +182,14 @@ class Mesh(object):
             mesh.points = unique_points
             for k, v in mesh.point_data.items():
                 mesh.point_data[k] = v[pind]
-            for k, v in cells.items():
-                cells[k] = pinv[v]
+            for ic, (k, v) in enumerate(cells):
+                cells[ic][1] = pinv[v]
 
         # Prune duplicate cells
-        for ic, (k, v) in enumerate(cells.items()):
+        for ic, (k, v) in enumerate(cells):
             vsort = numpy.sort(v, axis=1)
             _, order = numpy.unique(vsort, axis=0, return_index=True)
-            cells[k] = cells[k][order]
+            cells[ic][1] = v[order]
             if mesh.cell_data:
                 for kk, vv in mesh.cell_data.items():
                     mesh.cell_data[kk][ic] = vv[ic][order]
@@ -235,19 +240,9 @@ class Mesh(object):
                 }
             )
         else:
-            cell_data = {}
-            if self.cell_data:
-                for ic, c in enumerate(self.cells):
-                    if c.type not in cell_data.keys():
-                        cell_data[c.type] = {}
-                    for k, v in self.cell_data.items():
-                        cell_data[c.type][k] = v[ic]
+            cells, cell_data = get_old_meshio_cells(self.cells, self.cell_data)
             kwargs.update(
-                {
-                    "cells": self.cells_dict,
-                    "cell_data": cell_data,
-                    "node_sets": self.point_sets,
-                }
+                {"cells": cells, "cell_data": cell_data, "node_sets": self.point_sets,}
             )
 
         return meshio.Mesh(**kwargs)
@@ -323,25 +318,36 @@ class Mesh(object):
         """
         self.write(filename, file_format="tough", **kwargs)
 
-    def read_output(self, filename, time_step=-1):
+    def read_output(self, file_or_output, time_step=-1):
         """
-        Read TOUGH output file for a given time step.
+        Import TOUGH results to the mesh.
 
         Parameters
         ----------
-        filename : str
-            Input file name.
+        file_or_output : str, namedtuple or list of namedtuple
+            Input file name or output data.
         time_step : int, optional, default -1
             Data for given time step to import. Default is last time step.
         """
         from .. import read_output
+        from .._io._helpers import Output, Save
 
+        assert isinstance(file_or_output, (str, list, tuple, Output, Save))
         assert isinstance(time_step, int)
 
-        out = read_output(filename)
-        assert -len(out) <= time_step < len(out)
+        if isinstance(file_or_output, str):
+            out = read_output(file_or_output)
+        else:
+            out = file_or_output
 
-        _, labels, data = out[time_step]
+        if not isinstance(out, (Output, Save)):
+            assert -len(out) <= time_step < len(out)
+            out = out[time_step]
+
+        if isinstance(out, Output):
+            _, labels, data = out
+        else:
+            labels, data = out
         assert len(labels) == self.n_cells
 
         mapper = {k: v for v, k in enumerate(labels)}
@@ -523,10 +529,7 @@ class Mesh(object):
         Connectivity of cells (``meshio < 4.0.0``).
         """
         if self._cells:
-            assert len(self._cells) == len(
-                numpy.unique([c.type for c in self._cells])
-            ), "More than one block of the same type. Cannot create dictionary."
-            return dict(self._cells)
+            return get_old_meshio_cells(self._cells)
         else:
             return self._cells_dict
 
@@ -606,15 +609,15 @@ class Mesh(object):
         """
         meshio_type_to_faces = {
             "tetra": {
-                "triangle": numpy.array([[0, 1, 2], [0, 1, 3], [1, 2, 3], [0, 2, 3],]),
+                "triangle": numpy.array([[0, 1, 2], [0, 1, 3], [1, 2, 3], [0, 2, 3]]),
             },
             "pyramid": {
-                "triangle": numpy.array([[0, 1, 4], [1, 2, 4], [2, 3, 4], [0, 3, 4],]),
-                "quad": numpy.array([[0, 1, 2, 3],]),
+                "triangle": numpy.array([[0, 1, 4], [1, 2, 4], [2, 3, 4], [0, 3, 4]]),
+                "quad": numpy.array([[0, 1, 2, 3]]),
             },
             "wedge": {
-                "triangle": numpy.array([[0, 1, 2], [3, 4, 5],]),
-                "quad": numpy.array([[0, 1, 3, 4], [1, 2, 4, 5], [0, 2, 3, 5],]),
+                "triangle": numpy.array([[0, 1, 2], [3, 4, 5]]),
+                "quad": numpy.array([[0, 1, 3, 4], [1, 2, 4, 5], [0, 2, 3, 5]]),
             },
             "hexahedron": {
                 "quad": numpy.array(
@@ -759,11 +762,11 @@ class Mesh(object):
             return a[:, 0] * c0 + a[:, 1] * c1 + a[:, 2] * c2
 
         meshio_type_to_tetra = {
-            "tetra": numpy.array([[0, 1, 2, 3],]),
-            "pyramid": numpy.array([[0, 1, 3, 4], [1, 2, 3, 4],]),
-            "wedge": numpy.array([[0, 1, 2, 5], [0, 1, 4, 5], [0, 3, 4, 5],]),
+            "tetra": numpy.array([[0, 1, 2, 3]]),
+            "pyramid": numpy.array([[0, 1, 3, 4], [1, 2, 3, 4]]),
+            "wedge": numpy.array([[0, 1, 2, 5], [0, 1, 4, 5], [0, 3, 4, 5]]),
             "hexahedron": numpy.array(
-                [[0, 1, 3, 4], [1, 4, 5, 6], [1, 2, 3, 6], [3, 4, 6, 7], [1, 3, 4, 6],]
+                [[0, 1, 3, 4], [1, 4, 5, 6], [1, 2, 3, 6], [3, 4, 6, 7], [1, 3, 4, 6]]
             ),
         }
 

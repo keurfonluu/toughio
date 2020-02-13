@@ -7,11 +7,17 @@ import numpy
 from . import json, tough
 
 __all__ = [
+    "Output",
+    "Save",
     "read_input",
     "write_input",
     "read_output",
     "read_save",
 ]
+
+
+Output = collections.namedtuple("Output", ["time", "labels", "data"])
+Save = collections.namedtuple("Save", ["labels", "data"])
 
 
 _extension_to_filetype = {
@@ -135,8 +141,6 @@ def read_output(filename):
 
             line = f.readline().strip().replace('"', "")
 
-    Output = collections.namedtuple("Output", ["time", "labels", "data"])
-
     return [
         Output(
             time, label, {k: v for k, v in zip(headers[1:], numpy.transpose(variable))}
@@ -194,8 +198,6 @@ def read_save(filename):
             line = f.readline().strip()
             if line.startswith("+++"):
                 break
-
-    Save = collections.namedtuple("Save", ["labels", "data"])
 
     return Save(
         labels,

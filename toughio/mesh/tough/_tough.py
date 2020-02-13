@@ -441,7 +441,7 @@ def _get_triangle_normals(mesh, faces, islice=[0, 1, 2]):
     triangles = numpy.vstack([c[islice] for c in faces])
     triangles = mesh.points[triangles]
 
-    return cross(triangles[:, 1] - triangles[:, 0], triangles[:, 2] - triangles[:, 0],)
+    return cross(triangles[:, 1] - triangles[:, 0], triangles[:, 2] - triangles[:, 0])
 
 
 def _get_face_normals_areas(mesh, faces_dict, faces_cell):

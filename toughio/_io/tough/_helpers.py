@@ -17,7 +17,6 @@ dtypes = {
         "eos": "str",
         "n_component": "int",
         "n_phase": "int",
-        "n_phase": "int",
         "flac": "bool",
         "creep": "bool",
         "porosity_model": "int",
@@ -58,7 +57,7 @@ dtypes = {
         "permeability_model": "dict",
         "equivalent_pore_pressure": "dict",
     },
-    "MODEL": {"id": "int", "parameters": "array_like",},
+    "MODEL": {"id": "int", "parameters": "array_like"},
     "PARAM": {
         "n_iteration": "int",
         "n_cycle": "int",
@@ -85,14 +84,14 @@ dtypes = {
     "MOMOP": {i + 1: "int" for i in range(40)},
     "SELEC": {i + 1: "int" for i in range(16)},
     "SOLVR": {
-        "id": "int",
+        "method": "int",
         "z_precond": "str",
         "o_precond": "str",
         "rel_iter_max": "scalar",
         "eps": "scalar",
     },
     "GENER": {
-        "type": "str",
+        "type": "str_array_like",
         "times": "scalar_array_like",
         "rates": "scalar_array_like",
         "specific_enthalpy": "scalar_array_like",
@@ -119,6 +118,7 @@ str_to_dtype = {
         numpy.float64,
         numpy.ndarray,
     ),
+    "str_array_like": (str, list, tuple, numpy.ndarray),
 }
 
 

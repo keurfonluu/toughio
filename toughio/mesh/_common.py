@@ -10,6 +10,7 @@ __all__ = [
     "meshio_type_to_ndim",
     "meshio_data",
     "get_meshio_version",
+    "get_old_meshio_cells",
     "get_local_index",
     "labeler",
 ]
@@ -93,7 +94,7 @@ vtk_type_to_numnodes = {
 
 meshio_type_to_ndim = {k: 3 for k in meshio_to_vtk_type.keys()}
 meshio_type_to_ndim.update(
-    {"empty": 0, "vertex": 1, "line": 2, "triangle": 2, "polygon": 2, "quad": 2,}
+    {"empty": 0, "vertex": 1, "line": 2, "triangle": 2, "polygon": 2, "quad": 2}
 )
 
 
@@ -121,6 +122,51 @@ def get_meshio_version():
         :module:`meshio` version as tuple (major, minor, patch).
     """
     return tuple(int(i) for i in meshio.__version__.split("."))
+
+
+def get_old_meshio_cells(cells, cell_data=None):
+    """
+    Return old-style cells and cell_data (meshio < 4.0.0).
+
+    Parameters
+    ----------
+    cells : namedtuple (type, data)
+        New-style cells.
+    cell_data : dict or None, optional, default None
+        New-style cell data.
+
+    Returns
+    -------
+    dict
+        Old-style cells.
+    dict
+        Old-style cell data (only if `cell_data` is not None).
+    """
+    old_cells, cell_blocks = {}, {}
+    for ic, c in enumerate(cells):
+        if c.type not in old_cells.keys():
+            old_cells[c.type] = [c.data]
+            cell_blocks[c.type] = [ic]
+        else:
+            old_cells[c.type].append(c.data)
+            cell_blocks[c.type].append(ic)
+    old_cells = {k: numpy.concatenate(v) for k, v in old_cells.items()}
+
+    if cell_data is not None:
+        old_cell_data = (
+            {
+                cell_type: {
+                    k: numpy.concatenate([cell_data[k][i] for i in iblock])
+                    for k in cell_data.keys()
+                }
+                for cell_type, iblock in cell_blocks.items()
+            }
+            if cell_data
+            else {}
+        )
+        return old_cells, old_cell_data
+    else:
+        return old_cells
 
 
 def get_local_index(mesh, i):
