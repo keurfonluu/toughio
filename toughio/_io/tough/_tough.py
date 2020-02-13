@@ -472,7 +472,7 @@ def _write_times(parameters):
     """
     data = parameters["times"]
     n = len(data)
-    out = _write_record(_format_data([(n, "{:>5g}"),]))
+    out = _write_record(_format_data([(n, "{:>5g}")]))
     out += _write_multi_record(_format_data([(i, "{:>10.4e}") for i in data]))
     return out
 
@@ -529,20 +529,59 @@ def _write_gener(parameters):
     """
     from .._common import generators
 
-    out = []
+    # Handle multicomponent generators
+    generator_data = []
+    keys = [key for key in generators.keys() if key != "type"]
     for k, v in parameters["generators"].items():
         # Load data
-        data = generators.copy()
+        data = deepcopy(generators)
         data.update(v)
 
+        # Check that data are consistent
+        if not isinstance(data["type"], str):
+            # Number of components
+            num_comps = len(data["type"])
+
+            # Check that values in dict have the same length
+            for key in keys:
+                if data[key] is not None:
+                    assert isinstance(data[key], (list, tuple, numpy.ndarray))
+                    assert len(data[key]) == num_comps
+
+            # Split dict
+            for i in range(num_comps):
+                generator_data.append(
+                    (
+                        k,
+                        {
+                            key: (data[key][i] if data[key] is not None else None)
+                            for key in generators.keys()
+                        },
+                    )
+                )
+        else:
+            # Only one component for this element
+            # Check that values are scalar or 1D array_like
+            for key in keys:
+                assert numpy.ndim(data[key]) in {0, 1}
+            generator_data.append((k, data))
+
+    out = []
+    for k, v in generator_data:
         # Table
         ltab, itab = None, None
-        if data["times"] is not None and isinstance(
-            data["times"], (list, tuple, numpy.ndarray)
+        if v["times"] is not None and isinstance(
+            v["times"], (list, tuple, numpy.ndarray)
         ):
-            ltab, itab = len(data["times"]), 1
-            assert isinstance(data["rates"], (list, tuple, numpy.ndarray))
-            assert ltab > 1 and ltab == len(data["rates"])
+            ltab, itab = len(v["times"]), 1
+            assert isinstance(v["rates"], (list, tuple, numpy.ndarray))
+            assert ltab > 1 and ltab == len(v["rates"])
+        else:
+            # Rates and specific enthalpy tables cannot be written without a
+            # time table
+            for key in ["rates", "specific_enthalpy"]:
+                if v[key] is not None:
+                    assert numpy.ndim(v[key]) == 0
 
         # Record 1
         out += _write_record(
@@ -555,11 +594,11 @@ def _write_gener(parameters):
                     (None, "{:>5g}"),
                     (ltab, "{:>5g}"),
                     (None, "{:>5g}"),
-                    (data["type"], "{:4g}"),
+                    (v["type"], "{:4g}"),
                     (itab, "{:>1g}"),
-                    (None if ltab else data["rates"], "{:>10.3e}"),
-                    (None if ltab else data["specific_enthalpy"], "{:>10.3e}"),
-                    (data["layer_thickness"], "{:>10.3e}"),
+                    (None if ltab else v["rates"], "{:>10.3e}"),
+                    (None if ltab else v["specific_enthalpy"], "{:>10.3e}"),
+                    (v["layer_thickness"], "{:>10.3e}"),
                 ]
             )
         )
@@ -567,21 +606,21 @@ def _write_gener(parameters):
         # Record 2
         if ltab:
             out += _write_multi_record(
-                _format_data([(i, "{:>14.7e}") for i in data["times"]]), ncol=4
+                _format_data([(i, "{:>14.7e}") for i in v["times"]]), ncol=4
             )
 
         # Record 3
         if ltab:
             out += _write_multi_record(
-                _format_data([(i, "{:>14.7e}") for i in data["rates"]]), ncol=4
+                _format_data([(i, "{:>14.7e}") for i in v["rates"]]), ncol=4
             )
 
         # Record 4
-        if ltab and data["specific_enthalpy"] is not None:
-            if isinstance(data["specific_enthalpy"], (list, tuple, numpy.ndarray)):
-                specific_enthalpy = data["specific_enthalpy"]
+        if ltab and v["specific_enthalpy"] is not None:
+            if isinstance(v["specific_enthalpy"], (list, tuple, numpy.ndarray)):
+                specific_enthalpy = v["specific_enthalpy"]
             else:
-                specific_enthalpy = numpy.full(ltab, data["specific_enthalpy"])
+                specific_enthalpy = numpy.full(ltab, v["specific_enthalpy"])
             out += _write_multi_record(
                 _format_data([(i, "{:>14.7e}") for i in specific_enthalpy]), ncol=4
             )

@@ -1,4 +1,4 @@
-from . import mesh, meshmaker
+from . import _cli, mesh, meshmaker
 from .__about__ import (
     __author__,
     __author_email__,
@@ -21,6 +21,7 @@ __all__ = [
     "read_save",
     "read_mesh",
     "write_mesh",
+    "_cli",
     "__version__",
     "__author__",
     "__author_email__",
