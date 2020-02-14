@@ -29,9 +29,9 @@ def extract(argv=None):
                 line = next(f)
                 while line.strip():
                     label = line[:5]
-                    X = float(line[50:60])
-                    Y = float(line[60:70])
-                    Z = float(line[70:80])
+                    X = float(line[50:60]) if line[50:60].strip() else 0.0
+                    Y = float(line[60:70]) if line[60:70].strip() else 0.0
+                    Z = float(line[70:80]) if line[70:80].strip() else 0.0
                     nodes[label] = [X, Y, Z]
                     line = next(f)
                 headers = ["X", "Y", "Z"]
@@ -113,6 +113,14 @@ def _get_parser():
 
 
 def _read_table(f, points, version):
+    def str2float(s):
+        """
+        Convert primary variables string to float.
+        """
+        s = s.lower()
+        significand, exponent = s[:-4], s[-4:].replace("e", "")
+        return float("{}e{}".format(significand, exponent))
+
     # Skip next 5 lines
     n_skip = 5 if version == 2 else 4
     for _ in range(n_skip):
@@ -141,7 +149,7 @@ def _read_table(f, points, version):
         if line[:5] in points.keys():
             count += 1
             labels.append(line[:5])
-            variables.append([float(x) for x in line[5:].split()[1:]])
+            variables.append([str2float(x) for x in line[5:].split()[1:]])
 
         line = next(f).strip()
         if line.startswith(end_char):
