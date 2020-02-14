@@ -157,6 +157,10 @@ def write_buffer(
     material_end,
     incon_eos,
 ):
+    materials = [
+        "{:5}".format(material.strip()) if isinstance(material, str) else material
+        for material in materials
+    ]
     material_name = material_name if material_name else {}
     material_end = material_end if material_end else []
     material_end = [material_end] if isinstance(material_end, str) else material_end
