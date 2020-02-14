@@ -76,8 +76,8 @@ parameters = {
             "capillarity": {
                 "id": 1,
                 "parameters": [0.0, 0.0, 1.0],
-            # same keywords as in "default"
             },
+            # same keywords as in "default"
         },
         # other materials
     },
