@@ -46,7 +46,7 @@ def export(argv=None):
         print("Mesh file not specified, inferring dimensionality ...", end="")
         sys.stdout.flush()
         points = _get_points(out)
-        ndim = points.ndim
+        ndim = 1 if points.ndim == 1 else points.shape[1]
         print(" Done!")
 
         if ndim > 1:

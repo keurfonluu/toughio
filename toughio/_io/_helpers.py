@@ -121,8 +121,17 @@ def read_output(filename):
         # Skip second line (unit)
         line = f.readline()
 
+        # Check third line (does it starts with TIME?)
+        i = f.tell()
+        line = f.readline()
+        f.seek(i)
+        single = not line.startswith('"TIME')
+
         # Read data
-        times, labels, variables = [], [], []
+        if single:
+            times, labels, variables = [None], [[]], [[]]
+        else:
+            times, labels, variables = [], [], []
         line = f.readline().replace('"', "").strip()
         while line:
             line = line.split(",")
