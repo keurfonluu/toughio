@@ -86,8 +86,8 @@ def write(filename, mesh, nodal_distance, material_name, material_end, incon_eos
 
     # Define parameters related to faces
     faces = numpy.concatenate(mesh.faces)
-    face_normals = numpy.concatenate(mesh.face_normals)
-    face_areas = numpy.concatenate(mesh.face_areas)
+    face_normals = [fn for face in mesh.face_normals for fn in face]
+    face_areas = [fa for face in mesh.face_areas for fa in face]
 
     # Required variables for block INCON
     primary_variables = None
