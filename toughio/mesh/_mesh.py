@@ -645,14 +645,20 @@ class Mesh(object):
         """
         Normal vectors of faces in mesh.
         """
-        return self.split(_face_normals(self))
+        return [
+            numpy.array([face for face in faces])
+            for faces in self.split(_face_normals(self))
+        ]
 
     @property
     def face_areas(self):
         """
         Areas of faces in mesh.
         """
-        return self.split(_face_areas(self))
+        return [
+            numpy.array([face for face in faces])
+            for faces in self.split(_face_areas(self))
+        ]
 
     @property
     def volumes(self):
