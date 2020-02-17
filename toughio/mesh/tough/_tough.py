@@ -86,8 +86,8 @@ def write(filename, mesh, nodal_distance, material_name, material_end, incon_eos
 
     # Define parameters related to faces
     faces = numpy.concatenate(mesh.faces)
-    faces_dict, faces_cell = _get_faces(faces)
-    face_normals, face_areas = _get_face_normals_areas(mesh, faces_dict, faces_cell)
+    face_normals = numpy.concatenate(mesh.face_normals)
+    face_areas = numpy.concatenate(mesh.face_areas)
 
     # Required variables for block INCON
     primary_variables = None
@@ -407,81 +407,6 @@ def _write_incon(
             for v in pvar:
                 f.write("{:20.4e}".format(v) if v > -1.0e9 else "{:20}".format(""))
             f.write("\n")
-
-
-def _get_faces(faces):
-    """
-    Return a face dictionary.
-    """
-    faces_dict = {"triangle": [], "quad": []}
-    faces_cell = {"triangle": [], "quad": []}
-    numvert_to_face_type = {3: "triangle", 4: "quad"}
-
-    for i, face in enumerate(faces):
-        numvert = (face >= 0).sum(axis=-1)
-        for f, n in zip(face, numvert):
-            if n > 0:
-                face_type = numvert_to_face_type[n]
-                faces_dict[face_type].append(f[:n])
-                faces_cell[face_type].append(i)
-
-    # Stack arrays or remove empty cells
-    faces_dict = {
-        k: numpy.sort(numpy.vstack(v), axis=1) for k, v in faces_dict.items() if len(v)
-    }
-    faces_cell = {k: v for k, v in faces_cell.items() if len(v)}
-
-    return faces_dict, faces_cell
-
-
-def _get_triangle_normals(mesh, faces, islice=[0, 1, 2]):
-    """
-    Calculate normal vectors of triangular faces.
-    """
-
-    def cross(a, b):
-        return a[:, [1, 2, 0]] * b[:, [2, 0, 1]] - a[:, [2, 0, 1]] * b[:, [1, 2, 0]]
-
-    triangles = numpy.vstack([c[islice] for c in faces])
-    triangles = mesh.points[triangles]
-
-    return cross(triangles[:, 1] - triangles[:, 0], triangles[:, 2] - triangles[:, 0])
-
-
-def _get_face_normals_areas(mesh, faces_dict, faces_cell):
-    """
-    Calculate face normal vectors and areas.
-    """
-    # Face normal vectors
-    normals = numpy.concatenate(
-        [_get_triangle_normals(mesh, v) for k, v in faces_dict.items()]
-    )
-    normals_mag = numpy.linalg.norm(normals, axis=-1)
-    normals /= normals_mag[:, None]
-
-    # Face areas
-    areas = numpy.array(normals_mag)
-    if len(faces_dict["quad"]):
-        tmp = numpy.concatenate(
-            [
-                _get_triangle_normals(mesh, v, [0, 2, 3])
-                if k == "quad"
-                else numpy.zeros((len(v), 3))
-                for k, v in faces_dict.items()
-            ]
-        )
-        areas += numpy.linalg.norm(tmp, axis=-1)
-    areas *= 0.5
-
-    # Reorganize outputs
-    face_normals = [[] for _ in range(mesh.n_cells)]
-    face_areas = [[] for _ in range(mesh.n_cells)]
-    iface = numpy.concatenate([v for v in faces_cell.values()])
-    for i, normal, area in zip(iface, normals, areas):
-        face_normals[i].append(normal)
-        face_areas[i].append(area)
-
-    return face_normals, face_areas
 
 
 def _intersection_line_plane(center, lines, int_points, int_normals):
