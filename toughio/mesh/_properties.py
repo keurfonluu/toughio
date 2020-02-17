@@ -1,0 +1,261 @@
+import logging
+
+import numpy
+
+__all__ = [
+    "_materials",
+    "_faces",
+    "_face_normals",
+    "_face_areas",
+    "_volumes",
+    "_connections",
+]
+
+
+def _materials(mesh):
+    """
+    Materials of cell in mesh.
+    """
+    if "material" in mesh.cell_data.keys():
+        if mesh.field_data:
+            out = numpy.concatenate(mesh.cell_data["material"])
+            try:
+                field_data_dict = {v[0]: k for k, v in mesh.field_data.items()}
+                return mesh.split([field_data_dict[mat] for mat in out])
+            except KeyError:
+                logging.warning(
+                    (
+                        "field_data is not defined for all materials. "
+                        "Returns materials as integers."
+                    )
+                )
+                out = mesh.cell_data["material"]
+        else:
+            out = mesh.cell_data["material"]
+    else:
+        out = mesh.split(numpy.ones(mesh.n_cells, dtype=int))
+
+    return out
+
+
+def _faces(mesh):
+    """
+    Connectivity of faces of cell in mesh.
+    """
+    meshio_type_to_faces = {
+        "tetra": {
+            "triangle": numpy.array([[0, 1, 2], [0, 1, 3], [1, 2, 3], [0, 2, 3]]),
+        },
+        "pyramid": {
+            "triangle": numpy.array([[0, 1, 4], [1, 2, 4], [2, 3, 4], [0, 3, 4]]),
+            "quad": numpy.array([[0, 1, 2, 3]]),
+        },
+        "wedge": {
+            "triangle": numpy.array([[0, 1, 2], [3, 4, 5]]),
+            "quad": numpy.array([[0, 1, 3, 4], [1, 2, 4, 5], [0, 2, 3, 5]]),
+        },
+        "hexahedron": {
+            "quad": numpy.array(
+                [
+                    [0, 1, 2, 3],
+                    [4, 5, 6, 7],
+                    [0, 1, 4, 5],
+                    [1, 2, 5, 6],
+                    [2, 3, 6, 7],
+                    [0, 3, 4, 7],
+                ]
+            ),
+        },
+    }
+
+    out = [
+        [c[v] for v in meshio_type_to_faces[cell.type].values()]
+        for cell in mesh.cells
+        for c in cell.data
+    ]
+
+    # Convert to numpy.array
+    arr = numpy.full((mesh.n_cells, 6, 4), -1)
+    for i, x in enumerate(out):
+        arr[i, : len(x[0]), : x[0].shape[1]] = x[0]
+        if len(x) > 1:
+            arr[i, len(x[0]) : len(x[0]) + len(x[1]), : x[1].shape[1]] = x[1]
+
+    return arr
+
+
+def _face_normals(mesh):
+    """
+    Normal vectors of faces in mesh.
+    """
+    faces = numpy.concatenate(mesh.faces)
+    faces_dict, faces_cell, _ = _get_faces(faces)
+
+    # Face normal vectors
+    normals = numpy.concatenate(
+        [_get_triangle_normals(mesh, v) for k, v in faces_dict.items()]
+    )
+    normals_mag = numpy.linalg.norm(normals, axis=-1)
+    normals /= normals_mag[:, None]
+
+    # Reorganize outputs
+    face_normals = [[] for _ in range(mesh.n_cells)]
+    iface = numpy.concatenate([v for v in faces_cell.values()])
+    for i, normal in zip(iface, normals):
+        face_normals[i].append(normal)
+
+    return face_normals
+
+
+def _face_areas(mesh):
+    """
+    Areas of faces in mesh.
+    """
+    faces = numpy.concatenate(mesh.faces)
+    faces_dict, faces_cell, _ = _get_faces(faces)
+
+    # Face areas
+    areas = numpy.concatenate(
+        [_get_triangle_normals(mesh, v) for k, v in faces_dict.items()]
+    )
+    areas = numpy.linalg.norm(areas, axis=-1)
+    if len(faces_dict["quad"]):
+        tmp = numpy.concatenate(
+            [
+                _get_triangle_normals(mesh, v, [0, 2, 3])
+                if k == "quad"
+                else numpy.zeros((len(v), 3))
+                for k, v in faces_dict.items()
+            ]
+        )
+        areas += numpy.linalg.norm(tmp, axis=-1)
+    areas *= 0.5
+
+    # Reorganize outputs
+    face_areas = [[] for _ in range(mesh.n_cells)]
+    iface = numpy.concatenate([v for v in faces_cell.values()])
+    for i, area in zip(iface, areas):
+        face_areas[i].append(area)
+
+    return face_areas
+
+
+def _volumes(mesh):
+    """
+    Volumes of cell in mesh.
+    """
+
+    def scalar_triple_product(a, b, c):
+        c0 = b[:, 1] * c[:, 2] - b[:, 2] * c[:, 1]
+        c1 = b[:, 2] * c[:, 0] - b[:, 0] * c[:, 2]
+        c2 = b[:, 0] * c[:, 1] - b[:, 1] * c[:, 0]
+        return a[:, 0] * c0 + a[:, 1] * c1 + a[:, 2] * c2
+
+    meshio_type_to_tetra = {
+        "tetra": numpy.array([[0, 1, 2, 3]]),
+        "pyramid": numpy.array([[0, 1, 3, 4], [1, 2, 3, 4]]),
+        "wedge": numpy.array([[0, 1, 2, 5], [0, 1, 4, 5], [0, 3, 4, 5]]),
+        "hexahedron": numpy.array(
+            [[0, 1, 3, 4], [1, 4, 5, 6], [1, 2, 3, 6], [3, 4, 6, 7], [1, 3, 4, 6]]
+        ),
+    }
+
+    out = []
+    for cell in mesh.cells:
+        tetras = numpy.vstack([c[meshio_type_to_tetra[cell.type]] for c in cell.data])
+        tetras = mesh.points[tetras]
+        out.append(
+            numpy.sum(
+                numpy.split(
+                    numpy.abs(
+                        scalar_triple_product(
+                            tetras[:, 1] - tetras[:, 0],
+                            tetras[:, 2] - tetras[:, 0],
+                            tetras[:, 3] - tetras[:, 0],
+                        )
+                    ),
+                    len(cell.data),
+                ),
+                axis=1,
+            )
+            / 6.0
+        )
+    return out
+
+
+def _connections(mesh):
+    """
+    Mesh connections assuming conformity and that points and cells are
+    uniquely defined in mesh.
+    """
+    assert (
+        numpy.shape(mesh.points)[1] == 3
+    ), "Connections for 2D mesh has not been implemented yet."
+
+    faces = numpy.concatenate(mesh.faces)
+    faces_dict, faces_cell, faces_index = _get_faces(faces)
+
+    # Prune duplicate faces
+    uf, tmp1, tmp2 = {}, {}, {}
+    for k, v in faces_dict.items():
+        up, uf[k] = numpy.unique(v, axis=0, return_inverse=True)
+        tmp1[k] = [[] for _ in range(len(up))]
+        tmp2[k] = [[] for _ in range(len(up))]
+
+    # Make connections
+    for k, v in uf.items():
+        for i, j in enumerate(v):
+            tmp1[k][j].append(faces_cell[k][i])
+            tmp2[k][j].append(faces_index[k][i])
+    conne = [vv for v in tmp1.values() for vv in v if len(vv) == 2]
+    iface = [vv for v in tmp2.values() for vv in v if len(vv) == 2]
+
+    # Reorganize output
+    out = numpy.full((mesh.n_cells, 6), -1)
+    for (i1, i2), (j1, j2) in zip(conne, iface):
+        out[i1, j1] = i2
+        out[i2, j2] = i1
+
+    return out
+
+
+def _get_faces(faces):
+    """
+    Return dictionary of faces.
+    """
+    faces_dict = {"triangle": [], "quad": []}
+    faces_cell = {"triangle": [], "quad": []}
+    faces_index = {"triangle": [], "quad": []}
+    numvert_to_face_type = {3: "triangle", 4: "quad"}
+
+    for i, face in enumerate(faces):
+        numvert = (face >= 0).sum(axis=-1)
+        for j, (f, n) in enumerate(zip(face, numvert)):
+            if n > 0:
+                face_type = numvert_to_face_type[n]
+                faces_dict[face_type].append(f[:n])
+                faces_cell[face_type].append(i)
+                faces_index[face_type].append(j)
+
+    # Stack arrays or remove empty cells
+    faces_dict = {
+        k: numpy.sort(numpy.vstack(v), axis=1) for k, v in faces_dict.items() if len(v)
+    }
+    faces_cell = {k: v for k, v in faces_cell.items() if len(v)}
+    faces_index = {k: v for k, v in faces_index.items() if len(v)}
+
+    return faces_dict, faces_cell, faces_index
+
+
+def _get_triangle_normals(mesh, faces, islice=[0, 1, 2]):
+    """
+    Calculate normal vectors of triangular faces.
+    """
+
+    def cross(a, b):
+        return a[:, [1, 2, 0]] * b[:, [2, 0, 1]] - a[:, [2, 0, 1]] * b[:, [1, 2, 0]]
+
+    triangles = numpy.vstack([c[islice] for c in faces])
+    triangles = mesh.points[triangles]
+
+    return cross(triangles[:, 1] - triangles[:, 0], triangles[:, 2] - triangles[:, 0])
