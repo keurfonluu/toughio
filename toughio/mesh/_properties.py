@@ -44,25 +44,25 @@ def _faces(mesh):
     """
     meshio_type_to_faces = {
         "tetra": {
-            "triangle": numpy.array([[0, 1, 2], [0, 1, 3], [1, 2, 3], [0, 2, 3]]),
+            "triangle": numpy.array([[1, 2, 3], [0, 3, 2], [0, 1, 3], [0, 2, 1]]),
         },
         "pyramid": {
-            "triangle": numpy.array([[0, 1, 4], [1, 2, 4], [2, 3, 4], [0, 3, 4]]),
-            "quad": numpy.array([[0, 1, 2, 3]]),
+            "triangle": numpy.array([[0, 1, 4], [1, 2, 4], [2, 3, 4], [3, 0, 4]]),
+            "quad": numpy.array([[0, 3, 2, 1]]),
         },
         "wedge": {
-            "triangle": numpy.array([[0, 1, 2], [3, 4, 5]]),
-            "quad": numpy.array([[0, 1, 3, 4], [1, 2, 4, 5], [0, 2, 3, 5]]),
+            "triangle": numpy.array([[0, 2, 1], [3, 4, 5]]),
+            "quad": numpy.array([[0, 1, 4, 3], [1, 2, 5, 4], [0, 3, 5, 2]]),
         },
         "hexahedron": {
             "quad": numpy.array(
                 [
-                    [0, 1, 2, 3],
+                    [0, 3, 2, 1],
                     [4, 5, 6, 7],
-                    [0, 1, 4, 5],
-                    [1, 2, 5, 6],
-                    [2, 3, 6, 7],
-                    [0, 3, 4, 7],
+                    [0, 1, 5, 4],
+                    [1, 2, 6, 5],
+                    [2, 3, 7, 6],
+                    [0, 4, 7, 3],
                 ]
             ),
         },
@@ -194,6 +194,7 @@ def _connections(mesh):
 
     faces = numpy.concatenate(mesh.faces)
     faces_dict, faces_cell, faces_index = _get_faces(faces)
+    faces_dict = {k: numpy.sort(numpy.vstack(v), axis=1) for k, v in faces_dict.items()}
 
     # Prune duplicate faces
     uf, tmp1, tmp2 = {}, {}, {}
@@ -238,9 +239,7 @@ def _get_faces(faces):
                 faces_index[face_type].append(j)
 
     # Stack arrays or remove empty cells
-    faces_dict = {
-        k: numpy.sort(numpy.vstack(v), axis=1) for k, v in faces_dict.items() if len(v)
-    }
+    faces_dict = {k: numpy.vstack(v) for k, v in faces_dict.items() if len(v)}
     faces_cell = {k: v for k, v in faces_cell.items() if len(v)}
     faces_index = {k: v for k, v in faces_index.items() if len(v)}
 
