@@ -53,7 +53,7 @@ def cylindric_grid(dr, dz, origin_z=None, material="dfalt"):
             nr, nz = len(self._dr), len(self._dz)
             r2 = numpy.cumsum(self._dr) ** 2
             areas = (
-                numpy.tile(numpy.concatenate(([r2[0]], r2[1:] - r2[:-1])), nz,)
+                numpy.tile(numpy.concatenate(([r2[0]], r2[1:] - r2[:-1])), nz)
                 * numpy.pi
             )
             heights = numpy.tile(self._dz[:, None], nr).ravel()
