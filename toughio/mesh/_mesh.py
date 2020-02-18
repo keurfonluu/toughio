@@ -438,6 +438,7 @@ class Mesh(object):
             If any input argument is not valid.
 
         """
+
         def isinbounds(x, bounds):
             return (
                 numpy.logical_and(x >= min(bounds), x <= max(bounds))

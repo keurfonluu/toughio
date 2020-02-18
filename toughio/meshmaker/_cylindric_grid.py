@@ -28,6 +28,7 @@ def cylindric_grid(dr, dz, origin_z=None, material="dfalt"):
         Output cylindric mesh.
 
     """
+
     class CylindricMesh(Mesh):
         """Cylindric mesh.
 

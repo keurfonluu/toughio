@@ -124,6 +124,7 @@ str_to_dtype = {
 
 def block(keyword, multi=False, noend=False):
     """Decorate block writing functions."""
+
     def decorator(func):
         from .._common import header
 
@@ -143,6 +144,7 @@ def block(keyword, multi=False, noend=False):
 
 def check_parameters(input_types, keys=None, is_list=False):
     """Decorate function to check input parameters."""
+
     def _check_parameters(params, keys=None):
         for k, v in params.items():
             # Check whether parameters contain unknown keys

@@ -29,6 +29,7 @@ _eos_to_neq = {
 
 def block(keyword):
     """Decorate block writing functions."""
+
     def decorator(func):
         from functools import wraps
 

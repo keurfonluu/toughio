@@ -174,6 +174,7 @@ def read_save(filename):
     Does not support porosity, USERX and hysteresis values yet.
 
     """
+
     def str2float(s):
         """Convert primary variables string to float."""
         s = s.lower()
