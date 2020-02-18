@@ -8,8 +8,7 @@ __all__ = [
 
 
 def voxelize(points, material="dfalt"):
-    """
-    Generate a 1D hexahedral mesh from 1D point coordinates.
+    """Generate a 1D hexahedral mesh from 1D point coordinates.
 
     Parameters
     ----------

@@ -16,8 +16,7 @@ __all__ = [
 
 
 def read(filename):
-    """
-    Read TOUGH input file.
+    """Read TOUGH input file.
 
     Parameters
     ----------
@@ -33,8 +32,7 @@ def read(filename):
 
 
 def write(filename, parameters):
-    """
-    Write TOUGH input file.
+    """Write TOUGH input file.
 
     Parameters
     ----------
@@ -70,8 +68,7 @@ def write(filename, parameters):
 
 @check_parameters(dtypes["PARAMETERS"])
 def write_buffer(parameters):
-    """
-    Write TOUGH input file as a list of 80-character long record strings.
+    """Write TOUGH input file as a list of 80-character long record strings.
     """
     from .._common import eos, eos_select
 
@@ -127,8 +124,7 @@ def write_buffer(parameters):
 
 
 def _format_data(data):
-    """
-    Return a list of strings given input data and formats.
+    """Return a list of strings given input data and formats.
     """
 
     def to_str(x, fmt):
@@ -142,15 +138,13 @@ def _format_data(data):
 
 
 def _write_record(data):
-    """
-    Return a list with a single string.
+    """Return a list with a single string.
     """
     return ["{:80}\n".format("".join(data))]
 
 
 def _write_multi_record(data, ncol=8):
-    """
-    Return a list with multiple strings.
+    """Return a list with multiple strings.
     """
     n = len(data)
     rec = [
@@ -161,8 +155,7 @@ def _write_multi_record(data, ncol=8):
 
 
 def _add_record(data, id_fmt="{:>5g}     "):
-    """
-    Return a list with a single string for additional records.
+    """Return a list with a single string for additional records.
     """
     n = len(data["parameters"])
     rec = [(data["id"], id_fmt)]
@@ -180,8 +173,7 @@ def _add_record(data, id_fmt="{:>5g}     "):
 @check_parameters(dtypes["MODEL"], keys=("rocks", "capillarity"), is_list=True)
 @block("ROCKS", multi=True)
 def _write_rocks(parameters):
-    """
-    TOUGH input ROCKS block data.
+    """TOUGH input ROCKS block data.
     
     Introduces material parameters for up to 27 different reservoir
     domains.
@@ -256,8 +248,7 @@ def _write_rocks(parameters):
 )
 @block("FLAC", multi=True)
 def _write_flac(parameters):
-    """
-    TOUGH input FLAC block data (optional).
+    """TOUGH input FLAC block data (optional).
 
     Introduces mechanical parameters for each material in ROCKS block data.
     """
@@ -294,8 +285,7 @@ def _write_flac(parameters):
 
 @block("MULTI")
 def _write_multi(parameters):
-    """
-    TOUGH input MULTI block (optional).
+    """TOUGH input MULTI block (optional).
 
     Permits the user to select the number and nature of balance equations
     that will be solved. The keyword MULTI is followed by a single data
@@ -315,8 +305,7 @@ def _write_multi(parameters):
 @check_parameters(dtypes["SELEC"], keys="selections")
 @block("SELEC")
 def _write_selec(parameters):
-    """
-    TOUGH input SELEC block (optional).
+    """TOUGH input SELEC block (optional).
 
     Introduces a number of integer and floating point parameters that are
     used for different purposes in different TOUGH modules (EOS7, EOS7R,
@@ -342,8 +331,7 @@ def _write_selec(parameters):
 @check_parameters(dtypes["SOLVR"], keys="solver")
 @block("SOLVR")
 def _write_solvr(parameters):
-    """
-    TOUGH input SOLVR block (optional).
+    """TOUGH input SOLVR block (optional).
 
     Introduces computation parameters, time stepping information, and
     default initial conditions.
@@ -367,8 +355,7 @@ def _write_solvr(parameters):
 
 @block("START")
 def _write_start():
-    """
-    TOUGH input START block (optional).
+    """TOUGH input START block (optional).
 
     A record with START typed in columns 1-5 allows a more flexible
     initialization. More specifically, when START is present, INCON data
@@ -386,8 +373,7 @@ def _write_start():
 @check_parameters(dtypes["MOP"], keys="extra_options")
 @block("PARAM")
 def _write_param(parameters):
-    """
-    TOUGH input PARAM block data.
+    """TOUGH input PARAM block data.
     
     Introduces computation parameters, time stepping information, and
     default initial conditions.
@@ -469,8 +455,7 @@ def _write_param(parameters):
 @check_parameters(dtypes["MOMOP"], keys="more_options")
 @block("MOMOP")
 def _write_momop(parameters):
-    """
-    TOUGH input MOMOP block data (optional).
+    """TOUGH input MOMOP block data (optional).
 
     Provides additional options.
     """
@@ -486,8 +471,7 @@ def _write_momop(parameters):
 
 @block("INDOM", multi=True)
 def _write_indom(parameters):
-    """
-    TOUGH input INDOM block data (optional).
+    """TOUGH input INDOM block data (optional).
 
     Introduces domain-specific initial conditions.
     """
@@ -509,8 +493,7 @@ def _write_indom(parameters):
 
 @block("TIMES", multi=True)
 def _write_times(parameters):
-    """
-    TOUGH input TIMES block data (optional).
+    """TOUGH input TIMES block data (optional).
     
     Permits the user to obtain printout at specified times.
     """
@@ -523,8 +506,7 @@ def _write_times(parameters):
 
 @block("FOFT", multi=True)
 def _write_foft(parameters):
-    """
-    TOUGH input FOFT block data (optional).
+    """TOUGH input FOFT block data (optional).
     
     Introduces a list of elements (grid blocks) for which time-dependent
     data are to be written out for plotting to a file called FOFT during
@@ -537,8 +519,7 @@ def _write_foft(parameters):
 
 @block("COFT", multi=True)
 def _write_coft(parameters):
-    """
-    TOUGH input COFT block data (optional).
+    """TOUGH input COFT block data (optional).
     
     Introduces a list of connections for which time-dependent data are to
     be written out for plotting to a file called COFT during the
@@ -551,8 +532,7 @@ def _write_coft(parameters):
 
 @block("GOFT", multi=True)
 def _write_goft(parameters):
-    """
-    TOUGH input GOFT block data (optional).
+    """TOUGH input GOFT block data (optional).
     
     Introduces a list of sinks/sources for which time-dependent data are
     to be written out for plotting to a file called GOFT during the
@@ -566,8 +546,7 @@ def _write_goft(parameters):
 @check_parameters(dtypes["GENER"], keys="generators", is_list=True)
 @block("GENER", multi=True)
 def _write_gener(parameters):
-    """
-    TOUGH input GENER block data (optional).
+    """TOUGH input GENER block data (optional).
     
     Introduces sinks and/or sources.
     """
@@ -673,23 +652,20 @@ def _write_gener(parameters):
 
 @block("NOVER")
 def _write_nover():
-    """
-    TOUGH input NOVER block data (optional).
+    """TOUGH input NOVER block data (optional).
     """
     return []
 
 
 @block("ENDFI", noend=True)
 def _write_endfi():
-    """
-    TOUGH input ENDFI block data (optional).
+    """TOUGH input ENDFI block data (optional).
     """
     return []
 
 
 @block("ENDCY", noend=True)
 def _write_endcy():
-    """
-    TOUGH input ENDCY block data (optional).
+    """TOUGH input ENDCY block data (optional).
     """
     return []

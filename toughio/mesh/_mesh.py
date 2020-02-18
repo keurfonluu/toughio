@@ -1,5 +1,4 @@
 import collections
-import logging
 from copy import deepcopy
 
 import meshio
@@ -31,8 +30,7 @@ Cells = collections.namedtuple("Cells", ["type", "data"])
 
 
 class Mesh(object):
-    """
-    toughio mesh.
+    """toughio mesh.
 
     This class is updated following the latest :module:`meshio` version and
     brings backward compatibility with its previous versions.
@@ -97,8 +95,7 @@ class Mesh(object):
         return "\n".join(lines)
 
     def extrude_to_3d(self, height=1.0, axis=2, inplace=True):
-        """
-        Convert a 2D mesh to 3D by extruding cells along given axis.
+        """Convert a 2D mesh to 3D by extruding cells along given axis.
 
         Parameters
         ----------
@@ -162,8 +159,7 @@ class Mesh(object):
             return mesh
 
     def prune_duplicates(self, inplace=True):
-        """
-        Delete duplicate points and cells.
+        """Delete duplicate points and cells.
 
         Parameters
         ----------
@@ -207,8 +203,7 @@ class Mesh(object):
             return mesh
 
     def split(self, arr):
-        """
-        Split input array into subarrays for each cell block in mesh.
+        """Split input array into subarrays for each cell block in mesh.
 
         Parameters
         ----------
@@ -226,8 +221,7 @@ class Mesh(object):
         return numpy.split(numpy.asarray(arr), sizes[:-1])
 
     def to_meshio(self):
-        """
-        Convert mesh to :class:`meshio.Mesh`.
+        """Convert mesh to :class:`meshio.Mesh`.
 
         Returns
         -------
@@ -256,8 +250,7 @@ class Mesh(object):
         return meshio.Mesh(**kwargs)
 
     def to_pyvista(self):
-        """
-        Convert mesh to :class:`pyvista.UnstructuredGrid`.
+        """Convert mesh to :class:`pyvista.UnstructuredGrid`.
 
         Returns
         -------
@@ -316,8 +309,7 @@ class Mesh(object):
         return mesh
 
     def to_tough(self, filename="MESH", **kwargs):
-        """
-        Write TOUGH `MESH` file.
+        """Write TOUGH `MESH` file.
 
         Parameters
         ----------
@@ -327,8 +319,7 @@ class Mesh(object):
         self.write(filename, file_format="tough", **kwargs)
 
     def read_output(self, file_or_output, time_step=-1):
-        """
-        Import TOUGH results to the mesh.
+        """Import TOUGH results to the mesh.
 
         Parameters
         ----------
@@ -364,8 +355,7 @@ class Mesh(object):
             self.cell_data[k] = self.split(v[idx])
 
     def write(self, filename, file_format=None, **kwargs):
-        """
-        Write mesh to file.
+        """Write mesh to file.
 
         Parameters
         ----------
@@ -381,15 +371,13 @@ class Mesh(object):
         write(filename, self, file_format, **kwargs)
 
     def plot(self, *args, **kwargs):
-        """
-        Display mesh using :method:`pyvista.UnstructuredGrid.plot``.
+        """Display mesh using :method:`pyvista.UnstructuredGrid.plot``.
         """
         mesh = self.to_pyvista()
         mesh.plot(*args, **kwargs)
 
     def add_point_data(self, label, data):
-        """
-        Add a new point data array.
+        """Add a new point data array.
 
         Parameters
         ----------
@@ -404,8 +392,7 @@ class Mesh(object):
         self.point_data[label] = numpy.asarray(data)
 
     def add_cell_data(self, label, data):
-        """
-        Add a new cell data array.
+        """Add a new cell data array.
 
         Parameters
         ----------
@@ -420,8 +407,7 @@ class Mesh(object):
         self.cell_data[label] = self.split(data)
 
     def set_material(self, material, xlim=None, ylim=None, zlim=None):
-        """
-        Set material for cells within box selection defined by `xlim`,
+        """Set material for cells within box selection defined by `xlim`,
         `ylim` and `zlim`.
         
         Parameters
@@ -478,8 +464,7 @@ class Mesh(object):
             self.field_data[material] = numpy.array([imat, 3])
 
     def near(self, point):
-        """
-        Return local index of cell nearest to query point.
+        """Return local index of cell nearest to query point.
 
         Parameters
         ----------
@@ -503,8 +488,7 @@ class Mesh(object):
 
     @property
     def points(self):
-        """
-        Coordinates of points.
+        """Coordinates of points.
         """
         return self._points
 
@@ -514,8 +498,7 @@ class Mesh(object):
 
     @property
     def cells(self):
-        """
-        Connectivity of cells.
+        """Connectivity of cells.
         """
         if self._cells:
             return self._cells
@@ -533,8 +516,7 @@ class Mesh(object):
 
     @property
     def cells_dict(self):
-        """
-        Connectivity of cells (``meshio < 4.0.0``).
+        """Connectivity of cells (``meshio < 4.0.0``).
         """
         if self._cells:
             return get_old_meshio_cells(self._cells)
@@ -543,8 +525,7 @@ class Mesh(object):
 
     @property
     def point_data(self):
-        """
-        Point data arrays.
+        """Point data arrays.
         """
         return self._point_data
 
@@ -554,8 +535,7 @@ class Mesh(object):
 
     @property
     def cell_data(self):
-        """
-        Cell data arrays.
+        """Cell data arrays.
         """
         return self._cell_data
 
@@ -565,8 +545,7 @@ class Mesh(object):
 
     @property
     def field_data(self):
-        """
-        Field data names.
+        """Field data names.
         """
         return self._field_data
 
@@ -576,8 +555,7 @@ class Mesh(object):
 
     @property
     def point_sets(self):
-        """
-        Sets of points.
+        """Sets of points.
         """
         return self._point_sets
 
@@ -587,8 +565,7 @@ class Mesh(object):
 
     @property
     def cell_sets(self):
-        """
-        Sets of cells.
+        """Sets of cells.
         """
         return self._cell_sets
 
@@ -598,22 +575,19 @@ class Mesh(object):
 
     @property
     def n_points(self):
-        """
-        Number of points.
+        """Number of points.
         """
         return len(self.points)
 
     @property
     def n_cells(self):
-        """
-        Number of cells.
+        """Number of cells.
         """
         return sum(len(c.data) for c in self.cells)
 
     @property
     def labels(self):
-        """
-        Labels of cell in mesh.
+        """Labels of cell in mesh.
         """
         from ._common import labeler
 
@@ -621,29 +595,25 @@ class Mesh(object):
 
     @property
     def centers(self):
-        """
-        Node centers of cell in mesh.
+        """Node centers of cell in mesh.
         """
         return [self.points[c.data].mean(axis=1) for c in self.cells]
 
     @property
     def materials(self):
-        """
-        Materials of cell in mesh.
+        """Materials of cell in mesh.
         """
         return _materials(self)
 
     @property
     def faces(self):
-        """
-        Connectivity of faces of cell in mesh.
+        """Connectivity of faces of cell in mesh.
         """
         return self.split(_faces(self))
 
     @property
     def face_normals(self):
-        """
-        Normal vectors of faces in mesh.
+        """Normal vectors of faces in mesh.
         """
         return [
             numpy.array([face for face in faces])
@@ -652,8 +622,7 @@ class Mesh(object):
 
     @property
     def face_areas(self):
-        """
-        Areas of faces in mesh.
+        """Areas of faces in mesh.
         """
         return [
             numpy.array([face for face in faces])
@@ -662,15 +631,13 @@ class Mesh(object):
 
     @property
     def volumes(self):
-        """
-        Volumes of cell in mesh.
+        """Volumes of cell in mesh.
         """
         return _volumes(self)
 
     @property
     def connections(self):
-        """
-        Mesh connections assuming conformity and that points and cells are
+        """Mesh connections assuming conformity and that points and cells are
         uniquely defined in mesh.
 
         Note
@@ -681,8 +648,7 @@ class Mesh(object):
 
 
 def from_meshio(mesh):
-    """
-    Convert a :class:`meshio.Mesh` to :class:`toughio.Mesh`.
+    """Convert a :class:`meshio.Mesh` to :class:`toughio.Mesh`.
 
     Parameters
     ----------
@@ -693,6 +659,7 @@ def from_meshio(mesh):
     -------
     toughio.Mesh
         Output mesh.
+    
     """
     if mesh.cell_data:
         version = get_meshio_version()

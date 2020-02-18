@@ -123,8 +123,7 @@ str_to_dtype = {
 
 
 def block(keyword, multi=False, noend=False):
-    """
-    Decorator for block writing functions.
+    """Decorator for block writing functions.
     """
 
     def decorator(func):
@@ -145,8 +144,7 @@ def block(keyword, multi=False, noend=False):
 
 
 def check_parameters(input_types, keys=None, is_list=False):
-    """
-    Decorator to check input parameters.
+    """Decorator to check input parameters.
     """
 
     def _check_parameters(params, keys=None):
