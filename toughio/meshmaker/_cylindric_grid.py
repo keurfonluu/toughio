@@ -26,6 +26,7 @@ def cylindric_grid(dr, dz, origin_z=None, material="dfalt"):
     -------
     toughio.Mesh
         Output cylindric mesh.
+    
     """
 
     class CylindricMesh(Mesh):
@@ -37,6 +38,7 @@ def cylindric_grid(dr, dz, origin_z=None, material="dfalt"):
         ----
         This class inherits from :class:`toughio.Mesh` but overwrites how face
         areas and volumes are calculated.
+
         """
 
         def __init__(self, dr, dz, *args, **kwargs):
@@ -45,7 +47,8 @@ def cylindric_grid(dr, dz, origin_z=None, material="dfalt"):
             self._dz = dz
 
         def _get_areas_heights(self):
-            """Return areas and heights of cells in mesh.
+            """
+            Return areas and heights of cells in mesh.
             """
             nr, nz = len(self._dr), len(self._dz)
             r2 = numpy.cumsum(self._dr) ** 2
@@ -59,7 +62,8 @@ def cylindric_grid(dr, dz, origin_z=None, material="dfalt"):
 
         @property
         def face_areas(self):
-            """Areas of faces in mesh.
+            """
+            Areas of faces in mesh.
             """
             nz = len(self._dz)
             dr = numpy.concatenate(([0.0], self._dr))
@@ -83,7 +87,8 @@ def cylindric_grid(dr, dz, origin_z=None, material="dfalt"):
 
         @property
         def volumes(self):
-            """Volumes of cell in mesh.
+            """
+            Volumes of cell in mesh.
             """
             areas, heights = self._get_areas_heights()
             return [areas * heights]

@@ -51,6 +51,7 @@ class Mesh(object):
         Sets of points.
     cell_sets : dict or None, optional, default None
         Sets of cells.
+    
     """
 
     def __init__(
@@ -110,6 +111,7 @@ class Mesh(object):
         -------
         toughio.Mesh
             Extruded mesh (only if ``inplace == False``).
+        
         """
         assert axis in [0, 1, 2], "axis must be 0, 1 or 2."
         mesh = self if inplace else deepcopy(self)
@@ -174,6 +176,7 @@ class Mesh(object):
         Note
         ----
         Does not preserve points order from original array in mesh.
+
         """
         mesh = self if inplace else deepcopy(self)
         cells = [[c.type, c.data] for c in mesh.cells]
@@ -214,6 +217,7 @@ class Mesh(object):
         -------
         list of array_like
             List of subarrays.
+        
         """
         assert len(arr) == self.n_cells
         sizes = numpy.cumsum([len(c.data) for c in self.cells])
@@ -227,6 +231,7 @@ class Mesh(object):
         -------
         meshio.Mesh
             Output mesh.
+        
         """
         keys = ["points", "point_data", "field_data"]
         kwargs = {key: getattr(self, key) for key in keys}
@@ -256,6 +261,7 @@ class Mesh(object):
         -------
         pyvista.UnstructuredGrid
             Output mesh.
+        
         """
         try:
             import pyvista
@@ -315,6 +321,7 @@ class Mesh(object):
         ----------
         filename : str, optional, default 'MESH'
             Output file name.
+        
         """
         self.write(filename, file_format="tough", **kwargs)
 
@@ -327,6 +334,7 @@ class Mesh(object):
             Input file name or output data.
         time_step : int, optional, default -1
             Data for given time step to import. Default is last time step.
+        
         """
         from .. import read_output
         from .._io._helpers import Output, Save
@@ -365,13 +373,15 @@ class Mesh(object):
             Output file format. If `None`, it will be guessed from file's
             extension. To write TOUGH MESH, `file_format` must be specified
             as 'tough' (no specific extension exists for TOUGH MESH).
+        
         """
         from ._helpers import write
 
         write(filename, self, file_format, **kwargs)
 
     def plot(self, *args, **kwargs):
-        """Display mesh using :method:`pyvista.UnstructuredGrid.plot``.
+        """
+        Display mesh using :method:`pyvista.UnstructuredGrid.plot``.
         """
         mesh = self.to_pyvista()
         mesh.plot(*args, **kwargs)
@@ -385,6 +395,7 @@ class Mesh(object):
             Point data array name.
         data : array_like
             Point data array.
+        
         """
         assert isinstance(label, str)
         assert isinstance(data, (list, tuple, numpy.ndarray))
@@ -400,6 +411,7 @@ class Mesh(object):
             Cell data array name.
         data : array_like
             Cell data array.
+        
         """
         assert isinstance(label, str)
         assert isinstance(data, (list, tuple, numpy.ndarray))
@@ -425,6 +437,7 @@ class Mesh(object):
         ------
         AssertionError
             If any input argument is not valid.
+        
         """
 
         def isinbounds(x, bounds):
@@ -475,6 +488,7 @@ class Mesh(object):
         -------
         tuple
             Local index of cell as a tuple (iblock, icell).
+        
         """
         assert isinstance(point, (list, tuple, numpy.ndarray))
         assert numpy.ndim(point) == 1
@@ -488,7 +502,8 @@ class Mesh(object):
 
     @property
     def points(self):
-        """Coordinates of points.
+        """
+        Coordinates of points.
         """
         return self._points
 
@@ -498,7 +513,8 @@ class Mesh(object):
 
     @property
     def cells(self):
-        """Connectivity of cells.
+        """
+        Connectivity of cells.
         """
         if self._cells:
             return self._cells
@@ -516,7 +532,8 @@ class Mesh(object):
 
     @property
     def cells_dict(self):
-        """Connectivity of cells (``meshio < 4.0.0``).
+        """
+        Connectivity of cells (``meshio < 4.0.0``).
         """
         if self._cells:
             return get_old_meshio_cells(self._cells)
@@ -525,7 +542,8 @@ class Mesh(object):
 
     @property
     def point_data(self):
-        """Point data arrays.
+        """
+        Point data arrays.
         """
         return self._point_data
 
@@ -535,7 +553,8 @@ class Mesh(object):
 
     @property
     def cell_data(self):
-        """Cell data arrays.
+        """
+        Cell data arrays.
         """
         return self._cell_data
 
@@ -545,7 +564,8 @@ class Mesh(object):
 
     @property
     def field_data(self):
-        """Field data names.
+        """
+        Field data names.
         """
         return self._field_data
 
@@ -555,7 +575,8 @@ class Mesh(object):
 
     @property
     def point_sets(self):
-        """Sets of points.
+        """
+        Sets of points.
         """
         return self._point_sets
 
@@ -565,7 +586,8 @@ class Mesh(object):
 
     @property
     def cell_sets(self):
-        """Sets of cells.
+        """
+        Sets of cells.
         """
         return self._cell_sets
 
@@ -575,19 +597,22 @@ class Mesh(object):
 
     @property
     def n_points(self):
-        """Number of points.
+        """
+        Number of points.
         """
         return len(self.points)
 
     @property
     def n_cells(self):
-        """Number of cells.
+        """
+        Number of cells.
         """
         return sum(len(c.data) for c in self.cells)
 
     @property
     def labels(self):
-        """Labels of cell in mesh.
+        """
+        Labels of cell in mesh.
         """
         from ._common import labeler
 
@@ -595,25 +620,29 @@ class Mesh(object):
 
     @property
     def centers(self):
-        """Node centers of cell in mesh.
+        """
+        Node centers of cell in mesh.
         """
         return [self.points[c.data].mean(axis=1) for c in self.cells]
 
     @property
     def materials(self):
-        """Materials of cell in mesh.
+        """
+        Materials of cell in mesh.
         """
         return _materials(self)
 
     @property
     def faces(self):
-        """Connectivity of faces of cell in mesh.
+        """
+        Connectivity of faces of cell in mesh.
         """
         return self.split(_faces(self))
 
     @property
     def face_normals(self):
-        """Normal vectors of faces in mesh.
+        """
+        Normal vectors of faces in mesh.
         """
         return [
             numpy.array([face for face in faces])
@@ -622,7 +651,8 @@ class Mesh(object):
 
     @property
     def face_areas(self):
-        """Areas of faces in mesh.
+        """
+        Areas of faces in mesh.
         """
         return [
             numpy.array([face for face in faces])
@@ -631,7 +661,8 @@ class Mesh(object):
 
     @property
     def volumes(self):
-        """Volumes of cell in mesh.
+        """
+        Volumes of cell in mesh.
         """
         return _volumes(self)
 
@@ -643,6 +674,7 @@ class Mesh(object):
         Note
         ----
         Only for 3D meshes and first order cells.
+        
         """
         return self.split(_connections(self))
 
