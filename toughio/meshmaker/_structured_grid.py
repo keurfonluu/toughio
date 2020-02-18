@@ -27,6 +27,7 @@ def structured_grid(dx, dy, dz=None, origin=None, material="dfalt"):
     -------
     toughio.Mesh
         Output non-uniform structured mesh.
+    
     """
     assert isinstance(dx, (list, tuple, numpy.ndarray))
     assert isinstance(dy, (list, tuple, numpy.ndarray))
@@ -64,7 +65,8 @@ def structured_grid(dx, dy, dz=None, origin=None, material="dfalt"):
 
 
 def _grid_3d(dx, dy, dz):
-    """Generate 3D structured grid.
+    """
+    Generate 3D structured grid.
     """
     # Internal functions
     def meshgrid(x, y, z, indexing="ij", order="F"):
@@ -104,7 +106,8 @@ def _grid_3d(dx, dy, dz):
 
 
 def _grid_2d(dx, dy):
-    """Generate 2D structured grid.
+    """
+    Generate 2D structured grid.
     """
     # Internal functions
     def meshgrid(x, y, indexing="ij", order="F"):
