@@ -51,7 +51,7 @@ class Mesh(object):
         Sets of points.
     cell_sets : dict or None, optional, default None
         Sets of cells.
-    
+
     """
 
     def __init__(
@@ -111,7 +111,7 @@ class Mesh(object):
         -------
         toughio.Mesh
             Extruded mesh (only if ``inplace == False``).
-        
+
         """
         assert axis in [0, 1, 2], "axis must be 0, 1 or 2."
         mesh = self if inplace else deepcopy(self)
@@ -217,7 +217,7 @@ class Mesh(object):
         -------
         list of array_like
             List of subarrays.
-        
+
         """
         assert len(arr) == self.n_cells
         sizes = numpy.cumsum([len(c.data) for c in self.cells])
@@ -231,7 +231,7 @@ class Mesh(object):
         -------
         meshio.Mesh
             Output mesh.
-        
+
         """
         keys = ["points", "point_data", "field_data"]
         kwargs = {key: getattr(self, key) for key in keys}
@@ -261,7 +261,7 @@ class Mesh(object):
         -------
         pyvista.UnstructuredGrid
             Output mesh.
-        
+
         """
         try:
             import pyvista
@@ -321,7 +321,7 @@ class Mesh(object):
         ----------
         filename : str, optional, default 'MESH'
             Output file name.
-        
+
         """
         self.write(filename, file_format="tough", **kwargs)
 
@@ -334,7 +334,7 @@ class Mesh(object):
             Input file name or output data.
         time_step : int, optional, default -1
             Data for given time step to import. Default is last time step.
-        
+
         """
         from .. import read_output
         from .._io._helpers import Output, Save
@@ -373,7 +373,7 @@ class Mesh(object):
             Output file format. If `None`, it will be guessed from file's
             extension. To write TOUGH MESH, `file_format` must be specified
             as 'tough' (no specific extension exists for TOUGH MESH).
-        
+
         """
         from ._helpers import write
 
@@ -395,7 +395,7 @@ class Mesh(object):
             Point data array name.
         data : array_like
             Point data array.
-        
+
         """
         assert isinstance(label, str)
         assert isinstance(data, (list, tuple, numpy.ndarray))
@@ -411,7 +411,7 @@ class Mesh(object):
             Cell data array name.
         data : array_like
             Cell data array.
-        
+
         """
         assert isinstance(label, str)
         assert isinstance(data, (list, tuple, numpy.ndarray))
@@ -437,7 +437,7 @@ class Mesh(object):
         ------
         AssertionError
             If any input argument is not valid.
-        
+
         """
 
         def isinbounds(x, bounds):
@@ -488,7 +488,7 @@ class Mesh(object):
         -------
         tuple
             Local index of cell as a tuple (iblock, icell).
-        
+
         """
         assert isinstance(point, (list, tuple, numpy.ndarray))
         assert numpy.ndim(point) == 1
@@ -674,7 +674,7 @@ class Mesh(object):
         Note
         ----
         Only for 3D meshes and first order cells.
-        
+
         """
         return self.split(_connections(self))
 
@@ -691,7 +691,7 @@ def from_meshio(mesh):
     -------
     toughio.Mesh
         Output mesh.
-    
+
     """
     if mesh.cell_data:
         version = get_meshio_version()

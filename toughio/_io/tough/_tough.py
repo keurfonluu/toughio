@@ -27,7 +27,7 @@ def read(filename):
     -------
     dict
         TOUGH input parameters.
-    
+
     """
     raise NotImplementedError("Reading TOUGH input file is not implemented yet.")
 
@@ -41,7 +41,7 @@ def write(filename, parameters):
         Output file name.
     parameters : dict
         Parameters to export.
-    
+
     """
     from .._common import Parameters, default
 

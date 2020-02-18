@@ -51,7 +51,7 @@ def read_input(filename, file_format="json", **kwargs):
     -------
     dict
         TOUGH input parameters.
-    
+
     """
     assert isinstance(filename, str)
     assert file_format in {"tough", "json"}
@@ -79,7 +79,7 @@ def write_input(filename, parameters, file_format="tough", **kwargs):
         Parameters to export.
     file_format : str ('tough', 'json'), optional, default 'tough'
         Output file format.
-    
+
     """
     assert isinstance(filename, str)
     assert isinstance(parameters, dict)
@@ -109,7 +109,7 @@ def read_output(filename):
     -------
     list of namedtuple
         List of namedtuple (time, labels, data) for each time step.
-    
+
     """
     assert isinstance(filename, str)
 
@@ -174,7 +174,7 @@ def read_save(filename):
     Note
     ----
     Does not support porosity, USERX and hysteresis values yet.
-    
+
     """
 
     def str2float(s):

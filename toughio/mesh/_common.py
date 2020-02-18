@@ -119,7 +119,7 @@ def get_meshio_version():
     -------
     tuple
         :module:`meshio` version as tuple (major, minor, patch).
-    
+
     """
     return tuple(int(i) for i in meshio.__version__.split("."))
 
@@ -140,7 +140,7 @@ def get_old_meshio_cells(cells, cell_data=None):
         Old-style cells.
     dict
         Old-style cell data (only if `cell_data` is not None).
-    
+
     """
     old_cells, cell_blocks = {}, {}
     for ic, c in enumerate(cells):
@@ -178,7 +178,7 @@ def get_local_index(mesh, i):
         Input mesh.
     i : int
         Global cell index.
-    
+
     """
     n_cells = numpy.cumsum([len(c.data) for c in mesh.cells])
     idx = numpy.nonzero(n_cells > i)[0][0]
@@ -206,7 +206,7 @@ def labeler(i):
     Note
     ----
     Currently support up to 3,185,000 different cells.
-    
+
     """
     q1, r1 = divmod(i, len(numer))
     q2, r2 = divmod(q1, len(nomen))

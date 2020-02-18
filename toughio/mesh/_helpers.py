@@ -41,7 +41,7 @@ def read(filename, file_format=None, **kwargs):
     -------
     toughio.Mesh
         Imported mesh.
-    
+
     """
     # Check file format
     assert isinstance(filename, str)
@@ -95,7 +95,7 @@ def write(filename, mesh, file_format=None, **kwargs):
         Equation-of-state identifier to determine the actual number of
         primary variables to initialize. If `None`, TOUGH input `INCON`
         file will not be written.
-    
+
     """
     # Check file format
     assert isinstance(filename, str)
@@ -161,7 +161,7 @@ def write_points_cells(
     ----------------
     kwargs : dict
         Refer to function ``write`` for additional information.
-    
+
     """
     mesh = Mesh(
         points=points,
