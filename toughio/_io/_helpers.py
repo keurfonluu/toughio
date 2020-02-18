@@ -26,9 +26,7 @@ _extension_to_filetype = {
 
 
 def _filetype_from_filename(filename):
-    """
-    Determine file type from its extension.
-    """
+    """Determine file type from its extension."""
     import os
 
     ext = os.path.splitext(filename)[1].lower()
@@ -176,11 +174,8 @@ def read_save(filename):
     Does not support porosity, USERX and hysteresis values yet.
 
     """
-
     def str2float(s):
-        """
-        Convert primary variables string to float.
-        """
+        """Convert primary variables string to float."""
         s = s.lower()
         significand, exponent = s[:-4], s[-4:].replace("e", "")
         return float("{}e{}".format(significand, exponent))

@@ -380,9 +380,7 @@ class Mesh(object):
         write(filename, self, file_format, **kwargs)
 
     def plot(self, *args, **kwargs):
-        """
-        Display mesh using :method:`pyvista.UnstructuredGrid.plot``.
-        """
+        """Display mesh using :method:`pyvista.UnstructuredGrid.plot``."""
         mesh = self.to_pyvista()
         mesh.plot(*args, **kwargs)
 
@@ -419,8 +417,9 @@ class Mesh(object):
         self.cell_data[label] = self.split(data)
 
     def set_material(self, material, xlim=None, ylim=None, zlim=None):
-        """Set material for cells within box selection defined by `xlim`,
-        `ylim` and `zlim`.
+        """Set material to cells in box.
+        
+        Set material for cells within box selection defined by `xlim`, `ylim` and `zlim`.
         
         Parameters
         ----------
@@ -439,7 +438,6 @@ class Mesh(object):
             If any input argument is not valid.
 
         """
-
         def isinbounds(x, bounds):
             return (
                 numpy.logical_and(x >= min(bounds), x <= max(bounds))
@@ -502,9 +500,7 @@ class Mesh(object):
 
     @property
     def points(self):
-        """
-        Coordinates of points.
-        """
+        """Return coordinates of points."""
         return self._points
 
     @points.setter
@@ -513,9 +509,7 @@ class Mesh(object):
 
     @property
     def cells(self):
-        """
-        Connectivity of cells.
-        """
+        """Return connectivity of cells."""
         if self._cells:
             return self._cells
         else:
@@ -532,9 +526,7 @@ class Mesh(object):
 
     @property
     def cells_dict(self):
-        """
-        Connectivity of cells (``meshio < 4.0.0``).
-        """
+        """Return connectivity of cells (``meshio < 4.0.0``)."""
         if self._cells:
             return get_old_meshio_cells(self._cells)
         else:
@@ -542,9 +534,7 @@ class Mesh(object):
 
     @property
     def point_data(self):
-        """
-        Point data arrays.
-        """
+        """Return point data arrays."""
         return self._point_data
 
     @point_data.setter
@@ -553,9 +543,7 @@ class Mesh(object):
 
     @property
     def cell_data(self):
-        """
-        Cell data arrays.
-        """
+        """Return cell data arrays."""
         return self._cell_data
 
     @cell_data.setter
@@ -564,9 +552,7 @@ class Mesh(object):
 
     @property
     def field_data(self):
-        """
-        Field data names.
-        """
+        """Return field data names."""
         return self._field_data
 
     @field_data.setter
@@ -575,9 +561,7 @@ class Mesh(object):
 
     @property
     def point_sets(self):
-        """
-        Sets of points.
-        """
+        """Return sets of points."""
         return self._point_sets
 
     @point_sets.setter
@@ -586,9 +570,7 @@ class Mesh(object):
 
     @property
     def cell_sets(self):
-        """
-        Sets of cells.
-        """
+        """Return sets of cells."""
         return self._cell_sets
 
     @cell_sets.setter
@@ -597,53 +579,39 @@ class Mesh(object):
 
     @property
     def n_points(self):
-        """
-        Number of points.
-        """
+        """Return number of points."""
         return len(self.points)
 
     @property
     def n_cells(self):
-        """
-        Number of cells.
-        """
+        """Return number of cells."""
         return sum(len(c.data) for c in self.cells)
 
     @property
     def labels(self):
-        """
-        Labels of cell in mesh.
-        """
+        """Return labels of cell in mesh."""
         from ._common import labeler
 
         return self.split([labeler(i) for i in range(self.n_cells)])
 
     @property
     def centers(self):
-        """
-        Node centers of cell in mesh.
-        """
+        """Return node centers of cell in mesh."""
         return [self.points[c.data].mean(axis=1) for c in self.cells]
 
     @property
     def materials(self):
-        """
-        Materials of cell in mesh.
-        """
+        """Return materials of cell in mesh."""
         return _materials(self)
 
     @property
     def faces(self):
-        """
-        Connectivity of faces of cell in mesh.
-        """
+        """Return connectivity of faces of cell in mesh."""
         return self.split(_faces(self))
 
     @property
     def face_normals(self):
-        """
-        Normal vectors of faces in mesh.
-        """
+        """Return normal vectors of faces in mesh."""
         return [
             numpy.array([face for face in faces])
             for faces in self.split(_face_normals(self))
@@ -651,9 +619,7 @@ class Mesh(object):
 
     @property
     def face_areas(self):
-        """
-        Areas of faces in mesh.
-        """
+        """Return areas of faces in mesh."""
         return [
             numpy.array([face for face in faces])
             for faces in self.split(_face_areas(self))
@@ -661,15 +627,14 @@ class Mesh(object):
 
     @property
     def volumes(self):
-        """
-        Volumes of cell in mesh.
-        """
+        """Return volumes of cell in mesh."""
         return _volumes(self)
 
     @property
     def connections(self):
-        """Mesh connections assuming conformity and that points and cells are
-        uniquely defined in mesh.
+        """Return mesh connections.
+        
+        Assume conformity and that points and cells are uniquely defined in mesh.
 
         Note
         ----

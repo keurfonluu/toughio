@@ -114,9 +114,7 @@ def _get_parser():
 
 def _read_table(f, points, version):
     def str2float(s):
-        """
-        Convert primary variables string to float.
-        """
+        """Convert primary variables string to float."""
         s = s.lower()
         significand, exponent = s[:-4], s[-4:].replace("e", "")
         return float("{}e{}".format(significand, exponent))

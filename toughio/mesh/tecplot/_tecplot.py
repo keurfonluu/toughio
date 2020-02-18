@@ -5,6 +5,12 @@ import numpy
 from ...__about__ import __version__ as version
 from .._mesh import Mesh
 
+__all__ = [
+    "read",
+    "write",
+]
+
+
 zone_key_to_type = {
     "N": int,
     "NODES": int,
@@ -75,9 +81,7 @@ meshio_type_to_ndim = {
 
 
 def read(filename):
-    """
-    Read Tecplot ASCII file.
-    """
+    """Read Tecplot ASCII file."""
     with open(filename, "r") as f:
         out = read_buffer(f)
     return out
@@ -295,9 +299,7 @@ def _read_zone_data(f, num_data, num_cells, zone_format):
 
 
 def write(filename, mesh):
-    """
-    Write Tecplot ASCII file.
-    """
+    """Write Tecplot ASCII file."""
     # Check cell types
     cell_types = []
     cell_blocks = []

@@ -70,9 +70,7 @@ def write(filename, parameters):
 
 @check_parameters(dtypes["PARAMETERS"])
 def write_buffer(parameters):
-    """
-    Write TOUGH input file as a list of 80-character long record strings.
-    """
+    """Write TOUGH input file as a list of 80-character long record strings."""
     from .._common import eos, eos_select
 
     # Check that EOS is defined (for block MULTI)
@@ -127,10 +125,7 @@ def write_buffer(parameters):
 
 
 def _format_data(data):
-    """
-    Return a list of strings given input data and formats.
-    """
-
+    """Return a list of strings given input data and formats."""
     def to_str(x, fmt):
         x = "" if x is None or x == "" else x
         if isinstance(x, str):
@@ -142,16 +137,12 @@ def _format_data(data):
 
 
 def _write_record(data):
-    """
-    Return a list with a single string.
-    """
+    """Return a list with a single string."""
     return ["{:80}\n".format("".join(data))]
 
 
 def _write_multi_record(data, ncol=8):
-    """
-    Return a list with multiple strings.
-    """
+    """Return a list with multiple strings."""
     n = len(data)
     rec = [
         data[ncol * i : min(ncol * i + ncol, n)]
@@ -161,9 +152,7 @@ def _write_multi_record(data, ncol=8):
 
 
 def _add_record(data, id_fmt="{:>5g}     "):
-    """
-    Return a list with a single string for additional records.
-    """
+    """Return a list with a single string for additional records."""
     n = len(data["parameters"])
     rec = [(data["id"], id_fmt)]
     rec += [(v, "{:>10.3e}") for v in data["parameters"][: min(n, 7)]]
@@ -673,23 +662,17 @@ def _write_gener(parameters):
 
 @block("NOVER")
 def _write_nover():
-    """
-    TOUGH input NOVER block data (optional).
-    """
+    """TOUGH input NOVER block data (optional)."""
     return []
 
 
 @block("ENDFI", noend=True)
 def _write_endfi():
-    """
-    TOUGH input ENDFI block data (optional).
-    """
+    """TOUGH input ENDFI block data (optional)."""
     return []
 
 
 @block("ENDCY", noend=True)
 def _write_endcy():
-    """
-    TOUGH input ENDCY block data (optional).
-    """
+    """TOUGH input ENDCY block data (optional)."""
     return []

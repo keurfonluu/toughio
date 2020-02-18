@@ -28,7 +28,6 @@ def cylindric_grid(dr, dz, origin_z=None, material="dfalt"):
         Output cylindric mesh.
 
     """
-
     class CylindricMesh(Mesh):
         """Cylindric mesh.
 
@@ -47,9 +46,7 @@ def cylindric_grid(dr, dz, origin_z=None, material="dfalt"):
             self._dz = dz
 
         def _get_areas_heights(self):
-            """
-            Return areas and heights of cells in mesh.
-            """
+            """Return areas and heights of cells in mesh."""
             nr, nz = len(self._dr), len(self._dz)
             r2 = numpy.cumsum(self._dr) ** 2
             areas = (
@@ -62,9 +59,7 @@ def cylindric_grid(dr, dz, origin_z=None, material="dfalt"):
 
         @property
         def face_areas(self):
-            """
-            Areas of faces in mesh.
-            """
+            """Areas of faces in mesh."""
             nz = len(self._dz)
             dr = numpy.concatenate(([0.0], self._dr))
             perimeters_in = numpy.tile(numpy.cumsum(dr[:-1]), nz) * 2.0 * numpy.pi
@@ -87,9 +82,7 @@ def cylindric_grid(dr, dz, origin_z=None, material="dfalt"):
 
         @property
         def volumes(self):
-            """
-            Volumes of cell in mesh.
-            """
+            """Volumes of cell in mesh."""
             areas, heights = self._get_areas_heights()
             return [areas * heights]
 

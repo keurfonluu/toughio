@@ -28,10 +28,7 @@ _eos_to_neq = {
 
 
 def block(keyword):
-    """
-    Decorator for block writing functions.
-    """
-
+    """Decorate block writing functions."""
     def decorator(func):
         from functools import wraps
 
@@ -49,17 +46,15 @@ def block(keyword):
 
 
 def read(filename):
-    """
-    Read TOUGH MESH file is not supported yet. MESH file does not store
-    any geometrical information except node centers.
+    """Read TOUGH MESH file is not supported yet.
+    
+    MESH file does not store any geometrical information except node centers.
     """
     raise NotImplementedError("Reading TOUGH MESH file is not supported.")
 
 
 def write(filename, mesh, nodal_distance, material_name, material_end, incon_eos):
-    """
-    Write TOUGH MESH file.
-    """
+    """Write TOUGH MESH file."""
     assert nodal_distance in {"line", "orthogonal"}
     assert material_name is None or isinstance(material_name, dict)
     assert material_end is None or isinstance(material_end, (str, list, tuple))
@@ -238,9 +233,7 @@ def _write_eleme(
     material_name,
     material_end,
 ):
-    """
-    Write ELEME block.
-    """
+    """Write ELEME block."""
     # Apply time-independent Dirichlet boundary conditions
     volumes *= numpy.where(boundary_conditions, 1.0e50, 1.0)
 
@@ -287,9 +280,7 @@ def _write_conne(
     face_areas,
     nodal_distance,
 ):
-    """
-    Write CONNE block.
-    """
+    """Write CONNE block."""
     # Define unique connection variables
     cell_list = set()
     clabels, centers, int_points, int_normals, areas, bounds = [], [], [], [], [], []
@@ -363,9 +354,7 @@ def _write_conne(
 def _write_incon(
     f, incon_eos, labels, primary_variables, porosities, permeabilities,
 ):
-    """
-    Write INCON block.
-    """
+    """Write INCON block."""
     # Check initial pore pressures
     cond = numpy.logical_and(
         primary_variables[:, 0] > -1.0e9, primary_variables[:, 0] < 0.0,
@@ -408,25 +397,29 @@ def _write_incon(
 
 
 def _intersection_line_plane(center, lines, int_points, int_normals):
-    """
-    Calculate intersection point between a line defined by a point and a
-    direction vector and a plane defined by one point and a normal vector.
+    """Calculate the intersection point between a line and a plane.
+    
+    Calculate intersection between a line defined by a point and a direction
+    vector and a plane defined by one point and a normal vector.
     """
     tmp = _dot(int_points - center, int_normals) / _dot(lines, int_normals)
     return center + lines * tmp[:, None]
 
 
 def _distance_point_plane(center, int_points, int_normals, mask):
-    """
-    Calculate orthogonal distance of a point to a plane defined by one
-    point and a normal vector.
+    """Calculate orthogonal distance.
+    
+    Calculate orthogonal distance of a point to a plane defined by one point
+    and a normal vector.
     """
     return numpy.where(mask, 1.0e-9, numpy.abs(_dot(center - int_points, int_normals)))
 
 
 def _isot(lines):
-    """Determine anisotropy direction given the direction of the line
-    connecting the cell centers.
+    """Determine direction of anisotropy.
+    
+    Given the direction of the line connecting the cell centers, calculate the
+    direction of anisotropy.
 
     Note
     ----
@@ -438,7 +431,5 @@ def _isot(lines):
 
 
 def _dot(A, B):
-    """
-    Custom dot product when arrays A and B have the same shape.
-    """
+    """Calculate dot product when arrays A and B have the same shape."""
     return (A * B).sum(axis=1)

@@ -72,19 +72,17 @@ meshio_to_flac3d_order_2 = {
 
 
 def read(filename):
-    """
-    Read FLAC3D f3grid grid file (only ASCII).
-    """
+    """Read FLAC3D f3grid grid file (only ASCII)."""
     with open(filename, "r") as f:
         out = read_buffer(f)
     return out
 
 
 def read_buffer(f):
-    """
-    Read ASCII file line by line. Use combination of readline, tell and
-    seek since we need to rewind to the previous line when we read last
-    data line of a ZGROUP section.
+    """Read ASCII file line by line.
+    
+    Use combination of readline, tell and seek since we need to rewind to the previous
+    line when we read last data line of a ZGROUP section.
     """
     points = []
     point_ids = {}
@@ -141,16 +139,12 @@ def read_buffer(f):
 
 
 def _read_point(line):
-    """
-    Read point coordinates.
-    """
+    """Read point coordinates."""
     return int(line[1]), [float(l) for l in line[2:]]
 
 
 def _read_cell(line, point_ids):
-    """
-    Read cell corners.
-    """
+    """Read cell corners."""
     cell = [point_ids[int(l)] for l in line[3:]]
     if line[1] == "B7":
         cell.append(cell[-1])
@@ -158,9 +152,7 @@ def _read_cell(line, point_ids):
 
 
 def _read_zgroup(f, line):
-    """
-    Read cell group.
-    """
+    """Read cell group."""
     name = line[1].replace('"', "")
     data = []
     slot = "" if "SLOT" not in line else line[-1]
@@ -180,9 +172,7 @@ def _read_zgroup(f, line):
 
 
 def write(filename, mesh):
-    """
-    Write FLAC3D f3grid grid file (only ASCII).
-    """
+    """Write FLAC3D f3grid grid file (only ASCII)."""
     if not any(c.type in meshio_only.keys() for c in mesh.cells):
         raise AssertionError("FLAC3D format only supports 3D cells.")
 
@@ -201,17 +191,13 @@ def write(filename, mesh):
 
 
 def _write_points(f, points):
-    """
-    Write points coordinates.
-    """
+    """Write points coordinates."""
     for i, point in enumerate(points):
         f.write("G\t{:8}\t{:.14e}\t{:.14e}\t{:.14e}\n".format(i + 1, *point))
 
 
 def _write_cells(f, points, cells):
-    """
-    Write zones.
-    """
+    """Write zones."""
     zones = _translate_zones(points, cells)
     i = 1
     for meshio_type, zone in zones:
@@ -222,10 +208,10 @@ def _write_cells(f, points, cells):
 
 
 def _translate_zones(points, cells):
-    """
-    Reorder meshio cells to FLAC3D zones. Four first points must form a right-handed
-    coordinate system (outward normal vectors). Reorder corner points according to sign
-    of scalar triple products.
+    """Reorder meshio cells to FLAC3D zones.
+    
+    Four first points must form a right-handed coordinate system (outward normal vectors).
+    Reorder corner points according to sign of scalar triple products.
     """
     # See <https://stackoverflow.com/a/42386330/353337>
     def slicing_summing(a, b, c):
@@ -255,9 +241,7 @@ def _translate_zones(points, cells):
 
 
 def _write_cell_data(f, cells, cell_data, field_data):
-    """
-    Write zone groups.
-    """
+    """Write zone groups."""
     zgroups, labels = _translate_zgroups(cells, cell_data, field_data)
     for k in sorted(zgroups.keys()):
         f.write('ZGROUP "{}"\n'.format(labels[k]))
@@ -265,9 +249,7 @@ def _write_cell_data(f, cells, cell_data, field_data):
 
 
 def _translate_zgroups(cells, cell_data, field_data):
-    """
-    Convert meshio cell_data to FLAC3D zone groups.
-    """
+    """Convert meshio cell_data to FLAC3D zone groups."""
     mat_data = None
     for k in cell_data.keys():
         if k in meshio_data:
@@ -291,9 +273,7 @@ def _translate_zgroups(cells, cell_data, field_data):
 
 
 def _write_zgroup(f, data, ncol=20):
-    """
-    Write zone group data.
-    """
+    """Write zone group data."""
     nrow = len(data) // ncol
     lines = numpy.split(data, numpy.full(nrow, ncol).cumsum())
     for line in lines:
