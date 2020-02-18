@@ -1,6 +1,7 @@
 from __future__ import division, with_statement
 
 import logging
+import warnings
 from copy import deepcopy
 
 import numpy
@@ -58,7 +59,7 @@ def write(filename, parameters):
 
     for rock in params["rocks"].keys():
         for k, v in params["default"].items():
-            if k not in params["rocks"][rock].keys():
+            if k not in params["rocks"][rock].keys() and k not in {"incon"}:
                 params["rocks"][rock][k] = v
 
     buffer = write_buffer(params)
@@ -84,8 +85,17 @@ def write_buffer(parameters):
     indom = False
     for rock in parameters["rocks"].values():
         if "incon" in rock.keys():
-            indom = True
-            break
+            if any(x is not None for x in rock["incon"][:4]):
+                indom = True
+                break
+
+    # Deprecation warning: 'incon' is now in 'default' rather than in 'options'
+    if "incon" in parameters["options"].keys():
+        warnings.warn(
+            "Defining 'incon' in 'options' is deprecated, define 'incon' in 'default'.",
+            DeprecationWarning,
+        )
+        parameters["default"]["incon"] = parameters["options"].pop("incon")
 
     # Check that start is True if indom is True
     if indom and not parameters["start"]:
@@ -451,9 +461,10 @@ def _write_param(parameters):
     )
 
     # Record 4
-    n = len(data["incon"])
+    data = parameters["default"]["incon"]
+    n = len(data)
     out += _write_record(
-        _format_data([(i, "{:>20.4e}") for i in data["incon"][: min(n, 4)]])
+        _format_data([(i, "{:>20.4e}") for i in data[: min(n, 4)]])
     )
     return out
 

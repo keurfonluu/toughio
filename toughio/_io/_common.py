@@ -65,7 +65,6 @@ options = {
     "w_upstream": None,
     "w_newton": None,
     "derivative_factor": None,
-    "incon": [None for _ in range(4)],
 }
 
 extra_options = {
@@ -132,6 +131,7 @@ default = {
     "b_coeff": None,
     "xkd3": None,
     "xkd4": None,
+    "incon": [None for _ in range(4)],
     "relative_permeability": {"id": None, "parameters": []},
     "capillarity": {"id": None, "parameters": []},
     "permeability_model": {"id": 1, "parameters": []},
