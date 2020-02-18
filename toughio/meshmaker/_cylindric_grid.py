@@ -26,7 +26,7 @@ def cylindric_grid(dr, dz, origin_z=None, material="dfalt"):
     -------
     toughio.Mesh
         Output cylindric mesh.
-    
+
     """
 
     class CylindricMesh(Mesh):

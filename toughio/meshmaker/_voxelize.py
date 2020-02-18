@@ -21,7 +21,7 @@ def voxelize(points, material="dfalt"):
     -------
     toughio.Mesh
         Output hexahedral mesh.
-    
+
     """
     assert isinstance(points, (list, tuple, numpy.ndarray))
     assert numpy.ndim(points) == 1

@@ -27,7 +27,7 @@ def structured_grid(dx, dy, dz=None, origin=None, material="dfalt"):
     -------
     toughio.Mesh
         Output non-uniform structured mesh.
-    
+
     """
     assert isinstance(dx, (list, tuple, numpy.ndarray))
     assert isinstance(dy, (list, tuple, numpy.ndarray))
