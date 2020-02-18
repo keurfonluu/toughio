@@ -26,8 +26,7 @@ _extension_to_filetype = {
 
 
 def _filetype_from_filename(filename):
-    """
-    Determine file type from its extension.
+    """Determine file type from its extension.
     """
     import os
 
@@ -38,8 +37,7 @@ def _filetype_from_filename(filename):
 
 
 def read_input(filename, file_format="json", **kwargs):
-    """
-    Read TOUGH input file.
+    """Read TOUGH input file.
 
     Parameters
     ----------
@@ -69,8 +67,7 @@ def read_input(filename, file_format="json", **kwargs):
 
 
 def write_input(filename, parameters, file_format="tough", **kwargs):
-    """
-    Write TOUGH input file.
+    """Write TOUGH input file.
 
     Parameters
     ----------
@@ -98,8 +95,7 @@ def write_input(filename, parameters, file_format="tough", **kwargs):
 
 
 def read_output(filename):
-    """
-    Read TOUGH output file for each time step.
+    """Read TOUGH output file for each time step.
 
     Parameters
     ----------
@@ -159,8 +155,7 @@ def read_output(filename):
 
 
 def read_save(filename):
-    """
-    Read TOUGH SAVE file.
+    """Read TOUGH SAVE file.
 
     Parameters
     ----------

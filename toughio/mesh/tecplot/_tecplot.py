@@ -75,6 +75,8 @@ meshio_type_to_ndim = {
 
 
 def read(filename):
+    """Read Tecplot ASCII file.
+    """
     with open(filename, "r") as f:
         out = read_buffer(f)
     return out
@@ -292,6 +294,8 @@ def _read_zone_data(f, num_data, num_cells, zone_format):
 
 
 def write(filename, mesh):
+    """Write Tecplot ASCII file.
+    """
     # Check cell types
     cell_types = []
     cell_blocks = []

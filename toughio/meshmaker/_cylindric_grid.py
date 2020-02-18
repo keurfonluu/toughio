@@ -9,8 +9,7 @@ __all__ = [
 
 
 def cylindric_grid(dr, dz, origin_z=None, material="dfalt"):
-    """
-    Generate a cylindric mesh as a radial XZ structured grid.
+    """Generate a cylindric mesh as a radial XZ structured grid.
 
     Parameters
     ----------
@@ -30,8 +29,7 @@ def cylindric_grid(dr, dz, origin_z=None, material="dfalt"):
     """
 
     class CylindricMesh(Mesh):
-        """
-        Cylindric mesh.
+        """Cylindric mesh.
 
         This class is only intended to be used as output of :function:`cylindric_grid`.
 
@@ -47,8 +45,7 @@ def cylindric_grid(dr, dz, origin_z=None, material="dfalt"):
             self._dz = dz
 
         def _get_areas_heights(self):
-            """
-            Return areas and heights of cells in mesh.
+            """Return areas and heights of cells in mesh.
             """
             nr, nz = len(self._dr), len(self._dz)
             r2 = numpy.cumsum(self._dr) ** 2
@@ -62,8 +59,7 @@ def cylindric_grid(dr, dz, origin_z=None, material="dfalt"):
 
         @property
         def face_areas(self):
-            """
-            Areas of faces in mesh.
+            """Areas of faces in mesh.
             """
             nz = len(self._dz)
             dr = numpy.concatenate(([0.0], self._dr))
@@ -87,8 +83,7 @@ def cylindric_grid(dr, dz, origin_z=None, material="dfalt"):
 
         @property
         def volumes(self):
-            """
-            Volumes of cell in mesh.
+            """Volumes of cell in mesh.
             """
             areas, heights = self._get_areas_heights()
             return [areas * heights]

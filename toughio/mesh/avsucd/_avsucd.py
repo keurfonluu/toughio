@@ -46,6 +46,8 @@ avsucd_to_meshio_order = {
 
 
 def read(filename):
+    """Read AVS-UCD ASCII file.
+    """
     with open(filename, "r") as f:
         out = read_buffer(f)
     return out
@@ -145,6 +147,8 @@ def _read_data(f, num_entities, entity_ids):
 
 
 def write(filename, mesh):
+    """Write AVS-UCD ASCII file.
+    """
     if mesh.points.shape[1] == 2:
         logging.warning(
             "AVS-UCD requires 3D points, but 2D points given. "

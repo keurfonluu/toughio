@@ -113,8 +113,7 @@ nomen = ["{:1}".format(i + 1) for i in range(9)] + alpha
 
 
 def get_meshio_version():
-    """
-    Return :module:`meshio` version as a tuple.
+    """Return :module:`meshio` version as a tuple.
 
     Returns
     -------
@@ -125,8 +124,7 @@ def get_meshio_version():
 
 
 def get_old_meshio_cells(cells, cell_data=None):
-    """
-    Return old-style cells and cell_data (meshio < 4.0.0).
+    """Return old-style cells and cell_data (meshio < 4.0.0).
 
     Parameters
     ----------
@@ -170,8 +168,7 @@ def get_old_meshio_cells(cells, cell_data=None):
 
 
 def get_local_index(mesh, i):
-    """
-    Convert global cell index to local tuple index.
+    """Convert global cell index to local tuple index.
 
     Parameters
     ----------
@@ -187,8 +184,7 @@ def get_local_index(mesh, i):
 
 
 def labeler(i):
-    """
-    Return five-character long cell labels following:
+    """Return five-character long cell labels following:
     - 1st: from A to Z
     - 2nd and 3rd: from 1 to 9 then A to Z
     - 4th and 5th: from 00 to 99

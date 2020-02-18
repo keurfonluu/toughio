@@ -13,8 +13,7 @@ __all__ = [
 
 
 def _materials(mesh):
-    """
-    Materials of cell in mesh.
+    """Materials of cell in mesh.
     """
     if "material" in mesh.cell_data.keys():
         if mesh.field_data:
@@ -39,8 +38,7 @@ def _materials(mesh):
 
 
 def _faces(mesh):
-    """
-    Connectivity of faces of cell in mesh.
+    """Connectivity of faces of cell in mesh.
     """
     meshio_type_to_faces = {
         "tetra": {
@@ -85,8 +83,7 @@ def _faces(mesh):
 
 
 def _face_normals(mesh):
-    """
-    Normal vectors of faces in mesh.
+    """Normal vectors of faces in mesh.
     """
     faces = numpy.concatenate(mesh.faces)
     faces_dict, faces_cell, _ = _get_faces(faces)
@@ -108,8 +105,7 @@ def _face_normals(mesh):
 
 
 def _face_areas(mesh):
-    """
-    Areas of faces in mesh.
+    """Areas of faces in mesh.
     """
     faces = numpy.concatenate(mesh.faces)
     faces_dict, faces_cell, _ = _get_faces(faces)
@@ -141,8 +137,7 @@ def _face_areas(mesh):
 
 
 def _volumes(mesh):
-    """
-    Volumes of cell in mesh.
+    """Volumes of cell in mesh.
     """
 
     def scalar_triple_product(a, b, c):
@@ -184,8 +179,7 @@ def _volumes(mesh):
 
 
 def _connections(mesh):
-    """
-    Mesh connections assuming conformity and that points and cells are
+    """Mesh connections assuming conformity and that points and cells are
     uniquely defined in mesh.
     """
     assert (
@@ -221,8 +215,7 @@ def _connections(mesh):
 
 
 def _get_faces(faces):
-    """
-    Return dictionary of faces.
+    """Return dictionary of faces.
     """
     faces_dict = {"triangle": [], "quad": []}
     faces_cell = {"triangle": [], "quad": []}
@@ -246,13 +239,14 @@ def _get_faces(faces):
     return faces_dict, faces_cell, faces_index
 
 
-def _get_triangle_normals(mesh, faces, islice=[0, 1, 2]):
-    """
-    Calculate normal vectors of triangular faces.
+def _get_triangle_normals(mesh, faces, islice=None):
+    """Calculate normal vectors of triangular faces.
     """
 
     def cross(a, b):
         return a[:, [1, 2, 0]] * b[:, [2, 0, 1]] - a[:, [2, 0, 1]] * b[:, [1, 2, 0]]
+
+    islice = islice if islice is not None else [0, 1, 2]
 
     triangles = numpy.vstack([c[islice] for c in faces])
     triangles = mesh.points[triangles]

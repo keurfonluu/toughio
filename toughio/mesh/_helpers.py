@@ -18,8 +18,7 @@ _extension_to_filetype = {
 
 
 def _filetype_from_filename(filename):
-    """
-    Determine file type from its extension.
+    """Determine file type from its extension.
     """
     import os
 
@@ -28,8 +27,7 @@ def _filetype_from_filename(filename):
 
 
 def read(filename, file_format=None, **kwargs):
-    """
-    Read unstructured mesh from file.
+    """Read unstructured mesh from file.
 
     Parameters
     ----------
@@ -66,8 +64,7 @@ def read(filename, file_format=None, **kwargs):
 
 
 def write(filename, mesh, file_format=None, **kwargs):
-    """
-    Write unstructured mesh to file.
+    """Write unstructured mesh to file.
 
     Parameters
     ----------
@@ -138,8 +135,7 @@ def write_points_cells(
     file_format=None,
     **kwargs
 ):
-    """
-    Write unstructured mesh to file given points and cells data.
+    """Write unstructured mesh to file given points and cells data.
 
     Parameters
     ----------
