@@ -5,4 +5,5 @@ format:
 		black -t py27 test
 
 black:
+		black -t py27 toughio
 		black -t py27 test
