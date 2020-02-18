@@ -1,5 +1,7 @@
 from __future__ import division, with_statement
 
+import logging
+import warnings
 from copy import deepcopy
 
 import numpy
@@ -57,7 +59,7 @@ def write(filename, parameters):
 
     for rock in params["rocks"].keys():
         for k, v in params["default"].items():
-            if k not in params["rocks"][rock].keys():
+            if k not in params["rocks"][rock].keys() and k not in {"incon"}:
                 params["rocks"][rock][k] = v
 
     buffer = write_buffer(params)
@@ -79,6 +81,26 @@ def write_buffer(parameters):
             "EOS '{}' is unknown or not supported.".format(parameters["eos"])
         )
 
+    # Set some flags
+    indom = False
+    for rock in parameters["rocks"].values():
+        if "incon" in rock.keys():
+            if any(x is not None for x in rock["incon"][:4]):
+                indom = True
+                break
+
+    # Deprecation warning: 'incon' is now in 'default' rather than in 'options'
+    if "incon" in parameters["options"].keys():
+        warnings.warn(
+            "Defining 'incon' in 'options' is deprecated, define 'incon' in 'default'.",
+            DeprecationWarning,
+        )
+        parameters["default"]["incon"] = parameters["options"].pop("incon")
+
+    # Check that start is True if indom is True
+    if indom and not parameters["start"]:
+        logging.warning("Option 'START' is needed to use 'INDOM' conditions.")
+
     # Define input file contents
     out = ["{:80}\n".format(parameters["title"])]
     out += _write_rocks(parameters)
@@ -88,6 +110,7 @@ def write_buffer(parameters):
     out += _write_solvr(parameters) if parameters["solver"] else []
     out += _write_start() if parameters["start"] else []
     out += _write_param(parameters)
+    out += _write_indom(parameters) if indom else []
     out += _write_momop(parameters) if parameters["more_options"] else []
     out += _write_times(parameters) if parameters["times"] is not None else []
     out += _write_foft(parameters) if parameters["element_history"] is not None else []
@@ -177,9 +200,8 @@ def _write_rocks(parameters):
         data.update(parameters["rocks"][k])
 
         # Number of additional lines to write per rock
-        nad = 0
-        nad += 1 if data["relative_permeability"]["id"] is not None else 0
-        nad += 1 if data["capillarity"]["id"] is not None else 0
+        # Always 2 since relative permeability and capillarity are copied from default
+        nad = 2
 
         # Permeability
         per = data["permeability"]
@@ -438,10 +460,9 @@ def _write_param(parameters):
     )
 
     # Record 4
-    n = len(data["incon"])
-    out += _write_record(
-        _format_data([(i, "{:>20.4e}") for i in data["incon"][: min(n, 4)]])
-    )
+    data = parameters["default"]["incon"]
+    n = len(data)
+    out += _write_record(_format_data([(i, "{:>20.4e}") for i in data[: min(n, 4)]]))
     return out
 
 
@@ -460,6 +481,29 @@ def _write_momop(parameters):
     out = _write_record(
         _format_data([(_momop[k], "{:>1g}") for k in sorted(_momop.keys())])
     )
+    return out
+
+
+@block("INDOM", multi=True)
+def _write_indom(parameters):
+    """
+    TOUGH input INDOM block data (optional).
+
+    Introduces domain-specific initial conditions.
+    """
+    if parameters["rocks_order"]:
+        order = parameters["rocks_order"]
+    else:
+        order = parameters["rocks"].keys()
+
+    out = []
+    for k in order:
+        if "incon" in parameters["rocks"][k]:
+            data = parameters["rocks"][k]["incon"]
+            data = data[: min(len(data), 4)]
+            if any(x is not None for x in data):
+                out += ["{:5.5}\n".format(k)]
+                out += _write_record(_format_data([(i, "{:>20.4e}") for i in data]))
     return out
 
 

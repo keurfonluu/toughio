@@ -16,6 +16,7 @@ def export(argv=None):
     import os
     import sys
     from .. import read_mesh, read_output
+    from ..meshmaker import voxelize, triangulate
 
     parser = _get_parser()
     args = parser.parse_args(argv)
@@ -40,11 +41,34 @@ def export(argv=None):
         out = out[-1]
     print(" Done!")
 
-    # Triangulate if no mesh
+    # Triangulate or voxelize if no mesh
     if not args.mesh:
-        print("Mesh file not specified, performing triangulation...", end="")
+        print("Mesh file not specified, inferring dimensionality ...", end="")
         sys.stdout.flush()
-        mesh = _triangulate(out)
+        points = _get_points(out)
+        ndim = 1 if points.ndim == 1 else points.shape[1]
+        print(" Done!")
+
+        if ndim > 1:
+            print(
+                "Mesh is {}D, performing point triangulation ...".format(ndim), end=""
+            )
+            sys.stdout.flush()
+
+            mesh = triangulate(points)
+            for label, data in out.data.items():
+                if label not in {"X", "Y", "Z"}:
+                    mesh.add_point_data(label, data)
+
+        else:
+            print("Mesh is 1D, voxelizing points ...", end="")
+            sys.stdout.flush()
+
+            mesh = voxelize(points)
+            for label, data in out.data.items():
+                if label not in {"X", "Y", "Z"}:
+                    mesh.add_cell_data(label, data)
+
     else:
         print("Reading mesh file '{}' ...".format(args.mesh), end="")
         sys.stdout.flush()
@@ -112,18 +136,18 @@ def _get_parser():
     return parser
 
 
-def _triangulate(data):
+def _get_points(data):
     import numpy
-    from ..meshmaker import triangulate
+    from ..meshmaker import voxelize, triangulate
 
     # Make sure that point coordinates exist
     assert "X" in data.data.keys(), "Data 'X' not found."
     assert "Y" in data.data.keys(), "Data 'Y' not found."
     assert "Z" in data.data.keys(), "Data 'Z' not found."
 
-    X = data.data["X"]
-    Y = data.data["Y"]
-    Z = data.data["Z"]
+    X = numpy.array(data.data["X"])
+    Y = numpy.array(data.data["Y"])
+    Z = numpy.array(data.data["Z"])
 
     # Assert dimension of the problem
     nx = len(numpy.unique(X))
@@ -132,7 +156,13 @@ def _triangulate(data):
 
     # Reconstruct points cloud
     points = (
-        numpy.column_stack((Y, Z))
+        X
+        if ny == 1 and nz == 1
+        else Y
+        if nx == 1 and nz == 1
+        else Z
+        if nx == 1 and ny == 1
+        else numpy.column_stack((Y, Z))
         if nx == 1
         else numpy.column_stack((X, Z))
         if ny == 1
@@ -141,12 +171,4 @@ def _triangulate(data):
         else numpy.column_stack((X, Y, Z))
     )
 
-    # Triangulate
-    mesh = triangulate(points)
-
-    # Attach data to points in mesh
-    for label, data in data.data.items():
-        if label not in {"X", "Y", "Z"}:
-            mesh.add_point_data(label, data)
-
-    return mesh
+    return points
