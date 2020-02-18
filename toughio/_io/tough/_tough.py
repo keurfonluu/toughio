@@ -200,9 +200,8 @@ def _write_rocks(parameters):
         data.update(parameters["rocks"][k])
 
         # Number of additional lines to write per rock
-        nad = 0
-        nad += 1 if data["relative_permeability"]["id"] is not None else 0
-        nad += 1 if data["capillarity"]["id"] is not None else 0
+        # Always 2 since relative permeability and capillarity are copied from default
+        nad = 2
 
         # Permeability
         per = data["permeability"]
