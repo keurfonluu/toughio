@@ -44,7 +44,13 @@ def structured_grid(dx, dy, dz=None, origin=None, material="dfalt"):
     assert origin is None or (
         isinstance(origin, (list, tuple, numpy.ndarray)) and len(origin) == ndim
     )
-    origin = numpy.asarray(origin) if origin is not None else numpy.zeros(ndim)
+    origin = (
+        numpy.asarray(origin)
+        if origin is not None
+        else (
+            numpy.zeros(ndim) if ndim == 2 else numpy.array([0.0, 0.0, -numpy.sum(dz)])
+        )
+    )
     points += origin
 
     points = (
