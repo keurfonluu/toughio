@@ -42,7 +42,7 @@ def cylindric_grid(dr, dz, origin_z=None, material="dfalt"):
         """
 
         def __init__(self, dr, dz, *args, **kwargs):
-            super().__init__(*args, **kwargs)
+            super(CylindricMesh, self).__init__(*args, **kwargs)
             self._dr = dr
             self._dz = dz
 
