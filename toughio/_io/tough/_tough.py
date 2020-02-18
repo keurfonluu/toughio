@@ -1,5 +1,6 @@
 from __future__ import division, with_statement
 
+import logging
 from copy import deepcopy
 
 import numpy
@@ -79,6 +80,17 @@ def write_buffer(parameters):
             "EOS '{}' is unknown or not supported.".format(parameters["eos"])
         )
 
+    # Set some flags
+    indom = False
+    for rock in parameters["rocks"].values():
+        if "incon" in rock.keys():
+            indom = True
+            break
+
+    # Check that start is True if indom is True
+    if indom and not parameters["start"]:
+        logging.warning("Option 'START' is needed to use 'INDOM' conditions.")
+
     # Define input file contents
     out = ["{:80}\n".format(parameters["title"])]
     out += _write_rocks(parameters)
@@ -88,6 +100,7 @@ def write_buffer(parameters):
     out += _write_solvr(parameters) if parameters["solver"] else []
     out += _write_start() if parameters["start"] else []
     out += _write_param(parameters)
+    out += _write_indom(parameters) if indom else []
     out += _write_momop(parameters) if parameters["more_options"] else []
     out += _write_times(parameters) if parameters["times"] is not None else []
     out += _write_foft(parameters) if parameters["element_history"] is not None else []
@@ -460,6 +473,31 @@ def _write_momop(parameters):
     out = _write_record(
         _format_data([(_momop[k], "{:>1g}") for k in sorted(_momop.keys())])
     )
+    return out
+
+
+@block("INDOM", multi=True)
+def _write_indom(parameters):
+    """
+    TOUGH input INDOM block data (optional).
+
+    Introduces domain-specific initial conditions.
+    """
+    if parameters["rocks_order"]:
+        order = parameters["rocks_order"]
+    else:
+        order = parameters["rocks"].keys()
+
+    out = []
+    for k in order:
+        if "incon" in parameters["rocks"][k]:
+            data = parameters["rocks"][k]["incon"]
+            data = data[: min(len(data), 4)]
+            if any(x is not None for x in data):
+                out += ["{:5.5}\n".format(k)]
+                out += _write_record(
+                    _format_data([(i, "{:>20.4e}") for i in data])
+                )
     return out
 
 
