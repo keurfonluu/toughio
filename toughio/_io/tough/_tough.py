@@ -462,9 +462,7 @@ def _write_param(parameters):
     # Record 4
     data = parameters["default"]["incon"]
     n = len(data)
-    out += _write_record(
-        _format_data([(i, "{:>20.4e}") for i in data[: min(n, 4)]])
-    )
+    out += _write_record(_format_data([(i, "{:>20.4e}") for i in data[: min(n, 4)]]))
     return out
 
 
@@ -505,9 +503,7 @@ def _write_indom(parameters):
             data = data[: min(len(data), 4)]
             if any(x is not None for x in data):
                 out += ["{:5.5}\n".format(k)]
-                out += _write_record(
-                    _format_data([(i, "{:>20.4e}") for i in data])
-                )
+                out += _write_record(_format_data([(i, "{:>20.4e}") for i in data]))
     return out
 
 
