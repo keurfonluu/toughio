@@ -9,8 +9,7 @@ __all__ = [
 
 
 def read(filename):
-    """
-    Import json TOUGH input file.
+    """Import json TOUGH input file.
     
     Parameters
     ----------
@@ -21,12 +20,11 @@ def read(filename):
     -------
     dict
         TOUGH input parameters.
+
     """
 
     def to_int(data):
-        """
-        Return dict with integer keys instead of strings.
-        """
+        """Return dict with integer keys instead of strings."""
         return {int(k): data[k] for k in sorted(data.keys())}
 
     with open(filename, "r") as f:
@@ -41,8 +39,7 @@ def read(filename):
 
 
 def write(filename, parameters):
-    """
-    Export TOUGH parameters to json.
+    """Export TOUGH parameters to json.
 
     Parameters
     ----------
@@ -50,6 +47,7 @@ def write(filename, parameters):
         Output file name.
     parameters : dict
         Parameters to export.
+
     """
     with open(filename, "w") as f:
         json.dump(parameters, f, indent=4)

@@ -113,20 +113,19 @@ nomen = ["{:1}".format(i + 1) for i in range(9)] + alpha
 
 
 def get_meshio_version():
-    """
-    Return :module:`meshio` version as a tuple.
+    """Return :module:`meshio` version as a tuple.
 
     Returns
     -------
     tuple
         :module:`meshio` version as tuple (major, minor, patch).
+
     """
     return tuple(int(i) for i in meshio.__version__.split("."))
 
 
 def get_old_meshio_cells(cells, cell_data=None):
-    """
-    Return old-style cells and cell_data (meshio < 4.0.0).
+    """Return old-style cells and cell_data (meshio < 4.0.0).
 
     Parameters
     ----------
@@ -141,6 +140,7 @@ def get_old_meshio_cells(cells, cell_data=None):
         Old-style cells.
     dict
         Old-style cell data (only if `cell_data` is not None).
+
     """
     old_cells, cell_blocks = {}, {}
     for ic, c in enumerate(cells):
@@ -170,8 +170,7 @@ def get_old_meshio_cells(cells, cell_data=None):
 
 
 def get_local_index(mesh, i):
-    """
-    Convert global cell index to local tuple index.
+    """Convert global cell index to local tuple index.
 
     Parameters
     ----------
@@ -179,6 +178,7 @@ def get_local_index(mesh, i):
         Input mesh.
     i : int
         Global cell index.
+
     """
     n_cells = numpy.cumsum([len(c.data) for c in mesh.cells])
     idx = numpy.nonzero(n_cells > i)[0][0]
@@ -187,8 +187,8 @@ def get_local_index(mesh, i):
 
 
 def labeler(i):
-    """
-    Return five-character long cell labels following:
+    """Return five-character long cell labels.
+    
     - 1st: from A to Z
     - 2nd and 3rd: from 1 to 9 then A to Z
     - 4th and 5th: from 00 to 99
@@ -207,6 +207,7 @@ def labeler(i):
     Note
     ----
     Currently support up to 3,185,000 different cells.
+
     """
     q1, r1 = divmod(i, len(numer))
     q2, r2 = divmod(q1, len(nomen))

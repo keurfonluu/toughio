@@ -18,9 +18,7 @@ _extension_to_filetype = {
 
 
 def _filetype_from_filename(filename):
-    """
-    Determine file type from its extension.
-    """
+    """Determine file type from its extension."""
     import os
 
     ext = os.path.splitext(filename)[1].lower()
@@ -28,8 +26,7 @@ def _filetype_from_filename(filename):
 
 
 def read(filename, file_format=None, **kwargs):
-    """
-    Read unstructured mesh from file.
+    """Read unstructured mesh from file.
 
     Parameters
     ----------
@@ -42,6 +39,7 @@ def read(filename, file_format=None, **kwargs):
     -------
     toughio.Mesh
         Imported mesh.
+
     """
     # Check file format
     assert isinstance(filename, str)
@@ -66,8 +64,7 @@ def read(filename, file_format=None, **kwargs):
 
 
 def write(filename, mesh, file_format=None, **kwargs):
-    """
-    Write unstructured mesh to file.
+    """Write unstructured mesh to file.
 
     Parameters
     ----------
@@ -96,6 +93,7 @@ def write(filename, mesh, file_format=None, **kwargs):
         Equation-of-state identifier to determine the actual number of
         primary variables to initialize. If `None`, TOUGH input `INCON`
         file will not be written.
+
     """
     # Check file format
     assert isinstance(filename, str)
@@ -138,8 +136,7 @@ def write_points_cells(
     file_format=None,
     **kwargs
 ):
-    """
-    Write unstructured mesh to file given points and cells data.
+    """Write unstructured mesh to file given points and cells data.
 
     Parameters
     ----------
@@ -162,6 +159,7 @@ def write_points_cells(
     ----------------
     kwargs : dict
         Refer to function ``write`` for additional information.
+
     """
     mesh = Mesh(
         points=points,

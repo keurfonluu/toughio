@@ -83,7 +83,7 @@ def export(argv=None):
     if args.output_file:
         filename = args.output_file
     else:
-        head, ext = os.path.splitext(args.infile)
+        head, _ = os.path.splitext(args.infile)
         filename = "{}{}".format(head, format_to_ext[args.file_format])
 
     # Write output file
@@ -138,7 +138,6 @@ def _get_parser():
 
 def _get_points(data):
     import numpy
-    from ..meshmaker import voxelize, triangulate
 
     # Make sure that point coordinates exist
     assert "X" in data.data.keys(), "Data 'X' not found."
