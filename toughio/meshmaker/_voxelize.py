@@ -8,8 +8,7 @@ __all__ = [
 
 
 def voxelize(points, material="dfalt"):
-    """
-    Generate a 1D hexahedral mesh from 1D point coordinates.
+    """Generate a 1D hexahedral mesh from 1D point coordinates.
 
     Parameters
     ----------
@@ -22,6 +21,7 @@ def voxelize(points, material="dfalt"):
     -------
     toughio.Mesh
         Output hexahedral mesh.
+
     """
     assert isinstance(points, (list, tuple, numpy.ndarray))
     assert numpy.ndim(points) == 1

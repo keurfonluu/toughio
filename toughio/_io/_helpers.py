@@ -26,9 +26,7 @@ _extension_to_filetype = {
 
 
 def _filetype_from_filename(filename):
-    """
-    Determine file type from its extension.
-    """
+    """Determine file type from its extension."""
     import os
 
     ext = os.path.splitext(filename)[1].lower()
@@ -38,8 +36,7 @@ def _filetype_from_filename(filename):
 
 
 def read_input(filename, file_format="json", **kwargs):
-    """
-    Read TOUGH input file.
+    """Read TOUGH input file.
 
     Parameters
     ----------
@@ -52,6 +49,7 @@ def read_input(filename, file_format="json", **kwargs):
     -------
     dict
         TOUGH input parameters.
+
     """
     assert isinstance(filename, str)
     assert file_format in {"tough", "json"}
@@ -69,8 +67,7 @@ def read_input(filename, file_format="json", **kwargs):
 
 
 def write_input(filename, parameters, file_format="tough", **kwargs):
-    """
-    Write TOUGH input file.
+    """Write TOUGH input file.
 
     Parameters
     ----------
@@ -80,6 +77,7 @@ def write_input(filename, parameters, file_format="tough", **kwargs):
         Parameters to export.
     file_format : str ('tough', 'json'), optional, default 'tough'
         Output file format.
+
     """
     assert isinstance(filename, str)
     assert isinstance(parameters, dict)
@@ -98,8 +96,7 @@ def write_input(filename, parameters, file_format="tough", **kwargs):
 
 
 def read_output(filename):
-    """
-    Read TOUGH output file for each time step.
+    """Read TOUGH output file for each time step.
 
     Parameters
     ----------
@@ -110,6 +107,7 @@ def read_output(filename):
     -------
     list of namedtuple
         List of namedtuple (time, labels, data) for each time step.
+
     """
     assert isinstance(filename, str)
 
@@ -159,8 +157,7 @@ def read_output(filename):
 
 
 def read_save(filename):
-    """
-    Read TOUGH SAVE file.
+    """Read TOUGH SAVE file.
 
     Parameters
     ----------
@@ -175,12 +172,11 @@ def read_save(filename):
     Note
     ----
     Does not support porosity, USERX and hysteresis values yet.
+
     """
 
     def str2float(s):
-        """
-        Convert primary variables string to float.
-        """
+        """Convert primary variables string to float."""
         s = s.lower()
         significand, exponent = s[:-4], s[-4:].replace("e", "")
         return float("{}e{}".format(significand, exponent))
