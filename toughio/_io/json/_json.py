@@ -22,6 +22,7 @@ def read(filename):
         TOUGH input parameters.
 
     """
+
     def to_int(data):
         """Return dict with integer keys instead of strings."""
         return {int(k): data[k] for k in sorted(data.keys())}

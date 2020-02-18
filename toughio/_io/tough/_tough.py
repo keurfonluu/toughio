@@ -126,6 +126,7 @@ def write_buffer(parameters):
 
 def _format_data(data):
     """Return a list of strings given input data and formats."""
+
     def to_str(x, fmt):
         x = "" if x is None or x == "" else x
         if isinstance(x, str):
