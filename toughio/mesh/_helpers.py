@@ -18,9 +18,7 @@ _extension_to_filetype = {
 
 
 def _filetype_from_filename(filename):
-    """
-    Determine file type from its extension.
-    """
+    """Determine file type from its extension."""
     import os
 
     ext = os.path.splitext(filename)[1].lower()

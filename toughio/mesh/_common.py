@@ -187,7 +187,8 @@ def get_local_index(mesh, i):
 
 
 def labeler(i):
-    """Return five-character long cell labels following:
+    """Return five-character long cell labels.
+    
     - 1st: from A to Z
     - 2nd and 3rd: from 1 to 9 then A to Z
     - 4th and 5th: from 00 to 99
