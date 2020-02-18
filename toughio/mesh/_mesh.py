@@ -608,7 +608,13 @@ class Mesh(object):
     @property
     def faces(self):
         """Return connectivity of faces of cell in mesh."""
-        return self.split(_faces(self))
+        out = _faces(self)
+        arr = numpy.full((self.n_cells, 6, 4), -1)
+        for i, x in enumerate(out):
+            arr[i, : len(x[0]), : x[0].shape[1]] = x[0]
+            if len(x) > 1:
+                arr[i, len(x[0]) : len(x[0]) + len(x[1]), : x[1].shape[1]] = x[1]
+        return self.split(arr)
 
     @property
     def face_normals(self):

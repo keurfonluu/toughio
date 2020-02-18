@@ -64,20 +64,11 @@ def _faces(mesh):
         },
     }
 
-    out = [
+    return [
         [c[v] for v in meshio_type_to_faces[cell.type].values()]
         for cell in mesh.cells
         for c in cell.data
     ]
-
-    # Convert to numpy.array
-    arr = numpy.full((mesh.n_cells, 6, 4), -1)
-    for i, x in enumerate(out):
-        arr[i, : len(x[0]), : x[0].shape[1]] = x[0]
-        if len(x) > 1:
-            arr[i, len(x[0]) : len(x[0]) + len(x[1]), : x[1].shape[1]] = x[1]
-
-    return arr
 
 
 def _face_normals(mesh):
