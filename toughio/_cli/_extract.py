@@ -128,7 +128,7 @@ def _read_table(f, points):
         if line.startswith("ELEM."):
             break
 
-    # Read headers once (ignore "ELEM."" and "INDEX")
+    # Read headers once (ignore "ELEM." and "INDEX")
     headers = line.split()[2:]
 
     # Look for next non-empty line
