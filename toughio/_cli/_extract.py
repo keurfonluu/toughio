@@ -44,7 +44,7 @@ def extract(argv=None):
         for line in f:
             line = line.upper().strip()
             if line.startswith("OUTPUT DATA AFTER"):
-                out.append(_read_table(f, nodes, args.version))
+                out.append(_read_table(f, nodes))
 
     # Write TOUGH3 element output file
     if not args.split or len(out) == 1:
@@ -90,16 +90,6 @@ def _get_parser():
         help="TOUGH3 element output file",
     )
 
-    # TOUGH output file version
-    parser.add_argument(
-        "--version",
-        "-v",
-        type=int,
-        choices=(2, 3),
-        default=2,
-        help="TOUGH output file version",
-    )
-
     # Split or not
     parser.add_argument(
         "--split",
@@ -112,37 +102,44 @@ def _get_parser():
     return parser
 
 
-def _read_table(f, points, version):
+def _read_table(f, points):
     def str2float(s):
-        """Convert primary variables string to float."""
-        s = s.lower()
-        significand, exponent = s[:-4], s[-4:].replace("e", "")
-        return float("{}e{}".format(significand, exponent))
+        """Convert variable string to float."""
+        try:
+            return float(s)
+        except ValueError:
+            # It's probably something like "0.0001-001"
+            significand, exponent = s[:-4], s[-4:]
+            return float("{}e{}".format(significand, exponent))
 
-    # Skip next 5 lines
-    n_skip = 5 if version == 2 else 4
-    for _ in range(n_skip):
-        line = next(f)
-
-    # Read time step
-    time = float(line.strip().split()[0])
-
-    # Skip next 4 lines
-    n_skip = 4 if version == 2 else 3
-    for _ in range(n_skip):
-        line = next(f)
-
-    # Read headers once (ignore ELEM and INDEX)
-    headers = line.strip().split()[2:]
-
-    # Skip next 2 lines
-    for _ in range(2):
+    # Look for "TOTAL TIME"
+    while True:
         line = next(f).strip()
+        if line.startswith("TOTAL TIME"):
+            break
+    
+    # Read time step in following line
+    line = next(f).strip()
+    time = float(line.split()[0])
+
+    # Look for "ELEM."
+    while True:
+        line = next(f).strip()
+        if line.startswith("ELEM."):
+            break
+
+    # Read headers once (ignore "ELEM."" and "INDEX")
+    headers = line.split()[2:]
+
+    # Look for next non-empty line
+    while True:
+        line = next(f).strip()
+        if line:
+            break
 
     # Loop until end of output block
     count = 0
     variables, labels = [], []
-    end_char = "@" if version == 2 else "0@"
     while True:
         if line[:5] in points.keys():
             count += 1
@@ -150,7 +147,7 @@ def _read_table(f, points, version):
             variables.append([str2float(x) for x in line[5:].split()[1:]])
 
         line = next(f).strip()
-        if line.startswith(end_char):
+        if line[1:].startswith("@@@@@"):
             break
     assert count == len(points), "Inconsistent number of elements."
 
