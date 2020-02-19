@@ -55,6 +55,7 @@ class BaseCapillarity(ABC):
             New figure size if `ax` is `None`.
         plt_kws : dict or None, optional, default None
             Additional keywords passed to :function:`matplotlib.pyplot.semilogy`.
+
         """
         assert isinstance(n, int) and n > 1
         assert ax is None or isinstance(ax, plt.Axes)

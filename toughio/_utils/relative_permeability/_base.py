@@ -56,7 +56,8 @@ class BaseRelativePermeability(ABC):
         figsize : array_like or None, optional, default None
             New figure size if `ax` is `None`.
         plt_kws : dict or None, optional, default None
-            Additional keywords passed to :function:`matplotlib.pyplot.semilogy`.
+            Additional keywords passed to :function:`matplotlib.pyplot.plot`.
+
         """
         assert isinstance(n, int) and n > 1
         assert ax is None or isinstance(ax, plt.Axes)

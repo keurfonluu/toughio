@@ -2,8 +2,6 @@ import os
 
 import numpy
 
-import toughio
-
 
 def relative_permeability(model, parameters, sl=None, atol=1.0e-8):
     import json
