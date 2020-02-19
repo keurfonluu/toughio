@@ -1,6 +1,5 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
 
-import matplotlib.pyplot as plt
 import numpy
 
 __all__ = [
@@ -57,6 +56,8 @@ class BaseCapillarity(ABC):
             Additional keywords passed to :function:`matplotlib.pyplot.semilogy`.
 
         """
+        import matplotlib.pyplot as plt
+
         assert isinstance(n, int) and n > 1
         assert ax is None or isinstance(ax, plt.Axes)
         assert figsize is None or isinstance(figsize, (tuple, list, numpy.ndarray))
