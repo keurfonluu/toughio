@@ -21,7 +21,10 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install .[full]
+        pip install netcdf4
+        pip install h5py
+        pip install scipy
+        pip install .[base]
     - name: Test with pytest
       run: |
         pip install pytest
