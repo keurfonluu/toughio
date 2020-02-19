@@ -176,10 +176,13 @@ def read_save(filename):
     """
 
     def str2float(s):
-        """Convert primary variables string to float."""
-        s = s.lower()
-        significand, exponent = s[:-4], s[-4:].replace("e", "")
-        return float("{}e{}".format(significand, exponent))
+        """Convert variable string to float."""
+        try:
+            return float(s)
+        except ValueError:
+            # It's probably something like "0.0001-001"
+            significand, exponent = s[:-4], s[-4:]
+            return float("{}e{}".format(significand, exponent))
 
     assert isinstance(filename, str)
 
