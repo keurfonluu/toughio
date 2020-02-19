@@ -117,7 +117,7 @@ def _read_table(f, points):
         line = next(f).strip()
         if line.startswith("TOTAL TIME"):
             break
-    
+
     # Read time step in following line
     line = next(f).strip()
     time = float(line.split()[0])

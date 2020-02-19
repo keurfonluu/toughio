@@ -26,9 +26,7 @@ def triangulate(points, material="dfalt"):
     try:
         from scipy.spatial import Delaunay
     except ImportError:
-        raise ImportError(
-            "Triangulation requires scipy >= 0.9 to be installed."
-        )
+        raise ImportError("Triangulation requires scipy >= 0.9 to be installed.")
 
     assert isinstance(points, (list, tuple, numpy.ndarray))
     assert numpy.ndim(points) == 2
