@@ -7,6 +7,7 @@ from .__about__ import (
     __website__,
 )
 from ._io import read_input, read_output, read_save, write_input
+from ._utils import capillarity
 from .mesh import Mesh
 from .mesh import read as read_mesh
 from .mesh import write as write_mesh
@@ -21,6 +22,7 @@ __all__ = [
     "read_save",
     "read_mesh",
     "write_mesh",
+    "capillarity",
     "_cli",
     "__version__",
     "__author__",
