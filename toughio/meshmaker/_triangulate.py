@@ -26,7 +26,7 @@ def triangulate(points, material="dfalt"):
     try:
         from scipy.spatial import Delaunay
     except ImportError:
-        raise ModuleNotFoundError(
+        raise ImportError(
             "Triangulation requires scipy >= 0.9 to be installed."
         )
 

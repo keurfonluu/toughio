@@ -270,7 +270,7 @@ class Mesh(object):
                 vtk_type_to_numnodes,
             )
         except ImportError:
-            raise ModuleNotFoundError(
+            raise ImportError(
                 "Converting to pyvista.UnstructuredGrid requires pyvista to be installed."
             )
 
