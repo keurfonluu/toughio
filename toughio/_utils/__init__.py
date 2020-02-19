@@ -1,5 +1,6 @@
-from . import capillarity
+from . import capillarity, relative_permeability
 
 __all__ = [
+    "relative_permeability",
     "capillarity",
 ]
