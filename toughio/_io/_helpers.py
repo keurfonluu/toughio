@@ -95,13 +95,15 @@ def write_input(filename, parameters, file_format="tough", **kwargs):
     interface.write(filename, parameters, *args, **_kwargs)
 
 
-def read_output(filename):
+def read_output(filename, file_format="tough"):
     """Read TOUGH output file for each time step.
 
     Parameters
     ----------
     filename : str
         Input file name.
+    file_format : str ('tough' or 'tecplot'), optional, default 'tough'
+        TOUGH output file format.
 
     Returns
     -------
@@ -110,48 +112,145 @@ def read_output(filename):
 
     """
     assert isinstance(filename, str)
+    assert file_format in {"tough", "tecplot"}
 
     with open(filename, "r") as f:
-        # Read header
-        line = f.readline().replace('"', "")
-        headers = [l.strip() for l in line.split(",")]
+        if file_format == "tough":
+            # Read header
+            line = f.readline().replace('"', "")
+            headers = [l.strip() for l in line.split(",")]
+            headers = headers[1:]
 
-        # Skip second line (unit)
-        line = f.readline()
+            # Skip second line (unit)
+            line = f.readline()
 
-        # Check third line (does it starts with TIME?)
-        i = f.tell()
-        line = f.readline()
-        f.seek(i)
-        single = not line.startswith('"TIME')
+            # Check third line (does it starts with TIME?)
+            i = f.tell()
+            line = f.readline()
+            f.seek(i)
+            single = not line.startswith('"TIME')
 
-        # Read data
-        if single:
-            times, labels, variables = [None], [[]], [[]]
-        else:
-            times, labels, variables = [], [], []
-        line = f.readline().replace('"', "").strip()
-        while line:
-            line = line.split(",")
-
-            # Time step
-            if line[0].startswith("TIME"):
-                line = line[0].split()
-                times.append(float(line[-1]))
-                variables.append([])
-                labels.append([])
-
-            # Output
+            # Read data
+            if single:
+                times, labels, variables = [None], [[]], [[]]
             else:
-                labels[-1].append(line[0].strip())
-                variables[-1].append([float(l.strip()) for l in line[1:]])
+                times, labels, variables = [], [], []
+            line = f.readline().replace('"', "").strip()
+            while line:
+                line = line.split(",")
 
-            line = f.readline().strip().replace('"', "")
+                # Time step
+                if line[0].startswith("TIME"):
+                    line = line[0].split()
+                    times.append(float(line[-1]))
+                    variables.append([])
+                    labels.append([])
+
+                # Output
+                else:
+                    labels[-1].append(line[0].strip())
+                    variables[-1].append([float(l.strip()) for l in line[1:]])
+
+                line = f.readline().strip().replace('"', "")
+
+        elif file_format == "tecplot":
+            from ..mesh.tecplot._tecplot import zone_key_to_type
+
+            zone_key_to_type.update({"T": str, "I": int, "J": int})
+
+            # Look for header (VARIABLES)
+            while True:
+                line = f.readline().strip()
+                if line.upper().startswith("VARIABLES"):
+                    break
+
+            # Read header (VARIABLES)
+            line = line.split("=")[1]
+            headers = [l.strip() for l in line.replace('"', "").split()]
+            headers = [header for header in headers if "(" not in header]
+
+            # Loop until end of file
+            times, labels, variables = [], [], []
+            line = f.readline().upper().strip()
+            while True:
+                # Read zone
+                if line.startswith("ZONE"):
+                    line = " ".join(line[5:].split())
+                    line = "=".join(l.strip() for l in line.split("="))
+
+                    zone = {}
+                    i = 0
+                    key, value, read_key = "", "", True
+                    is_title, is_end = False, False
+                    while True:
+                        char = line[i]
+
+                        if char == "=":
+                            key = key.strip()
+                            read_key = False
+                            is_title = key == "T"
+
+                        if is_title:
+                            # Look for first '"'
+                            i += 1
+                            while True:
+                                if line[i] == '"':
+                                    break
+                                else:
+                                    i += 1
+
+                            # Look for second '"'
+                            i += 1
+                            while True:
+                                value += line[i]
+                                if line[i] == '"':
+                                    value = value[:-1]
+                                    break
+                                else:
+                                    i += 1
+                            is_title, is_end = False, True
+                        else:
+                            if char != " ":
+                                if char != "=":
+                                    if read_key:
+                                        key += char
+                                    else:
+                                        value += char
+                            else:
+                                is_end = True
+
+                        if is_end:
+                            if key in zone_key_to_type.keys():
+                                zone[key] = zone_key_to_type[key](value)
+                            key, value, read_key = "", "", True
+                            is_end = False
+
+                        if i >= len(line) - 1:
+                            if key in zone_key_to_type.keys():
+                                zone[key] = zone_key_to_type[key](value)
+                            break
+                        else:
+                            i += 1
+
+                    zone["T"] = (
+                        float(zone["T"].split()[0]) if "T" in zone.keys() else None
+                    )
+                    assert "I" in zone.keys()
+
+                # Read data
+                data = numpy.genfromtxt(f, max_rows=zone["I"])
+
+                # Output
+                times.append(zone["T"])
+                labels.append(None)
+                variables.append(data)
+
+                line = f.readline().upper().strip()
+                if not line:
+                    break
 
     return [
-        Output(
-            time, label, {k: v for k, v in zip(headers[1:], numpy.transpose(variable))}
-        )
+        Output(time, label, {k: v for k, v in zip(headers, numpy.transpose(variable))})
         for time, label, variable in zip(times, labels, variables)
     ]
 
