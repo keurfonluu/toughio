@@ -54,7 +54,7 @@ mesh = toughio.read_mesh(
 mesh.to_tough()             # Write MESH file
 ```
 
-Parameters of a TOUGH simulation can be defined as a dictionary with specific keywords following the JSON standard, following
+Parameters of a TOUGH simulation can be defined as a dictionary with specific keywords following the JSON standard, for instance
 
 ```python
 parameters = {
@@ -89,7 +89,10 @@ toughio.write_input("INFILE", parameters)
 TOUGH simulation output can also be imported into Python as a list of *namedtuple* (``time``, ``labels``, ``data``)
 
 ```python
-output = toughio.read_output(filename)  # Assume TOUGH3 CSV output file
+output = toughio.read_output(
+    filename,
+    file_format="tough",    # Optional, "tough" or "tecplot"
+)
 ```
 
 **``toughio``** is mainly intended to be used as a Python scripting library for TOUGH. Nevertheless, several utility command line scripts are available for users who are not familiar with Python. From a console or terminal, the user can execute the following scripts:
