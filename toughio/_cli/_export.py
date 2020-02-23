@@ -21,11 +21,25 @@ def export(argv=None):
     parser = _get_parser()
     args = parser.parse_args(argv)
 
+    # Display warning if mesh is provided but input file format is 'tecplot'
+    # Continue as if mesh was not provided
+    with_mesh = bool(args.mesh)
+    if args.input_format == "tecplot":
+        with_mesh = False
+        msg = (
+            "Cannot use mesh file with Tecplot TOUGH output, inferring dimensionality"
+            if args.mesh
+            else "Inferring dimensionality"
+        )
+    else:
+        with_mesh = bool(args.mesh)
+        msg = "Mesh file not specified, inferring dimensionality"
+
     # Check that TOUGH output and mesh file exist
     assert os.path.isfile(args.infile), "TOUGH output file '{}' not found.".format(
         args.infile
     )
-    if args.mesh:
+    if with_mesh:
         assert os.path.isfile(args.mesh), "Pickled mesh file '{}' not found.".format(
             args.mesh
         )
@@ -33,7 +47,7 @@ def export(argv=None):
     # Read output file
     print("Reading file '{}' ...".format(args.infile), end="")
     sys.stdout.flush()
-    out = read_output(args.infile)
+    out = read_output(args.infile, args.input_format)
     if args.time_step is not None:
         assert -len(out) <= args.time_step < len(out), "Inconsistent time step value."
         out = out[args.time_step]
@@ -42,8 +56,8 @@ def export(argv=None):
     print(" Done!")
 
     # Triangulate or voxelize if no mesh
-    if not args.mesh:
-        print("Mesh file not specified, inferring dimensionality ...", end="")
+    if not with_mesh:
+        print("{} ...".format(msg), end="")
         sys.stdout.flush()
         points = _get_points(out)
         ndim = 1 if points.ndim == 1 else points.shape[1]
@@ -108,6 +122,16 @@ def _get_parser():
         "infile", type=str, help="TOUGH output file",
     )
 
+    # Input file format
+    parser.add_argument(
+        "--input-format",
+        "-i",
+        type=str,
+        choices=("tough", "tecplot"),
+        default="tough",
+        help="TOUGH output file format",
+    )
+
     # Mesh file
     parser.add_argument(
         "--mesh", "-m", type=str, default=None, help="Pickled toughio.Mesh",
@@ -139,14 +163,31 @@ def _get_parser():
 def _get_points(data):
     import numpy
 
-    # Make sure that point coordinates exist
-    assert "X" in data.data.keys(), "Data 'X' not found."
-    assert "Y" in data.data.keys(), "Data 'Y' not found."
-    assert "Z" in data.data.keys(), "Data 'Z' not found."
+    # Number of data points
+    n_points = len(next(iter(data.data.values())))
 
-    X = numpy.array(data.data["X"])
-    Y = numpy.array(data.data["Y"])
-    Z = numpy.array(data.data["Z"])
+    # Make sure that point coordinates exist
+    count = 0
+
+    if "X" in data.data.keys():
+        X = numpy.array(data.data["X"])
+        count += 1
+    else:
+        X = numpy.zeros(n_points)
+
+    if "Y" in data.data.keys():
+        Y = numpy.array(data.data["Y"])
+        count += 1
+    else:
+        Y = numpy.zeros(n_points)
+
+    if "Z" in data.data.keys():
+        Z = numpy.array(data.data["Z"])
+        count += 1
+    else:
+        Z = numpy.zeros(n_points)
+
+    assert count > 0, "No coordinate array ('X', 'Y', 'Z') found."
 
     # Assert dimension of the problem
     nx = len(numpy.unique(X))
