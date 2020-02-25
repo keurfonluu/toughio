@@ -23,6 +23,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install netcdf4
         pip install h5py
+        pip install lxml
         pip install scipy
         pip install .[base]
     - name: Test with pytest
