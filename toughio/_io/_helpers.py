@@ -95,7 +95,7 @@ def write_input(filename, parameters, file_format="tough", **kwargs):
     interface.write(filename, parameters, *args, **_kwargs)
 
 
-def read_output(filename, file_format="tough"):
+def read_output(filename, file_format="tough", labels_order=None):
     """Read TOUGH output file for each time step.
 
     Parameters
@@ -104,6 +104,8 @@ def read_output(filename, file_format="tough"):
         Input file name.
     file_format : str ('tough' or 'tecplot'), optional, default 'tough'
         TOUGH output file format.
+    labels_order : list of array_like
+        List of labels as returned by :property:`toughio.Mesh.labels`.
 
     Returns
     -------
@@ -113,6 +115,7 @@ def read_output(filename, file_format="tough"):
     """
     assert isinstance(filename, str)
     assert file_format in {"tough", "tecplot"}
+    assert labels_order is None or isinstance(labels_order, list)
 
     with open(filename, "r") as f:
         if file_format == "tough":
@@ -249,13 +252,22 @@ def read_output(filename, file_format="tough"):
                 if not line:
                     break
 
-    return [
-        Output(time, label, {k: v for k, v in zip(headers, numpy.transpose(variable))})
+    outputs = [
+        Output(
+            time,
+            numpy.array(label),
+            {k: v for k, v in zip(headers, numpy.transpose(variable))},
+        )
         for time, label, variable in zip(times, labels, variables)
     ]
+    return (
+        [_reorder_labels(out, labels_order) for out in outputs]
+        if labels_order is not None
+        else outputs
+    )
 
 
-def read_save(filename):
+def read_save(filename, labels_order=None):
     """Read TOUGH SAVE file.
 
     Parameters
@@ -267,6 +279,8 @@ def read_save(filename):
     -------
     list of namedtuple
         SAVE data as namedtuple (labels, data).
+    labels_order : list of array_like
+        List of labels as returned by :property:`toughio.Mesh.labels`.
 
     Note
     ----
@@ -284,6 +298,7 @@ def read_save(filename):
             return float("{}e{}".format(significand, exponent))
 
     assert isinstance(filename, str)
+    assert labels_order is None or isinstance(labels_order, list)
 
     with open(filename, "r") as f:
         # Check first line
@@ -306,7 +321,21 @@ def read_save(filename):
             if line.startswith("+++"):
                 break
 
-    return Save(
-        labels,
+    output = Save(
+        numpy.array(labels),
         {"X{}".format(i + 1): x for i, x in enumerate(numpy.transpose(variables))},
     )
+    return _reorder_labels(output, labels_order) if labels_order is not None else output
+
+
+def _reorder_labels(data, labels):
+    """Reorder output or save cell data according to input labels."""
+    mapper = {k: v for v, k in enumerate(data.labels)}
+    idx = [mapper[label] for label in numpy.concatenate(labels)]
+    data.labels[:] = data.labels[idx]
+
+    n_labels = numpy.cumsum([len(label) for label in labels[:-1]])
+    for k, v in data.data.items():
+        data.data[k] = numpy.split(v[idx], n_labels)
+
+    return data

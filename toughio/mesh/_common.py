@@ -129,7 +129,7 @@ def get_old_meshio_cells(cells, cell_data=None):
 
     Parameters
     ----------
-    cells : namedtuple (type, data)
+    cells : list of namedtuple (type, data)
         New-style cells.
     cell_data : dict or None, optional, default None
         New-style cell data.
@@ -167,6 +167,39 @@ def get_old_meshio_cells(cells, cell_data=None):
         return old_cells, old_cell_data
     else:
         return old_cells
+
+
+def get_new_meshio_cells(cells, cell_data=None):
+    """Return new-style cells and cell_data (meshio >= 4.0.0).
+
+    Parameters
+    ----------
+    cells : dict
+        Old-style cells.
+    cell_data : dict or None, optional, default None
+        Old-style cell data.
+
+    Returns
+    -------
+    list of namedtuple (type, data)
+        New-style cells.
+    dict
+        New-style cell data (only if `cell_data` is not None).
+
+    """
+    from ._mesh import Cells
+
+    new_cells = [Cells(k, v) for k, v in cells.items()]
+
+    if cell_data is not None:
+        labels = numpy.unique([kk for k, v in cell_data.items() for kk in v.keys()])
+        new_cell_data = {k: [] for k in labels}
+        for k in new_cell_data.keys():
+            for kk in cells.keys():
+                new_cell_data[k].append(cell_data[kk][k])
+        return new_cells, new_cell_data
+    else:
+        return new_cells
 
 
 def get_local_index(mesh, i):

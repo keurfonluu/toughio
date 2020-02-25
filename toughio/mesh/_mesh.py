@@ -7,6 +7,7 @@ import numpy
 from ._common import (
     get_local_index,
     get_meshio_version,
+    get_new_meshio_cells,
     get_old_meshio_cells,
     meshio_data,
 )
@@ -337,7 +338,7 @@ class Mesh(object):
 
         """
         from .. import read_output
-        from .._io._helpers import Output, Save
+        from .._io._helpers import Output, Save, _reorder_labels
 
         assert isinstance(file_or_output, (str, list, tuple, Output, Save))
         assert isinstance(time_step, int)
@@ -351,16 +352,9 @@ class Mesh(object):
             assert -len(out) <= time_step < len(out)
             out = out[time_step]
 
-        if isinstance(out, Output):
-            _, labels, data = out
-        else:
-            labels, data = out
-        assert len(labels) == self.n_cells
-
-        mapper = {k: v for v, k in enumerate(labels)}
-        idx = [mapper[label] for label in numpy.concatenate(self.labels)]
-        for k, v in data.items():
-            self.cell_data[k] = self.split(v[idx])
+        assert len(out.labels) == self.n_cells
+        out = _reorder_labels(out, self.labels)
+        self.cell_data.update(out.data)
 
     def write(self, filename, file_format=None, **kwargs):
         """Write mesh to file.
@@ -668,15 +662,10 @@ def from_meshio(mesh):
     if mesh.cell_data:
         version = get_meshio_version()
         if version[0] >= 4:
+            cells = mesh.cells
             cell_data = mesh.cell_data
         else:
-            labels = numpy.unique(
-                [kk for k, v in mesh.cell_data.items() for kk in v.keys()]
-            )
-            cell_data = {k: [] for k in labels}
-            for k in cell_data.keys():
-                for kk in mesh.cells.keys():
-                    cell_data[k].append(mesh.cell_data[kk][k])
+            cells, cell_data = get_new_meshio_cells(mesh.cells, mesh.cell_data)
 
         for k in cell_data.keys():
             if k in meshio_data:
@@ -687,7 +676,7 @@ def from_meshio(mesh):
 
     out = Mesh(
         points=mesh.points,
-        cells=mesh.cells,
+        cells=cells,
         point_data=mesh.point_data,
         cell_data=cell_data,
         field_data=mesh.field_data,
