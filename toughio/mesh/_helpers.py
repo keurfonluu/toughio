@@ -230,7 +230,7 @@ def write_time_series(
     filename, points, cells, point_data=None, cell_data=None, time_steps=None,
 ):
     """Write time series given points and cells data.
-    
+
     Parameters
     ----------
     filename : str
