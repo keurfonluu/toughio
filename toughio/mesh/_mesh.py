@@ -8,6 +8,7 @@ from ._common import (
     get_local_index,
     get_meshio_version,
     get_old_meshio_cells,
+    get_new_meshio_cells,
     meshio_data,
 )
 from ._properties import (
@@ -661,15 +662,10 @@ def from_meshio(mesh):
     if mesh.cell_data:
         version = get_meshio_version()
         if version[0] >= 4:
+            cells = mesh.cells
             cell_data = mesh.cell_data
         else:
-            labels = numpy.unique(
-                [kk for k, v in mesh.cell_data.items() for kk in v.keys()]
-            )
-            cell_data = {k: [] for k in labels}
-            for k in cell_data.keys():
-                for kk in mesh.cells.keys():
-                    cell_data[k].append(mesh.cell_data[kk][k])
+            cells, cell_data = get_new_meshio_cells(mesh.cells, mesh.cell_data)
 
         for k in cell_data.keys():
             if k in meshio_data:
@@ -680,7 +676,7 @@ def from_meshio(mesh):
 
     out = Mesh(
         points=mesh.points,
-        cells=mesh.cells,
+        cells=cells,
         point_data=mesh.point_data,
         cell_data=cell_data,
         field_data=mesh.field_data,
