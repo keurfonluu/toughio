@@ -119,6 +119,7 @@ def write_buffer(parameters):
         _write_goft(parameters) if parameters["generator_history"] is not None else []
     )
     out += _write_gener(parameters) if parameters["generators"] else []
+    out += _write_outpu(parameters) if parameters["output"] else []
     out += _write_nover() if parameters["nover"] else []
     out += _write_endfi() if parameters["endfi"] else _write_endcy()
     return out
@@ -658,6 +659,40 @@ def _write_gener(parameters):
             out += _write_multi_record(
                 _format_data([(i, "{:>14.7e}") for i in specific_enthalpy]), ncol=4
             )
+    return out
+
+
+@check_parameters(dtypes["OUTPU"], keys="output")
+@block("OUTPU")
+def _write_outpu(parameters):
+    """
+    TOUGH(3) input OUTPU block data (optional).
+    
+    Specifies variables/parameters for printout.
+    """
+    from .._common import output
+
+    data = deepcopy(output)
+    data.update(parameters["output"])
+
+    # Format
+    out = []
+    out += "{:20}\n".format(data["format"].upper()) if data["format"] else "\n"
+
+    # Variables
+    if data["variables"]:
+        out += "{:15}\n".format(str(len(data["variables"])))
+
+        for k, v in data["variables"].items():
+            fmt = "{:20}"
+            if v:
+                v = v if isinstance(v, (list, tuple, numpy.ndarray)) else [v]
+                assert 0 < len(v) < 3
+                fmt += "{:5}" * len(v)
+                out += "{}\n".format(fmt.format(k.upper(), *v))
+            else:
+                out += "{}\n".format(fmt.format(k.upper()))
+
     return out
 
 
