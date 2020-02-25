@@ -52,7 +52,9 @@ def export(argv=None):
     output = read_output(args.infile, args.input_format)
     if args.file_format != "xdmf":
         if args.time_step is not None:
-            assert -len(output) <= args.time_step < len(output), "Inconsistent time step value."
+            assert (
+                -len(output) <= args.time_step < len(output)
+            ), "Inconsistent time step value."
             output = output[args.time_step]
         else:
             output = output[-1]
@@ -98,7 +100,7 @@ def export(argv=None):
             mesh = read_mesh(args.mesh, file_format="pickle")
         except:
             raise ValueError("Cannot unpickle mesh file {}.".format(args.mesh))
-        
+
         if args.file_format != "xdmf":
             mesh.read_output(output)
         else:
@@ -121,7 +123,10 @@ def export(argv=None):
         mesh.write(filename, file_format=args.file_format)
 
     else:
-        data = [{k: v for k, v in out.data.items() if k not in {"X", "Y", "Z"}} for out in output]
+        data = [
+            {k: v for k, v in out.data.items() if k not in {"X", "Y", "Z"}}
+            for out in output
+        ]
         time_steps = [out.time for out in output]
 
         if not with_mesh:
@@ -140,7 +145,7 @@ def export(argv=None):
                 cell_data=data,
                 time_steps=time_steps,
             )
-    
+
     print(" Done!")
 
 

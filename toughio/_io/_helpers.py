@@ -253,7 +253,11 @@ def read_output(filename, file_format="tough", labels_order=None):
                     break
 
     outputs = [
-        Output(time, numpy.array(label), {k: v for k, v in zip(headers, numpy.transpose(variable))})
+        Output(
+            time,
+            numpy.array(label),
+            {k: v for k, v in zip(headers, numpy.transpose(variable))},
+        )
         for time, label, variable in zip(times, labels, variables)
     ]
     return (
@@ -321,11 +325,7 @@ def read_save(filename, labels_order=None):
         numpy.array(labels),
         {"X{}".format(i + 1): x for i, x in enumerate(numpy.transpose(variables))},
     )
-    return (
-        _reorder_labels(output, labels_order)
-        if labels_order is not None
-        else output
-    )
+    return _reorder_labels(output, labels_order) if labels_order is not None else output
 
 
 def _reorder_labels(data, labels):
