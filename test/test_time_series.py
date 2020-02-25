@@ -2,7 +2,6 @@ import os
 import tempfile
 from copy import deepcopy
 
-import meshio
 import numpy
 
 import helpers
