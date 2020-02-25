@@ -1,6 +1,5 @@
-import numpy
-
 import meshio
+import numpy
 
 from . import avsucd, flac3d, pickle, tecplot, tough
 from ._mesh import Mesh, from_meshio
@@ -228,12 +227,7 @@ def read_time_series(filename):
 
 
 def write_time_series(
-    filename,
-    points,
-    cells,
-    point_data=None,
-    cell_data=None,
-    time_steps=None,
+    filename, points, cells, point_data=None, cell_data=None, time_steps=None,
 ):
     """Write time series given points and cells data.
     
@@ -261,7 +255,9 @@ def write_time_series(
         raise ValueError()
     if cell_data is not None and not isinstance(cell_data, (list, tuple)):
         raise ValueError()
-    if time_steps is not None and not isinstance(time_steps, (list, tuple, numpy.ndarray)):
+    if time_steps is not None and not isinstance(
+        time_steps, (list, tuple, numpy.ndarray)
+    ):
         raise ValueError()
 
     if not (point_data or cell_data):
@@ -275,7 +271,7 @@ def write_time_series(
         raise ValueError("Inconsistent number of cell data.")
     if time_steps is not None and len(time_steps) != nt:
         raise ValueError("Inconsistent number of time steps.")
-    
+
     point_data = point_data if point_data else [{}] * nt
     cell_data = cell_data if cell_data else [{}] * nt
     time_steps = time_steps if time_steps is not None else list(range(nt))

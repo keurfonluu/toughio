@@ -7,8 +7,8 @@ import numpy
 from ._common import (
     get_local_index,
     get_meshio_version,
-    get_old_meshio_cells,
     get_new_meshio_cells,
+    get_old_meshio_cells,
     meshio_data,
 )
 from ._properties import (
