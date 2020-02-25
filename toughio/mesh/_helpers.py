@@ -175,6 +175,58 @@ def write_points_cells(
     write(filename, mesh, file_format=file_format, **kwargs)
 
 
+def read_time_series(filename):
+    """Read time series from XDMF file.
+
+    Parameters
+    ----------
+    filename : str
+        Input file name.
+
+    Returns
+    -------
+    list of namedtuple (type, data)
+        Grid cell data.
+    list of dict
+        Data associated to grid points for each time step.
+    list of dict
+        Data associated to grid cells for each time step.
+    array_like
+        Time step values.
+
+    """
+    from ._common import get_meshio_version, get_new_meshio_cells
+
+    if not isinstance(filename, str):
+        raise ValueError()
+
+    point_data, cell_data, time_steps = [], [], []
+    if get_meshio_version() < (3,):
+        reader = meshio.XdmfTimeSeriesReader(filename)
+        points, cells = reader.read_points_cells()
+
+        for k in range(reader.num_steps):
+            t, pdata, cdata = reader.read_data(k)
+
+            _, cdata = get_new_meshio_cells(cells, cdata)
+            point_data.append(pdata)
+            cell_data.append(cdata)
+            time_steps.append(t)
+
+        cells = get_new_meshio_cells(cells)
+    else:
+        with meshio.xdmf.TimeSeriesReader(filename) as reader:
+            points, cells = reader.read_points_cells()
+
+            for k in range(reader.num_steps):
+                t, pdata, cdata = reader.read_data(k)
+                point_data.append(pdata)
+                cell_data.append(cdata)
+                time_steps.append(t)
+
+    return points, cells, point_data, cell_data, time_steps
+
+
 def write_time_series(
     filename,
     points,
