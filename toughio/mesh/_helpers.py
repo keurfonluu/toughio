@@ -1,3 +1,5 @@
+import numpy
+
 import meshio
 
 from . import avsucd, flac3d, pickle, tecplot, tough
@@ -7,6 +9,7 @@ __all__ = [
     "read",
     "write",
     "write_points_cells",
+    "write_time_series",
 ]
 
 
@@ -169,3 +172,78 @@ def write_points_cells(
         field_data=field_data,
     )
     write(filename, mesh, file_format=file_format, **kwargs)
+
+
+def write_time_series(
+    filename,
+    points,
+    cells,
+    point_data=None,
+    cell_data=None,
+    time_steps=None,
+):
+    """Write time series given points and cells data.
+    
+    Parameters
+    ----------
+    filename : str
+        Output file name.
+    points : ndarray
+        Grid points array.
+    cells : dict
+        Grid cell data.
+    point_data : list of dict or None, optional, default None
+        Data associated to grid points for each time step.
+    cell_data : list of dict or None, optional, default None
+        Data associated to grid cells for each time step.
+    time_steps : list of scalar or None, optional, default None
+        Time step values.
+
+    """
+    import meshio
+    from ._common import get_meshio_version, get_old_meshio_cells
+
+    if point_data is not None and not isinstance(point_data, (list, tuple)):
+        raise ValueError()
+    if cell_data is not None and not isinstance(cell_data, (list, tuple)):
+        raise ValueError()
+    if time_steps is not None and not isinstance(time_steps, (list, tuple)):
+        raise ValueError()
+
+    if not (point_data or cell_data):
+        raise ValueError("Provide at least point_data or cell_data.")
+    else:
+        nt = len(point_data) if point_data else len(cell_data)
+
+    if point_data and len(point_data) != nt:
+        raise ValueError("Inconsistent number of point data.")
+    if cell_data and len(cell_data) != nt:
+        raise ValueError("Inconsistent number of cell data.")
+    if time_steps and len(time_steps) != nt:
+        raise ValueError("Inconsistent number of time steps.")
+    
+    point_data = point_data if point_data else [{}] * nt
+    cell_data = cell_data if cell_data else [{}] * nt
+    time_steps = time_steps if time_steps else list(range(nt))
+
+    # Sort data with time steps
+    idx = numpy.argsort(time_steps)
+    point_data = [point_data[i] for i in idx]
+    cell_data = [cell_data[i] for i in idx]
+    time_steps = [time_steps[i] for i in idx]
+
+    # Write XDMF
+    def write_data(writer, points, cells, point_data, cell_data, time_steps):
+        writer.write_points_cells(points, cells)
+        for tstep, pdata, cdata in zip(time_steps, point_data, cell_data):
+            writer.write_data(tstep, point_data=pdata, cell_data=cdata)
+
+    if get_meshio_version() < (3,):
+        writer = meshio.XdmfTimeSeriesWriter(filename)
+        tmp = [get_old_meshio_cells(cells, cdata) for cdata in cell_data]
+        cells = tmp[0][0]
+        cell_data = [cell[1] for cell in tmp]
+        write_data(writer, points, cells, point_data, cell_data, time_steps)
+    else:
+        with meshio.xdmf.TimeSeriesWriter(filename) as writer:
+            write_data(writer, points, cells, point_data, cell_data, time_steps)
