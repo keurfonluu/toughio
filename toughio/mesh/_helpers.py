@@ -200,7 +200,6 @@ def write_time_series(
         Time step values.
 
     """
-    import meshio
     from ._common import get_meshio_version, get_old_meshio_cells
 
     if point_data is not None and not isinstance(point_data, (list, tuple)):
