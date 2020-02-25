@@ -1,13 +1,16 @@
 import os
+import sys
 import tempfile
 from copy import deepcopy
 
 import numpy
+import pytest
 
 import helpers
 import toughio
 
 
+@pytest.mark.skipif(sys.version_info < (3,), reason="Order of keys in dictionary")
 def test_time_series():
     # Import hybrid mesh
     mesh = deepcopy(helpers.hybrid_mesh)
