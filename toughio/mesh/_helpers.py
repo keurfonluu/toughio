@@ -9,6 +9,7 @@ __all__ = [
     "read",
     "write",
     "write_points_cells",
+    "read_time_series",
     "write_time_series",
 ]
 
@@ -206,7 +207,7 @@ def write_time_series(
         raise ValueError()
     if cell_data is not None and not isinstance(cell_data, (list, tuple)):
         raise ValueError()
-    if time_steps is not None and not isinstance(time_steps, (list, tuple)):
+    if time_steps is not None and not isinstance(time_steps, (list, tuple, numpy.ndarray)):
         raise ValueError()
 
     if not (point_data or cell_data):
@@ -218,12 +219,12 @@ def write_time_series(
         raise ValueError("Inconsistent number of point data.")
     if cell_data and len(cell_data) != nt:
         raise ValueError("Inconsistent number of cell data.")
-    if time_steps and len(time_steps) != nt:
+    if time_steps is not None and len(time_steps) != nt:
         raise ValueError("Inconsistent number of time steps.")
     
     point_data = point_data if point_data else [{}] * nt
     cell_data = cell_data if cell_data else [{}] * nt
-    time_steps = time_steps if time_steps else list(range(nt))
+    time_steps = time_steps if time_steps is not None else list(range(nt))
 
     # Sort data with time steps
     idx = numpy.argsort(time_steps)
