@@ -9,13 +9,15 @@ format_to_ext = {
     "tecplot": ".dat",
     "vtk": ".vtk",
     "vtu": ".vtu",
+    "xdmf": ".xdmf",
 }
 
 
 def export(argv=None):
     import os
     import sys
-    from .. import read_mesh, read_output
+    from .. import read_mesh, read_output, write_time_series
+    from .._io._helpers import _reorder_labels
     from ..meshmaker import voxelize, triangulate
 
     parser = _get_parser()
@@ -47,19 +49,20 @@ def export(argv=None):
     # Read output file
     print("Reading file '{}' ...".format(args.infile), end="")
     sys.stdout.flush()
-    out = read_output(args.infile, args.input_format)
-    if args.time_step is not None:
-        assert -len(out) <= args.time_step < len(out), "Inconsistent time step value."
-        out = out[args.time_step]
-    else:
-        out = out[-1]
+    output = read_output(args.infile, args.input_format)
+    if args.file_format != "xdmf":
+        if args.time_step is not None:
+            assert -len(output) <= args.time_step < len(output), "Inconsistent time step value."
+            output = output[args.time_step]
+        else:
+            output = output[-1]
     print(" Done!")
 
     # Triangulate or voxelize if no mesh
     if not with_mesh:
         print("{} ...".format(msg), end="")
         sys.stdout.flush()
-        points = _get_points(out)
+        points = _get_points(output if args.file_format != "xdmf" else output[0])
         ndim = 1 if points.ndim == 1 else points.shape[1]
         print(" Done!")
 
@@ -70,27 +73,36 @@ def export(argv=None):
             sys.stdout.flush()
 
             mesh = triangulate(points)
-            for label, data in out.data.items():
-                if label not in {"X", "Y", "Z"}:
-                    mesh.add_point_data(label, data)
+
+            if args.file_format != "xdmf":
+                for label, data in output.data.items():
+                    if label not in {"X", "Y", "Z"}:
+                        mesh.add_point_data(label, data)
 
         else:
             print("Mesh is 1D, voxelizing points ...", end="")
             sys.stdout.flush()
 
             mesh = voxelize(points)
-            for label, data in out.data.items():
-                if label not in {"X", "Y", "Z"}:
-                    mesh.add_cell_data(label, data)
+
+            if args.file_format != "xdmf":
+                for label, data in output.data.items():
+                    if label not in {"X", "Y", "Z"}:
+                        mesh.add_cell_data(label, data)
 
     else:
         print("Reading mesh file '{}' ...".format(args.mesh), end="")
         sys.stdout.flush()
+
         try:
             mesh = read_mesh(args.mesh, file_format="pickle")
         except:
             raise ValueError("Cannot unpickle mesh file {}.".format(args.mesh))
-        mesh.read_output(out)
+        
+        if args.file_format != "xdmf":
+            mesh.read_output(output)
+        else:
+            output = [_reorder_labels(data, mesh.labels) for data in output]
     print(" Done!")
 
     # Output file name
@@ -103,8 +115,32 @@ def export(argv=None):
     # Write output file
     print("Writing output file '{}' ...".format(filename), end="")
     sys.stdout.flush()
-    mesh.cell_data.pop("material")
-    mesh.write(filename, file_format=args.file_format)
+
+    if args.file_format != "xdmf":
+        mesh.cell_data.pop("material")
+        mesh.write(filename, file_format=args.file_format)
+
+    else:
+        data = [{k: v for k, v in out.data.items() if k not in {"X", "Y", "Z"}} for out in output]
+        time_steps = [out.time for out in output]
+
+        if not with_mesh:
+            write_time_series(
+                filename,
+                mesh.points,
+                mesh.cells,
+                point_data=data,
+                time_steps=time_steps,
+            )
+        else:
+            write_time_series(
+                filename,
+                mesh.points,
+                mesh.cells,
+                cell_data=data,
+                time_steps=time_steps,
+            )
+    
     print(" Done!")
 
 
@@ -152,7 +188,7 @@ def _get_parser():
         "--file-format",
         "-f",
         type=str,
-        choices=("tecplot", "vtk", "vtu"),
+        choices=("tecplot", "vtk", "vtu", "xdmf"),
         default="vtk",
         help="Exported file format",
     )
@@ -160,29 +196,29 @@ def _get_parser():
     return parser
 
 
-def _get_points(data):
+def _get_points(output):
     import numpy
 
     # Number of data points
-    n_points = len(next(iter(data.data.values())))
+    n_points = len(next(iter(output.data.values())))
 
     # Make sure that point coordinates exist
     count = 0
 
-    if "X" in data.data.keys():
-        X = numpy.array(data.data["X"])
+    if "X" in output.data.keys():
+        X = numpy.array(output.data["X"])
         count += 1
     else:
         X = numpy.zeros(n_points)
 
-    if "Y" in data.data.keys():
-        Y = numpy.array(data.data["Y"])
+    if "Y" in output.data.keys():
+        Y = numpy.array(output.data["Y"])
         count += 1
     else:
         Y = numpy.zeros(n_points)
 
-    if "Z" in data.data.keys():
-        Z = numpy.array(data.data["Z"])
+    if "Z" in output.data.keys():
+        Z = numpy.array(output.data["Z"])
         count += 1
     else:
         Z = numpy.zeros(n_points)
