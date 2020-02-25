@@ -337,7 +337,7 @@ class Mesh(object):
 
         """
         from .. import read_output
-        from .._io._helpers import Output, Save
+        from .._io._helpers import Output, Save, _reorder_labels
 
         assert isinstance(file_or_output, (str, list, tuple, Output, Save))
         assert isinstance(time_step, int)
@@ -351,16 +351,9 @@ class Mesh(object):
             assert -len(out) <= time_step < len(out)
             out = out[time_step]
 
-        if isinstance(out, Output):
-            _, labels, data = out
-        else:
-            labels, data = out
-        assert len(labels) == self.n_cells
-
-        mapper = {k: v for v, k in enumerate(labels)}
-        idx = [mapper[label] for label in numpy.concatenate(self.labels)]
-        for k, v in data.items():
-            self.cell_data[k] = self.split(v[idx])
+        assert len(out.labels) == self.n_cells
+        out = _reorder_labels(out, self.labels)
+        self.cell_data.update(out.data)
 
     def write(self, filename, file_format=None, **kwargs):
         """Write mesh to file.
