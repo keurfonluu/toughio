@@ -243,18 +243,20 @@ def write_time_series(
         Output file name.
     points : ndarray
         Grid points array.
-    cells : dict
+    cells : list of namedtuple (type, data)
         Grid cell data.
     point_data : list of dict or None, optional, default None
         Data associated to grid points for each time step.
     cell_data : list of dict or None, optional, default None
         Data associated to grid cells for each time step.
-    time_steps : list of scalar or None, optional, default None
+    time_steps : array_like, optional, default None
         Time step values.
 
     """
     from ._common import get_meshio_version, get_old_meshio_cells
 
+    if not isinstance(filename, str):
+        raise ValueError()
     if point_data is not None and not isinstance(point_data, (list, tuple)):
         raise ValueError()
     if cell_data is not None and not isinstance(cell_data, (list, tuple)):
