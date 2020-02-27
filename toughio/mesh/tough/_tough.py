@@ -76,7 +76,7 @@ def write(filename, mesh, nodal_distance, material_name, material_end, incon_eos
     )
     points = mesh.points
     connections = numpy.concatenate(mesh.connections)
-    gravity = numpy.array([0.0, 0.0, 1.0])
+    gravity = numpy.array([0.0, 0.0, -1.0])
 
     # Define parameters related to faces
     faces = numpy.concatenate(mesh.faces)
