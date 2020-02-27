@@ -113,7 +113,9 @@ def write_buffer(parameters):
         if parameters["version"] == 3:
             out += _write_momop(parameters)
         else:
-            logging.warning("Defining 'more_options' is only available for 'version == 3'. Skipping.")
+            logging.warning(
+                "Defining 'more_options' is only available for 'version == 3'. Skipping."
+            )
     out += _write_times(parameters) if parameters["times"] is not None else []
     out += _write_foft(parameters) if parameters["element_history"] is not None else []
     out += (
@@ -128,7 +130,9 @@ def write_buffer(parameters):
         if parameters["version"] == 3:
             out += _write_outpu(parameters)
         else:
-            logging.warning("Defining 'output' is only available for 'version == 3'. Skipping.")
+            logging.warning(
+                "Defining 'output' is only available for 'version == 3'. Skipping."
+            )
     out += _write_nover() if parameters["nover"] else []
     out += _write_endfi() if parameters["endfi"] else _write_endcy()
     return out
@@ -313,7 +317,7 @@ def _write_multi(parameters):
     # Handle diffusion
     if parameters["diffusion"]:
         out[3] = 8
-        parameters["n_phase"] = out[2]      # Save for later check
+        parameters["n_phase"] = out[2]  # Save for later check
 
     return [("{:>5d}" * len(out) + "\n").format(*out)]
 
@@ -688,12 +692,8 @@ def _write_diffu(parameters):
     mass1, mass2 = parameters["diffusion"]
 
     out = []
-    out += _write_multi_record(
-        _format_data([(i, "{:>10.3e}") for i in mass1]), ncol=8
-    )
-    out += _write_multi_record(
-        _format_data([(i, "{:>10.3e}") for i in mass2]), ncol=8
-    )
+    out += _write_multi_record(_format_data([(i, "{:>10.3e}") for i in mass1]), ncol=8)
+    out += _write_multi_record(_format_data([(i, "{:>10.3e}") for i in mass2]), ncol=8)
     return out
 
 
