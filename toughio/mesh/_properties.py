@@ -124,13 +124,6 @@ def _face_areas(mesh):
 
 def _volumes(mesh):
     """Return volumes of cell in mesh."""
-
-    def scalar_triple_product(a, b, c):
-        c0 = b[:, 1] * c[:, 2] - b[:, 2] * c[:, 1]
-        c1 = b[:, 2] * c[:, 0] - b[:, 0] * c[:, 2]
-        c2 = b[:, 0] * c[:, 1] - b[:, 1] * c[:, 0]
-        return a[:, 0] * c0 + a[:, 1] * c1 + a[:, 2] * c2
-
     meshio_type_to_tetra = {
         "tetra": numpy.array([[0, 1, 2, 3]]),
         "pyramid": numpy.array([[0, 1, 3, 4], [1, 2, 3, 4]]),
@@ -148,7 +141,7 @@ def _volumes(mesh):
             numpy.sum(
                 numpy.split(
                     numpy.abs(
-                        scalar_triple_product(
+                        _scalar_triple_product(
                             tetras[:, 1] - tetras[:, 0],
                             tetras[:, 2] - tetras[:, 0],
                             tetras[:, 3] - tetras[:, 0],
@@ -224,13 +217,19 @@ def _get_faces(faces):
 
 def _get_triangle_normals(mesh, faces, islice=None):
     """Calculate normal vectors of triangular faces."""
-
-    def cross(a, b):
-        return a[:, [1, 2, 0]] * b[:, [2, 0, 1]] - a[:, [2, 0, 1]] * b[:, [1, 2, 0]]
-
     islice = islice if islice is not None else [0, 1, 2]
 
     triangles = numpy.vstack([c[islice] for c in faces])
     triangles = mesh.points[triangles]
 
-    return cross(triangles[:, 1] - triangles[:, 0], triangles[:, 2] - triangles[:, 0])
+    return _cross(triangles[:, 1] - triangles[:, 0], triangles[:, 2] - triangles[:, 0])
+
+
+def _cross(a, b):
+    """Calculate cross product (faster than :function:`numpy.cross`)."""
+    return a[:, [1, 2, 0]] * b[:, [2, 0, 1]] - a[:, [2, 0, 1]] * b[:, [1, 2, 0]]
+
+
+def _scalar_triple_product(a, b, c):
+    """Calculate determinant as scalar triple product."""
+    return (a * _cross(b, c)).sum(axis=-1)
