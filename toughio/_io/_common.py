@@ -36,6 +36,7 @@ _Parameters = {
     "extra_selections": None,
     "solver": {},
     "generators": {},
+    "diffusion": None,
     "times": None,
     "element_history": None,
     "connection_history": None,

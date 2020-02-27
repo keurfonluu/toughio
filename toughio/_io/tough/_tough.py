@@ -123,6 +123,7 @@ def write_buffer(parameters):
         _write_goft(parameters) if parameters["generator_history"] is not None else []
     )
     out += _write_gener(parameters) if parameters["generators"] else []
+    out += _write_diffu(parameters) if parameters["diffusion"] else []
     if parameters["output"]:
         if parameters["version"] == 3:
             out += _write_outpu(parameters)
@@ -308,6 +309,12 @@ def _write_multi(parameters):
     out[0] = parameters["n_component"] if parameters["n_component"] else out[0]
     out[1] = out[0] if parameters["isothermal"] else out[0] + 1
     out[2] = parameters["n_phase"] if parameters["n_phase"] else out[2]
+
+    # Handle diffusion
+    if parameters["diffusion"]:
+        out[3] = 8
+        parameters["n_phase"] = out[2]      # Save for later check
+
     return [("{:>5d}" * len(out) + "\n").format(*out)]
 
 
@@ -667,6 +674,26 @@ def _write_gener(parameters):
             out += _write_multi_record(
                 _format_data([(i, "{:>14.7e}") for i in specific_enthalpy]), ncol=4
             )
+    return out
+
+
+@block("DIFFU")
+def _write_diffu(parameters):
+    """
+    TOUGH input DIFFU block data (optional).
+
+    Introduces diffusion coefficients.
+    """
+    assert numpy.shape(parameters["diffusion"]) == (2, parameters["n_phase"])
+    mass1, mass2 = parameters["diffusion"]
+
+    out = []
+    out += _write_multi_record(
+        _format_data([(i, "{:>10.3e}") for i in mass1]), ncol=8
+    )
+    out += _write_multi_record(
+        _format_data([(i, "{:>10.3e}") for i in mass2]), ncol=8
+    )
     return out
 
 
