@@ -1,4 +1,5 @@
 import logging
+from itertools import chain
 
 import numpy
 
@@ -73,8 +74,7 @@ def _faces(mesh):
 
 def _face_normals(mesh):
     """Return normal vectors of faces in mesh."""
-    faces = numpy.concatenate(mesh.faces)
-    faces_dict, faces_cell, _ = _get_faces(faces)
+    faces_dict, faces_cell, _ = _get_faces(_faces(mesh))
 
     # Face normal vectors
     normals = numpy.concatenate(
@@ -94,8 +94,7 @@ def _face_normals(mesh):
 
 def _face_areas(mesh):
     """Return areas of faces in mesh."""
-    faces = numpy.concatenate(mesh.faces)
-    faces_dict, faces_cell, _ = _get_faces(faces)
+    faces_dict, faces_cell, _ = _get_faces(_faces(mesh))
 
     # Face areas
     areas = numpy.concatenate(
@@ -173,8 +172,7 @@ def _connections(mesh):
         numpy.shape(mesh.points)[1] == 3
     ), "Connections for 2D mesh has not been implemented yet."
 
-    faces = numpy.concatenate(mesh.faces)
-    faces_dict, faces_cell, faces_index = _get_faces(faces)
+    faces_dict, faces_cell, faces_index = _get_faces(_faces(mesh))
     faces_dict = {k: numpy.sort(numpy.vstack(v), axis=1) for k, v in faces_dict.items()}
 
     # Prune duplicate faces
@@ -209,13 +207,12 @@ def _get_faces(faces):
     numvert_to_face_type = {3: "triangle", 4: "quad"}
 
     for i, face in enumerate(faces):
-        numvert = (face >= 0).sum(axis=-1)
-        for j, (f, n) in enumerate(zip(face, numvert)):
-            if n > 0:
-                face_type = numvert_to_face_type[n]
-                faces_dict[face_type].append(f[:n])
-                faces_cell[face_type].append(i)
-                faces_index[face_type].append(j)
+        for j, f in enumerate(chain.from_iterable(face)):
+            n = len(f)
+            face_type = numvert_to_face_type[n]
+            faces_dict[face_type].append(f[:n])
+            faces_cell[face_type].append(i)
+            faces_index[face_type].append(j)
 
     # Stack arrays or remove empty cells
     faces_dict = {k: numpy.vstack(v) for k, v in faces_dict.items() if len(v)}
