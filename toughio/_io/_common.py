@@ -6,6 +6,7 @@ __all__ = [
     "more_options",
     "solver",
     "generators",
+    "output",
     "default",
     "eos",
     "eos_select",
@@ -35,10 +36,12 @@ _Parameters = {
     "extra_selections": None,
     "solver": {},
     "generators": {},
+    "diffusion": None,
     "times": None,
     "element_history": None,
     "connection_history": None,
     "generator_history": None,
+    "output": None,
     "default": {},
 }
 
@@ -117,6 +120,11 @@ generators = {
     "rates": None,
     "specific_enthalpy": None,
     "layer_thickness": None,
+}
+
+output = {
+    "format": "csv",
+    "variables": None,
 }
 
 default = {

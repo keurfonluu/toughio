@@ -15,6 +15,7 @@ dtypes = {
     "PARAMETERS": {
         "title": "str",
         "eos": "str",
+        "version": "int",
         "n_component": "int",
         "n_phase": "int",
         "flac": "bool",
@@ -37,6 +38,8 @@ dtypes = {
         "element_history": "array_like",
         "connection_history": "array_like",
         "generator_history": "array_like",
+        "diffusion": "array_like",
+        "output": "dict",
         "default": "dict",
     },
     "ROCKS": {
@@ -96,6 +99,10 @@ dtypes = {
         "rates": "scalar_array_like",
         "specific_enthalpy": "scalar_array_like",
         "layer_thickness": "scalar_array_like",
+    },
+    "OUTPU": {
+        "format": "str",
+        "variables": "dict",
     },
 }
 
