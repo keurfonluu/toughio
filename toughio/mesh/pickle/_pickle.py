@@ -12,7 +12,8 @@ __all__ = [
 
 
 def read(filename):
-    """Import pickled :class:`toughio.Mesh`.
+    """
+    Import pickled :class:`toughio.Mesh`.
 
     Parameters
     ----------
@@ -32,7 +33,8 @@ def read(filename):
 
 
 def write(filename, mesh):
-    """Pickle :class:`toughio.Mesh`.
+    """
+    Pickle :class:`toughio.Mesh`.
 
     Parameters
     ----------

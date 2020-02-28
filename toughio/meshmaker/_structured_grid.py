@@ -8,7 +8,8 @@ __all__ = [
 
 
 def structured_grid(dx, dy, dz=None, origin=None, material="dfalt"):
-    """Generate 2D or 3D non-uniform structured grid.
+    """
+    Generate 2D or 3D non-uniform structured grid.
 
     Parameters
     ----------

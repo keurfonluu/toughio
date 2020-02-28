@@ -6,7 +6,8 @@ __all__ = [
 
 
 class vanGenuchten(BaseCapillarity):
-    """van Genuchten function.
+    """
+    van Genuchten function.
 
     After van Genuchten (1980).
 

@@ -6,7 +6,8 @@ __all__ = [
 
 
 class Pickens(BaseRelativePermeability):
-    """Gas perfect mobile function.
+    """
+    Gas perfect mobile function.
 
     Parameters
     ----------

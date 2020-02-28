@@ -9,7 +9,8 @@ __all__ = [
 
 
 class CylindricMesh(Mesh):
-    """Cylindric mesh.
+    """
+    Cylindric mesh.
 
     This class is only intended to be used as output of :function:`cylindric_grid`.
 
@@ -67,7 +68,8 @@ class CylindricMesh(Mesh):
 
 
 def cylindric_grid(dr, dz, origin_z=None, material="dfalt"):
-    """Generate a cylindric mesh as a radial XZ structured grid.
+    """
+    Generate a cylindric mesh as a radial XZ structured grid.
 
     Parameters
     ----------

@@ -9,7 +9,8 @@ __all__ = [
 
 
 def read(filename):
-    """Import json TOUGH input file.
+    """
+    Import json TOUGH input file.
 
     Parameters
     ----------
@@ -39,7 +40,8 @@ def read(filename):
 
 
 def write(filename, parameters):
-    """Export TOUGH parameters to json.
+    """
+    Export TOUGH parameters to json.
 
     Parameters
     ----------

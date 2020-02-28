@@ -6,7 +6,8 @@ __all__ = [
 
 
 class Corey(BaseRelativePermeability):
-    """Corey's curve.
+    """
+    Corey's curve.
 
     After Corey (1954).
 

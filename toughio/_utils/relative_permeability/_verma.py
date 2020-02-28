@@ -6,7 +6,8 @@ __all__ = [
 
 
 class Verma(BaseRelativePermeability):
-    """Verma's function.
+    """
+    Verma's function.
 
     After Verma et al. (1985).
 

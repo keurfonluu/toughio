@@ -29,7 +29,8 @@ def _filetype_from_filename(filename):
 
 
 def read(filename, file_format=None, **kwargs):
-    """Read unstructured mesh from file.
+    """
+    Read unstructured mesh from file.
 
     Parameters
     ----------
@@ -68,7 +69,8 @@ def read(filename, file_format=None, **kwargs):
 
 
 def write(filename, mesh, file_format=None, **kwargs):
-    """Write unstructured mesh to file.
+    """
+    Write unstructured mesh to file.
 
     Parameters
     ----------
@@ -141,7 +143,8 @@ def write_points_cells(
     file_format=None,
     **kwargs
 ):
-    """Write unstructured mesh to file given points and cells data.
+    """
+    Write unstructured mesh to file given points and cells data.
 
     Parameters
     ----------
@@ -177,7 +180,8 @@ def write_points_cells(
 
 
 def read_time_series(filename):
-    """Read time series from XDMF file.
+    """
+    Read time series from XDMF file.
 
     Parameters
     ----------
@@ -231,7 +235,8 @@ def read_time_series(filename):
 def write_time_series(
     filename, points, cells, point_data=None, cell_data=None, time_steps=None,
 ):
-    """Write time series given points and cells data.
+    """
+    Write time series given points and cells data.
 
     Parameters
     ----------

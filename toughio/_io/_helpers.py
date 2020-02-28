@@ -36,7 +36,8 @@ def _filetype_from_filename(filename):
 
 
 def read_input(filename, file_format="json", **kwargs):
-    """Read TOUGH input file.
+    """
+    Read TOUGH input file.
 
     Parameters
     ----------
@@ -69,7 +70,8 @@ def read_input(filename, file_format="json", **kwargs):
 
 
 def write_input(filename, parameters, file_format="tough", **kwargs):
-    """Write TOUGH input file.
+    """
+    Write TOUGH input file.
 
     Parameters
     ----------
@@ -101,7 +103,8 @@ def write_input(filename, parameters, file_format="tough", **kwargs):
 
 
 def read_output(filename, file_format="tough", labels_order=None):
-    """Read TOUGH output file for each time step.
+    """
+    Read TOUGH output file for each time step.
 
     Parameters
     ----------
@@ -277,7 +280,8 @@ def read_output(filename, file_format="tough", labels_order=None):
 
 
 def read_save(filename, labels_order=None):
-    """Read TOUGH SAVE file.
+    """
+    Read TOUGH SAVE file.
 
     Parameters
     ----------

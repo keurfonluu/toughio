@@ -6,7 +6,8 @@ __all__ = [
 
 
 class Linear(BaseCapillarity):
-    """Linear function.
+    """
+    Linear function.
 
     Parameters
     ----------
