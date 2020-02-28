@@ -51,8 +51,10 @@ def read_input(filename, file_format="json", **kwargs):
         TOUGH input parameters.
 
     """
-    assert isinstance(filename, str)
-    assert file_format in {"tough", "json"}
+    if not isinstance(filename, str):
+        raise TypeError()
+    if file_format not in {"tough", "json"}:
+        raise ValueError()
 
     fmt = file_format if file_format else _filetype_from_filename(filename)
 
@@ -79,9 +81,12 @@ def write_input(filename, parameters, file_format="tough", **kwargs):
         Output file format.
 
     """
-    assert isinstance(filename, str)
-    assert isinstance(parameters, dict)
-    assert file_format in {"tough", "json"}
+    if not isinstance(filename, str):
+        raise TypeError()
+    if not isinstance(parameters, dict):
+        raise TypeError()
+    if file_format not in {"tough", "json"}:
+        raise ValueError()
 
     fmt = file_format if file_format else _filetype_from_filename(filename)
 
@@ -113,9 +118,12 @@ def read_output(filename, file_format="tough", labels_order=None):
         List of namedtuple (time, labels, data) for each time step.
 
     """
-    assert isinstance(filename, str)
-    assert file_format in {"tough", "tecplot"}
-    assert labels_order is None or isinstance(labels_order, list)
+    if not isinstance(filename, str):
+        raise TypeError()
+    if file_format not in {"tough", "tecplot"}:
+        raise ValueError()
+    if not (labels_order is None or isinstance(labels_order, list)):
+        raise TypeError()
 
     with open(filename, "r") as f:
         if file_format == "tough":
@@ -238,7 +246,8 @@ def read_output(filename, file_format="tough", labels_order=None):
                     zone["T"] = (
                         float(zone["T"].split()[0]) if "T" in zone.keys() else None
                     )
-                    assert "I" in zone.keys()
+                    if "I" not in zone.keys():
+                        raise ValueError()
 
                 # Read data
                 data = numpy.genfromtxt(f, max_rows=zone["I"])
@@ -297,13 +306,16 @@ def read_save(filename, labels_order=None):
             significand, exponent = s[:-4], s[-4:]
             return float("{}e{}".format(significand, exponent))
 
-    assert isinstance(filename, str)
-    assert labels_order is None or isinstance(labels_order, list)
+    if not isinstance(filename, str):
+        raise TypeError()
+    if not (labels_order is None or isinstance(labels_order, list)):
+        raise TypeError()
 
     with open(filename, "r") as f:
         # Check first line
         line = f.readline()
-        assert line.startswith("INCON"), "Invalid SAVE file '{}'.".format(filename)
+        if not line.startswith("INCON"):
+            raise ValueError("Invalid SAVE file '{}'.".format(filename))
 
         # Read data
         labels, variables = [], []

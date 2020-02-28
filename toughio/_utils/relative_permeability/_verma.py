@@ -49,7 +49,8 @@ class Verma(BaseRelativePermeability):
 
     @parameters.setter
     def parameters(self, value):
-        assert len(value) == 5
+        if len(value) != 5:
+            raise ValueError()
         self._slr = value[0]
         self._sls = value[1]
         self._a = value[2]

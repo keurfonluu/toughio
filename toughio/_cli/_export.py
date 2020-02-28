@@ -38,13 +38,11 @@ def export(argv=None):
         msg = "Mesh file not specified, inferring dimensionality"
 
     # Check that TOUGH output and mesh file exist
-    assert os.path.isfile(args.infile), "TOUGH output file '{}' not found.".format(
-        args.infile
-    )
+    if not os.path.isfile(args.infile):
+        raise ValueError("TOUGH output file '{}' not found.".format(args.infile))
     if with_mesh:
-        assert os.path.isfile(args.mesh), "Pickled mesh file '{}' not found.".format(
-            args.mesh
-        )
+        if not os.path.isfile(args.mesh):
+            raise ValueError("Pickled mesh file '{}' not found.".format(args.mesh))
 
     # Read output file
     print("Reading file '{}' ...".format(args.infile), end="")
@@ -52,9 +50,8 @@ def export(argv=None):
     output = read_output(args.infile, args.input_format)
     if args.file_format != "xdmf":
         if args.time_step is not None:
-            assert (
-                -len(output) <= args.time_step < len(output)
-            ), "Inconsistent time step value."
+            if not (-len(output) <= args.time_step < len(output)):
+                raise ValueError("Inconsistent time step value.")
             output = output[args.time_step]
         else:
             output = output[-1]
@@ -228,7 +225,8 @@ def _get_points(output):
     else:
         Z = numpy.zeros(n_points)
 
-    assert count > 0, "No coordinate array ('X', 'Y', 'Z') found."
+    if count == 0:
+        raise ValueError("No coordinate array ('X', 'Y', 'Z') found.")
 
     # Assert dimension of the problem
     nx = len(numpy.unique(X))

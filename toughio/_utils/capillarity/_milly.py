@@ -21,7 +21,8 @@ class Milly(BaseCapillarity):
     _name = "Milly"
 
     def __init__(self, slr):
-        assert slr >= 0.0
+        if slr < 0.0:
+            raise ValueError()
         self.parameters = [slr]
 
     def _eval(self, sl, slr):
@@ -40,5 +41,6 @@ class Milly(BaseCapillarity):
 
     @parameters.setter
     def parameters(self, value):
-        assert len(value) == 1
+        if len(value) != 1:
+            raise ValueError()
         self._slr = value[0]

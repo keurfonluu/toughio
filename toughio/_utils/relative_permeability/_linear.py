@@ -25,8 +25,10 @@ class Linear(BaseRelativePermeability):
     _name = "Linear"
 
     def __init__(self, slmin, sgmin, slmax, sgmax):
-        assert slmin < slmax
-        assert sgmin < sgmax
+        if slmin >= slmax:
+            raise ValueError()
+        if sgmin >= sgmax:
+            raise ValueError()
         self.parameters = [slmin, sgmin, slmax, sgmax]
 
     def _eval(self, sl, slmin, sgmin, slmax, sgmax):
@@ -57,7 +59,8 @@ class Linear(BaseRelativePermeability):
 
     @parameters.setter
     def parameters(self, value):
-        assert len(value) == 4
+        if len(value) != 4:
+            raise ValueError()
         self._slmin = value[0]
         self._sgmin = value[1]
         self._slmax = value[2]

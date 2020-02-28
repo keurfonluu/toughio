@@ -30,11 +30,13 @@ class BaseCapillarity(ABC):
 
     def __call__(self, sl):
         if numpy.ndim(sl) == 0:
-            assert 0.0 <= sl <= 1.0
+            if not (0.0 <= sl <= 1.0):
+                raise ValueError()
             return self._eval(sl, *self.parameters)
         else:
             sl = numpy.asarray(sl)
-            assert numpy.logical_and((sl >= 0.0).all(), (sl <= 1.0).all())
+            if not numpy.logical_and((sl >= 0.0).all(), (sl <= 1.0).all()):
+                raise ValueError()
             return numpy.array([self._eval(sat, *self.parameters) for sat in sl])
 
     @abstractmethod
@@ -58,11 +60,16 @@ class BaseCapillarity(ABC):
         """
         import matplotlib.pyplot as plt
 
-        assert isinstance(n, int) and n > 1
-        assert ax is None or isinstance(ax, plt.Axes)
-        assert figsize is None or isinstance(figsize, (tuple, list, numpy.ndarray))
-        assert len(figsize) == 2
-        assert plt_kws is None or isinstance(plt_kws, dict)
+        if not (isinstance(n, int) and n > 1):
+            raise ValueError()
+        if not (ax is None or isinstance(ax, plt.Axes)):
+            raise TypeError()
+        if not (figsize is None or isinstance(figsize, (tuple, list, numpy.ndarray))):
+            raise TypeError()
+        if len(figsize) != 2:
+            raise ValueError()
+        if not (plt_kws is None or isinstance(plt_kws, dict)):
+            raise TypeError()
 
         # Plot parameters
         plt_kws = plt_kws if plt_kws is not None else {}

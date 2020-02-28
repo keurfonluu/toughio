@@ -45,7 +45,8 @@ def read(filename, file_format=None, **kwargs):
 
     """
     # Check file format
-    assert isinstance(filename, str)
+    if not isinstance(filename, str):
+        raise TypeError()
     fmt = file_format if file_format else _filetype_from_filename(filename)
 
     # Call custom readers
@@ -99,7 +100,8 @@ def write(filename, mesh, file_format=None, **kwargs):
 
     """
     # Check file format
-    assert isinstance(filename, str)
+    if not isinstance(filename, str):
+        raise TypeError()
     fmt = file_format if file_format else _filetype_from_filename(filename)
 
     # Call custom writer
