@@ -6,24 +6,24 @@ __all__ = [
 
 
 class Linear(BaseCapillarity):
-    """
-    Linear function.
-
-    Parameters
-    ----------
-    pmax : scalar
-        Maximum pressure (CP(1)).
-    smin : scalar
-        Lower liquid saturation threshold (CP(2)).
-    smax : scalar
-        Upper liquid saturation threshold (CP(3)).
-
-    """
 
     _id = 1
     _name = "Linear"
 
     def __init__(self, pmax, smin, smax):
+        """
+        Linear function.
+
+        Parameters
+        ----------
+        pmax : scalar
+            Maximum pressure (CP(1)).
+        smin : scalar
+            Lower liquid saturation threshold (CP(2)).
+        smax : scalar
+            Upper liquid saturation threshold (CP(3)).
+
+        """
         if smax <= smin:
             raise ValueError()
         self.parameters = [pmax, smin, smax]

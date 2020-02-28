@@ -6,22 +6,22 @@ __all__ = [
 
 
 class Milly(BaseCapillarity):
-    """
-    Milly's function.
-
-    After Milly (1982).
-
-    Parameters
-    ----------
-    slr : scalar
-        Irreducible liquid saturation (CP(1)).
-
-    """
 
     _id = 4
     _name = "Milly"
 
     def __init__(self, slr):
+        """
+        Milly's function.
+
+        After Milly (1982).
+
+        Parameters
+        ----------
+        slr : scalar
+            Irreducible liquid saturation (CP(1)).
+
+        """
         if slr < 0.0:
             raise ValueError()
         self.parameters = [slr]

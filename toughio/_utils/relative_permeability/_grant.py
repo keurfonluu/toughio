@@ -6,24 +6,24 @@ __all__ = [
 
 
 class Grant(BaseRelativePermeability):
-    """
-    Grant's curve.
-
-    After Grant (1977).
-
-    Parameters
-    ----------
-    slr : scalar
-        Irreducible liquid saturation (RP(1)).
-    sgr : scalar
-        Irreducible gas saturation (RP(2)).
-
-    """
 
     _id = 4
     _name = "Grant"
 
     def __init__(self, slr, sgr):
+        """
+        Grant's curve.
+
+        After Grant (1977).
+
+        Parameters
+        ----------
+        slr : scalar
+            Irreducible liquid saturation (RP(1)).
+        sgr : scalar
+            Irreducible gas saturation (RP(2)).
+
+        """
         if slr + sgr >= 1.0:
             raise ValueError()
         self.parameters = [slr, sgr]

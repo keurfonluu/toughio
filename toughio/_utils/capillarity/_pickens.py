@@ -8,28 +8,28 @@ __all__ = [
 
 
 class Pickens(BaseCapillarity):
-    """
-    Pickens et al. function.
-
-    After Pickens et al. (1979).
-
-    Parameters
-    ----------
-    p0 : scalar
-        Capillary pressure strength (CP(1)).
-    slr : scalar
-        Irreducible liquid saturation (CP(2)).
-    sl0 : scalar
-        Initial liquid saturation (CP(3)).
-    x : scalar
-        CP(4).
-
-    """
 
     _id = 2
     _name = "Pickens"
 
     def __init__(self, p0, slr, sl0, x):
+        """
+        Pickens et al. function.
+
+        After Pickens et al. (1979).
+
+        Parameters
+        ----------
+        p0 : scalar
+            Capillary pressure strength (CP(1)).
+        slr : scalar
+            Irreducible liquid saturation (CP(2)).
+        sl0 : scalar
+            Initial liquid saturation (CP(3)).
+        x : scalar
+            CP(4).
+
+        """
         if not (0.0 < slr < 1.0):
             raise ValueError()
         if sl0 < 1.0:

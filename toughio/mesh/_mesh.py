@@ -31,30 +31,6 @@ Cells = collections.namedtuple("Cells", ["type", "data"])
 
 
 class Mesh(object):
-    """
-    toughio mesh.
-
-    This class is updated following the latest :module:`meshio` version and
-    brings backward compatibility with its previous versions.
-
-    Parameters
-    ----------
-    points : array_like (n_points, 3)
-        Cooordinates of points.
-    cells : list of tuples (cell_type, data)
-        Connectivity of cells.
-    point_data : dict or None, optional, default None
-        Point data arrays.
-    cell_data : dict or None, optional, default None
-        Cell data arrays.
-    field_data : dict or None, optional, default None
-        Field data names.
-    point_sets : dict or None, optional, default None
-        Sets of points.
-    cell_sets : dict or None, optional, default None
-        Sets of cells.
-
-    """
 
     def __init__(
         self,
@@ -66,6 +42,30 @@ class Mesh(object):
         point_sets=None,
         cell_sets=None,
     ):
+        """
+        toughio mesh.
+
+        This class is updated following the latest :module:`meshio` version and
+        brings backward compatibility with its previous versions.
+
+        Parameters
+        ----------
+        points : array_like (n_points, 3)
+            Cooordinates of points.
+        cells : list of tuples (cell_type, data)
+            Connectivity of cells.
+        point_data : dict or None, optional, default None
+            Point data arrays.
+        cell_data : dict or None, optional, default None
+            Cell data arrays.
+        field_data : dict or None, optional, default None
+            Field data names.
+        point_sets : dict or None, optional, default None
+            Sets of points.
+        cell_sets : dict or None, optional, default None
+            Sets of cells.
+
+        """
         self.points = points
         self.cells = cells
         self.point_data = point_data if point_data else {}

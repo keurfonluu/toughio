@@ -9,19 +9,19 @@ __all__ = [
 
 
 class CylindricMesh(Mesh):
-    """
-    Cylindric mesh.
-
-    This class is only intended to be used as output of :function:`cylindric_grid`.
-
-    Note
-    ----
-    This class inherits from :class:`toughio.Mesh` but overwrites how face areas
-    and volumes are calculated.
-
-    """
 
     def __init__(self, dr, dz, *args, **kwargs):
+        """
+        Cylindric mesh.
+
+        This class is only intended to be used as output of :function:`cylindric_grid`.
+
+        Note
+        ----
+        This class inherits from :class:`toughio.Mesh` but overwrites how face areas
+        and volumes are calculated.
+
+        """
         super(CylindricMesh, self).__init__(*args, **kwargs)
         self._dr = dr
         self._dz = dz
