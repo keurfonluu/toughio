@@ -29,7 +29,8 @@ class vanGenuchten(BaseCapillarity):
     _name = "van Genuchten"
 
     def __init__(self, m, slr, alpha, pmax, sls):
-        assert pmax >= 0.0
+        if pmax < 0.0:
+            raise ValueError()
         self.parameters = [m, slr, alpha, pmax, sls]
 
     def _eval(self, sl, m, slr, alpha, pmax, sls):
@@ -53,7 +54,8 @@ class vanGenuchten(BaseCapillarity):
 
     @parameters.setter
     def parameters(self, value):
-        assert len(value) == 5
+        if len(value) != 5:
+            raise ValueError()
         self._m = value[0]
         self._slr = value[1]
         self._alpha = value[2]

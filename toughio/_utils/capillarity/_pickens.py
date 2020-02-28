@@ -29,9 +29,12 @@ class Pickens(BaseCapillarity):
     _name = "Pickens"
 
     def __init__(self, p0, slr, sl0, x):
-        assert 0.0 < slr < 1.0
-        assert sl0 >= 1.0
-        assert x != 0.0
+        if not (0.0 < slr < 1.0):
+            raise ValueError()
+        if sl0 < 1.0:
+            raise ValueError()
+        if x == 0.0:
+            raise ValueError()
         self.parameters = [p0, slr, sl0, x]
 
     def _eval(self, sl, p0, slr, sl0, x):
@@ -52,7 +55,8 @@ class Pickens(BaseCapillarity):
 
     @parameters.setter
     def parameters(self, value):
-        assert len(value) == 4
+        if len(value) != 4:
+            raise ValueError()
         self._p0 = value[0]
         self._slr = value[1]
         self._sl0 = value[2]

@@ -23,8 +23,10 @@ def voxelize(points, material="dfalt"):
         Output hexahedral mesh.
 
     """
-    assert isinstance(points, (list, tuple, numpy.ndarray))
-    assert numpy.ndim(points) == 1
+    if not isinstance(points, (list, tuple, numpy.ndarray)):
+        raise TypeError()
+    if numpy.ndim(points) != 1:
+        raise ValueError()
 
     points = numpy.asarray(points)
     idx = numpy.argsort(points)

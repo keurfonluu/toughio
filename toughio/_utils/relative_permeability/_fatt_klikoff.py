@@ -21,7 +21,8 @@ class FattKlikoff(BaseRelativePermeability):
     _name = "Fatt-Klikoff"
 
     def __init__(self, slr):
-        assert slr < 1.0
+        if slr >= 1.0:
+            raise ValueError()
         self.parameters = [slr]
 
     def _eval(self, sl, slr):
@@ -38,5 +39,6 @@ class FattKlikoff(BaseRelativePermeability):
 
     @parameters.setter
     def parameters(self, value):
-        assert len(value) == 1
+        if len(value) != 1:
+            raise ValueError()
         self._slr = value[0]

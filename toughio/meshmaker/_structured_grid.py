@@ -29,10 +29,14 @@ def structured_grid(dx, dy, dz=None, origin=None, material="dfalt"):
         Output non-uniform structured mesh.
 
     """
-    assert isinstance(dx, (list, tuple, numpy.ndarray))
-    assert isinstance(dy, (list, tuple, numpy.ndarray))
-    assert dz is None or isinstance(dz, (list, tuple, numpy.ndarray))
-    assert isinstance(material, str)
+    if not isinstance(dx, (list, tuple, numpy.ndarray)):
+        raise TypeError()
+    if not isinstance(dy, (list, tuple, numpy.ndarray)):
+        raise TypeError()
+    if not (dz is None or isinstance(dz, (list, tuple, numpy.ndarray))):
+        raise TypeError()
+    if not isinstance(material, str):
+        raise TypeError()
 
     if dz is None:
         ndim = 2
@@ -41,9 +45,8 @@ def structured_grid(dx, dy, dz=None, origin=None, material="dfalt"):
         ndim = 3
         points, cells = _grid_3d(dx, dy, dz)
 
-    assert origin is None or (
-        isinstance(origin, (list, tuple, numpy.ndarray)) and len(origin) == ndim
-    )
+    if not (origin is None or (isinstance(origin, (list, tuple, numpy.ndarray)) and len(origin) == ndim)):
+        raise ValueError()
     origin = (
         numpy.asarray(origin)
         if origin is not None
