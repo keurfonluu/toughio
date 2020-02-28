@@ -27,8 +27,9 @@ class Linear(BaseCapillarity):
             raise ValueError()
         self.parameters = [pmax, smin, smax]
 
-    def _eval(self, sl, pmax, smin, smax):
+    def _eval(self, sl, *args):
         """Linear function."""
+        pmax, smin, smax = args
         return (
             -pmax
             if sl <= smin

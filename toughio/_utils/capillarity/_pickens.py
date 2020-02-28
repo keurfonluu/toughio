@@ -37,8 +37,9 @@ class Pickens(BaseCapillarity):
             raise ValueError()
         self.parameters = [p0, slr, sl0, x]
 
-    def _eval(self, sl, p0, slr, sl0, x):
+    def _eval(self, sl, *args):
         """Pickens et al function."""
+        p0, slr, sl0, x = args
         sl = max(sl, 1.001 * slr)
         sl = 0.999 * sl0 if sl > 0.999 * sl0 else sl
 

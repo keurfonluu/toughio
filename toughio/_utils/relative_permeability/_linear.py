@@ -31,8 +31,9 @@ class Linear(BaseRelativePermeability):
             raise ValueError()
         self.parameters = [slmin, sgmin, slmax, sgmax]
 
-    def _eval(self, sl, slmin, sgmin, slmax, sgmax):
+    def _eval(self, sl, *args):
         """Linear function."""
+        slmin, sgmin, slmax, sgmax = args
         kl = (
             1.0
             if sl >= slmax

@@ -29,8 +29,9 @@ class vanGenuchtenMualem(BaseRelativePermeability):
     def __init__(self, m, slr, sls, sgr):
         self.parameters = [m, slr, sls, sgr]
 
-    def _eval(self, sl, m, slr, sls, sgr):
+    def _eval(self, sl, *args):
         """van Genuchten-Mualem function."""
+        m, slr, sls, sgr = args
         if sl >= sls:
             kl = 1.0
             kg = 0.0
