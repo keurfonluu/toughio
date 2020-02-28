@@ -182,7 +182,11 @@ def write_buffer(
         else:
             if permeabilities.ndim not in {1, 2}:
                 raise ValueError()
-            if not (permeabilities.shape == (num_cells, 3) if permeabilities.ndim == 2 else len(permeabilities) == num_cells):
+            if not (
+                permeabilities.shape == (num_cells, 3)
+                if permeabilities.ndim == 2
+                else len(permeabilities) == num_cells
+            ):
                 raise ValueError("Inconsistent permeability modifiers array.")
 
     # Write MESH file
