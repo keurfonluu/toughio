@@ -26,7 +26,7 @@ class BaseCapillarity(ABC):
         pass
 
     def __repr__(self):
-        """Represent a :class:`toughio.capillarity.BaseCapillarity`."""
+        """Display capillarity model informations."""
         out = ["{} capillarity model (ICP = {}):".format(self._name, self._id)]
         out += [
             "    CP({}) = {}".format(i + 1, parameter)
