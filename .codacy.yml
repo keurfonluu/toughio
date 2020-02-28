@@ -1,0 +1,3 @@
+---
+exclude_paths:
+  - '**/__init__.py'
