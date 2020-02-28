@@ -1,0 +1,7 @@
+pep257:
+  run: true
+  disable:
+    - D212
+
+mccabe:
+  run: false
