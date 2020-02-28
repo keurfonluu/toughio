@@ -173,7 +173,7 @@ class Mesh(object):
         -------
         toughio.Mesh
             Pruned mesh (only if ``inplace == False``).
-        
+
         Note
         ----
         Does not preserve points order from original array in mesh.
@@ -423,9 +423,9 @@ class Mesh(object):
 
     def set_material(self, material, xlim=None, ylim=None, zlim=None):
         """Set material to cells in box.
-        
+
         Set material for cells within box selection defined by `xlim`, `ylim` and `zlim`.
-        
+
         Parameters
         ----------
         material : str
@@ -656,7 +656,7 @@ class Mesh(object):
     @property
     def connections(self):
         """Return mesh connections.
-        
+
         Assume conformity and that points and cells are uniquely defined in mesh.
 
         Note

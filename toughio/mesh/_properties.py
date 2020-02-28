@@ -158,8 +158,9 @@ def _volumes(mesh):
 
 def _connections(mesh):
     """Return mesh connections.
-    
+
     Assume conformity and that points and cells are uniquely defined in mesh.
+
     """
     if numpy.shape(mesh.points)[1] != 3:
         raise ValueError("Connections for 2D mesh has not been implemented yet.")

@@ -10,12 +10,12 @@ __all__ = [
 
 def read(filename):
     """Import json TOUGH input file.
-    
+
     Parameters
     ----------
     filename : str
         Input file name.
-    
+
     Returns
     -------
     dict

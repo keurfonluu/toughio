@@ -23,7 +23,7 @@ def read(filename):
     -------
     toughio.Mesh
         Output mesh.
-    
+
     """
     with open(filename, "rb") as f:
         mesh = pickle.load(f)
@@ -40,7 +40,7 @@ def write(filename, mesh):
         Output file name.
     mesh : toughio.Mesh
         Mesh to pickle.
-    
+
     """
     with open(filename, "wb") as f:
         pickle.dump(mesh, f, protocol=pickle.HIGHEST_PROTOCOL)
