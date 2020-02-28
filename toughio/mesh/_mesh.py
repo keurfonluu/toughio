@@ -43,7 +43,7 @@ class Mesh(object):
         cell_sets=None,
     ):
         """
-        toughio mesh.
+        Unstructured toughio mesh.
 
         This class is updated following the latest :module:`meshio` version and
         brings backward compatibility with its previous versions.

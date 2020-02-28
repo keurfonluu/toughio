@@ -12,7 +12,7 @@ class vanGenuchtenMualem(BaseRelativePermeability):
 
     def __init__(self, m, slr, sls, sgr):
         """
-        van Genuchten-Mualem function.
+        Van Genuchten-Mualem function.
 
         After Mualem (1976) and van Genuchten (1980).
 

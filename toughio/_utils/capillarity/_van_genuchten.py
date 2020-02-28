@@ -12,7 +12,7 @@ class vanGenuchten(BaseCapillarity):
 
     def __init__(self, m, slr, alpha, pmax, sls):
         """
-        van Genuchten function.
+        Van Genuchten function.
 
         After van Genuchten (1980).
 
