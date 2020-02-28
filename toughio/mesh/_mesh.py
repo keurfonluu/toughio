@@ -455,11 +455,20 @@ class Mesh(object):
             raise TypeError()
         if not (xlim is not None or ylim is not None or zlim is not None):
             raise TypeError()
-        if not (xlim is None or (isinstance(xlim, (list, tuple, numpy.ndarray)) and len(xlim) == 2)):
+        if not (
+            xlim is None
+            or (isinstance(xlim, (list, tuple, numpy.ndarray)) and len(xlim) == 2)
+        ):
             raise ValueError()
-        if not (ylim is None or (isinstance(ylim, (list, tuple, numpy.ndarray)) and len(ylim) == 2)):
+        if not (
+            ylim is None
+            or (isinstance(ylim, (list, tuple, numpy.ndarray)) and len(ylim) == 2)
+        ):
             raise ValueError()
-        if not (zlim is None or (isinstance(zlim, (list, tuple, numpy.ndarray)) and len(zlim) == 2)):
+        if not (
+            zlim is None
+            or (isinstance(zlim, (list, tuple, numpy.ndarray)) and len(zlim) == 2)
+        ):
             raise ValueError()
 
         x, y, z = numpy.concatenate(self.centers).T

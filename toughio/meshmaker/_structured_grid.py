@@ -45,7 +45,10 @@ def structured_grid(dx, dy, dz=None, origin=None, material="dfalt"):
         ndim = 3
         points, cells = _grid_3d(dx, dy, dz)
 
-    if not (origin is None or (isinstance(origin, (list, tuple, numpy.ndarray)) and len(origin) == ndim)):
+    if not (
+        origin is None
+        or (isinstance(origin, (list, tuple, numpy.ndarray)) and len(origin) == ndim)
+    ):
         raise ValueError()
     origin = (
         numpy.asarray(origin)
