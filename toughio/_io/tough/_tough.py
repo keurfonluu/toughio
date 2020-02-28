@@ -16,7 +16,8 @@ __all__ = [
 
 
 def read(filename):
-    """Read TOUGH input file.
+    """
+    Read TOUGH input file.
 
     Parameters
     ----------
@@ -33,7 +34,8 @@ def read(filename):
 
 
 def write(filename, parameters):
-    """Write TOUGH input file.
+    """
+    Write TOUGH input file.
 
     Parameters
     ----------

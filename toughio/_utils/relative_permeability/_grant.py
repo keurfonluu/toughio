@@ -6,7 +6,8 @@ __all__ = [
 
 
 class Grant(BaseRelativePermeability):
-    """Grant's curve.
+    """
+    Grant's curve.
 
     After Grant (1977).
 

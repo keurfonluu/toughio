@@ -31,7 +31,8 @@ Cells = collections.namedtuple("Cells", ["type", "data"])
 
 
 class Mesh(object):
-    """toughio mesh.
+    """
+    toughio mesh.
 
     This class is updated following the latest :module:`meshio` version and
     brings backward compatibility with its previous versions.
@@ -97,7 +98,8 @@ class Mesh(object):
         return "\n".join(lines)
 
     def extrude_to_3d(self, height=1.0, axis=2, inplace=True):
-        """Convert a 2D mesh to 3D by extruding cells along given axis.
+        """
+        Convert a 2D mesh to 3D by extruding cells along given axis.
 
         Parameters
         ----------
@@ -162,7 +164,8 @@ class Mesh(object):
             return mesh
 
     def prune_duplicates(self, inplace=True):
-        """Delete duplicate points and cells.
+        """
+        Delete duplicate points and cells.
 
         Parameters
         ----------
@@ -207,7 +210,8 @@ class Mesh(object):
             return mesh
 
     def split(self, arr):
-        """Split input array into subarrays for each cell block in mesh.
+        """
+        Split input array into subarrays for each cell block in mesh.
 
         Parameters
         ----------
@@ -227,7 +231,8 @@ class Mesh(object):
         return numpy.split(numpy.asarray(arr), sizes[:-1])
 
     def to_meshio(self):
-        """Convert mesh to :class:`meshio.Mesh`.
+        """
+        Convert mesh to :class:`meshio.Mesh`.
 
         Returns
         -------
@@ -257,7 +262,8 @@ class Mesh(object):
         return meshio.Mesh(**kwargs)
 
     def to_pyvista(self):
-        """Convert mesh to :class:`pyvista.UnstructuredGrid`.
+        """
+        Convert mesh to :class:`pyvista.UnstructuredGrid`.
 
         Returns
         -------
@@ -317,7 +323,8 @@ class Mesh(object):
         return mesh
 
     def to_tough(self, filename="MESH", **kwargs):
-        """Write TOUGH `MESH` file.
+        """
+        Write TOUGH `MESH` file.
 
         Parameters
         ----------
@@ -328,7 +335,8 @@ class Mesh(object):
         self.write(filename, file_format="tough", **kwargs)
 
     def read_output(self, file_or_output, time_step=-1):
-        """Import TOUGH results to the mesh.
+        """
+        Import TOUGH results to the mesh.
 
         Parameters
         ----------
@@ -362,7 +370,8 @@ class Mesh(object):
         self.cell_data.update(out.data)
 
     def write(self, filename, file_format=None, **kwargs):
-        """Write mesh to file.
+        """
+        Write mesh to file.
 
         Parameters
         ----------
@@ -384,7 +393,8 @@ class Mesh(object):
         mesh.plot(*args, **kwargs)
 
     def add_point_data(self, label, data):
-        """Add a new point data array.
+        """
+        Add a new point data array.
 
         Parameters
         ----------
@@ -403,7 +413,8 @@ class Mesh(object):
         self.point_data[label] = numpy.asarray(data)
 
     def add_cell_data(self, label, data):
-        """Add a new cell data array.
+        """
+        Add a new cell data array.
 
         Parameters
         ----------
@@ -422,7 +433,8 @@ class Mesh(object):
         self.cell_data[label] = self.split(data)
 
     def set_material(self, material, xlim=None, ylim=None, zlim=None):
-        """Set material to cells in box.
+        """
+        Set material to cells in box.
 
         Set material for cells within box selection defined by `xlim`, `ylim` and `zlim`.
 
@@ -489,7 +501,8 @@ class Mesh(object):
             self.field_data[material] = numpy.array([imat, 3])
 
     def near(self, point):
-        """Return local index of cell nearest to query point.
+        """
+        Return local index of cell nearest to query point.
 
         Parameters
         ----------
@@ -655,7 +668,8 @@ class Mesh(object):
 
     @property
     def connections(self):
-        """Return mesh connections.
+        """
+        Return mesh connections.
 
         Assume conformity and that points and cells are uniquely defined in mesh.
 
@@ -668,7 +682,8 @@ class Mesh(object):
 
 
 def from_meshio(mesh):
-    """Convert a :class:`meshio.Mesh` to :class:`toughio.Mesh`.
+    """
+    Convert a :class:`meshio.Mesh` to :class:`toughio.Mesh`.
 
     Parameters
     ----------

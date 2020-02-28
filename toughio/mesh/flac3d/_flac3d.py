@@ -79,7 +79,8 @@ def read(filename):
 
 
 def read_buffer(f):
-    """Read ASCII file line by line.
+    """
+    Read ASCII file line by line.
 
     Use combination of readline, tell and seek since we need to rewind to the previous
     line when we read last data line of a ZGROUP section.
@@ -209,7 +210,8 @@ def _write_cells(f, points, cells):
 
 
 def _translate_zones(points, cells):
-    """Reorder meshio cells to FLAC3D zones.
+    """
+    Reorder meshio cells to FLAC3D zones.
 
     Four first points must form a right-handed coordinate system (outward normal
     vectors). Reorder corner points according to sign of scalar triple products.

@@ -6,7 +6,8 @@ __all__ = [
 
 
 class Milly(BaseCapillarity):
-    """Milly's function.
+    """
+    Milly's function.
 
     After Milly (1982).
 

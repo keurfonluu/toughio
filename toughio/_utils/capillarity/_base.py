@@ -12,7 +12,8 @@ ABC = ABCMeta("ABC", (object,), {"__slots__": ()})
 
 
 class BaseCapillarity(ABC):
-    """Base class for capillarity models.
+    """
+    Base class for capillarity models.
 
     Do not use.
 
@@ -48,7 +49,8 @@ class BaseCapillarity(ABC):
         raise NotImplementedError()
 
     def plot(self, n=100, ax=None, figsize=(10, 8), plt_kws=None):
-        """Plot capillary pressure curve.
+        """
+        Plot capillary pressure curve.
 
         Parameters
         ----------

@@ -6,7 +6,8 @@ __all__ = [
 
 
 class Linear(BaseRelativePermeability):
-    """Linear function.
+    """
+    Linear function.
 
     Parameters
     ----------

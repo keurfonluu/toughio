@@ -12,7 +12,8 @@ ABC = ABCMeta("ABC", (object,), {"__slots__": ()})
 
 
 class BaseRelativePermeability(ABC):
-    """Base class for relative permeability models.
+    """
+    Base class for relative permeability models.
 
     Do not use.
 
@@ -50,7 +51,8 @@ class BaseRelativePermeability(ABC):
         raise NotImplementedError()
 
     def plot(self, n=100, ax=None, figsize=(10, 8), plt_kws=None):
-        """Plot relative permeability curve.
+        """
+        Plot relative permeability curve.
 
         Parameters
         ----------

@@ -8,7 +8,8 @@ __all__ = [
 
 
 def triangulate(points, material="dfalt"):
-    """Generate a triangulated mesh from cloud points.
+    """
+    Generate a triangulated mesh from cloud points.
 
     Parameters
     ----------

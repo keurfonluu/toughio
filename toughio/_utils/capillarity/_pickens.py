@@ -8,7 +8,8 @@ __all__ = [
 
 
 class Pickens(BaseCapillarity):
-    """Pickens et al. function.
+    """
+    Pickens et al. function.
 
     After Pickens et al. (1979).
 

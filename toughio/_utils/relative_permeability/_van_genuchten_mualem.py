@@ -6,7 +6,8 @@ __all__ = [
 
 
 class vanGenuchtenMualem(BaseRelativePermeability):
-    """van Genuchten-Mualem function.
+    """
+    van Genuchten-Mualem function.
 
     After Mualem (1976) and van Genuchten (1980).
 

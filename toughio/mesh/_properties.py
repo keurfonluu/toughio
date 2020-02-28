@@ -157,7 +157,8 @@ def _volumes(mesh):
 
 
 def _connections(mesh):
-    """Return mesh connections.
+    """
+    Return mesh connections.
 
     Assume conformity and that points and cells are uniquely defined in mesh.
 

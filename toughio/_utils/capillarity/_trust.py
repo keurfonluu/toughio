@@ -6,7 +6,8 @@ __all__ = [
 
 
 class TRUST(BaseCapillarity):
-    """TRUST capillary pressure.
+    """
+    TRUST capillary pressure.
 
     After Narasimhan et al. (1978).
 

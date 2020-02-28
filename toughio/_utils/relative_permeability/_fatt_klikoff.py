@@ -6,7 +6,8 @@ __all__ = [
 
 
 class FattKlikoff(BaseRelativePermeability):
-    """Fatt and Klikoff's function.
+    """
+    Fatt and Klikoff's function.
 
     After Fatt and Klikoff (1959).
 

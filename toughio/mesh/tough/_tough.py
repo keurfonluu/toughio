@@ -47,7 +47,8 @@ def block(keyword):
 
 
 def read(filename):
-    """Read TOUGH MESH file is not supported yet.
+    """
+    Read TOUGH MESH file is not supported yet.
 
     MESH file does not store any geometrical information except node centers.
 
@@ -402,7 +403,8 @@ def _write_incon(
 
 
 def _intersection_line_plane(center, lines, int_points, int_normals):
-    """Calculate the intersection point between a line and a plane.
+    """
+    Calculate the intersection point between a line and a plane.
 
     Calculate intersection between a line defined by a point and a direction vector and
     a plane defined by one point and a normal vector.
@@ -413,7 +415,8 @@ def _intersection_line_plane(center, lines, int_points, int_normals):
 
 
 def _distance_point_plane(center, int_points, int_normals, mask):
-    """Calculate orthogonal distance.
+    """
+    Calculate orthogonal distance.
 
     Calculate orthogonal distance of a point to a plane defined by one point and a
     normal vector.
@@ -423,7 +426,8 @@ def _distance_point_plane(center, int_points, int_normals, mask):
 
 
 def _isot(lines):
-    """Determine direction of anisotropy.
+    """
+    Determine direction of anisotropy.
 
     Given the direction of the line connecting the cell centers, calculate the
     direction of anisotropy.
