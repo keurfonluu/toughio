@@ -31,8 +31,9 @@ class Verma(BaseRelativePermeability):
     def __init__(self, slr=0.2, sls=0.895, a=1.259, b=-1.7615, c=0.5089):
         self.parameters = [slr, sls, a, b, c]
 
-    def _eval(self, sl, slr, sls, a, b, c):
+    def _eval(self, sl, *args):
         """Verma's function."""
+        slr, sls, a, b, c = args
         Shat = (sl - slr) / (sls - slr)
         Shat = max(Shat, 0.0)
         Shat = min(Shat, 1.0)

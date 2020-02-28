@@ -44,7 +44,7 @@ class BaseCapillarity(ABC):
             return numpy.array([self._eval(sat, *self.parameters) for sat in sl])
 
     @abstractmethod
-    def _eval(self, *args):
+    def _eval(self, sl, *args):
         raise NotImplementedError()
 
     def plot(self, n=100, ax=None, figsize=(10, 8), plt_kws=None):

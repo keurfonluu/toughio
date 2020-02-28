@@ -35,8 +35,9 @@ class TRUST(BaseCapillarity):
             raise ValueError()
         self.parameters = [p0, slr, eta, pe, pmax]
 
-    def _eval(self, sl, p0, slr, eta, pe, pmax):
+    def _eval(self, sl, *args):
         """TRUST capillary pressure."""
+        p0, slr, eta, pe, pmax = args
         if sl > slr:
             pcap = -pe - p0 * ((1.0 - sl) / (sl - slr)) ** (1.0 / eta)
         else:

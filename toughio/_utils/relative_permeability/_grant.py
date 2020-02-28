@@ -27,8 +27,9 @@ class Grant(BaseRelativePermeability):
             raise ValueError()
         self.parameters = [slr, sgr]
 
-    def _eval(self, sl, slr, sgr):
+    def _eval(self, sl, *args):
         """Grant's curve."""
+        slr, sgr = args
         sg = 1.0 - sl
         if sg < sgr:
             kl = 1.0
