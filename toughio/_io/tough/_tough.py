@@ -184,7 +184,8 @@ def _add_record(data, id_fmt="{:>5g}     "):
 @check_parameters(dtypes["MODEL"], keys=("rocks", "capillarity"), is_list=True)
 @block("ROCKS", multi=True)
 def _write_rocks(parameters):
-    """TOUGH input ROCKS block data.
+    """
+    TOUGH input ROCKS block data.
 
     Introduces material parameters for up to 27 different reservoir domains.
 
@@ -260,7 +261,8 @@ def _write_rocks(parameters):
 )
 @block("FLAC", multi=True)
 def _write_flac(parameters):
-    """TOUGH input FLAC block data (optional).
+    """
+    TOUGH input FLAC block data (optional).
 
     Introduces mechanical parameters for each material in ROCKS block data.
 
@@ -298,7 +300,8 @@ def _write_flac(parameters):
 
 @block("MULTI")
 def _write_multi(parameters):
-    """TOUGH input MULTI block (optional).
+    """
+    TOUGH input MULTI block (optional).
 
     Permits the user to select the number and nature of balance equations that will be
     solved. The keyword MULTI is followed by a single data record. For most EOS modules,
@@ -324,7 +327,8 @@ def _write_multi(parameters):
 @check_parameters(dtypes["SELEC"], keys="selections")
 @block("SELEC")
 def _write_selec(parameters):
-    """TOUGH input SELEC block (optional).
+    """
+    TOUGH input SELEC block (optional).
 
     Introduces a number of integer and floating point parameters that are used for
     different purposes in different TOUGH modules (EOS7, EOS7R, EWASG, T2DM, ECO2N).
@@ -350,7 +354,8 @@ def _write_selec(parameters):
 @check_parameters(dtypes["SOLVR"], keys="solver")
 @block("SOLVR")
 def _write_solvr(parameters):
-    """TOUGH input SOLVR block (optional).
+    """
+    TOUGH input SOLVR block (optional).
 
     Introduces computation parameters, time stepping information, and default initial
     conditions.
@@ -375,7 +380,8 @@ def _write_solvr(parameters):
 
 @block("START")
 def _write_start():
-    """TOUGH input START block (optional).
+    """
+    TOUGH input START block (optional).
 
     A record with START typed in columns 1-5 allows a more flexible initialization. More
     specifically, when START is present, INCON data can be in arbitrary order, and need
@@ -394,7 +400,8 @@ def _write_start():
 @check_parameters(dtypes["MOP"], keys="extra_options")
 @block("PARAM")
 def _write_param(parameters):
-    """TOUGH input PARAM block data.
+    """
+    TOUGH input PARAM block data.
 
     Introduces computation parameters, time stepping information, and default initial
     conditions.
@@ -477,7 +484,8 @@ def _write_param(parameters):
 @check_parameters(dtypes["MOMOP"], keys="more_options")
 @block("MOMOP")
 def _write_momop(parameters):
-    """TOUGH input MOMOP block data (optional).
+    """
+    TOUGH input MOMOP block data (optional).
 
     Provides additional options.
 
@@ -494,7 +502,8 @@ def _write_momop(parameters):
 
 @block("INDOM", multi=True)
 def _write_indom(parameters):
-    """TOUGH input INDOM block data (optional).
+    """
+    TOUGH input INDOM block data (optional).
 
     Introduces domain-specific initial conditions.
 
@@ -517,7 +526,8 @@ def _write_indom(parameters):
 
 @block("TIMES", multi=True)
 def _write_times(parameters):
-    """TOUGH input TIMES block data (optional).
+    """
+    TOUGH input TIMES block data (optional).
 
     Permits the user to obtain printout at specified times.
 
@@ -531,7 +541,8 @@ def _write_times(parameters):
 
 @block("FOFT", multi=True)
 def _write_foft(parameters):
-    """TOUGH input FOFT block data (optional).
+    """
+    TOUGH input FOFT block data (optional).
 
     Introduces a list of elements (grid blocks) for which time-dependent data are to be
     written out for plotting to a file called FOFT during the simulation.
@@ -544,7 +555,8 @@ def _write_foft(parameters):
 
 @block("COFT", multi=True)
 def _write_coft(parameters):
-    """TOUGH input COFT block data (optional).
+    """
+    TOUGH input COFT block data (optional).
 
     Introduces a list of connections for which time-dependent data are to be written out
     for plotting to a file called COFT during the simulation.
@@ -557,7 +569,8 @@ def _write_coft(parameters):
 
 @block("GOFT", multi=True)
 def _write_goft(parameters):
-    """TOUGH input GOFT block data (optional).
+    """
+    TOUGH input GOFT block data (optional).
 
     Introduces a list of sinks/sources for which time-dependent data are to be written
     out for plotting to a file called GOFT during the simulation.
@@ -571,7 +584,8 @@ def _write_goft(parameters):
 @check_parameters(dtypes["GENER"], keys="generators", is_list=True)
 @block("GENER", multi=True)
 def _write_gener(parameters):
-    """TOUGH input GENER block data (optional).
+    """
+    TOUGH input GENER block data (optional).
 
     Introduces sinks and/or sources.
 
@@ -684,7 +698,8 @@ def _write_gener(parameters):
 
 @block("DIFFU")
 def _write_diffu(parameters):
-    """TOUGH input DIFFU block data (optional).
+    """
+    TOUGH input DIFFU block data (optional).
 
     Introduces diffusion coefficients.
 
@@ -702,7 +717,8 @@ def _write_diffu(parameters):
 @check_parameters(dtypes["OUTPU"], keys="output")
 @block("OUTPU")
 def _write_outpu(parameters):
-    """TOUGH(3) input OUTPU block data (optional).
+    """
+    TOUGH input OUTPU block data (optional).
 
     Specifies variables/parameters for printout.
 
