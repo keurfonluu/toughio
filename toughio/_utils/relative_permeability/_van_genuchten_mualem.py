@@ -57,7 +57,8 @@ class vanGenuchtenMualem(BaseRelativePermeability):
 
     @parameters.setter
     def parameters(self, value):
-        assert len(value) == 4
+        if len(value) != 4:
+            raise ValueError()
         self._m = value[0]
         self._slr = value[1]
         self._sls = value[2]

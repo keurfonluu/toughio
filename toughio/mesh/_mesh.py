@@ -114,15 +114,15 @@ class Mesh(object):
             Extruded mesh (only if ``inplace == False``).
 
         """
-        assert axis in [0, 1, 2], "axis must be 0, 1 or 2."
+        if axis not in [0, 1, 2]:
+            raise ValueError("axis must be 0, 1 or 2.")
         mesh = self if inplace else deepcopy(self)
         height = [height] if isinstance(height, (int, float)) else height
 
         npts, nh = len(mesh.points), len(height)
         if mesh.points.shape[1] == 3:
-            assert (
-                len(set(mesh.points[:, axis])) == 1
-            ), "Cannot extrude mesh along axis {}.".format(axis)
+            if len(set(mesh.points[:, axis])) != 1:
+                raise ValueError("Cannot extrude mesh along axis {}.".format(axis))
         else:
             mesh.points = numpy.column_stack((mesh.points, numpy.zeros(npts)))
             if axis != 2:
@@ -220,7 +220,8 @@ class Mesh(object):
             List of subarrays.
 
         """
-        assert len(arr) == self.n_cells
+        if len(arr) != self.n_cells:
+            raise ValueError()
         sizes = numpy.cumsum([len(c.data) for c in self.cells])
 
         return numpy.split(numpy.asarray(arr), sizes[:-1])
@@ -340,8 +341,10 @@ class Mesh(object):
         from .. import read_output
         from .._io._helpers import Output, Save, _reorder_labels
 
-        assert isinstance(file_or_output, (str, list, tuple, Output, Save))
-        assert isinstance(time_step, int)
+        if not isinstance(file_or_output, (str, list, tuple, Output, Save)):
+            raise TypeError()
+        if not isinstance(time_step, int):
+            raise TypeError()
 
         if isinstance(file_or_output, str):
             out = read_output(file_or_output)
@@ -349,10 +352,12 @@ class Mesh(object):
             out = file_or_output
 
         if not isinstance(out, (Output, Save)):
-            assert -len(out) <= time_step < len(out)
+            if not (-len(out) <= time_step < len(out)):
+                raise ValueError()
             out = out[time_step]
 
-        assert len(out.labels) == self.n_cells
+        if len(out.labels) != self.n_cells:
+            raise ValueError()
         out = _reorder_labels(out, self.labels)
         self.cell_data.update(out.data)
 
@@ -389,9 +394,12 @@ class Mesh(object):
             Point data array.
 
         """
-        assert isinstance(label, str)
-        assert isinstance(data, (list, tuple, numpy.ndarray))
-        assert len(data) == self.n_points
+        if not isinstance(label, str):
+            raise TypeError()
+        if not isinstance(data, (list, tuple, numpy.ndarray)):
+            raise TypeError()
+        if len(data) != self.n_points:
+            raise ValueError()
         self.point_data[label] = numpy.asarray(data)
 
     def add_cell_data(self, label, data):
@@ -405,9 +413,12 @@ class Mesh(object):
             Cell data array.
 
         """
-        assert isinstance(label, str)
-        assert isinstance(data, (list, tuple, numpy.ndarray))
-        assert len(data) == self.n_cells
+        if not isinstance(label, str):
+            raise TypeError()
+        if not isinstance(data, (list, tuple, numpy.ndarray)):
+            raise TypeError()
+        if len(data) != self.n_cells:
+            raise ValueError()
         self.cell_data[label] = self.split(data)
 
     def set_material(self, material, xlim=None, ylim=None, zlim=None):
@@ -440,17 +451,25 @@ class Mesh(object):
                 else numpy.ones(len(x), dtype=bool)
             )
 
-        assert isinstance(material, str)
-        assert xlim is not None or ylim is not None or zlim is not None
-        assert xlim is None or (
-            isinstance(xlim, (list, tuple, numpy.ndarray)) and len(xlim) == 2
-        )
-        assert ylim is None or (
-            isinstance(ylim, (list, tuple, numpy.ndarray)) and len(ylim) == 2
-        )
-        assert zlim is None or (
-            isinstance(zlim, (list, tuple, numpy.ndarray)) and len(zlim) == 2
-        )
+        if not isinstance(material, str):
+            raise TypeError()
+        if not (xlim is not None or ylim is not None or zlim is not None):
+            raise TypeError()
+        if not (
+            xlim is None
+            or (isinstance(xlim, (list, tuple, numpy.ndarray)) and len(xlim) == 2)
+        ):
+            raise ValueError()
+        if not (
+            ylim is None
+            or (isinstance(ylim, (list, tuple, numpy.ndarray)) and len(ylim) == 2)
+        ):
+            raise ValueError()
+        if not (
+            zlim is None
+            or (isinstance(zlim, (list, tuple, numpy.ndarray)) and len(zlim) == 2)
+        ):
+            raise ValueError()
 
         x, y, z = numpy.concatenate(self.centers).T
         mask_x = isinbounds(x, xlim)
@@ -483,9 +502,12 @@ class Mesh(object):
             Local index of cell as a tuple (iblock, icell).
 
         """
-        assert isinstance(point, (list, tuple, numpy.ndarray))
-        assert numpy.ndim(point) == 1
-        assert len(point) == self.points.shape[1]
+        if not isinstance(point, (list, tuple, numpy.ndarray)):
+            raise TypeError()
+        if numpy.ndim(point) != 1:
+            raise ValueError()
+        if len(point) != self.points.shape[1]:
+            raise ValueError()
 
         centers = numpy.concatenate(self.centers)
         idx = numpy.arange(self.n_cells)

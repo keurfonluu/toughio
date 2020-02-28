@@ -86,15 +86,21 @@ def cylindric_grid(dr, dz, origin_z=None, material="dfalt"):
         Output cylindric mesh.
 
     """
-    assert isinstance(dr, (list, tuple, numpy.ndarray))
-    assert isinstance(dz, (list, tuple, numpy.ndarray))
-    assert origin_z is None or isinstance(origin_z, (int, float))
-    assert isinstance(material, str)
+    if not isinstance(dr, (list, tuple, numpy.ndarray)):
+        raise TypeError()
+    if not isinstance(dz, (list, tuple, numpy.ndarray)):
+        raise TypeError()
+    if not (origin_z is None or isinstance(origin_z, (int, float))):
+        raise TypeError()
+    if not isinstance(material, str):
+        raise TypeError()
 
     dr = numpy.asarray(dr)
     dz = numpy.asarray(dz)
-    assert (dr > 0.0).all()
-    assert (dz > 0.0).all()
+    if not (dr > 0.0).all():
+        raise ValueError()
+    if not (dz > 0.0).all():
+        raise ValueError()
     origin_z = origin_z if origin_z is not None else -dz.sum()
 
     mesh = structured_grid(

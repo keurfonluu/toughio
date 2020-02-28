@@ -56,12 +56,14 @@ def read(filename):
 
 def write(filename, mesh, nodal_distance, material_name, material_end, incon_eos):
     """Write TOUGH MESH file."""
-    assert nodal_distance in {"line", "orthogonal"}
-    assert material_name is None or isinstance(material_name, dict)
-    assert material_end is None or isinstance(material_end, (str, list, tuple))
-    assert (
-        incon_eos is None or incon_eos in _eos_to_neq.keys()
-    ), "EOS '{}' is unknown or not supported.".format(incon_eos)
+    if nodal_distance not in {"line", "orthogonal"}:
+        raise ValueError()
+    if not (material_name is None or isinstance(material_name, dict)):
+        raise TypeError()
+    if not (material_end is None or isinstance(material_end, (str, list, tuple))):
+        raise TypeError()
+    if not (incon_eos is None or incon_eos in _eos_to_neq.keys()):
+        raise ValueError("EOS '{}' is unknown or not supported.".format(incon_eos))
 
     # Required variables for blocks ELEME and CONNE
     num_cells = mesh.n_cells
@@ -169,9 +171,8 @@ def write_buffer(
         if not incon_eos:
             logging.warning("Porosity is only exported if incon_eos is provided.")
         else:
-            assert (
-                len(porosities) == num_cells and porosities.ndim == 1
-            ), "Inconsistent porosity array."
+            if not (len(porosities) == num_cells and porosities.ndim == 1):
+                raise ValueError("Inconsistent porosity array.")
 
     if permeabilities is not None:
         if not incon_eos:
@@ -179,12 +180,14 @@ def write_buffer(
                 "Permeability modifiers are only exported if incon_eos is provided."
             )
         else:
-            assert permeabilities.ndim in {1, 2}
-            assert (
+            if permeabilities.ndim not in {1, 2}:
+                raise ValueError()
+            if not (
                 permeabilities.shape == (num_cells, 3)
                 if permeabilities.ndim == 2
                 else len(permeabilities) == num_cells
-            ), "Inconsistent permeability modifiers array."
+            ):
+                raise ValueError("Inconsistent permeability modifiers array.")
 
     # Write MESH file
     with open(filename, "w") as f:

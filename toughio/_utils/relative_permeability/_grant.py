@@ -23,7 +23,8 @@ class Grant(BaseRelativePermeability):
     _name = "Grant"
 
     def __init__(self, slr, sgr):
-        assert slr + sgr < 1.0
+        if slr + sgr >= 1.0:
+            raise ValueError()
         self.parameters = [slr, sgr]
 
     def _eval(self, sl, slr, sgr):
@@ -48,6 +49,7 @@ class Grant(BaseRelativePermeability):
 
     @parameters.setter
     def parameters(self, value):
-        assert len(value) == 2
+        if len(value) != 2:
+            raise ValueError()
         self._slr = value[0]
         self._sgr = value[1]
