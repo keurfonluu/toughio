@@ -35,7 +35,7 @@ class vanGenuchten(BaseCapillarity):
         self.parameters = [m, slr, alpha, pmax, sls]
 
     def _eval(self, sl, *args):
-        """van Genuchten function."""
+        """Van Genuchten function."""
         m, slr, alpha, pmax, sls = args
         if sl == 1.0:
             pcap = 0.0
