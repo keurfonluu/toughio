@@ -6,20 +6,20 @@ __all__ = [
 
 
 class Pickens(BaseRelativePermeability):
-    """
-    Gas perfect mobile function.
-
-    Parameters
-    ----------
-    x : scalar
-        RP(1).
-
-    """
 
     _id = 2
     _name = "Pickens"
 
     def __init__(self, x):
+        """
+        Gas perfect mobile function.
+
+        Parameters
+        ----------
+        x : scalar
+            RP(1).
+
+        """
         self.parameters = [x]
 
     def _eval(self, sl, *args):

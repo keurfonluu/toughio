@@ -6,30 +6,30 @@ __all__ = [
 
 
 class vanGenuchten(BaseCapillarity):
-    """
-    van Genuchten function.
-
-    After van Genuchten (1980).
-
-    Parameters
-    ----------
-    m : scalar
-        Related to pore size distribution (CP(1)).
-    slr : scalar
-        Irreducible liquid saturation (CP(2)).
-    alpha : scalar
-        Inverse of capillary pressure strength 1/P0 (CP(3)).
-    pmax : scalar
-        Maximum pressure (CP(4)).
-    sls : scalar
-        Maximum liquid saturation (CP(5)).
-
-    """
 
     _id = 7
     _name = "van Genuchten"
 
     def __init__(self, m, slr, alpha, pmax, sls):
+        """
+        van Genuchten function.
+
+        After van Genuchten (1980).
+
+        Parameters
+        ----------
+        m : scalar
+            Related to pore size distribution (CP(1)).
+        slr : scalar
+            Irreducible liquid saturation (CP(2)).
+        alpha : scalar
+            Inverse of capillary pressure strength 1/P0 (CP(3)).
+        pmax : scalar
+            Maximum pressure (CP(4)).
+        sls : scalar
+            Maximum liquid saturation (CP(5)).
+
+        """
         if pmax < 0.0:
             raise ValueError()
         self.parameters = [m, slr, alpha, pmax, sls]

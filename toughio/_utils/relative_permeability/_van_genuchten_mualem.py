@@ -6,28 +6,28 @@ __all__ = [
 
 
 class vanGenuchtenMualem(BaseRelativePermeability):
-    """
-    van Genuchten-Mualem function.
-
-    After Mualem (1976) and van Genuchten (1980).
-
-    Parameters
-    ----------
-    m : scalar
-        Related to pore size distribution (RP(1)).
-    slr : scalar
-        Irreducible liquid saturation (RP(2)).
-    sls : scalar
-        Maximum liquid saturation (RP(3)).
-    sgr : scalar
-        Irreducible gas saturation (RP(4)).
-
-    """
 
     _id = 7
     _name = "van Genuchten-Mualem"
 
     def __init__(self, m, slr, sls, sgr):
+        """
+        van Genuchten-Mualem function.
+
+        After Mualem (1976) and van Genuchten (1980).
+
+        Parameters
+        ----------
+        m : scalar
+            Related to pore size distribution (RP(1)).
+        slr : scalar
+            Irreducible liquid saturation (RP(2)).
+        sls : scalar
+            Maximum liquid saturation (RP(3)).
+        sgr : scalar
+            Irreducible gas saturation (RP(4)).
+
+        """
         self.parameters = [m, slr, sls, sgr]
 
     def _eval(self, sl, *args):

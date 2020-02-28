@@ -6,30 +6,30 @@ __all__ = [
 
 
 class TRUST(BaseCapillarity):
-    """
-    TRUST capillary pressure.
-
-    After Narasimhan et al. (1978).
-
-    Parameters
-    ----------
-    p0 : scalar
-        Capillary pressure strength (CP(1)).
-    slr : scalar
-        Irreducible liquid saturation (CP(2)).
-    eta : scalar
-        CP(3).
-    pe : scalar
-        Capillary entry pressure (CP(4)).
-    pmax : scalar
-        Maximum pressure (CP(5)).
-
-    """
 
     _id = 3
     _name = "TRUST"
 
     def __init__(self, p0, slr, eta, pe, pmax):
+        """
+        TRUST capillary pressure.
+
+        After Narasimhan et al. (1978).
+
+        Parameters
+        ----------
+        p0 : scalar
+            Capillary pressure strength (CP(1)).
+        slr : scalar
+            Irreducible liquid saturation (CP(2)).
+        eta : scalar
+            CP(3).
+        pe : scalar
+            Capillary entry pressure (CP(4)).
+        pmax : scalar
+            Maximum pressure (CP(5)).
+
+        """
         if slr < 0.0:
             raise ValueError()
         if eta == 0.0:

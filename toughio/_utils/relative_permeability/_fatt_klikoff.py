@@ -6,22 +6,22 @@ __all__ = [
 
 
 class FattKlikoff(BaseRelativePermeability):
-    """
-    Fatt and Klikoff's function.
-
-    After Fatt and Klikoff (1959).
-
-    Parameters
-    ----------
-    slr : scalar
-        Irreducible liquid saturation (RP(1)).
-
-    """
 
     _id = 7
     _name = "Fatt-Klikoff"
 
     def __init__(self, slr):
+        """
+        Fatt and Klikoff's function.
+
+        After Fatt and Klikoff (1959).
+
+        Parameters
+        ----------
+        slr : scalar
+            Irreducible liquid saturation (RP(1)).
+
+        """
         if slr >= 1.0:
             raise ValueError()
         self.parameters = [slr]

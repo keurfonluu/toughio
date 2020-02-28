@@ -6,24 +6,24 @@ __all__ = [
 
 
 class Corey(BaseRelativePermeability):
-    """
-    Corey's curve.
-
-    After Corey (1954).
-
-    Parameters
-    ----------
-    slr : scalar
-        Irreducible liquid saturation (RP(1)).
-    sgr : scalar
-        Irreducible gas saturation (RP(2)).
-
-    """
 
     _id = 3
     _name = "Corey"
 
     def __init__(self, slr, sgr):
+        """
+        Corey's curve.
+
+        After Corey (1954).
+
+        Parameters
+        ----------
+        slr : scalar
+            Irreducible liquid saturation (RP(1)).
+        sgr : scalar
+            Irreducible gas saturation (RP(2)).
+
+        """
         if slr + sgr >= 1.0:
             raise ValueError()
         self.parameters = [slr, sgr]

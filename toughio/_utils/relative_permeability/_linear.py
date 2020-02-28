@@ -6,26 +6,26 @@ __all__ = [
 
 
 class Linear(BaseRelativePermeability):
-    """
-    Linear function.
-
-    Parameters
-    ----------
-    slmin : scalar
-        Lower liquid saturation threshold (CP(1)).
-    sgmin : scalar
-        Lower gas saturation threshold (CP(2)).
-    slmax : scalar
-        Upper liquid saturation threshold (CP(3)).
-    sgmax : scalar
-        Upper gas saturation threshold (CP(4)).
-
-    """
 
     _id = 1
     _name = "Linear"
 
     def __init__(self, slmin, sgmin, slmax, sgmax):
+        """
+        Linear function.
+
+        Parameters
+        ----------
+        slmin : scalar
+            Lower liquid saturation threshold (CP(1)).
+        sgmin : scalar
+            Lower gas saturation threshold (CP(2)).
+        slmax : scalar
+            Upper liquid saturation threshold (CP(3)).
+        sgmax : scalar
+            Upper gas saturation threshold (CP(4)).
+
+        """
         if slmin >= slmax:
             raise ValueError()
         if sgmin >= sgmax:

@@ -12,17 +12,17 @@ ABC = ABCMeta("ABC", (object,), {"__slots__": ()})
 
 
 class BaseCapillarity(ABC):
-    """
-    Base class for capillarity models.
-
-    Do not use.
-
-    """
 
     _id = None
     _name = ""
 
     def __init__(self, *args):
+        """
+        Base class for capillarity models.
+
+        Do not use.
+
+        """
         pass
 
     def __repr__(self):
