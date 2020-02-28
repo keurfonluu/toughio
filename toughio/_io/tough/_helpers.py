@@ -100,10 +100,7 @@ dtypes = {
         "specific_enthalpy": "scalar_array_like",
         "layer_thickness": "scalar_array_like",
     },
-    "OUTPU": {
-        "format": "str",
-        "variables": "dict",
-    },
+    "OUTPU": {"format": "str", "variables": "dict"},
 }
 
 

@@ -1,4 +1,5 @@
 import logging
+from itertools import chain
 
 import numpy
 
@@ -73,8 +74,7 @@ def _faces(mesh):
 
 def _face_normals(mesh):
     """Return normal vectors of faces in mesh."""
-    faces = numpy.concatenate(mesh.faces)
-    faces_dict, faces_cell, _ = _get_faces(faces)
+    faces_dict, faces_cell, _ = _get_faces(_faces(mesh))
 
     # Face normal vectors
     normals = numpy.concatenate(
@@ -94,8 +94,7 @@ def _face_normals(mesh):
 
 def _face_areas(mesh):
     """Return areas of faces in mesh."""
-    faces = numpy.concatenate(mesh.faces)
-    faces_dict, faces_cell, _ = _get_faces(faces)
+    faces_dict, faces_cell, _ = _get_faces(_faces(mesh))
 
     # Face areas
     areas = numpy.concatenate(
@@ -125,13 +124,6 @@ def _face_areas(mesh):
 
 def _volumes(mesh):
     """Return volumes of cell in mesh."""
-
-    def scalar_triple_product(a, b, c):
-        c0 = b[:, 1] * c[:, 2] - b[:, 2] * c[:, 1]
-        c1 = b[:, 2] * c[:, 0] - b[:, 0] * c[:, 2]
-        c2 = b[:, 0] * c[:, 1] - b[:, 1] * c[:, 0]
-        return a[:, 0] * c0 + a[:, 1] * c1 + a[:, 2] * c2
-
     meshio_type_to_tetra = {
         "tetra": numpy.array([[0, 1, 2, 3]]),
         "pyramid": numpy.array([[0, 1, 3, 4], [1, 2, 3, 4]]),
@@ -149,7 +141,7 @@ def _volumes(mesh):
             numpy.sum(
                 numpy.split(
                     numpy.abs(
-                        scalar_triple_product(
+                        _scalar_triple_product(
                             tetras[:, 1] - tetras[:, 0],
                             tetras[:, 2] - tetras[:, 0],
                             tetras[:, 3] - tetras[:, 0],
@@ -173,8 +165,7 @@ def _connections(mesh):
         numpy.shape(mesh.points)[1] == 3
     ), "Connections for 2D mesh has not been implemented yet."
 
-    faces = numpy.concatenate(mesh.faces)
-    faces_dict, faces_cell, faces_index = _get_faces(faces)
+    faces_dict, faces_cell, faces_index = _get_faces(_faces(mesh))
     faces_dict = {k: numpy.sort(numpy.vstack(v), axis=1) for k, v in faces_dict.items()}
 
     # Prune duplicate faces
@@ -209,13 +200,12 @@ def _get_faces(faces):
     numvert_to_face_type = {3: "triangle", 4: "quad"}
 
     for i, face in enumerate(faces):
-        numvert = (face >= 0).sum(axis=-1)
-        for j, (f, n) in enumerate(zip(face, numvert)):
-            if n > 0:
-                face_type = numvert_to_face_type[n]
-                faces_dict[face_type].append(f[:n])
-                faces_cell[face_type].append(i)
-                faces_index[face_type].append(j)
+        for j, f in enumerate(chain.from_iterable(face)):
+            n = len(f)
+            face_type = numvert_to_face_type[n]
+            faces_dict[face_type].append(f[:n])
+            faces_cell[face_type].append(i)
+            faces_index[face_type].append(j)
 
     # Stack arrays or remove empty cells
     faces_dict = {k: numpy.vstack(v) for k, v in faces_dict.items() if len(v)}
@@ -227,13 +217,19 @@ def _get_faces(faces):
 
 def _get_triangle_normals(mesh, faces, islice=None):
     """Calculate normal vectors of triangular faces."""
-
-    def cross(a, b):
-        return a[:, [1, 2, 0]] * b[:, [2, 0, 1]] - a[:, [2, 0, 1]] * b[:, [1, 2, 0]]
-
     islice = islice if islice is not None else [0, 1, 2]
 
     triangles = numpy.vstack([c[islice] for c in faces])
     triangles = mesh.points[triangles]
 
-    return cross(triangles[:, 1] - triangles[:, 0], triangles[:, 2] - triangles[:, 0])
+    return _cross(triangles[:, 1] - triangles[:, 0], triangles[:, 2] - triangles[:, 0])
+
+
+def _cross(a, b):
+    """Calculate cross product (faster than :function:`numpy.cross`)."""
+    return a[:, [1, 2, 0]] * b[:, [2, 0, 1]] - a[:, [2, 0, 1]] * b[:, [1, 2, 0]]
+
+
+def _scalar_triple_product(a, b, c):
+    """Calculate determinant as scalar triple product."""
+    return (a * _cross(b, c)).sum(axis=-1)
