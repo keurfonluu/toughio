@@ -112,7 +112,7 @@ def read_output(filename, file_format="tough", labels_order=None):
         Input file name.
     file_format : str ('tough' or 'tecplot'), optional, default 'tough'
         TOUGH output file format.
-    labels_order : list of array_like
+    labels_order : list of array_like or None, optional, default None
         List of labels as returned by :property:`toughio.Mesh.labels`.
 
     Returns
@@ -287,13 +287,13 @@ def read_save(filename, labels_order=None):
     ----------
     filename : str
         Input file name.
+    labels_order : list of array_like or None, optional, default None
+        List of labels as returned by :property:`toughio.Mesh.labels`.
 
     Returns
     -------
     list of namedtuple
         SAVE data as namedtuple (labels, data).
-    labels_order : list of array_like
-        List of labels as returned by :property:`toughio.Mesh.labels`.
 
     Note
     ----
