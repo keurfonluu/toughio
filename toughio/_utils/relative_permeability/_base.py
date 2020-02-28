@@ -26,8 +26,7 @@ class BaseRelativePermeability(ABC):
         pass
 
     def __repr__(self):
-        """Represent a
-        :class:`toughio.relative_permeability.BaseRelativePermeability`."""
+        """Display relative permeability model informations."""
         out = [
             "{} relative permeability model (IRP = {}):".format(self._name, self._id)
         ]
