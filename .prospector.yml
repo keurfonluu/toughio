@@ -1,7 +1,15 @@
 pep257:
   run: true
   disable:
+    - D211
     - D212
+    - D401
+
+pep8:
+  run: false
+
+pylint:
+  run: false
 
 mccabe:
   run: false
