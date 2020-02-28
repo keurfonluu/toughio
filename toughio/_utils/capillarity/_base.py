@@ -26,6 +26,7 @@ class BaseCapillarity(ABC):
         pass
 
     def __repr__(self):
+        """Represent a :class:`toughio.capillarity.BaseCapillarity`."""
         out = ["{} capillarity model (ICP = {}):".format(self._name, self._id)]
         out += [
             "    CP({}) = {}".format(i + 1, parameter)
@@ -34,6 +35,7 @@ class BaseCapillarity(ABC):
         return "\n".join(out)
 
     def __call__(self, sl):
+        """Calculate capillary pressure given liquid saturation."""
         if numpy.ndim(sl) == 0:
             if not (0.0 <= sl <= 1.0):
                 raise ValueError()
