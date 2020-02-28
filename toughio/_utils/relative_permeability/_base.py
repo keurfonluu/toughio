@@ -12,7 +12,11 @@ ABC = ABCMeta("ABC", (object,), {"__slots__": ()})
 
 
 class BaseRelativePermeability(ABC):
-    """Base class for relative permeability models. Do not use."""
+    """Base class for relative permeability models.
+
+    Do not use.
+
+    """
 
     _id = None
     _name = ""

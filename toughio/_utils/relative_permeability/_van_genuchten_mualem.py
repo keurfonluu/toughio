@@ -20,7 +20,7 @@ class vanGenuchtenMualem(BaseRelativePermeability):
         Maximum liquid saturation (RP(3)).
     sgr : scalar
         Irreducible gas saturation (RP(4)).
-    
+
     """
 
     _id = 7

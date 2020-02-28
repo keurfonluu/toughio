@@ -44,7 +44,7 @@ def read_input(filename, file_format="json", **kwargs):
         Input file name.
     file_format : str ('tough', 'json'), optional, default 'json'
         Input file format.
-    
+
     Returns
     -------
     dict

@@ -12,7 +12,11 @@ ABC = ABCMeta("ABC", (object,), {"__slots__": ()})
 
 
 class BaseCapillarity(ABC):
-    """Base class for capillarity models. Do not use."""
+    """Base class for capillarity models.
+
+    Do not use.
+
+    """
 
     _id = None
     _name = ""
