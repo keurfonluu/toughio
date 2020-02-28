@@ -45,10 +45,10 @@ def write(filename, parameters):
     """
     from .._common import Parameters, default
 
-    assert "rocks" in parameters.keys(), "Block 'ROCKS' (key 'rocks') is not defined."
-    assert (
-        "options" in parameters.keys()
-    ), "Block 'PARAM' (key 'options') is not defined."
+    if "rocks" not in parameters.keys():
+        raise ValueError("Block 'ROCKS' (key 'rocks') is not defined.")
+    if "options" not in parameters.keys():
+        raise ValueError("Block 'PARAM' (key 'options') is not defined.")
 
     params = deepcopy(Parameters)
     params.update(deepcopy(parameters))
@@ -210,7 +210,8 @@ def _write_rocks(parameters):
         # Permeability
         per = data["permeability"]
         per = [per] * 3 if isinstance(per, float) else per
-        assert isinstance(per, (list, tuple, numpy.ndarray)) and len(per) == 3
+        if not (isinstance(per, (list, tuple, numpy.ndarray)) and len(per) == 3):
+            raise TypeError()
 
         # Record 1
         out += _write_record(
@@ -599,8 +600,10 @@ def _write_gener(parameters):
             # Check that values in dict have the same length
             for key in keys:
                 if data[key] is not None:
-                    assert isinstance(data[key], (list, tuple, numpy.ndarray))
-                    assert len(data[key]) == num_comps
+                    if not isinstance(data[key], (list, tuple, numpy.ndarray)):
+                        raise TypeError()
+                    if len(data[key]) != num_comps:
+                        raise ValueError()
 
             # Split dict
             for i in range(num_comps):
@@ -617,7 +620,8 @@ def _write_gener(parameters):
             # Only one component for this element
             # Check that values are scalar or 1D array_like
             for key in keys:
-                assert numpy.ndim(data[key]) in {0, 1}
+                if numpy.ndim(data[key]) not in {0, 1}:
+                    raise ValueError()
             generator_data.append((k, data))
 
     out = []
@@ -628,14 +632,17 @@ def _write_gener(parameters):
             v["times"], (list, tuple, numpy.ndarray)
         ):
             ltab, itab = len(v["times"]), 1
-            assert isinstance(v["rates"], (list, tuple, numpy.ndarray))
-            assert ltab > 1 and ltab == len(v["rates"])
+            if not isinstance(v["rates"], (list, tuple, numpy.ndarray)):
+                raise TypeError()
+            if not (ltab > 1 and ltab == len(v["rates"])):
+                raise ValueError()
         else:
             # Rates and specific enthalpy tables cannot be written without a
             # time table
             for key in ["rates", "specific_enthalpy"]:
                 if v[key] is not None:
-                    assert numpy.ndim(v[key]) == 0
+                    if numpy.ndim(v[key]) != 0:
+                        raise ValueError()
 
         # Record 1
         out += _write_record(
@@ -688,7 +695,8 @@ def _write_diffu(parameters):
 
     Introduces diffusion coefficients.
     """
-    assert numpy.shape(parameters["diffusion"]) == (2, parameters["n_phase"])
+    if numpy.shape(parameters["diffusion"]) != (2, parameters["n_phase"]):
+        raise ValueError()
     mass1, mass2 = parameters["diffusion"]
 
     out = []
@@ -722,7 +730,8 @@ def _write_outpu(parameters):
             fmt = "{:20}"
             if v:
                 v = v if isinstance(v, (list, tuple, numpy.ndarray)) else [v]
-                assert 0 < len(v) < 3
+                if not (0 < len(v) < 3):
+                    raise ValueError()
                 fmt += "{:5}" * len(v)
                 out += "{}\n".format(fmt.format(k.upper(), *v))
             else:

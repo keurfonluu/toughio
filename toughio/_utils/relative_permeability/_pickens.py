@@ -32,5 +32,6 @@ class Pickens(BaseRelativePermeability):
 
     @parameters.setter
     def parameters(self, value):
-        assert len(value) == 1
+        if len(value) != 1:
+            raise ValueError()
         self._x = value[0]

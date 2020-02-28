@@ -23,7 +23,8 @@ class Linear(BaseCapillarity):
     _name = "Linear"
 
     def __init__(self, pmax, smin, smax):
-        assert smax > smin
+        if smax <= smin:
+            raise ValueError()
         self.parameters = [pmax, smin, smax]
 
     def _eval(self, sl, pmax, smin, smax):
@@ -43,7 +44,8 @@ class Linear(BaseCapillarity):
 
     @parameters.setter
     def parameters(self, value):
-        assert len(value) == 3
+        if len(value) != 3:
+            raise ValueError()
         self._pmax = value[0]
         self._smin = value[1]
         self._smax = value[2]

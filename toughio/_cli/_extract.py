@@ -14,10 +14,10 @@ def extract(argv=None):
     args = parser.parse_args(argv)
 
     # Check that TOUGH output and MESH file exist
-    assert os.path.isfile(args.infile), "TOUGH output file '{}' not found.".format(
-        args.infile
-    )
-    assert os.path.isfile(args.mesh), "MESH file '{}' not found.".format(args.mesh)
+    if not os.path.isfile(args.infile):
+        raise ValueError("TOUGH output file '{}' not found.".format(args.infile))
+    if not os.path.isfile(args.mesh):
+        raise ValueError("MESH file '{}' not found.".format(args.mesh))
 
     # Read MESH and extract X, Y and Z
     nodes, is_eleme = {}, False
@@ -36,7 +36,8 @@ def extract(argv=None):
                     line = next(f)
                 headers = ["X", "Y", "Z"]
                 break
-    assert is_eleme, "Invalid MESH file '{}'.".format(args.mesh)
+    if not is_eleme:
+        raise ValueError("Invalid MESH file '{}'.".format(args.mesh))
 
     # Read TOUGH output file
     out = []
@@ -149,7 +150,8 @@ def _read_table(f, points):
         line = next(f).strip()
         if line[1:].startswith("@@@@@"):
             break
-    assert count == len(points), "Inconsistent number of elements."
+    if count != len(points):
+        raise ValueError("Inconsistent number of elements.")
 
     return Output(
         time, labels, {k: v for k, v in zip(headers, numpy.transpose(variables))}

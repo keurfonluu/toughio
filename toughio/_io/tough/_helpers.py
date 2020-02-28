@@ -163,11 +163,12 @@ def check_parameters(input_types, keys=None, is_list=False):
 
             # Check input types
             input_type = str_to_dtype[input_types[k]]
-            assert v is None or isinstance(
-                v, input_type
-            ), "Invalid type for parameter '{}' {}(expected {}).".format(
-                k, "in {} ".format(keys) if keys else "", input_types[k],
-            )
+            if not (v is None or isinstance(v, input_type)):
+                raise TypeError(
+                    "Invalid type for parameter '{}' {}(expected {}).".format(
+                        k, "in {} ".format(keys) if keys else "", input_types[k],
+                    )
+                )
 
     keys = [keys] if isinstance(keys, str) else keys
 

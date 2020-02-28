@@ -14,8 +14,10 @@ def merge(argv=None):
     mesh_filename = head + ("/" if head else "") + "MESH"
     incon_filename = head + ("/" if head else "") + "INCON"
 
-    assert os.path.isfile(args.infile), "File '{}' not found.".format(args.infile)
-    assert os.path.isfile(mesh_filename), "MESH file not found."
+    if not os.path.isfile(args.infile):
+        raise ValueError("File '{}' not found.".format(args.infile))
+    if not os.path.isfile(mesh_filename):
+        raise ValueError("MESH file not found.")
     incon_exists = os.path.isfile(incon_filename)
 
     # Buffer input file
@@ -26,18 +28,21 @@ def merge(argv=None):
     count = 0
     for line in input_file:
         count += int(line.upper()[:5] in {"ROCKS", "PARAM", "ENDFI", "ENDCY"})
-    assert count >= 3, "Invalid input file '{}'.".format(args.infile)
+    if count < 3:
+        raise ValueError("Invalid input file '{}'.".format(args.infile))
 
     # Buffer MESH
     with open(mesh_filename, "r") as f:
         mesh_file = list(f)
-    assert mesh_file[0].startswith("ELEME"), "Invalid MESH file."
+    if not mesh_file[0].startswith("ELEME"):
+        raise ValueError("Invalid MESH file.")
 
     # Buffer INCON if exist
     if incon_exists:
         with open(incon_filename, "r") as f:
             incon_file = list(f)
-        assert incon_file[0].startswith("INCON"), "Invalid INCON file."
+        if not incon_file[0].startswith("INCON"):
+            raise ValueError("Invalid INCON file.")
 
     # Locate ENDFI or ENDCY
     for i, line in enumerate(input_file):

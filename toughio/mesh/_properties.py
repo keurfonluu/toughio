@@ -161,9 +161,8 @@ def _connections(mesh):
     
     Assume conformity and that points and cells are uniquely defined in mesh.
     """
-    assert (
-        numpy.shape(mesh.points)[1] == 3
-    ), "Connections for 2D mesh has not been implemented yet."
+    if numpy.shape(mesh.points)[1] != 3:
+        raise ValueError("Connections for 2D mesh has not been implemented yet.")
 
     faces_dict, faces_cell, faces_index = _get_faces(_faces(mesh))
     faces_dict = {k: numpy.sort(numpy.vstack(v), axis=1) for k, v in faces_dict.items()}

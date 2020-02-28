@@ -28,10 +28,14 @@ def triangulate(points, material="dfalt"):
     except ImportError:
         raise ImportError("Triangulation requires scipy >= 0.9 to be installed.")
 
-    assert isinstance(points, (list, tuple, numpy.ndarray))
-    assert numpy.ndim(points) == 2
-    assert numpy.shape(points)[1] in {2, 3}
-    assert isinstance(material, str)
+    if not isinstance(points, (list, tuple, numpy.ndarray)):
+        raise TypeError()
+    if numpy.ndim(points) != 2:
+        raise ValueError()
+    if numpy.shape(points)[1] not in {2, 3}:
+        raise ValueError()
+    if not isinstance(material, str):
+        raise TypeError()
 
     points = numpy.asarray(points)
     connectivity = Delaunay(points).simplices

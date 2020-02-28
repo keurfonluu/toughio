@@ -29,8 +29,10 @@ class TRUST(BaseCapillarity):
     _name = "TRUST"
 
     def __init__(self, p0, slr, eta, pe, pmax):
-        assert slr >= 0.0
-        assert eta != 0.0
+        if slr < 0.0:
+            raise ValueError()
+        if eta == 0.0:
+            raise ValueError()
         self.parameters = [p0, slr, eta, pe, pmax]
 
     def _eval(self, sl, p0, slr, eta, pe, pmax):
@@ -50,7 +52,8 @@ class TRUST(BaseCapillarity):
 
     @parameters.setter
     def parameters(self, value):
-        assert len(value) == 5
+        if len(value) != 5:
+            raise ValueError()
         self._p0 = value[0]
         self._slr = value[1]
         self._eta = value[2]

@@ -45,7 +45,8 @@ def read(filename, file_format=None, **kwargs):
 
     """
     # Check file format
-    assert isinstance(filename, str)
+    if not isinstance(filename, str):
+        raise TypeError()
     fmt = file_format if file_format else _filetype_from_filename(filename)
 
     # Call custom readers
@@ -99,7 +100,8 @@ def write(filename, mesh, file_format=None, **kwargs):
 
     """
     # Check file format
-    assert isinstance(filename, str)
+    if not isinstance(filename, str):
+        raise TypeError()
     fmt = file_format if file_format else _filetype_from_filename(filename)
 
     # Call custom writer
@@ -250,15 +252,15 @@ def write_time_series(
     from ._common import get_meshio_version, get_old_meshio_cells
 
     if not isinstance(filename, str):
-        raise ValueError()
+        raise TypeError()
     if point_data is not None and not isinstance(point_data, (list, tuple)):
-        raise ValueError()
+        raise TypeError()
     if cell_data is not None and not isinstance(cell_data, (list, tuple)):
-        raise ValueError()
+        raise TypeError()
     if time_steps is not None and not isinstance(
         time_steps, (list, tuple, numpy.ndarray)
     ):
-        raise ValueError()
+        raise TypeError()
 
     if not (point_data or cell_data):
         raise ValueError("Provide at least point_data or cell_data.")
