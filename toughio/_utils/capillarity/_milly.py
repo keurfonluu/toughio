@@ -27,7 +27,7 @@ class Milly(BaseCapillarity):
         self.parameters = [slr]
 
     def _eval(self, sl, *args):
-        slr, = args
+        (slr,) = args
         sl = max(sl, 1.001 * slr)
         fac = (
             1.0

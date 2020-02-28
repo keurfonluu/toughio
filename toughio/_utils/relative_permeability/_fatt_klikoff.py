@@ -28,7 +28,7 @@ class FattKlikoff(BaseRelativePermeability):
 
     def _eval(self, sl, *args):
         """Fatt and Klikoff's function."""
-        slr, = args
+        (slr,) = args
         Seff = (sl - slr) / (1.0 - slr) if sl > slr else 0.0
         kl = Seff ** 3
         kg = (1.0 - Seff) ** 3
