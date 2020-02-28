@@ -31,7 +31,6 @@ Cells = collections.namedtuple("Cells", ["type", "data"])
 
 
 class Mesh(object):
-
     def __init__(
         self,
         points,

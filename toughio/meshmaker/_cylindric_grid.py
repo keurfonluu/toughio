@@ -9,7 +9,6 @@ __all__ = [
 
 
 class CylindricMesh(Mesh):
-
     def __init__(self, dr, dz, *args, **kwargs):
         """
         Cylindric mesh.
