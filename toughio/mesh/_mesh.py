@@ -75,6 +75,7 @@ class Mesh(object):
         self.cell_sets = cell_sets if cell_sets else {}
 
     def __repr__(self):
+        """Represent a :class:`toughio.Mesh`."""
         lines = [
             "<toughio mesh object>",
             "  Number of points: {}".format(len(self.points)),

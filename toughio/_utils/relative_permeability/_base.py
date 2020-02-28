@@ -26,6 +26,7 @@ class BaseRelativePermeability(ABC):
         pass
 
     def __repr__(self):
+        """Represent a :class:`toughio.relative_permeability.BaseRelativePermeability`."""
         out = [
             "{} relative permeability model (IRP = {}):".format(self._name, self._id)
         ]
@@ -36,6 +37,7 @@ class BaseRelativePermeability(ABC):
         return "\n".join(out)
 
     def __call__(self, sl):
+        """Calculate relative permeability given liquid saturation."""
         if numpy.ndim(sl) == 0:
             if not (0.0 <= sl <= 1.0):
                 raise ValueError()
