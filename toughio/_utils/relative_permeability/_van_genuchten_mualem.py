@@ -31,7 +31,7 @@ class vanGenuchtenMualem(BaseRelativePermeability):
         self.parameters = [m, slr, sls, sgr]
 
     def _eval(self, sl, *args):
-        """van Genuchten-Mualem function."""
+        """Van Genuchten-Mualem function."""
         m, slr, sls, sgr = args
         if sl >= sls:
             kl = 1.0
