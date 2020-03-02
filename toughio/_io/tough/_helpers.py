@@ -21,6 +21,7 @@ dtypes = {
         "version": "int",
         "n_component": "int",
         "n_phase": "int",
+        "n_component_mass": "int",
         "flac": "bool",
         "creep": "bool",
         "porosity_model": "int",

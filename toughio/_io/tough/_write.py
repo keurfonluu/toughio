@@ -64,6 +64,8 @@ def write_buffer(parameters):
                 indom = True
                 break
 
+    eos = parameters["eos"] or (parameters["n_component"] and parameters["n_phase"])
+
     # Check that start is True if indom is True
     if indom and not parameters["start"]:
         logging.warning("Option 'START' is needed to use 'INDOM' conditions.")
@@ -72,7 +74,7 @@ def write_buffer(parameters):
     out = ["{:80}\n".format(parameters["title"])]
     out += _write_rocks(parameters)
     out += _write_flac(parameters) if parameters["flac"] else []
-    out += _write_multi(parameters) if parameters["eos"] else []
+    out += _write_multi(parameters) if eos else []
     out += _write_selec(parameters) if parameters["eos"] in eos_select else []
     out += _write_solvr(parameters) if parameters["solver"] else []
     out += _write_start() if parameters["start"] else []
@@ -280,7 +282,7 @@ def _write_multi(parameters):
     """
     from ._common import eos
 
-    out = list(eos[parameters["eos"]])
+    out = list(eos[parameters["eos"]]) if parameters["eos"] else [0, 0, 0, 6]
     out[0] = parameters["n_component"] if parameters["n_component"] else out[0]
     out[1] = out[0] if parameters["isothermal"] else out[0] + 1
     out[2] = parameters["n_phase"] if parameters["n_phase"] else out[2]
@@ -289,6 +291,10 @@ def _write_multi(parameters):
     if parameters["diffusion"]:
         out[3] = 8
         parameters["n_phase"] = out[2]  # Save for later check
+
+    # Number of mass components
+    if parameters["n_component_mass"]:
+        out.append(parameters["n_component_mass"])
 
     return [("{:>5d}" * len(out) + "\n").format(*out)]
 

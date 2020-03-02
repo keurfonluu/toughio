@@ -20,6 +20,7 @@ _Parameters = {
     "version": 3,
     "n_component": None,
     "n_phase": None,
+    "n_component_mass": None,
     "flac": False,
     "creep": False,
     "porosity_model": 0,
