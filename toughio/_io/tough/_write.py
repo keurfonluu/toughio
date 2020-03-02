@@ -314,7 +314,7 @@ def _write_selec(parameters):
     )
 
     # Record 1
-    out = _write_record(_format_data([(data["integers"][i + 1], "{:>5}") for i in range(16)]))
+    out = _write_record(_format_data([(data["integers"][k], "{:>5}") for k in sorted(data["integers"].keys())]))
 
     # Record 2
     if data["floats"]:
