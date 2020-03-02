@@ -51,7 +51,7 @@ def write_buffer(parameters):
     from ._common import eos
 
     # Check that EOS is defined (for block MULTI)
-    if parameters["isothermal"] and parameters["eos"] not in eos.keys():
+    if parameters["eos"] and parameters["eos"] not in eos.keys():
         raise ValueError(
             "EOS '{}' is unknown or not supported.".format(parameters["eos"])
         )
@@ -64,7 +64,7 @@ def write_buffer(parameters):
                 indom = True
                 break
 
-    eos = parameters["eos"] or (parameters["n_component"] and parameters["n_phase"])
+    multi = parameters["eos"] or (parameters["n_component"] and parameters["n_phase"])
 
     # Check that start is True if indom is True
     if indom and not parameters["start"]:
@@ -74,7 +74,7 @@ def write_buffer(parameters):
     out = ["{:80}\n".format(parameters["title"])]
     out += _write_rocks(parameters)
     out += _write_flac(parameters) if parameters["flac"] else []
-    out += _write_multi(parameters) if eos else []
+    out += _write_multi(parameters) if multi else []
     out += _write_selec(parameters) if parameters["selections"] else []
     out += _write_solvr(parameters) if parameters["solver"] else []
     out += _write_start() if parameters["start"] else []
