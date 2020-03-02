@@ -45,9 +45,9 @@ def read_buffer(f):
         elif line.startswith("RPCAP"):
             rpcap = _read_rpcap(f)
             if "default" in parameters.keys():
-                parameters["default"].update(rpcap["default"])
+                parameters["default"].update(rpcap)
             else:
-                parameters["default"] = rpcap["default"]
+                parameters["default"] = rpcap
         elif line.startswith("FLAC"):
             parameters.update(_read_flac(f))
         elif line.startswith("MULTI"):
@@ -144,12 +144,12 @@ def _read_rocks(f):
 
 def _read_rpcap(f):
     """Read RPCAP block data."""
-    rpcap = {"default": {}}
+    rpcap = {}
 
     for key in ["relative_permeability", "capillarity"]:
         line = f.readline()
         data = read_record(line, "5d,5s,10e,10e,10e,10e,10e,10e,10e")
-        rpcap["default"][key] = {
+        rpcap[key] = {
             "id": data[0],
             "parameters": prune_nones_list(data[2:]),
         }
