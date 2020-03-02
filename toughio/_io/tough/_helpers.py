@@ -8,6 +8,9 @@ __all__ = [
     "dtypes",
     "block",
     "check_parameters",
+    "read_record",
+    "prune_nones_dict",
+    "prune_nones_list",
 ]
 
 
@@ -130,7 +133,7 @@ def block(keyword, multi=False, noend=False):
     """Decorate block writing functions."""
 
     def decorator(func):
-        from .._common import header
+        from ._common import header
 
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -201,3 +204,35 @@ def check_parameters(input_types, keys=None, is_list=False):
         return wrapper
 
     return decorator
+
+
+def read_record(data, fmt):
+    """Parse string to data given format."""
+    token_to_type = {
+        "s": str,
+        "S": str,
+        "d": int,
+        "f": float,
+        "e": float,
+    }
+    
+    i = 0
+    out = []
+    for token in fmt.split(","):
+        n = int(token[:-1])
+        tmp = data[i:i+n]
+        tmp = tmp if token[-1] == "S" else tmp.strip()
+        out.append(token_to_type[token[-1]](tmp) if tmp else None)
+        i += n
+
+    return out
+
+
+def prune_nones_dict(data):
+    """Remove None key/value pairs from dict."""
+    return {k: v for k, v in data.items() if v is not None}
+
+
+def prune_nones_list(data):
+    """Remove trailing None values from list."""
+    return [x for i, x in enumerate(data) if any(xx is not None for xx in data[i:])]
