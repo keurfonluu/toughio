@@ -27,11 +27,6 @@ def write(filename, parameters):
     """
     from ._common import Parameters, default
 
-    if "rocks" not in parameters.keys():
-        raise ValueError("Block 'ROCKS' (key 'rocks') is not defined.")
-    if "options" not in parameters.keys():
-        raise ValueError("Block 'PARAM' (key 'options') is not defined.")
-
     params = deepcopy(Parameters)
     params.update(deepcopy(parameters))
 
