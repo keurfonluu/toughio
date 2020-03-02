@@ -875,7 +875,7 @@ def _write_indom(parameters):
     return out
 
 
-@block("TIMES", multi=True)
+@block("TIMES")
 def _write_times(parameters):
     """
     TOUGH input TIMES block data (optional).
