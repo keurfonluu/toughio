@@ -297,7 +297,7 @@ def _write_selec(parameters):
     data = deepcopy(selections)
     if parameters["selections"]["integers"]:
         data["integers"].update(parameters["selections"]["integers"])
-    if parameters["selections"]["floats"]:
+    if len(parameters["selections"]["floats"]):
         data["floats"] = parameters["selections"]["floats"]
 
     # IE(1)
@@ -311,7 +311,7 @@ def _write_selec(parameters):
     out = write_record(format_data([(data["integers"][k], "{:>5}") for k in sorted(data["integers"].keys())]))
 
     # Record 2
-    if data["floats"]:
+    if len(data["floats"]):
         out += write_multi_record(
             format_data([(i, "{:>10.3e}") for i in data["floats"]])
         )
