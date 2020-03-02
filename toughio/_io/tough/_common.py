@@ -116,6 +116,7 @@ solver = {
 }
 
 generators = {
+    "name": None,
     "type": None,
     "times": None,
     "rates": None,

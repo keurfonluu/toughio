@@ -103,6 +103,7 @@ dtypes = {
         "eps": "scalar",
     },
     "GENER": {
+        "name": "str_array_like",
         "type": "str_array_like",
         "times": "scalar_array_like",
         "rates": "scalar_array_like",
