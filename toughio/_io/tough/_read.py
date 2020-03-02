@@ -48,6 +48,8 @@ def read_buffer(f):
             parameters.update(_read_flac(f))
         elif line.startswith("MULTI"):
             parameters.update(_read_multi(f))
+        elif line.startswith("SELEC"):
+            parameters.update(_read_selec(f))
         elif line.startswith("SOLVR"):
             parameters.update(_read_solvr(f))
         elif line.startswith("START"):
@@ -160,6 +162,27 @@ def _read_multi(f):
     multi["n_phase"] = int(line[2])
     
     return multi
+
+
+def _read_selec(f):
+    """Read SELEC block data."""
+    selec = {"selections": {}}
+
+    line = f.readline()
+    data = read_record(line, ",".join(16 * ["5d"]))
+    selec["selections"]["integers"] = {k + 1: v for k, v in enumerate(data)}
+
+    if selec["selections"]["integers"][1]:
+        selec["selections"]["floats"] = []
+        for _ in range(selec["selections"]["integers"][1]):
+            line = f.readline()
+            data = read_record(line, ",".join(8 * ["10e"]))
+            selec["selections"]["floats"] += data
+
+    selec["selections"]["integers"] = prune_nones_dict(selec["selections"]["integers"])
+    selec["selections"]["floats"] = prune_nones_list(selec["selections"]["floats"])
+    
+    return selec
 
 
 def _read_solvr(f):
