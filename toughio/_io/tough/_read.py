@@ -274,6 +274,8 @@ def _read_param(f):
     if any(x is not None for x in data):
         data = prune_nones_list(data)
         param["default"] = {"initial_condition": data}
+    else:
+        param["default"] = {}
 
     # Remove Nones
     param["options"] = prune_nones_dict(param["options"])
