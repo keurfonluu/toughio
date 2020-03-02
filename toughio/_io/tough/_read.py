@@ -43,7 +43,11 @@ def read_buffer(f):
         if line.startswith("ROCKS"):
             parameters.update(_read_rocks(f))
         elif line.startswith("RPCAP"):
-            parameters.update(_read_rpcap(f))
+            rpcap = _read_rpcap(f)
+            if "default" in parameters.keys():
+                parameters["default"].update(rpcap["default"])
+            else:
+                parameters["default"] = rpcap["default"]
         elif line.startswith("FLAC"):
             parameters.update(_read_flac(f))
         elif line.startswith("MULTI"):
@@ -55,7 +59,12 @@ def read_buffer(f):
         elif line.startswith("START"):
             parameters["start"] = True
         elif line.startswith("PARAM"):
-            parameters.update(_read_param(f))
+            param = _read_param(f)
+            parameters["options"] = param["options"]
+            if "default" in parameters.keys():
+                parameters["default"].update(param["default"])
+            else:
+                parameters["default"] = param["default"]
         elif line.startswith("INDOM"):
             parameters.update(_read_indom(f))
         elif line.startswith("MOMOP"):
@@ -133,12 +142,12 @@ def _read_rocks(f):
 
 def _read_rpcap(f):
     """Read RPCAP block data."""
-    rpcap = {}
+    rpcap = {"default": {}}
 
     for key in ["relative_permeability", "capillarity"]:
         line = f.readline()
         data = read_record(line, "5d,5s,10e,10e,10e,10e,10e,10e,10e")
-        rpcap[key] = {
+        rpcap["default"][key] = {
             "id": data[0],
             "parameters": prune_nones_list(data[2:]),
         }
@@ -181,7 +190,7 @@ def _read_selec(f):
 
     selec["selections"]["integers"] = prune_nones_dict(selec["selections"]["integers"])
     selec["selections"]["floats"] = prune_nones_list(selec["selections"]["floats"])
-    
+
     return selec
 
 
