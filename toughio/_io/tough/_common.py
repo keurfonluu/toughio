@@ -63,7 +63,7 @@ options = {
     "t_steps": None,
     "t_step_max": None,
     "t_reduce_factor": None,
-    "gravity": 9.81,
+    "gravity": None,
     "mesh_scale_factor": None,
     "eps1": None,
     "eps2": None,
