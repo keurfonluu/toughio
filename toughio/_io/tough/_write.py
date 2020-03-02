@@ -1,7 +1,6 @@
 from __future__ import division, with_statement
 
 import logging
-import warnings
 from copy import deepcopy
 
 import numpy
@@ -69,14 +68,6 @@ def write_buffer(parameters):
             if any(x is not None for x in rock["incon"][:4]):
                 indom = True
                 break
-
-    # Deprecation warning: 'incon' is now in 'default' rather than in 'options'
-    if "incon" in parameters["options"].keys():
-        warnings.warn(
-            "Defining 'incon' in 'options' is deprecated, define 'incon' in 'default'.",
-            DeprecationWarning,
-        )
-        parameters["default"]["incon"] = parameters["options"].pop("incon")
 
     # Check that start is True if indom is True
     if indom and not parameters["start"]:
