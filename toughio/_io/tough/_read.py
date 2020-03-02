@@ -109,7 +109,7 @@ def _read_rocks(f):
                     "expansivity": data[1],
                     "conductivity_dry": data[2],
                     "tortuosity": data[3],
-                    "b_coeff": data[4],
+                    "klinkenberg_parameter": data[4],
                     "xkd3": data[5],
                     "xkd4": data[6],
                 })

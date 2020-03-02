@@ -55,7 +55,7 @@ dtypes = {
         "expansion": "scalar",
         "conductivity_dry": "scalar",
         "tortuosity": "scalar",
-        "b_coeff": "scalar",
+        "klinkenberg_parameter": "scalar",
         "xkd3": "scalar",
         "xkd4": "scalar",
         "initial_condition": "array_like",
