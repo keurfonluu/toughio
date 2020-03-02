@@ -25,57 +25,63 @@ def read(filename):
 
     """
     with open(filename, "r") as f:
-        parameters = {}
+        out = read_buffer(f)
+    return out
 
-        # Title
-        parameters["title"] = f.readline().strip()
-        
-        # Loop over blocks
-        while True:
-            line = f.readline().strip()
 
-            if line.startswith("ROCKS"):
-                parameters.update(_read_rocks(f))
-            elif line.startswith("RPCAP"):
-                parameters.update(_read_rpcap(f))
-            elif line.startswith("FLAC"):
-                parameters.update(_read_flac(f))
-            elif line.startswith("MULTI"):
-                parameters.update(_read_multi(f))
-            elif line.startswith("START"):
-                parameters["start"] = True
-            elif line.startswith("PARAM"):
-                parameters.update(_read_param(f))
-            elif line.startswith("MOMOP"):
-                parameters.update(_read_momop(f))
-            elif line.startswith("INDOM"):
-                parameters.update(_read_indom(f))
-            elif line.startswith("TIMES"):
-                parameters.update(_read_times(f))
-            elif line.startswith("SOLVR"):
-                parameters.update(_read_solvr(f))
-            elif line.startswith("FOFT"):
-                parameters.update(_read_oft(f, "element_history"))
-            elif line.startswith("COFT"):
-                parameters.update(_read_oft(f, "connection_history"))
-            elif line.startswith("GOFT"):
-                parameters.update(_read_oft(f, "generator_history"))
-            elif line.startswith("DIFFU"):
-                parameters.update(_read_diffu(f))
-            elif line.startswith("OUTPU"):
-                parameters.update(_read_outpu(f))
-            elif line.startswith("ELEME"):
-                logging.warning("Reading block ELEME is not supported. Skipping.")
-            elif line.startswith("CONNE"):
-                logging.warning("Reading block CONNE is not supported. Skipping.")
-            elif line.startswith("INCON"):
-                logging.warning("Reading block INCON is not supported. Skipping.")
-            elif line.startswith("NOVER"):
-                parameters["nover"] = True
-            elif line.startswith("ENDFI"):
-                parameters["endfi"] = True
-            elif line.startswith("ENDCY"):
-                break
+def read_buffer(f):
+    """Read TOUGH input file."""
+    parameters = {}
+
+    # Title
+    parameters["title"] = f.readline().strip()
+    
+    # Loop over blocks
+    while True:
+        line = f.readline().strip()
+
+        if line.startswith("ROCKS"):
+            parameters.update(_read_rocks(f))
+        elif line.startswith("RPCAP"):
+            parameters.update(_read_rpcap(f))
+        elif line.startswith("FLAC"):
+            parameters.update(_read_flac(f))
+        elif line.startswith("MULTI"):
+            parameters.update(_read_multi(f))
+        elif line.startswith("SOLVR"):
+            parameters.update(_read_solvr(f))
+        elif line.startswith("START"):
+            parameters["start"] = True
+        elif line.startswith("PARAM"):
+            parameters.update(_read_param(f))
+        elif line.startswith("INDOM"):
+            parameters.update(_read_indom(f))
+        elif line.startswith("MOMOP"):
+            parameters.update(_read_momop(f))
+        elif line.startswith("TIMES"):
+            parameters.update(_read_times(f))
+        elif line.startswith("FOFT"):
+            parameters.update(_read_oft(f, "element_history"))
+        elif line.startswith("COFT"):
+            parameters.update(_read_oft(f, "connection_history"))
+        elif line.startswith("GOFT"):
+            parameters.update(_read_oft(f, "generator_history"))
+        elif line.startswith("DIFFU"):
+            parameters.update(_read_diffu(f))
+        elif line.startswith("OUTPU"):
+            parameters.update(_read_outpu(f))
+        elif line.startswith("ELEME"):
+            logging.warning("Reading block ELEME is not supported. Skipping.")
+        elif line.startswith("CONNE"):
+            logging.warning("Reading block CONNE is not supported. Skipping.")
+        elif line.startswith("INCON"):
+            logging.warning("Reading block INCON is not supported. Skipping.")
+        elif line.startswith("NOVER"):
+            parameters["nover"] = True
+        elif line.startswith("ENDFI"):
+            parameters["endfi"] = True
+        elif line.startswith("ENDCY"):
+            break
 
     return parameters
 
@@ -156,6 +162,23 @@ def _read_multi(f):
     return multi
 
 
+def _read_solvr(f):
+    """Read SOLVR block data."""
+    solvr = {}
+
+    line = f.readline()
+    data = read_record(line, "1d,2s,2s,3s,2s,10e,10e")
+    solvr["solver"] = {
+        "method": data[0],
+        "z_precond": data[2],
+        "o_precond": data[4],
+        "rel_iter_max": data[5],
+        "eps": data[6],
+    }
+
+    return solvr
+
+
 def _read_param(f):
     """Read PARAM block data."""
     param = {}
@@ -224,15 +247,6 @@ def _read_param(f):
     return param
 
 
-def _read_momop(f):
-    """Read MOMOP block data."""
-    line = f.readline()
-    data = read_record(line, "40S")
-    momop = {"more_options": {i+1: int(x) for i, x in enumerate(data[5]) if x.isdigit()}}
-
-    return momop
-
-
 def _read_indom(f):
     """Read INDOM block data."""
     indom = {"rocks": {}}
@@ -252,6 +266,15 @@ def _read_indom(f):
     return indom
 
 
+def _read_momop(f):
+    """Read MOMOP block data."""
+    line = f.readline()
+    data = read_record(line, "40S")
+    momop = {"more_options": {i+1: int(x) for i, x in enumerate(data[5]) if x.isdigit()}}
+
+    return momop
+
+
 def _read_times(f):
     """Read TIMES block data."""
     times = {"times": []}
@@ -268,23 +291,6 @@ def _read_times(f):
         times["times"] += prune_nones_list(data)
 
     return times
-
-
-def _read_solvr(f):
-    """Read SOLVR block data."""
-    solvr = {}
-
-    line = f.readline()
-    data = read_record(line, "1d,2s,2s,3s,2s,10e,10e")
-    solvr["solver"] = {
-        "method": data[0],
-        "z_precond": data[2],
-        "o_precond": data[4],
-        "rel_iter_max": data[5],
-        "eps": data[6],
-    }
-
-    return solvr
 
 
 def _read_oft(f, oft):

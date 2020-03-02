@@ -6,7 +6,7 @@ from copy import deepcopy
 import numpy
 
 from ._common import default
-from ._helpers import block, check_parameters, dtypes
+from ._helpers import block, check_parameters, dtypes, format_data, write_record, write_multi_record, add_record
 
 __all__ = [
     "write",
@@ -104,42 +104,6 @@ def write_buffer(parameters):
     return out
 
 
-def _format_data(data):
-    """Return a list of strings given input data and formats."""
-
-    def to_str(x, fmt):
-        x = "" if x is None or x == "" else x
-        if isinstance(x, str):
-            return fmt.replace("g", "").replace("e", "").format(x)
-        else:
-            return fmt.format(x)
-
-    return [to_str(x, fmt) for x, fmt in data]
-
-
-def _write_record(data):
-    """Return a list with a single string."""
-    return ["{:80}\n".format("".join(data))]
-
-
-def _write_multi_record(data, ncol=8):
-    """Return a list with multiple strings."""
-    n = len(data)
-    rec = [
-        data[ncol * i : min(ncol * i + ncol, n)]
-        for i in range(int(numpy.ceil(n / ncol)))
-    ]
-    return [_write_record(r)[0] for r in rec]
-
-
-def _add_record(data, id_fmt="{:>5g}     "):
-    """Return a list with a single string for additional records."""
-    n = len(data["parameters"])
-    rec = [(data["id"], id_fmt)]
-    rec += [(v, "{:>10.3e}") for v in data["parameters"][: min(n, 7)]]
-    return _write_record(_format_data(rec))
-
-
 @check_parameters(dtypes["ROCKS"], keys="default")
 @check_parameters(dtypes["ROCKS"], keys="rocks", is_list=True)
 @check_parameters(
@@ -164,12 +128,8 @@ def _write_rocks(parameters):
     for k in order:
         # Load data
         data = parameters["rocks"][k]
-        # data = default.copy()
-        # data.update(parameters["default"])
-        # data.update(parameters["rocks"][k])
 
         # Number of additional lines to write per rock
-        # Always 2 since relative permeability and capillarity are copied from default
         cond = any(data[k] is not None for k in ["compressibility", "expansion", "conductivity_dry", "tortuosity", "klinkenberg_parameter", "distribution_coefficient_3", "distribution_coefficient_4"])
         nad = (
             2
@@ -184,8 +144,8 @@ def _write_rocks(parameters):
             raise TypeError()
 
         # Record 1
-        out += _write_record(
-            _format_data(
+        out += write_record(
+            format_data(
                 [
                     (k, "{:5.5}"),
                     (nad if nad else None, "{:>5g}"),
@@ -202,8 +162,8 @@ def _write_rocks(parameters):
 
         # Record 2
         if cond:
-            out += _write_record(
-                _format_data(
+            out += write_record(
+                format_data(
                     [
                         (data["compressibility"], "{:>10.4e}"),
                         (data["expansion"], "{:>10.4e}"),
@@ -220,8 +180,8 @@ def _write_rocks(parameters):
 
         # Relative permeability / Capillary pressure
         if nad == 2:
-            out += _add_record(data["relative_permeability"])
-            out += _add_record(data["capillarity"])
+            out += add_record(data["relative_permeability"])
+            out += add_record(data["capillarity"])
 
     return out
 
@@ -241,8 +201,8 @@ def _write_rpcap(parameters):
     data.update(parameters["default"])
 
     out = []
-    out += _add_record(data["relative_permeability"])
-    out += _add_record(data["capillarity"])
+    out += add_record(data["relative_permeability"])
+    out += add_record(data["capillarity"])
     return out
 
 
@@ -267,8 +227,8 @@ def _write_flac(parameters):
         order = parameters["rocks"].keys()
 
     # Record 1
-    out = _write_record(
-        _format_data(
+    out = write_record(
+        format_data(
             [
                 (1 if parameters["creep"] else 0, "{:5g}"),
                 (parameters["porosity_model"], "{:5g}"),
@@ -284,10 +244,10 @@ def _write_flac(parameters):
         data.update(parameters["rocks"][k])
 
         # Permeability law
-        out += _add_record(data["permeability_model"], "{:>10g}")
+        out += add_record(data["permeability_model"], "{:>10g}")
 
         # Equivalent pore pressure
-        out += _add_record(data["equivalent_pore_pressure"])
+        out += add_record(data["equivalent_pore_pressure"])
     return out
 
 
@@ -348,12 +308,12 @@ def _write_selec(parameters):
     )
 
     # Record 1
-    out = _write_record(_format_data([(data["integers"][k], "{:>5}") for k in sorted(data["integers"].keys())]))
+    out = write_record(format_data([(data["integers"][k], "{:>5}") for k in sorted(data["integers"].keys())]))
 
     # Record 2
     if data["floats"]:
-        out += _write_multi_record(
-            _format_data([(i, "{:>10.3e}") for i in data["floats"]])
+        out += write_multi_record(
+            format_data([(i, "{:>10.3e}") for i in data["floats"]])
         )
     return out
 
@@ -372,8 +332,8 @@ def _write_solvr(parameters):
 
     data = solver.copy()
     data.update(parameters["solver"])
-    return _write_record(
-        _format_data(
+    return write_record(
+        format_data(
             [
                 (data["method"], "{:1g}  "),
                 (data["z_precond"], "{:>2g}   "),
@@ -429,9 +389,9 @@ def _write_param(parameters):
 
     _mop = deepcopy(extra_options)
     _mop.update(parameters["extra_options"])
-    mop = _format_data([(_mop[k], "{:>1g}") for k in sorted(_mop.keys())])
-    out = _write_record(
-        _format_data(
+    mop = format_data([(_mop[k], "{:>1g}") for k in sorted(_mop.keys())])
+    out = write_record(
+        format_data(
             [
                 (data["n_iteration"], "{:>2g}"),
                 (data["verbosity"], "{:>2g}"),
@@ -447,8 +407,8 @@ def _write_param(parameters):
     )
 
     # Record 2
-    out += _write_record(
-        _format_data(
+    out += write_record(
+        format_data(
             [
                 (data["t_ini"], "{:>10.4e}"),
                 (data["t_max"], "{:>10.4e}"),
@@ -463,13 +423,13 @@ def _write_param(parameters):
     )
 
     # Record 2.1
-    out += _write_multi_record(
-        _format_data([(i, "{:>10.4e}") for i in data["t_steps"]])
+    out += write_multi_record(
+        format_data([(i, "{:>10.4e}") for i in data["t_steps"]])
     )
 
     # Record 3
-    out += _write_record(
-        _format_data(
+    out += write_record(
+        format_data(
             [
                 (data["eps1"], "{:>10.4e}"),
                 (data["eps2"], "{:>10.4e}"),
@@ -484,26 +444,7 @@ def _write_param(parameters):
     # Record 4
     data = parameters["default"]["initial_condition"]
     n = len(data)
-    out += _write_record(_format_data([(i, "{:>20.4e}") for i in data[: min(n, 4)]]))
-    return out
-
-
-@check_parameters(dtypes["MOMOP"], keys="more_options")
-@block("MOMOP")
-def _write_momop(parameters):
-    """
-    TOUGH input MOMOP block data (optional).
-
-    Provides additional options.
-
-    """
-    from ._common import more_options
-
-    _momop = more_options.copy()
-    _momop.update(parameters["more_options"])
-    out = _write_record(
-        _format_data([(_momop[k], "{:>1g}") for k in sorted(_momop.keys())])
-    )
+    out += write_record(format_data([(i, "{:>20.4e}") for i in data[: min(n, 4)]]))
     return out
 
 
@@ -527,7 +468,26 @@ def _write_indom(parameters):
             data = data[: min(len(data), 4)]
             if any(x is not None for x in data):
                 out += ["{:5.5}\n".format(k)]
-                out += _write_record(_format_data([(i, "{:>20.4e}") for i in data]))
+                out += write_record(format_data([(i, "{:>20.4e}") for i in data]))
+    return out
+
+
+@check_parameters(dtypes["MOMOP"], keys="more_options")
+@block("MOMOP")
+def _write_momop(parameters):
+    """
+    TOUGH input MOMOP block data (optional).
+
+    Provides additional options.
+
+    """
+    from ._common import more_options
+
+    _momop = more_options.copy()
+    _momop.update(parameters["more_options"])
+    out = write_record(
+        format_data([(_momop[k], "{:>1g}") for k in sorted(_momop.keys())])
+    )
     return out
 
 
@@ -541,8 +501,8 @@ def _write_times(parameters):
     """
     data = parameters["times"]
     n = len(data)
-    out = _write_record(_format_data([(n, "{:>5g}")]))
-    out += _write_multi_record(_format_data([(i, "{:>10.4e}") for i in data]))
+    out = write_record(format_data([(n, "{:>5g}")]))
+    out += write_multi_record(format_data([(i, "{:>10.4e}") for i in data]))
     return out
 
 
@@ -555,8 +515,8 @@ def _write_foft(parameters):
     written out for plotting to a file called FOFT during the simulation.
 
     """
-    return _write_multi_record(
-        _format_data([(i, "{:>5g}") for i in parameters["element_history"]]), ncol=1
+    return write_multi_record(
+        format_data([(i, "{:>5g}") for i in parameters["element_history"]]), ncol=1
     )
 
 
@@ -569,8 +529,8 @@ def _write_coft(parameters):
     for plotting to a file called COFT during the simulation.
 
     """
-    return _write_multi_record(
-        _format_data([(i, "{:>10g}") for i in parameters["connection_history"]]), ncol=1
+    return write_multi_record(
+        format_data([(i, "{:>10g}") for i in parameters["connection_history"]]), ncol=1
     )
 
 
@@ -583,8 +543,8 @@ def _write_goft(parameters):
     out for plotting to a file called GOFT during the simulation.
 
     """
-    return _write_multi_record(
-        _format_data([(i, "{:>5g}") for i in parameters["generator_history"]]), ncol=1
+    return write_multi_record(
+        format_data([(i, "{:>5g}") for i in parameters["generator_history"]]), ncol=1
     )
 
 
@@ -660,8 +620,8 @@ def _write_gener(parameters):
                         raise ValueError()
 
         # Record 1
-        out += _write_record(
-            _format_data(
+        out += write_record(
+            format_data(
                 [
                     (k, "{:5.5}"),
                     (None, "{:>5g}"),
@@ -681,14 +641,14 @@ def _write_gener(parameters):
 
         # Record 2
         if ltab:
-            out += _write_multi_record(
-                _format_data([(i, "{:>14.7e}") for i in v["times"]]), ncol=4
+            out += write_multi_record(
+                format_data([(i, "{:>14.7e}") for i in v["times"]]), ncol=4
             )
 
         # Record 3
         if ltab:
-            out += _write_multi_record(
-                _format_data([(i, "{:>14.7e}") for i in v["rates"]]), ncol=4
+            out += write_multi_record(
+                format_data([(i, "{:>14.7e}") for i in v["rates"]]), ncol=4
             )
 
         # Record 4
@@ -697,8 +657,8 @@ def _write_gener(parameters):
                 specific_enthalpy = v["specific_enthalpy"]
             else:
                 specific_enthalpy = numpy.full(ltab, v["specific_enthalpy"])
-            out += _write_multi_record(
-                _format_data([(i, "{:>14.7e}") for i in specific_enthalpy]), ncol=4
+            out += write_multi_record(
+                format_data([(i, "{:>14.7e}") for i in specific_enthalpy]), ncol=4
             )
     return out
 
@@ -716,8 +676,8 @@ def _write_diffu(parameters):
     mass1, mass2 = parameters["diffusion"]
 
     out = []
-    out += _write_multi_record(_format_data([(i, "{:>10.3e}") for i in mass1]), ncol=8)
-    out += _write_multi_record(_format_data([(i, "{:>10.3e}") for i in mass2]), ncol=8)
+    out += write_multi_record(format_data([(i, "{:>10.3e}") for i in mass1]), ncol=8)
+    out += write_multi_record(format_data([(i, "{:>10.3e}") for i in mass2]), ncol=8)
     return out
 
 

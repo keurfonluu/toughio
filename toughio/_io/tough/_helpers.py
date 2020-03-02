@@ -8,6 +8,10 @@ __all__ = [
     "dtypes",
     "block",
     "check_parameters",
+    "format_data",
+    "write_record",
+    "write_multi_record",
+    "add_record",
     "read_record",
     "prune_nones_dict",
     "prune_nones_list",
@@ -209,6 +213,42 @@ def check_parameters(input_types, keys=None, is_list=False):
         return wrapper
 
     return decorator
+
+
+def format_data(data):
+    """Return a list of strings given input data and formats."""
+
+    def to_str(x, fmt):
+        x = "" if x is None or x == "" else x
+        if isinstance(x, str):
+            return fmt.replace("g", "").replace("e", "").format(x)
+        else:
+            return fmt.format(x)
+
+    return [to_str(x, fmt) for x, fmt in data]
+
+
+def write_record(data):
+    """Return a list with a single string."""
+    return ["{:80}\n".format("".join(data))]
+
+
+def write_multi_record(data, ncol=8):
+    """Return a list with multiple strings."""
+    n = len(data)
+    rec = [
+        data[ncol * i : min(ncol * i + ncol, n)]
+        for i in range(int(numpy.ceil(n / ncol)))
+    ]
+    return [write_record(r)[0] for r in rec]
+
+
+def add_record(data, id_fmt="{:>5g}     "):
+    """Return a list with a single string for additional records."""
+    n = len(data["parameters"])
+    rec = [(data["id"], id_fmt)]
+    rec += [(v, "{:>10.3e}") for v in data["parameters"][: min(n, 7)]]
+    return write_record(format_data(rec))
 
 
 def read_record(data, fmt):
