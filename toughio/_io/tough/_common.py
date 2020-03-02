@@ -72,37 +72,7 @@ options = {
     "derivative_factor": None,
 }
 
-extra_options = {
-    k + 1: v
-    for k, v in enumerate(
-        [
-            None,
-            0,
-            0,
-            0,
-            None,
-            0,
-            0,
-            None,
-            0,
-            0,
-            0,
-            0,
-            0,
-            None,
-            None,
-            4,
-            None,
-            None,
-            None,
-            None,
-            3,
-            None,
-            None,
-            None,
-        ]
-    )
-}
+extra_options = {k + 1: None for k in range(24)}
 
 more_options = {k + 1: None for k in range(40)}
 more_options[2] = 5
