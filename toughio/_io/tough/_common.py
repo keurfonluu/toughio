@@ -1,6 +1,6 @@
 __all__ = [
     "Parameters",
-    "select",
+    "selections",
     "options",
     "extra_options",
     "more_options",
@@ -9,7 +9,6 @@ __all__ = [
     "output",
     "default",
     "eos",
-    "eos_select",
     "header",
 ]
 
@@ -34,7 +33,6 @@ _Parameters = {
     "extra_options": {},
     "more_options": {},
     "selections": {},
-    "extra_selections": None,
     "solver": {},
     "generators": {},
     "diffusion": None,
@@ -48,7 +46,10 @@ _Parameters = {
 
 Parameters = dict(_Parameters)
 
-select = {k + 1: None for k in range(16)}
+selections = {
+    "integers": {k + 1: None for k in range(16)},
+    "floats": None,
+}
 
 options = {
     "n_iteration": None,
@@ -161,15 +162,6 @@ eos = {
     "eco2n": [3, 4, 3, 6],
     "eco2n_v2": [3, 4, 3, 6],
     "eco2m": [3, 4, 4, 6],
-}
-
-eos_select = {
-    "eos7",
-    "eos8",
-    "eoswasg",
-    "eco2n",
-    "eco2n_v2",
-    "eco2m",
 }
 
 header = "----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8"

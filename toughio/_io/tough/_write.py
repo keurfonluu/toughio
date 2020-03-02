@@ -48,7 +48,7 @@ def write(filename, parameters):
 @check_parameters(dtypes["PARAMETERS"])
 def write_buffer(parameters):
     """Write TOUGH input file as a list of 80-character long record strings."""
-    from ._common import eos, eos_select
+    from ._common import eos
 
     # Check that EOS is defined (for block MULTI)
     if parameters["isothermal"] and parameters["eos"] not in eos.keys():
@@ -75,7 +75,7 @@ def write_buffer(parameters):
     out += _write_rocks(parameters)
     out += _write_flac(parameters) if parameters["flac"] else []
     out += _write_multi(parameters) if eos else []
-    out += _write_selec(parameters) if parameters["eos"] in eos_select else []
+    out += _write_selec(parameters) if parameters["selections"] else []
     out += _write_solvr(parameters) if parameters["solver"] else []
     out += _write_start() if parameters["start"] else []
     out += _write_param(parameters)
@@ -310,18 +310,28 @@ def _write_selec(parameters):
 
     """
     # Load data
-    from ._common import select
+    from ._common import selections
 
-    data = select.copy()
-    data.update(parameters["selections"])
+    data = deepcopy(selections)
+    if parameters["selections"]["integers"]:
+        data["integers"].update(parameters["selections"]["integers"])
+    if parameters["selections"]["floats"]:
+        data["floats"] = parameters["selections"]["floats"]
+
+    # IE(1)
+    data["integers"][1] = (
+        len(data["floats"]) // 8 + 1
+        if data["floats"] is not None
+        else None
+    )
 
     # Record 1
-    out = _write_record(_format_data([(v, "{:>5}") for v in data.values()]))
+    out = _write_record(_format_data([(data["integers"][i + 1], "{:>5}") for i in range(16)]))
 
     # Record 2
-    if parameters["extra_selections"] is not None:
+    if data["floats"]:
         out += _write_multi_record(
-            _format_data([(i, "{:>10.3e}") for i in parameters["extra_selections"]])
+            _format_data([(i, "{:>10.3e}") for i in data["floats"]])
         )
     return out
 

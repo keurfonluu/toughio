@@ -35,7 +35,6 @@ dtypes = {
         "extra_options": "dict",
         "more_options": "dict",
         "selections": "dict",
-        "extra_selections": "array_like",
         "solver": "dict",
         "generators": "dict",
         "times": "scalar_array_like",
@@ -89,7 +88,10 @@ dtypes = {
     },
     "MOP": {i + 1: "int" for i in range(24)},
     "MOMOP": {i + 1: "int" for i in range(40)},
-    "SELEC": {i + 1: "int" for i in range(16)},
+    "SELEC": {
+        "integers": "dict",
+        "floats": "array_like",
+    },
     "SOLVR": {
         "method": "int",
         "z_precond": "str",
