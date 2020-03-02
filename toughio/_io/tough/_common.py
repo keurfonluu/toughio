@@ -140,7 +140,7 @@ default = {
     "b_coeff": None,
     "xkd3": None,
     "xkd4": None,
-    "incon": [None for _ in range(4)],
+    "initial_condition": [None for _ in range(4)],
     "relative_permeability": {"id": None, "parameters": []},
     "capillarity": {"id": None, "parameters": []},
     "permeability_model": {"id": 1, "parameters": []},

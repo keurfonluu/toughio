@@ -41,7 +41,7 @@ def write(filename, parameters):
 
     for rock in params["rocks"].keys():
         for k, v in params["default"].items():
-            if k not in params["rocks"][rock].keys() and k not in {"incon"}:
+            if k not in params["rocks"][rock].keys() and k not in {"initial_condition"}:
                 params["rocks"][rock][k] = v
 
     buffer = write_buffer(params)
@@ -64,8 +64,8 @@ def write_buffer(parameters):
     # Set some flags
     indom = False
     for rock in parameters["rocks"].values():
-        if "incon" in rock.keys():
-            if any(x is not None for x in rock["incon"][:4]):
+        if "initial_condition" in rock.keys():
+            if any(x is not None for x in rock["initial_condition"][:4]):
                 indom = True
                 break
 
@@ -449,7 +449,7 @@ def _write_param(parameters):
     )
 
     # Record 4
-    data = parameters["default"]["incon"]
+    data = parameters["default"]["initial_condition"]
     n = len(data)
     out += _write_record(_format_data([(i, "{:>20.4e}") for i in data[: min(n, 4)]]))
     return out
@@ -489,8 +489,8 @@ def _write_indom(parameters):
 
     out = []
     for k in order:
-        if "incon" in parameters["rocks"][k]:
-            data = parameters["rocks"][k]["incon"]
+        if "initial_condition" in parameters["rocks"][k]:
+            data = parameters["rocks"][k]["initial_condition"]
             data = data[: min(len(data), 4)]
             if any(x is not None for x in data):
                 out += ["{:5.5}\n".format(k)]
