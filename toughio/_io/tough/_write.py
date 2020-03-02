@@ -36,7 +36,9 @@ def write(filename, parameters):
 
     for rock in params["rocks"].keys():
         for k, v in params["default"].items():
-            if k not in params["rocks"][rock].keys() and k not in {"initial_condition"}:
+            cond1 = k not in params["rocks"][rock].keys()
+            cond2 = k not in {"initial_condition", "relative_permeability", "capillarity"}
+            if cond1 and cond2:
                 params["rocks"][rock][k] = v
 
     buffer = write_buffer(params)
@@ -57,6 +59,10 @@ def write_buffer(parameters):
         )
 
     # Set some flags
+    cond1 = "relative_permeability" in parameters["default"].keys()
+    cond2 = "capillarity" in parameters["default"].keys()
+    rpcap = cond1 or cond2
+
     indom = False
     for rock in parameters["rocks"].values():
         if "initial_condition" in rock.keys():
@@ -73,6 +79,7 @@ def write_buffer(parameters):
     # Define input file contents
     out = ["{:80}\n".format(parameters["title"])]
     out += _write_rocks(parameters)
+    out += _write_rpcap(parameters) if rpcap else []
     out += _write_flac(parameters) if parameters["flac"] else []
     out += _write_multi(parameters) if multi else []
     out += _write_selec(parameters) if parameters["selections"] else []
@@ -134,8 +141,6 @@ def _add_record(data, id_fmt="{:>5g}     "):
 
 
 @check_parameters(dtypes["ROCKS"], keys="default")
-@check_parameters(dtypes["MODEL"], keys=("default", "relative_permeability"))
-@check_parameters(dtypes["MODEL"], keys=("default", "capillarity"))
 @check_parameters(dtypes["ROCKS"], keys="rocks", is_list=True)
 @check_parameters(
     dtypes["MODEL"], keys=("rocks", "relative_permeability"), is_list=True
@@ -158,13 +163,19 @@ def _write_rocks(parameters):
     out = []
     for k in order:
         # Load data
-        data = default.copy()
-        data.update(parameters["default"])
-        data.update(parameters["rocks"][k])
+        data = parameters["rocks"][k]
+        # data = default.copy()
+        # data.update(parameters["default"])
+        # data.update(parameters["rocks"][k])
 
         # Number of additional lines to write per rock
         # Always 2 since relative permeability and capillarity are copied from default
-        nad = 2
+        cond = any(data[k] is not None for k in ["compressibility", "expansion", "conductivity_dry", "tortuosity", "klinkenberg_parameter", "distribution_coefficient_3", "distribution_coefficient_4"])
+        nad = (
+            2
+            if "relative_permeability" in data.keys() or "capillarity" in data.keys()
+            else int(cond)
+        )
 
         # Permeability
         per = data["permeability"]
@@ -190,25 +201,48 @@ def _write_rocks(parameters):
         )
 
         # Record 2
-        out += _write_record(
-            _format_data(
-                [
-                    (data["compressibility"], "{:>10.4e}"),
-                    (data["expansion"], "{:>10.4e}"),
-                    (data["conductivity_dry"], "{:>10.4e}"),
-                    (data["tortuosity"], "{:>10.4e}"),
-                    (data["klinkenberg_parameter"], "{:>10.4e}"),
-                    (data["distribution_coefficient_3"], "{:>10.4e}"),
-                    (data["distribution_coefficient_4"], "{:>10.4e}"),
-                ]
+        if cond:
+            out += _write_record(
+                _format_data(
+                    [
+                        (data["compressibility"], "{:>10.4e}"),
+                        (data["expansion"], "{:>10.4e}"),
+                        (data["conductivity_dry"], "{:>10.4e}"),
+                        (data["tortuosity"], "{:>10.4e}"),
+                        (data["klinkenberg_parameter"], "{:>10.4e}"),
+                        (data["distribution_coefficient_3"], "{:>10.4e}"),
+                        (data["distribution_coefficient_4"], "{:>10.4e}"),
+                    ]
+                )
             )
-        )
+        else:
+            out += ["{:80}\n".format("")] if nad == 2 else []
 
-        # Relative permeability
-        out += _add_record(data["relative_permeability"]) if nad >= 1 else []
+        # Relative permeability / Capillary pressure
+        if nad == 2:
+            out += _add_record(data["relative_permeability"])
+            out += _add_record(data["capillarity"])
 
-        # Capillary pressure
-        out += _add_record(data["capillarity"]) if nad >= 2 else []
+    return out
+
+
+@check_parameters(dtypes["MODEL"], keys=("default", "relative_permeability"))
+@check_parameters(dtypes["MODEL"], keys=("default", "capillarity"))
+@block("RPCAP")
+def _write_rpcap(parameters):
+    """
+    TOUGH input RPCAP block data (optional).
+
+    Introduces information on relative permeability and capillary pressure
+    functions.
+
+    """
+    data = deepcopy(default)
+    data.update(parameters["default"])
+
+    out = []
+    out += _add_record(data["relative_permeability"])
+    out += _add_record(data["capillarity"])
     return out
 
 

@@ -189,10 +189,13 @@ def check_parameters(input_types, keys=None, is_list=False):
                     for k, v in params.items():
                         tmp = keys_str
                         tmp += "['{}']".format(k)
-                        for key in keys[1:]:
-                            v = v[key]
-                            tmp += "['{}']".format(key)
-                        _check_parameters(v, tmp)
+                        try:
+                            for key in keys[1:]:
+                                v = v[key]
+                                tmp += "['{}']".format(key)
+                            _check_parameters(v, tmp)
+                        except KeyError:
+                            continue
                 else:
                     for key in keys[1:]:
                         params = params[key]
