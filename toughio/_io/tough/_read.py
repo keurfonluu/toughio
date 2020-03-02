@@ -77,6 +77,8 @@ def read_buffer(f):
             parameters.update(_read_oft(f, "connection_history"))
         elif line.startswith("GOFT"):
             parameters.update(_read_oft(f, "generator_history"))
+        elif line.startswith("GENER"):
+            parameters.update(_read_gener(f))
         elif line.startswith("DIFFU"):
             parameters.update(_read_diffu(f))
         elif line.startswith("OUTPU"):
@@ -338,6 +340,59 @@ def _read_oft(f, oft):
             break
 
     return history
+
+
+def _read_gener(f):
+    """Read GENER block data."""
+    gener = {"generators": {}}
+
+    while True:
+        line = f.readline()
+
+        if line.strip():
+            data = read_record(line, "5s,5s,5d,5d,5d,5d,5s,4s,1s,10e,10e,10e")
+            label = data[0]
+            tmp = {
+                "type": [data[7]],
+                "layer_thickness": [data[11]],
+            }
+
+            ltab = data[5]
+            if ltab and ltab > 1:
+                for key in ["times", "rates", "specific_enthalpy"]:
+                    table = []
+
+                    while len(table) < ltab:
+                        line = f.readline()
+                        data = read_record(line, "14e,14e,14e,14e")
+                        table += prune_nones_list(data)
+
+                    tmp[key] = [table]
+            else:
+                tmp.update({
+                    "times": [None],
+                    "rates": [data[9]],
+                    "specific_enthalpy": [data[10]],
+                })
+
+            if label in gener["generators"].keys():
+                for k, v in gener["generators"][label].items():
+                    v += tmp[k]
+            else:
+                gener["generators"][label] = tmp
+        else:
+            break
+
+    # Tidy up
+    for generator in gener["generators"].values():
+        for k, v in generator.items():
+            if len(v) == 1:
+                generator[k] = v[0]
+            else:
+                if all(x is None for x in v):
+                    generator[k] = None
+                    
+    return {k: {kk: prune_nones_dict(vv) for kk, vv in v.items()} for k, v in gener.items()}
 
 
 def _read_diffu(f):
