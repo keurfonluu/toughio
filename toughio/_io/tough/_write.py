@@ -212,7 +212,7 @@ def _write_rocks(parameters):
                     (data["expansion"], "{:>10.4e}"),
                     (data["conductivity_dry"], "{:>10.4e}"),
                     (data["tortuosity"], "{:>10.4e}"),
-                    (data["b_coeff"], "{:>10.4e}"),
+                    (data["klinkenberg_parameter"], "{:>10.4e}"),
                     (data["xkd3"], "{:>10.4e}"),
                     (data["xkd4"], "{:>10.4e}"),
                 ]

@@ -137,7 +137,7 @@ default = {
     "expansion": None,
     "conductivity_dry": None,
     "tortuosity": None,
-    "b_coeff": None,
+    "klinkenberg_parameter": None,
     "xkd3": None,
     "xkd4": None,
     "initial_condition": [None for _ in range(4)],
