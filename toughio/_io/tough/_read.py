@@ -106,7 +106,7 @@ def _read_rocks(f):
                 data = read_record(line, "10e,10e,10e,10e,10e,10e,10e")
                 rocks["rocks"][rock].update({
                     "compressibility": data[0],
-                    "expansivity": data[1],
+                    "expansion": data[1],
                     "conductivity_dry": data[2],
                     "tortuosity": data[3],
                     "klinkenberg_parameter": data[4],
