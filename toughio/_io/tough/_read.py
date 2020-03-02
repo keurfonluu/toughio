@@ -61,6 +61,7 @@ def read_buffer(f):
         elif line.startswith("PARAM"):
             param = _read_param(f)
             parameters["options"] = param["options"]
+            parameters["extra_options"] = param["extra_options"]
             if "default" in parameters.keys():
                 parameters["default"].update(param["default"])
             else:
@@ -133,7 +134,7 @@ def _read_rocks(f):
                     "distribution_coefficient_4": data[6],
                 })
 
-            if nad > 1:
+            if nad and nad > 1:
                 rocks["rocks"][rock].update(_read_rpcap(f))
 
         else:
