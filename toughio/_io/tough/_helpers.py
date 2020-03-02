@@ -58,7 +58,7 @@ dtypes = {
         "b_coeff": "scalar",
         "xkd3": "scalar",
         "xkd4": "scalar",
-        "incon": "array_like",
+        "initial_condition": "array_like",
         "relative_permeability": "dict",
         "capillarity": "dict",
         "permeability_model": "dict",

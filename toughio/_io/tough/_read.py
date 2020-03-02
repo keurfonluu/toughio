@@ -215,7 +215,7 @@ def _read_param(f):
     data = read_record(line, "20e,20e,20e,20e")
     if any(x is not None for x in data):
         data = prune_nones_list(data)
-        param["default"] = {"incon": data}
+        param["default"] = {"initial_condition": data}
 
     # Remove Nones
     param["options"] = prune_nones_dict(param["options"])
@@ -245,7 +245,7 @@ def _read_indom(f):
             line = f.readline()
             data = read_record(line, "20e,20e,20e,20e")
             data = prune_nones_list(data)
-            indom["rocks"][rock]["incon"] = data
+            indom["rocks"][rock]["initial_condition"] = data
         else:
             break
 
