@@ -353,6 +353,7 @@ def _read_gener(f):
             data = read_record(line, "5s,5s,5d,5d,5d,5d,5s,4s,1s,10e,10e,10e")
             label = data[0]
             tmp = {
+                "name": [data[1]],
                 "type": [data[7]],
                 "layer_thickness": [data[11]],
             }
@@ -391,7 +392,7 @@ def _read_gener(f):
             else:
                 if all(x is None for x in v):
                     generator[k] = None
-                    
+
     return {k: {kk: prune_nones_dict(vv) for kk, vv in v.items()} for k, v in gener.items()}
 
 

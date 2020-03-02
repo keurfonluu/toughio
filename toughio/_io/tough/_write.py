@@ -624,7 +624,7 @@ def _write_gener(parameters):
             format_data(
                 [
                     (k, "{:5.5}"),
-                    (None, "{:>5g}"),
+                    (v["name"], "{:>5g}"),
                     (None, "{:>5g}"),
                     (None, "{:>5g}"),
                     (None, "{:>5g}"),
