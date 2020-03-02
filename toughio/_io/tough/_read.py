@@ -110,8 +110,8 @@ def _read_rocks(f):
                     "conductivity_dry": data[2],
                     "tortuosity": data[3],
                     "klinkenberg_parameter": data[4],
-                    "xkd3": data[5],
-                    "xkd4": data[6],
+                    "distribution_coefficient_3": data[5],
+                    "distribution_coefficient_4": data[6],
                 })
 
             if nad > 1:

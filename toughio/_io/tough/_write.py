@@ -213,8 +213,8 @@ def _write_rocks(parameters):
                     (data["conductivity_dry"], "{:>10.4e}"),
                     (data["tortuosity"], "{:>10.4e}"),
                     (data["klinkenberg_parameter"], "{:>10.4e}"),
-                    (data["xkd3"], "{:>10.4e}"),
-                    (data["xkd4"], "{:>10.4e}"),
+                    (data["distribution_coefficient_3"], "{:>10.4e}"),
+                    (data["distribution_coefficient_4"], "{:>10.4e}"),
                 ]
             )
         )
