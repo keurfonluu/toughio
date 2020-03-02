@@ -80,13 +80,7 @@ def write_buffer(parameters):
     out += _write_start() if parameters["start"] else []
     out += _write_param(parameters)
     out += _write_indom(parameters) if indom else []
-    if parameters["more_options"]:
-        if parameters["version"] == 3:
-            out += _write_momop(parameters)
-        else:
-            logging.warning(
-                "Defining 'more_options' is only available for 'version == 3'. Skipping."
-            )
+    out += _write_momop(parameters) if parameters["more_options"] else []
     out += _write_times(parameters) if parameters["times"] is not None else []
     out += _write_foft(parameters) if parameters["element_history"] is not None else []
     out += (
@@ -97,13 +91,7 @@ def write_buffer(parameters):
     )
     out += _write_gener(parameters) if parameters["generators"] else []
     out += _write_diffu(parameters) if parameters["diffusion"] else []
-    if parameters["output"]:
-        if parameters["version"] == 3:
-            out += _write_outpu(parameters)
-        else:
-            logging.warning(
-                "Defining 'output' is only available for 'version == 3'. Skipping."
-            )
+    out += _write_outpu(parameters) if parameters["output"] else []
     out += _write_nover() if parameters["nover"] else []
     out += _write_endfi() if parameters["endfi"] else _write_endcy()
     return out

@@ -18,7 +18,6 @@ dtypes = {
     "PARAMETERS": {
         "title": "str",
         "eos": "str",
-        "version": "int",
         "n_component": "int",
         "n_phase": "int",
         "n_component_mass": "int",

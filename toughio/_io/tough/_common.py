@@ -16,7 +16,6 @@ __all__ = [
 _Parameters = {
     "title": "",
     "eos": "",
-    "version": 3,
     "n_component": None,
     "n_phase": None,
     "n_component_mass": None,
