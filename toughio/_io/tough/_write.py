@@ -6,7 +6,15 @@ from copy import deepcopy
 import numpy
 
 from ._common import default
-from ._helpers import block, check_parameters, dtypes, format_data, write_record, write_multi_record, add_record
+from ._helpers import (
+    add_record,
+    block,
+    check_parameters,
+    dtypes,
+    format_data,
+    write_multi_record,
+    write_record,
+)
 
 __all__ = [
     "write",
@@ -37,7 +45,11 @@ def write(filename, parameters):
     for rock in params["rocks"].keys():
         for k, v in params["default"].items():
             cond1 = k not in params["rocks"][rock].keys()
-            cond2 = k not in {"initial_condition", "relative_permeability", "capillarity"}
+            cond2 = k not in {
+                "initial_condition",
+                "relative_permeability",
+                "capillarity",
+            }
             if cond1 and cond2:
                 params["rocks"][rock][k] = v
 
@@ -130,7 +142,18 @@ def _write_rocks(parameters):
         data = parameters["rocks"][k]
 
         # Number of additional lines to write per rock
-        cond = any(data[k] is not None for k in ["compressibility", "expansion", "conductivity_dry", "tortuosity", "klinkenberg_parameter", "distribution_coefficient_3", "distribution_coefficient_4"])
+        cond = any(
+            data[k] is not None
+            for k in [
+                "compressibility",
+                "expansion",
+                "conductivity_dry",
+                "tortuosity",
+                "klinkenberg_parameter",
+                "distribution_coefficient_3",
+                "distribution_coefficient_4",
+            ]
+        )
         nad = (
             2
             if "relative_permeability" in data.keys() or "capillarity" in data.keys()
@@ -193,8 +216,7 @@ def _write_rpcap(parameters):
     """
     TOUGH input RPCAP block data (optional).
 
-    Introduces information on relative permeability and capillary pressure
-    functions.
+    Introduces information on relative permeability and capillary pressure functions.
 
     """
     data = deepcopy(default)
@@ -309,7 +331,11 @@ def _write_selec(parameters):
         data["floats"] = parameters["selections"]["floats"]
 
     # Record 1
-    out = write_record(format_data([(data["integers"][k], "{:>5}") for k in sorted(data["integers"].keys())]))
+    out = write_record(
+        format_data(
+            [(data["integers"][k], "{:>5}") for k in sorted(data["integers"].keys())]
+        )
+    )
 
     # Record 2
     if data["floats"] is not None and len(data["floats"]):
@@ -424,9 +450,7 @@ def _write_param(parameters):
     )
 
     # Record 2.1
-    out += write_multi_record(
-        format_data([(i, "{:>10.4e}") for i in data["t_steps"]])
-    )
+    out += write_multi_record(format_data([(i, "{:>10.4e}") for i in data["t_steps"]]))
 
     # Record 3
     out += write_record(
