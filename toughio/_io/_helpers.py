@@ -35,7 +35,7 @@ def _filetype_from_filename(filename):
     )
 
 
-def read_input(filename, file_format="json", **kwargs):
+def read_input(filename, file_format="tough", **kwargs):
     """
     Read TOUGH input file.
 
@@ -43,7 +43,7 @@ def read_input(filename, file_format="json", **kwargs):
     ----------
     filename : str
         Input file name.
-    file_format : str ('tough', 'json'), optional, default 'json'
+    file_format : str ('tough', 'json'), optional, default 'tough'
         Input file format.
 
     Returns

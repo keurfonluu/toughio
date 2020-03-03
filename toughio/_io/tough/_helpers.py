@@ -1,3 +1,5 @@
+from __future__ import division
+
 import logging
 from copy import deepcopy
 from functools import wraps
@@ -8,6 +10,13 @@ __all__ = [
     "dtypes",
     "block",
     "check_parameters",
+    "format_data",
+    "write_record",
+    "write_multi_record",
+    "add_record",
+    "read_record",
+    "prune_nones_dict",
+    "prune_nones_list",
 ]
 
 
@@ -15,23 +24,19 @@ dtypes = {
     "PARAMETERS": {
         "title": "str",
         "eos": "str",
-        "version": "int",
         "n_component": "int",
         "n_phase": "int",
-        "flac": "bool",
-        "creep": "bool",
-        "porosity_model": "int",
+        "n_component_mass": "int",
+        "flac": "dict",
         "isothermal": "bool",
         "start": "bool",
         "nover": "bool",
-        "endfi": "bool",
         "rocks": "dict",
         "rocks_order": "array_like",
         "options": "dict",
         "extra_options": "dict",
         "more_options": "dict",
         "selections": "dict",
-        "extra_selections": "array_like",
         "solver": "dict",
         "generators": "dict",
         "times": "scalar_array_like",
@@ -52,15 +57,16 @@ dtypes = {
         "expansion": "scalar",
         "conductivity_dry": "scalar",
         "tortuosity": "scalar",
-        "b_coeff": "scalar",
-        "xkd3": "scalar",
-        "xkd4": "scalar",
-        "incon": "array_like",
+        "klinkenberg_parameter": "scalar",
+        "distribution_coefficient_3": "scalar",
+        "distribution_coefficient_4": "scalar",
+        "initial_condition": "array_like",
         "relative_permeability": "dict",
         "capillarity": "dict",
         "permeability_model": "dict",
         "equivalent_pore_pressure": "dict",
     },
+    "FLAC": {"creep": "bool", "porosity_model": "int", "version": "int"},
     "MODEL": {"id": "int", "parameters": "array_like"},
     "PARAM": {
         "n_iteration": "int",
@@ -85,7 +91,7 @@ dtypes = {
     },
     "MOP": {i + 1: "int" for i in range(24)},
     "MOMOP": {i + 1: "int" for i in range(40)},
-    "SELEC": {i + 1: "int" for i in range(16)},
+    "SELEC": {"integers": "dict", "floats": "array_like"},
     "SOLVR": {
         "method": "int",
         "z_precond": "str",
@@ -94,6 +100,7 @@ dtypes = {
         "eps": "scalar",
     },
     "GENER": {
+        "name": "str_array_like",
         "type": "str_array_like",
         "times": "scalar_array_like",
         "rates": "scalar_array_like",
@@ -105,19 +112,20 @@ dtypes = {
 
 
 str_to_dtype = {
-    "int": (int, numpy.int32),
+    "int": (int, numpy.int32, numpy.int64),
     "float": (float, numpy.float32, numpy.float64),
     "str": (str,),
     "bool": (bool,),
     "array_like": (list, tuple, numpy.ndarray),
     "dict": (dict,),
-    "scalar": (int, float, numpy.int32, numpy.float32, numpy.float64),
+    "scalar": (int, float, numpy.int32, numpy.int64, numpy.float32, numpy.float64),
     "scalar_array_like": (
         int,
         float,
         list,
         tuple,
         numpy.int32,
+        numpy.int64,
         numpy.float32,
         numpy.float64,
         numpy.ndarray,
@@ -130,7 +138,7 @@ def block(keyword, multi=False, noend=False):
     """Decorate block writing functions."""
 
     def decorator(func):
-        from .._common import header
+        from ._common import header
 
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -184,10 +192,13 @@ def check_parameters(input_types, keys=None, is_list=False):
                     for k, v in params.items():
                         tmp = keys_str
                         tmp += "['{}']".format(k)
-                        for key in keys[1:]:
-                            v = v[key]
-                            tmp += "['{}']".format(key)
-                        _check_parameters(v, tmp)
+                        try:
+                            for key in keys[1:]:
+                                v = v[key]
+                                tmp += "['{}']".format(key)
+                            _check_parameters(v, tmp)
+                        except KeyError:
+                            continue
                 else:
                     for key in keys[1:]:
                         params = params[key]
@@ -201,3 +212,71 @@ def check_parameters(input_types, keys=None, is_list=False):
         return wrapper
 
     return decorator
+
+
+def format_data(data):
+    """Return a list of strings given input data and formats."""
+
+    def to_str(x, fmt):
+        x = "" if x is None or x == "" else x
+        if isinstance(x, str):
+            return fmt.replace("g", "").replace("e", "").format(x)
+        else:
+            return fmt.format(x)
+
+    return [to_str(x, fmt) for x, fmt in data]
+
+
+def write_record(data):
+    """Return a list with a single string."""
+    return ["{:80}\n".format("".join(data))]
+
+
+def write_multi_record(data, ncol=8):
+    """Return a list with multiple strings."""
+    n = len(data)
+    rec = [
+        data[ncol * i : min(ncol * i + ncol, n)]
+        for i in range(int(numpy.ceil(n / ncol)))
+    ]
+    return [write_record(r)[0] for r in rec]
+
+
+def add_record(data, id_fmt="{:>5g}     "):
+    """Return a list with a single string for additional records."""
+    n = len(data["parameters"])
+    rec = [(data["id"], id_fmt)]
+    rec += [(v, "{:>10.3e}") for v in data["parameters"][: min(n, 7)]]
+    return write_record(format_data(rec))
+
+
+def read_record(data, fmt):
+    """Parse string to data given format."""
+    token_to_type = {
+        "s": str,
+        "S": str,
+        "d": int,
+        "f": float,
+        "e": float,
+    }
+
+    i = 0
+    out = []
+    for token in fmt.split(","):
+        n = int(token[:-1])
+        tmp = data[i : i + n]
+        tmp = tmp if token[-1] == "S" else tmp.strip()
+        out.append(token_to_type[token[-1]](tmp) if tmp else None)
+        i += n
+
+    return out
+
+
+def prune_nones_dict(data):
+    """Remove None key/value pairs from dict."""
+    return {k: v for k, v in data.items() if v is not None}
+
+
+def prune_nones_list(data):
+    """Remove trailing None values from list."""
+    return [x for i, x in enumerate(data) if any(xx is not None for xx in data[i:])]

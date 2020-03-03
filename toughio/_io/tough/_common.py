@@ -1,6 +1,7 @@
 __all__ = [
     "Parameters",
-    "select",
+    "flac",
+    "selections",
     "options",
     "extra_options",
     "more_options",
@@ -9,7 +10,6 @@ __all__ = [
     "output",
     "default",
     "eos",
-    "eos_select",
     "header",
 ]
 
@@ -17,23 +17,19 @@ __all__ = [
 _Parameters = {
     "title": "",
     "eos": "",
-    "version": 3,
     "n_component": None,
     "n_phase": None,
-    "flac": False,
-    "creep": False,
-    "porosity_model": 0,
+    "n_component_mass": None,
+    "flac": None,
     "isothermal": False,
     "start": True,
     "nover": False,
-    "endfi": False,
     "rocks": {},
     "rocks_order": None,
     "options": {},
     "extra_options": {},
     "more_options": {},
     "selections": {},
-    "extra_selections": None,
     "solver": {},
     "generators": {},
     "diffusion": None,
@@ -47,7 +43,16 @@ _Parameters = {
 
 Parameters = dict(_Parameters)
 
-select = {k + 1: None for k in range(16)}
+flac = {
+    "creep": False,
+    "porosity_model": None,
+    "version": None,
+}
+
+selections = {
+    "integers": {k + 1: None for k in range(16)},
+    "floats": None,
+}
 
 options = {
     "n_iteration": None,
@@ -62,7 +67,7 @@ options = {
     "t_steps": None,
     "t_step_max": None,
     "t_reduce_factor": None,
-    "gravity": 9.81,
+    "gravity": None,
     "mesh_scale_factor": None,
     "eps1": None,
     "eps2": None,
@@ -71,37 +76,7 @@ options = {
     "derivative_factor": None,
 }
 
-extra_options = {
-    k + 1: v
-    for k, v in enumerate(
-        [
-            None,
-            0,
-            0,
-            0,
-            None,
-            0,
-            0,
-            None,
-            0,
-            0,
-            0,
-            0,
-            0,
-            None,
-            None,
-            4,
-            None,
-            None,
-            None,
-            None,
-            3,
-            None,
-            None,
-            None,
-        ]
-    )
-}
+extra_options = {k + 1: None for k in range(24)}
 
 more_options = {k + 1: None for k in range(40)}
 more_options[2] = 5
@@ -115,6 +90,7 @@ solver = {
 }
 
 generators = {
+    "name": None,
     "type": None,
     "times": None,
     "rates": None,
@@ -137,10 +113,10 @@ default = {
     "expansion": None,
     "conductivity_dry": None,
     "tortuosity": None,
-    "b_coeff": None,
-    "xkd3": None,
-    "xkd4": None,
-    "incon": [None for _ in range(4)],
+    "klinkenberg_parameter": None,
+    "distribution_coefficient_3": None,
+    "distribution_coefficient_4": None,
+    "initial_condition": [None for _ in range(4)],
     "relative_permeability": {"id": None, "parameters": []},
     "capillarity": {"id": None, "parameters": []},
     "permeability_model": {"id": 1, "parameters": []},
@@ -160,15 +136,6 @@ eos = {
     "eco2n": [3, 4, 3, 6],
     "eco2n_v2": [3, 4, 3, 6],
     "eco2m": [3, 4, 4, 6],
-}
-
-eos_select = {
-    "eos7",
-    "eos8",
-    "eoswasg",
-    "eco2n",
-    "eco2n_v2",
-    "eco2m",
 }
 
 header = "----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8"
