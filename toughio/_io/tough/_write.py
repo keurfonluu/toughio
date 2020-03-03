@@ -1,36 +1,24 @@
 from __future__ import division, with_statement
 
 import logging
-import warnings
 from copy import deepcopy
 
 import numpy
 
-from .._common import default
-from ._helpers import block, check_parameters, dtypes
+from ._common import default
+from ._helpers import (
+    add_record,
+    block,
+    check_parameters,
+    dtypes,
+    format_data,
+    write_multi_record,
+    write_record,
+)
 
 __all__ = [
-    "read",
     "write",
 ]
-
-
-def read(filename):
-    """
-    Read TOUGH input file.
-
-    Parameters
-    ----------
-    filename : str
-        Input file name.
-
-    Returns
-    -------
-    dict
-        TOUGH input parameters.
-
-    """
-    raise NotImplementedError("Reading TOUGH input file is not implemented yet.")
 
 
 def write(filename, parameters):
@@ -45,12 +33,7 @@ def write(filename, parameters):
         Parameters to export.
 
     """
-    from .._common import Parameters, default
-
-    if "rocks" not in parameters.keys():
-        raise ValueError("Block 'ROCKS' (key 'rocks') is not defined.")
-    if "options" not in parameters.keys():
-        raise ValueError("Block 'PARAM' (key 'options') is not defined.")
+    from ._common import Parameters, default
 
     params = deepcopy(Parameters)
     params.update(deepcopy(parameters))
@@ -61,7 +44,13 @@ def write(filename, parameters):
 
     for rock in params["rocks"].keys():
         for k, v in params["default"].items():
-            if k not in params["rocks"][rock].keys() and k not in {"incon"}:
+            cond1 = k not in params["rocks"][rock].keys()
+            cond2 = k not in {
+                "initial_condition",
+                "relative_permeability",
+                "capillarity",
+            }
+            if cond1 and cond2:
                 params["rocks"][rock][k] = v
 
     buffer = write_buffer(params)
@@ -73,29 +62,27 @@ def write(filename, parameters):
 @check_parameters(dtypes["PARAMETERS"])
 def write_buffer(parameters):
     """Write TOUGH input file as a list of 80-character long record strings."""
-    from .._common import eos, eos_select
+    from ._common import eos
 
     # Check that EOS is defined (for block MULTI)
-    if parameters["isothermal"] and parameters["eos"] not in eos.keys():
+    if parameters["eos"] and parameters["eos"] not in eos.keys():
         raise ValueError(
             "EOS '{}' is unknown or not supported.".format(parameters["eos"])
         )
 
     # Set some flags
+    cond1 = "relative_permeability" in parameters["default"].keys()
+    cond2 = "capillarity" in parameters["default"].keys()
+    rpcap = cond1 or cond2
+
     indom = False
     for rock in parameters["rocks"].values():
-        if "incon" in rock.keys():
-            if any(x is not None for x in rock["incon"][:4]):
+        if "initial_condition" in rock.keys():
+            if any(x is not None for x in rock["initial_condition"][:4]):
                 indom = True
                 break
 
-    # Deprecation warning: 'incon' is now in 'default' rather than in 'options'
-    if "incon" in parameters["options"].keys():
-        warnings.warn(
-            "Defining 'incon' in 'options' is deprecated, define 'incon' in 'default'.",
-            DeprecationWarning,
-        )
-        parameters["default"]["incon"] = parameters["options"].pop("incon")
+    multi = parameters["eos"] or (parameters["n_component"] and parameters["n_phase"])
 
     # Check that start is True if indom is True
     if indom and not parameters["start"]:
@@ -104,20 +91,15 @@ def write_buffer(parameters):
     # Define input file contents
     out = ["{:80}\n".format(parameters["title"])]
     out += _write_rocks(parameters)
-    out += _write_flac(parameters) if parameters["flac"] else []
-    out += _write_multi(parameters) if parameters["eos"] else []
-    out += _write_selec(parameters) if parameters["eos"] in eos_select else []
+    out += _write_rpcap(parameters) if rpcap else []
+    out += _write_flac(parameters) if parameters["flac"] is not None else []
+    out += _write_multi(parameters) if multi else []
+    out += _write_selec(parameters) if parameters["selections"] else []
     out += _write_solvr(parameters) if parameters["solver"] else []
     out += _write_start() if parameters["start"] else []
     out += _write_param(parameters)
     out += _write_indom(parameters) if indom else []
-    if parameters["more_options"]:
-        if parameters["version"] == 3:
-            out += _write_momop(parameters)
-        else:
-            logging.warning(
-                "Defining 'more_options' is only available for 'version == 3'. Skipping."
-            )
+    out += _write_momop(parameters) if parameters["more_options"] else []
     out += _write_times(parameters) if parameters["times"] is not None else []
     out += _write_foft(parameters) if parameters["element_history"] is not None else []
     out += (
@@ -127,58 +109,14 @@ def write_buffer(parameters):
         _write_goft(parameters) if parameters["generator_history"] is not None else []
     )
     out += _write_gener(parameters) if parameters["generators"] else []
-    out += _write_diffu(parameters) if parameters["diffusion"] else []
-    if parameters["output"]:
-        if parameters["version"] == 3:
-            out += _write_outpu(parameters)
-        else:
-            logging.warning(
-                "Defining 'output' is only available for 'version == 3'. Skipping."
-            )
+    out += _write_diffu(parameters) if parameters["diffusion"] is not None else []
+    out += _write_outpu(parameters) if parameters["output"] else []
     out += _write_nover() if parameters["nover"] else []
-    out += _write_endfi() if parameters["endfi"] else _write_endcy()
+    out += _write_endcy()
     return out
 
 
-def _format_data(data):
-    """Return a list of strings given input data and formats."""
-
-    def to_str(x, fmt):
-        x = "" if x is None or x == "" else x
-        if isinstance(x, str):
-            return fmt.replace("g", "").replace("e", "").format(x)
-        else:
-            return fmt.format(x)
-
-    return [to_str(x, fmt) for x, fmt in data]
-
-
-def _write_record(data):
-    """Return a list with a single string."""
-    return ["{:80}\n".format("".join(data))]
-
-
-def _write_multi_record(data, ncol=8):
-    """Return a list with multiple strings."""
-    n = len(data)
-    rec = [
-        data[ncol * i : min(ncol * i + ncol, n)]
-        for i in range(int(numpy.ceil(n / ncol)))
-    ]
-    return [_write_record(r)[0] for r in rec]
-
-
-def _add_record(data, id_fmt="{:>5g}     "):
-    """Return a list with a single string for additional records."""
-    n = len(data["parameters"])
-    rec = [(data["id"], id_fmt)]
-    rec += [(v, "{:>10.3e}") for v in data["parameters"][: min(n, 7)]]
-    return _write_record(_format_data(rec))
-
-
 @check_parameters(dtypes["ROCKS"], keys="default")
-@check_parameters(dtypes["MODEL"], keys=("default", "relative_permeability"))
-@check_parameters(dtypes["MODEL"], keys=("default", "capillarity"))
 @check_parameters(dtypes["ROCKS"], keys="rocks", is_list=True)
 @check_parameters(
     dtypes["MODEL"], keys=("rocks", "relative_permeability"), is_list=True
@@ -201,23 +139,36 @@ def _write_rocks(parameters):
     out = []
     for k in order:
         # Load data
-        data = default.copy()
-        data.update(parameters["default"])
-        data.update(parameters["rocks"][k])
+        data = parameters["rocks"][k]
 
         # Number of additional lines to write per rock
-        # Always 2 since relative permeability and capillarity are copied from default
-        nad = 2
+        cond = any(
+            data[k] is not None
+            for k in [
+                "compressibility",
+                "expansion",
+                "conductivity_dry",
+                "tortuosity",
+                "klinkenberg_parameter",
+                "distribution_coefficient_3",
+                "distribution_coefficient_4",
+            ]
+        )
+        nad = (
+            2
+            if "relative_permeability" in data.keys() or "capillarity" in data.keys()
+            else int(cond)
+        )
 
         # Permeability
         per = data["permeability"]
-        per = [per] * 3 if isinstance(per, float) else per
+        per = [per] * 3 if not numpy.ndim(per) else per
         if not (isinstance(per, (list, tuple, numpy.ndarray)) and len(per) == 3):
             raise TypeError()
 
         # Record 1
-        out += _write_record(
-            _format_data(
+        out += write_record(
+            format_data(
                 [
                     (k, "{:5.5}"),
                     (nad if nad else None, "{:>5g}"),
@@ -233,28 +184,51 @@ def _write_rocks(parameters):
         )
 
         # Record 2
-        out += _write_record(
-            _format_data(
-                [
-                    (data["compressibility"], "{:>10.4e}"),
-                    (data["expansion"], "{:>10.4e}"),
-                    (data["conductivity_dry"], "{:>10.4e}"),
-                    (data["tortuosity"], "{:>10.4e}"),
-                    (data["b_coeff"], "{:>10.4e}"),
-                    (data["xkd3"], "{:>10.4e}"),
-                    (data["xkd4"], "{:>10.4e}"),
-                ]
+        if cond:
+            out += write_record(
+                format_data(
+                    [
+                        (data["compressibility"], "{:>10.4e}"),
+                        (data["expansion"], "{:>10.4e}"),
+                        (data["conductivity_dry"], "{:>10.4e}"),
+                        (data["tortuosity"], "{:>10.4e}"),
+                        (data["klinkenberg_parameter"], "{:>10.4e}"),
+                        (data["distribution_coefficient_3"], "{:>10.4e}"),
+                        (data["distribution_coefficient_4"], "{:>10.4e}"),
+                    ]
+                )
             )
-        )
+        else:
+            out += ["{:80}\n".format("")] if nad == 2 else []
 
-        # Relative permeability
-        out += _add_record(data["relative_permeability"]) if nad >= 1 else []
+        # Relative permeability / Capillary pressure
+        if nad == 2:
+            out += add_record(data["relative_permeability"])
+            out += add_record(data["capillarity"])
 
-        # Capillary pressure
-        out += _add_record(data["capillarity"]) if nad >= 2 else []
     return out
 
 
+@check_parameters(dtypes["MODEL"], keys=("default", "relative_permeability"))
+@check_parameters(dtypes["MODEL"], keys=("default", "capillarity"))
+@block("RPCAP")
+def _write_rpcap(parameters):
+    """
+    TOUGH input RPCAP block data (optional).
+
+    Introduces information on relative permeability and capillary pressure functions.
+
+    """
+    data = deepcopy(default)
+    data.update(parameters["default"])
+
+    out = []
+    out += add_record(data["relative_permeability"])
+    out += add_record(data["capillarity"])
+    return out
+
+
+@check_parameters(dtypes["FLAC"], keys="flac")
 @check_parameters(dtypes["MODEL"], keys=("default", "permeability_model"))
 @check_parameters(dtypes["MODEL"], keys=("default", "equivalent_pore_pressure"))
 @check_parameters(dtypes["MODEL"], keys=("rocks", "permeability_model"), is_list=True)
@@ -269,6 +243,12 @@ def _write_flac(parameters):
     Introduces mechanical parameters for each material in ROCKS block data.
 
     """
+    # Load data
+    from ._common import flac
+
+    data = deepcopy(flac)
+    data.update(parameters["flac"])
+
     # Reorder rocks
     if parameters["rocks_order"]:
         order = parameters["rocks_order"]
@@ -276,11 +256,12 @@ def _write_flac(parameters):
         order = parameters["rocks"].keys()
 
     # Record 1
-    out = _write_record(
-        _format_data(
+    out = write_record(
+        format_data(
             [
-                (1 if parameters["creep"] else 0, "{:5g}"),
-                (parameters["porosity_model"], "{:5g}"),
+                (bool(data["creep"]), "{:5g}"),
+                (data["porosity_model"], "{:5g}"),
+                (data["version"], "{:5g}"),
             ]
         )
     )
@@ -288,15 +269,15 @@ def _write_flac(parameters):
     # Additional records
     for k in order:
         # Load data
-        data = default.copy()
+        data = deepcopy(default)
         data.update(parameters["default"])
         data.update(parameters["rocks"][k])
 
-        # Permeability law
-        out += _add_record(data["permeability_model"], "{:>10g}")
+        # Permeability model
+        out += add_record(data["permeability_model"], "{:>10g}")
 
         # Equivalent pore pressure
-        out += _add_record(data["equivalent_pore_pressure"])
+        out += add_record(data["equivalent_pore_pressure"])
     return out
 
 
@@ -311,9 +292,9 @@ def _write_multi(parameters):
     parameter choices are different for different EOS modules.
 
     """
-    from .._common import eos
+    from ._common import eos
 
-    out = list(eos[parameters["eos"]])
+    out = list(eos[parameters["eos"]]) if parameters["eos"] else [0, 0, 0, 6]
     out[0] = parameters["n_component"] if parameters["n_component"] else out[0]
     out[1] = out[0] if parameters["isothermal"] else out[0] + 1
     out[2] = parameters["n_phase"] if parameters["n_phase"] else out[2]
@@ -322,6 +303,10 @@ def _write_multi(parameters):
     if parameters["diffusion"]:
         out[3] = 8
         parameters["n_phase"] = out[2]  # Save for later check
+
+    # Number of mass components
+    if parameters["n_component_mass"]:
+        out.append(parameters["n_component_mass"])
 
     return [("{:>5d}" * len(out) + "\n").format(*out)]
 
@@ -337,18 +322,25 @@ def _write_selec(parameters):
 
     """
     # Load data
-    from .._common import select
+    from ._common import selections
 
-    data = select.copy()
-    data.update(parameters["selections"])
+    data = deepcopy(selections)
+    if parameters["selections"]["integers"]:
+        data["integers"].update(parameters["selections"]["integers"])
+    if len(parameters["selections"]["floats"]):
+        data["floats"] = parameters["selections"]["floats"]
 
     # Record 1
-    out = _write_record(_format_data([(v, "{:>5}") for v in data.values()]))
+    out = write_record(
+        format_data(
+            [(data["integers"][k], "{:>5}") for k in sorted(data["integers"].keys())]
+        )
+    )
 
     # Record 2
-    if parameters["extra_selections"] is not None:
-        out += _write_multi_record(
-            _format_data([(i, "{:>10.3e}") for i in parameters["extra_selections"]])
+    if data["floats"] is not None and len(data["floats"]):
+        out += write_multi_record(
+            format_data([(i, "{:>10.3e}") for i in data["floats"]])
         )
     return out
 
@@ -363,12 +355,12 @@ def _write_solvr(parameters):
     conditions.
 
     """
-    from .._common import solver
+    from ._common import solver
 
     data = solver.copy()
     data.update(parameters["solver"])
-    return _write_record(
-        _format_data(
+    return write_record(
+        format_data(
             [
                 (data["method"], "{:1g}  "),
                 (data["z_precond"], "{:>2g}   "),
@@ -392,7 +384,7 @@ def _write_start():
     and INCON.
 
     """
-    from .._common import header
+    from ._common import header
 
     out = "{:5}{}\n".format("----*", header)
     return [out[:11] + "MOP: 123456789*123456789*1234" + out[40:]]
@@ -410,7 +402,7 @@ def _write_param(parameters):
 
     """
     # Load data
-    from .._common import options
+    from ._common import options
 
     data = options.copy()
     data.update(parameters["options"])
@@ -420,13 +412,13 @@ def _write_param(parameters):
         data["t_steps"] = [data["t_steps"]]
 
     # Record 1
-    from .._common import extra_options
+    from ._common import extra_options
 
     _mop = deepcopy(extra_options)
     _mop.update(parameters["extra_options"])
-    mop = _format_data([(_mop[k], "{:>1g}") for k in sorted(_mop.keys())])
-    out = _write_record(
-        _format_data(
+    mop = format_data([(_mop[k], "{:>1g}") for k in sorted(_mop.keys())])
+    out = write_record(
+        format_data(
             [
                 (data["n_iteration"], "{:>2g}"),
                 (data["verbosity"], "{:>2g}"),
@@ -442,8 +434,8 @@ def _write_param(parameters):
     )
 
     # Record 2
-    out += _write_record(
-        _format_data(
+    out += write_record(
+        format_data(
             [
                 (data["t_ini"], "{:>10.4e}"),
                 (data["t_max"], "{:>10.4e}"),
@@ -458,13 +450,11 @@ def _write_param(parameters):
     )
 
     # Record 2.1
-    out += _write_multi_record(
-        _format_data([(i, "{:>10.4e}") for i in data["t_steps"]])
-    )
+    out += write_multi_record(format_data([(i, "{:>10.4e}") for i in data["t_steps"]]))
 
     # Record 3
-    out += _write_record(
-        _format_data(
+    out += write_record(
+        format_data(
             [
                 (data["eps1"], "{:>10.4e}"),
                 (data["eps2"], "{:>10.4e}"),
@@ -477,28 +467,9 @@ def _write_param(parameters):
     )
 
     # Record 4
-    data = parameters["default"]["incon"]
+    data = parameters["default"]["initial_condition"]
     n = len(data)
-    out += _write_record(_format_data([(i, "{:>20.4e}") for i in data[: min(n, 4)]]))
-    return out
-
-
-@check_parameters(dtypes["MOMOP"], keys="more_options")
-@block("MOMOP")
-def _write_momop(parameters):
-    """
-    TOUGH input MOMOP block data (optional).
-
-    Provides additional options.
-
-    """
-    from .._common import more_options
-
-    _momop = more_options.copy()
-    _momop.update(parameters["more_options"])
-    out = _write_record(
-        _format_data([(_momop[k], "{:>1g}") for k in sorted(_momop.keys())])
-    )
+    out += write_record(format_data([(i, "{:>20.4e}") for i in data[: min(n, 4)]]))
     return out
 
 
@@ -517,16 +488,35 @@ def _write_indom(parameters):
 
     out = []
     for k in order:
-        if "incon" in parameters["rocks"][k]:
-            data = parameters["rocks"][k]["incon"]
+        if "initial_condition" in parameters["rocks"][k]:
+            data = parameters["rocks"][k]["initial_condition"]
             data = data[: min(len(data), 4)]
             if any(x is not None for x in data):
                 out += ["{:5.5}\n".format(k)]
-                out += _write_record(_format_data([(i, "{:>20.4e}") for i in data]))
+                out += write_record(format_data([(i, "{:>20.4e}") for i in data]))
     return out
 
 
-@block("TIMES", multi=True)
+@check_parameters(dtypes["MOMOP"], keys="more_options")
+@block("MOMOP")
+def _write_momop(parameters):
+    """
+    TOUGH input MOMOP block data (optional).
+
+    Provides additional options.
+
+    """
+    from ._common import more_options
+
+    _momop = more_options.copy()
+    _momop.update(parameters["more_options"])
+    out = write_record(
+        format_data([(_momop[k], "{:>1g}") for k in sorted(_momop.keys())])
+    )
+    return out
+
+
+@block("TIMES")
 def _write_times(parameters):
     """
     TOUGH input TIMES block data (optional).
@@ -535,9 +525,10 @@ def _write_times(parameters):
 
     """
     data = parameters["times"]
+    data = data if numpy.ndim(data) else [data]
     n = len(data)
-    out = _write_record(_format_data([(n, "{:>5g}")]))
-    out += _write_multi_record(_format_data([(i, "{:>10.4e}") for i in data]))
+    out = write_record(format_data([(n, "{:>5g}")]))
+    out += write_multi_record(format_data([(i, "{:>10.4e}") for i in data]))
     return out
 
 
@@ -550,8 +541,8 @@ def _write_foft(parameters):
     written out for plotting to a file called FOFT during the simulation.
 
     """
-    return _write_multi_record(
-        _format_data([(i, "{:>5g}") for i in parameters["element_history"]]), ncol=1
+    return write_multi_record(
+        format_data([(i, "{:>5g}") for i in parameters["element_history"]]), ncol=1
     )
 
 
@@ -564,8 +555,8 @@ def _write_coft(parameters):
     for plotting to a file called COFT during the simulation.
 
     """
-    return _write_multi_record(
-        _format_data([(i, "{:>10g}") for i in parameters["connection_history"]]), ncol=1
+    return write_multi_record(
+        format_data([(i, "{:>10g}") for i in parameters["connection_history"]]), ncol=1
     )
 
 
@@ -578,8 +569,8 @@ def _write_goft(parameters):
     out for plotting to a file called GOFT during the simulation.
 
     """
-    return _write_multi_record(
-        _format_data([(i, "{:>5g}") for i in parameters["generator_history"]]), ncol=1
+    return write_multi_record(
+        format_data([(i, "{:>5g}") for i in parameters["generator_history"]]), ncol=1
     )
 
 
@@ -592,7 +583,7 @@ def _write_gener(parameters):
     Introduces sinks and/or sources.
 
     """
-    from .._common import generators
+    from ._common import generators
 
     # Handle multicomponent generators
     generator_data = []
@@ -655,11 +646,11 @@ def _write_gener(parameters):
                         raise ValueError()
 
         # Record 1
-        out += _write_record(
-            _format_data(
+        out += write_record(
+            format_data(
                 [
                     (k, "{:5.5}"),
-                    (None, "{:>5g}"),
+                    (v["name"], "{:>5g}"),
                     (None, "{:>5g}"),
                     (None, "{:>5g}"),
                     (None, "{:>5g}"),
@@ -676,14 +667,14 @@ def _write_gener(parameters):
 
         # Record 2
         if ltab:
-            out += _write_multi_record(
-                _format_data([(i, "{:>14.7e}") for i in v["times"]]), ncol=4
+            out += write_multi_record(
+                format_data([(i, "{:>14.7e}") for i in v["times"]]), ncol=4
             )
 
         # Record 3
         if ltab:
-            out += _write_multi_record(
-                _format_data([(i, "{:>14.7e}") for i in v["rates"]]), ncol=4
+            out += write_multi_record(
+                format_data([(i, "{:>14.7e}") for i in v["rates"]]), ncol=4
             )
 
         # Record 4
@@ -692,8 +683,8 @@ def _write_gener(parameters):
                 specific_enthalpy = v["specific_enthalpy"]
             else:
                 specific_enthalpy = numpy.full(ltab, v["specific_enthalpy"])
-            out += _write_multi_record(
-                _format_data([(i, "{:>14.7e}") for i in specific_enthalpy]), ncol=4
+            out += write_multi_record(
+                format_data([(i, "{:>14.7e}") for i in specific_enthalpy]), ncol=4
             )
     return out
 
@@ -711,8 +702,8 @@ def _write_diffu(parameters):
     mass1, mass2 = parameters["diffusion"]
 
     out = []
-    out += _write_multi_record(_format_data([(i, "{:>10.3e}") for i in mass1]), ncol=8)
-    out += _write_multi_record(_format_data([(i, "{:>10.3e}") for i in mass2]), ncol=8)
+    out += write_multi_record(format_data([(i, "{:>10.3e}") for i in mass1]), ncol=8)
+    out += write_multi_record(format_data([(i, "{:>10.3e}") for i in mass2]), ncol=8)
     return out
 
 
@@ -725,7 +716,7 @@ def _write_outpu(parameters):
     Specifies variables/parameters for printout.
 
     """
-    from .._common import output
+    from ._common import output
 
     data = deepcopy(output)
     data.update(parameters["output"])
@@ -755,12 +746,6 @@ def _write_outpu(parameters):
 @block("NOVER")
 def _write_nover():
     """TOUGH input NOVER block data (optional)."""
-    return []
-
-
-@block("ENDFI", noend=True)
-def _write_endfi():
-    """TOUGH input ENDFI block data (optional)."""
     return []
 
 
