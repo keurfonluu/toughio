@@ -1,3 +1,5 @@
+from __future__ import division
+
 import logging
 from copy import deepcopy
 from functools import wraps
@@ -110,19 +112,20 @@ dtypes = {
 
 
 str_to_dtype = {
-    "int": (int, numpy.int32),
+    "int": (int, numpy.int32, numpy.int64),
     "float": (float, numpy.float32, numpy.float64),
     "str": (str,),
     "bool": (bool,),
     "array_like": (list, tuple, numpy.ndarray),
     "dict": (dict,),
-    "scalar": (int, float, numpy.int32, numpy.float32, numpy.float64),
+    "scalar": (int, float, numpy.int32, numpy.int64, numpy.float32, numpy.float64),
     "scalar_array_like": (
         int,
         float,
         list,
         tuple,
         numpy.int32,
+        numpy.int64,
         numpy.float32,
         numpy.float64,
         numpy.ndarray,

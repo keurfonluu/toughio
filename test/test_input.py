@@ -60,6 +60,7 @@ def test_rocks():
             },
         }
     )
+    toughio.write_input("infile.dat", parameters_ref)
     parameters = write_read(parameters_ref)
 
     assert sorted(parameters_ref["rocks"].keys()) == sorted(parameters["rocks"].keys())
@@ -404,3 +405,7 @@ def test_flag(flag, enable):
         assert parameters_ref[flag] == parameters[flag]
     else:
         assert not enable
+
+
+if __name__ == "__main__":
+    test_rocks()
