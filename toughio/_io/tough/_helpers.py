@@ -64,11 +64,7 @@ dtypes = {
         "permeability_model": "dict",
         "equivalent_pore_pressure": "dict",
     },
-    "FLAC": {
-        "creep": "bool",
-        "porosity_model": "int",
-        "version": "int",
-    },
+    "FLAC": {"creep": "bool", "porosity_model": "int", "version": "int"},
     "MODEL": {"id": "int", "parameters": "array_like"},
     "PARAM": {
         "n_iteration": "int",
@@ -93,10 +89,7 @@ dtypes = {
     },
     "MOP": {i + 1: "int" for i in range(24)},
     "MOMOP": {i + 1: "int" for i in range(40)},
-    "SELEC": {
-        "integers": "dict",
-        "floats": "array_like",
-    },
+    "SELEC": {"integers": "dict", "floats": "array_like"},
     "SOLVR": {
         "method": "int",
         "z_precond": "str",
@@ -263,12 +256,12 @@ def read_record(data, fmt):
         "f": float,
         "e": float,
     }
-    
+
     i = 0
     out = []
     for token in fmt.split(","):
         n = int(token[:-1])
-        tmp = data[i:i+n]
+        tmp = data[i : i + n]
         tmp = tmp if token[-1] == "S" else tmp.strip()
         out.append(token_to_type[token[-1]](tmp) if tmp else None)
         i += n

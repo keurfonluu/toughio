@@ -19,7 +19,8 @@ def test_time_series():
         {"points": numpy.random.rand(mesh_ref.n_points)} for _ in range(num_steps)
     ]
     cell_data_ref = [
-        {"cells": mesh_ref.split(numpy.random.rand(mesh_ref.n_cells))} for i in range(num_steps)
+        {"cells": mesh_ref.split(numpy.random.rand(mesh_ref.n_cells))}
+        for i in range(num_steps)
     ]
     time_steps_ref = numpy.sort(numpy.random.rand(num_steps))
 

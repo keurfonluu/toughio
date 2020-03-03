@@ -2,7 +2,7 @@ from __future__ import division, with_statement
 
 import logging
 
-from ._helpers import read_record, prune_nones_dict, prune_nones_list
+from ._helpers import prune_nones_dict, prune_nones_list, read_record
 
 __all__ = [
     "read",
@@ -35,7 +35,7 @@ def read_buffer(f):
 
     # Title
     parameters["title"] = f.readline().strip()
-    
+
     # Loop over blocks
     while True:
         line = f.readline().strip()
@@ -129,15 +129,17 @@ def _read_rocks(f):
                 # Record 2
                 line = f.readline()
                 data = read_record(line, "10e,10e,10e,10e,10e,10e,10e")
-                rocks["rocks"][rock].update({
-                    "compressibility": data[0],
-                    "expansion": data[1],
-                    "conductivity_dry": data[2],
-                    "tortuosity": data[3],
-                    "klinkenberg_parameter": data[4],
-                    "distribution_coefficient_3": data[5],
-                    "distribution_coefficient_4": data[6],
-                })
+                rocks["rocks"][rock].update(
+                    {
+                        "compressibility": data[0],
+                        "expansion": data[1],
+                        "conductivity_dry": data[2],
+                        "tortuosity": data[3],
+                        "klinkenberg_parameter": data[4],
+                        "distribution_coefficient_3": data[5],
+                        "distribution_coefficient_4": data[6],
+                    }
+                )
 
             if nad and nad > 1:
                 rocks["rocks"][rock].update(_read_rpcap(f))
@@ -147,8 +149,10 @@ def _read_rocks(f):
         else:
             break
 
-    rocks = {k: {kk: prune_nones_dict(vv) for kk, vv in v.items()} for k, v in rocks.items()}
-    
+    rocks = {
+        k: {kk: prune_nones_dict(vv) for kk, vv in v.items()} for k, v in rocks.items()
+    }
+
     return rocks, rocks_order
 
 
@@ -209,7 +213,7 @@ def _read_multi(f):
     multi["n_component"] = int(line[0])
     multi["isothermal"] = int(line[1]) == int(line[0])
     multi["n_phase"] = int(line[2])
-    
+
     return multi
 
 
@@ -268,20 +272,24 @@ def _read_param(f):
         "temperature_dependence_gas": data[7],
         "effective_strength_vapor": data[8],
     }
-    param["extra_options"] = {i+1: int(x) for i, x in enumerate(data[5]) if x.isdigit()}
+    param["extra_options"] = {
+        i + 1: int(x) for i, x in enumerate(data[5]) if x.isdigit()
+    }
 
     # Record 2
     line = f.readline()
     data = read_record(line, "10e,10e,10f,10e,10s,10e,10e,10e")
-    param["options"].update({
-        "t_ini": data[0],
-        "t_max": data[1],
-        "t_steps": data[2],
-        "t_step_max": data[3],
-        "gravity": data[5],
-        "t_reduce_factor": data[6],
-        "mesh_scale_factor": data[7],
-    })
+    param["options"].update(
+        {
+            "t_ini": data[0],
+            "t_max": data[1],
+            "t_steps": data[2],
+            "t_step_max": data[3],
+            "gravity": data[5],
+            "t_reduce_factor": data[6],
+            "mesh_scale_factor": data[7],
+        }
+    )
 
     t_steps = int(data[2])
     if t_steps >= 0.0:
@@ -298,13 +306,15 @@ def _read_param(f):
     # Record 3
     line = f.readline()
     data = read_record(line, "10e,10e,10s,10e,10e,10e")
-    param["options"].update({
-        "eps1": data[0],
-        "eps2": data[1],
-        "w_upstream": data[3],
-        "w_newton": data[4],
-        "derivative_factor": data[5],
-    })
+    param["options"].update(
+        {
+            "eps1": data[0],
+            "eps2": data[1],
+            "w_upstream": data[3],
+            "w_newton": data[4],
+            "derivative_factor": data[5],
+        }
+    )
 
     # Record 4
     line = f.readline()
@@ -345,7 +355,9 @@ def _read_momop(f):
     """Read MOMOP block data."""
     line = f.readline()
     data = read_record(line, "40S")
-    momop = {"more_options": {i+1: int(x) for i, x in enumerate(data[0]) if x.isdigit()}}
+    momop = {
+        "more_options": {i + 1: int(x) for i, x in enumerate(data[0]) if x.isdigit()}
+    }
 
     return momop
 
@@ -414,11 +426,13 @@ def _read_gener(f):
 
                     tmp[key] = [table]
             else:
-                tmp.update({
-                    "times": [None],
-                    "rates": [data[9]],
-                    "specific_enthalpy": [data[10]],
-                })
+                tmp.update(
+                    {
+                        "times": [None],
+                        "rates": [data[9]],
+                        "specific_enthalpy": [data[10]],
+                    }
+                )
 
             if label in gener["generators"].keys():
                 for k, v in gener["generators"][label].items():
@@ -437,7 +451,9 @@ def _read_gener(f):
                 if all(x is None for x in v):
                     generator[k] = None
 
-    return {k: {kk: prune_nones_dict(vv) for kk, vv in v.items()} for k, v in gener.items()}
+    return {
+        k: {kk: prune_nones_dict(vv) for kk, vv in v.items()} for k, v in gener.items()
+    }
 
 
 def _read_diffu(f):
