@@ -29,7 +29,6 @@ dtypes = {
         "isothermal": "bool",
         "start": "bool",
         "nover": "bool",
-        "endfi": "bool",
         "rocks": "dict",
         "rocks_order": "array_like",
         "options": "dict",
