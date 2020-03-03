@@ -300,18 +300,11 @@ def _write_selec(parameters):
     if len(parameters["selections"]["floats"]):
         data["floats"] = parameters["selections"]["floats"]
 
-    # IE(1)
-    data["integers"][1] = (
-        len(data["floats"]) // 8 + 1
-        if data["floats"] is not None
-        else None
-    )
-
     # Record 1
     out = write_record(format_data([(data["integers"][k], "{:>5}") for k in sorted(data["integers"].keys())]))
 
     # Record 2
-    if len(data["floats"]):
+    if data["floats"] is not None and len(data["floats"]):
         out += write_multi_record(
             format_data([(i, "{:>10.3e}") for i in data["floats"]])
         )
