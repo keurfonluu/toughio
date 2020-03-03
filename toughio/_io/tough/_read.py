@@ -98,9 +98,6 @@ def read_buffer(f):
             logging.warning("Reading block INCON is not supported. Skipping.")
         elif line.startswith("NOVER"):
             parameters["nover"] = True
-        elif line.startswith("ENDFI"):
-            parameters["endfi"] = True
-            break
         elif line.startswith("ENDCY"):
             break
 

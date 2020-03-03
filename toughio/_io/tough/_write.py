@@ -100,7 +100,7 @@ def write_buffer(parameters):
     out += _write_diffu(parameters) if parameters["diffusion"] is not None else []
     out += _write_outpu(parameters) if parameters["output"] else []
     out += _write_nover() if parameters["nover"] else []
-    out += _write_endfi() if parameters["endfi"] else _write_endcy()
+    out += _write_endcy()
     return out
 
 
@@ -722,12 +722,6 @@ def _write_outpu(parameters):
 @block("NOVER")
 def _write_nover():
     """TOUGH input NOVER block data (optional)."""
-    return []
-
-
-@block("ENDFI", noend=True)
-def _write_endfi():
-    """TOUGH input ENDFI block data (optional)."""
     return []
 
 

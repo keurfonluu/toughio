@@ -24,7 +24,6 @@ _Parameters = {
     "isothermal": False,
     "start": True,
     "nover": False,
-    "endfi": False,
     "rocks": {},
     "rocks_order": None,
     "options": {},

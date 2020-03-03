@@ -356,7 +356,6 @@ def test_outpu():
     [
         ("start", True), ("start", False),
         ("nover", True), ("nover", False),
-        ("endfi", True), ("endfi", False),
     ],
 )
 def test_flag(flag, enable):
