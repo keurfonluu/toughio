@@ -192,7 +192,8 @@ def _read_selec(f):
             selec["selections"]["floats"] += data
 
     selec["selections"]["integers"] = prune_nones_dict(selec["selections"]["integers"])
-    selec["selections"]["floats"] = prune_nones_list(selec["selections"]["floats"])
+    if selec["selections"]["integers"][1]:
+        selec["selections"]["floats"] = prune_nones_list(selec["selections"]["floats"])
 
     return selec
 
