@@ -80,7 +80,7 @@ def write_buffer(parameters):
     out = ["{:80}\n".format(parameters["title"])]
     out += _write_rocks(parameters)
     out += _write_rpcap(parameters) if rpcap else []
-    out += _write_flac(parameters) if parameters["flac"] else []
+    out += _write_flac(parameters) if parameters["flac"] is not None else []
     out += _write_multi(parameters) if multi else []
     out += _write_selec(parameters) if parameters["selections"] else []
     out += _write_solvr(parameters) if parameters["solver"] else []
@@ -206,6 +206,7 @@ def _write_rpcap(parameters):
     return out
 
 
+@check_parameters(dtypes["FLAC"], keys="flac")
 @check_parameters(dtypes["MODEL"], keys=("default", "permeability_model"))
 @check_parameters(dtypes["MODEL"], keys=("default", "equivalent_pore_pressure"))
 @check_parameters(dtypes["MODEL"], keys=("rocks", "permeability_model"), is_list=True)
@@ -220,6 +221,12 @@ def _write_flac(parameters):
     Introduces mechanical parameters for each material in ROCKS block data.
 
     """
+    # Load data
+    from ._common import flac
+
+    data = deepcopy(flac)
+    data.update(parameters["flac"])
+
     # Reorder rocks
     if parameters["rocks_order"]:
         order = parameters["rocks_order"]
@@ -230,8 +237,9 @@ def _write_flac(parameters):
     out = write_record(
         format_data(
             [
-                (1 if parameters["creep"] else 0, "{:5g}"),
-                (parameters["porosity_model"], "{:5g}"),
+                (bool(data["creep"]), "{:5g}"),
+                (data["porosity_model"], "{:5g}"),
+                (data["version"], "{:5g}"),
             ]
         )
     )
@@ -239,11 +247,11 @@ def _write_flac(parameters):
     # Additional records
     for k in order:
         # Load data
-        data = default.copy()
+        data = deepcopy(default)
         data.update(parameters["default"])
         data.update(parameters["rocks"][k])
 
-        # Permeability law
+        # Permeability model
         out += add_record(data["permeability_model"], "{:>10g}")
 
         # Equivalent pore pressure

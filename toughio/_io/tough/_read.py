@@ -41,7 +41,8 @@ def read_buffer(f):
         line = f.readline().strip()
 
         if line.startswith("ROCKS"):
-            parameters.update(_read_rocks(f))
+            rocks, rocks_order = _read_rocks(f)
+            parameters.update(rocks)
         elif line.startswith("RPCAP"):
             rpcap = _read_rpcap(f)
             if "default" in parameters.keys():
@@ -49,7 +50,10 @@ def read_buffer(f):
             else:
                 parameters["default"] = rpcap
         elif line.startswith("FLAC"):
-            parameters.update(_read_flac(f))
+            flac = _read_flac(f, rocks_order)
+            parameters["flac"] = flac["flac"]
+            for k, v in flac["rocks"].items():
+                parameters["rocks"][k].update(v)
         elif line.startswith("MULTI"):
             parameters.update(_read_multi(f))
         elif line.startswith("SELEC"):
@@ -106,6 +110,7 @@ def read_buffer(f):
 def _read_rocks(f):
     """Read ROCKS block data."""
     rocks = {"rocks": {}}
+    rocks_order = []
 
     while True:
         line = f.readline()
@@ -140,10 +145,14 @@ def _read_rocks(f):
             if nad and nad > 1:
                 rocks["rocks"][rock].update(_read_rpcap(f))
 
+            rocks_order.append(rock)
+
         else:
             break
+
+    rocks = {k: {kk: prune_nones_dict(vv) for kk, vv in v.items()} for k, v in rocks.items()}
     
-    return {k: {kk: prune_nones_dict(vv) for kk, vv in v.items()} for k, v in rocks.items()}
+    return rocks, rocks_order
 
 
 def _read_rpcap(f):
@@ -161,10 +170,38 @@ def _read_rpcap(f):
     return rpcap
 
 
-def _read_flac(f):
+def _read_flac(f, rocks_order):
     """Read FLAC block data."""
-    logging.warning("Reading block FLAC is not supported yet. Skipping.")
-    return {}
+    flac = {"rocks": {}, "flac": {}}
+
+    # Record 1
+    line = f.readline()
+    data = read_record(line, ",".join(16 * ["5d"]))
+    flac["flac"]["creep"] = data[0]
+    flac["flac"]["porosity_model"] = data[1]
+    flac["flac"]["version"] = data[2]
+
+    # Additional records
+    for rock in rocks_order:
+        flac["rocks"][rock] = {}
+
+        line = f.readline()
+        data = read_record(line, "10d,10e,10e,10e,10e,10e,10e,10e")
+        flac["rocks"][rock]["permeability_model"] = {
+            "id": data[0],
+            "parameters": prune_nones_list(data[1:]),
+        }
+
+        line = f.readline()
+        data = read_record(line, "5d,5s,10e,10e,10e,10e,10e,10e,10e")
+        flac["rocks"][rock]["equivalent_pore_pressure"] = {
+            "id": data[0],
+            "parameters": prune_nones_list(data[2:]),
+        }
+
+    flac["flac"] = prune_nones_dict(flac["flac"])
+
+    return flac
 
 
 def _read_multi(f):

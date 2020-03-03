@@ -25,9 +25,7 @@ dtypes = {
         "n_component": "int",
         "n_phase": "int",
         "n_component_mass": "int",
-        "flac": "bool",
-        "creep": "bool",
-        "porosity_model": "int",
+        "flac": "dict",
         "isothermal": "bool",
         "start": "bool",
         "nover": "bool",
@@ -66,6 +64,11 @@ dtypes = {
         "capillarity": "dict",
         "permeability_model": "dict",
         "equivalent_pore_pressure": "dict",
+    },
+    "FLAC": {
+        "creep": "bool",
+        "porosity_model": "int",
+        "version": "int",
     },
     "MODEL": {"id": "int", "parameters": "array_like"},
     "PARAM": {
