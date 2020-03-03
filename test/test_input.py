@@ -80,6 +80,34 @@ def test_rpcap():
         helpers.allclose_dict(v, parameters["default"][k], atol=1.0e-4)
 
 
+def test_flac():
+    parameters_ref = {
+        "flac": {
+            "creep": bool(numpy.random.randint(2)),
+            "porosity_model": numpy.random.randint(10),
+            "version": numpy.random.randint(10),
+        },
+        "rocks": {
+            helpers.random_string(5): {
+                "permeability_model": {
+                    "id": numpy.random.randint(10),
+                    "parameters": numpy.random.rand(numpy.random.randint(7) + 1),
+                },
+                "equivalent_pore_pressure": {
+                    "id": numpy.random.randint(10),
+                    "parameters": numpy.random.rand(numpy.random.randint(7) + 1),
+                }
+            }
+        for _ in numpy.random.rand(10) + 1},
+    }
+    parameters = write_read(parameters_ref)
+
+    helpers.allclose_dict(parameters_ref["flac"], parameters["flac"])
+    for k, v in parameters_ref["rocks"].items():
+        for kk, vv in v.items():
+            helpers.allclose_dict(vv, parameters["rocks"][k][kk], atol=1.0e-4)
+
+
 @pytest.mark.parametrize("isothermal", [True, False])
 def test_multi(isothermal):
     import random

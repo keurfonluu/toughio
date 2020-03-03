@@ -1,5 +1,6 @@
 __all__ = [
     "Parameters",
+    "flac",
     "selections",
     "options",
     "extra_options",
@@ -19,9 +20,7 @@ _Parameters = {
     "n_component": None,
     "n_phase": None,
     "n_component_mass": None,
-    "flac": False,
-    "creep": False,
-    "porosity_model": 0,
+    "flac": None,
     "isothermal": False,
     "start": True,
     "nover": False,
@@ -44,6 +43,12 @@ _Parameters = {
 }
 
 Parameters = dict(_Parameters)
+
+flac = {
+    "creep": False,
+    "porosity_model": None,
+    "version": None,
+}
 
 selections = {
     "integers": {k + 1: None for k in range(16)},
