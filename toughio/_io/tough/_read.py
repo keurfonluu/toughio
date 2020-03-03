@@ -67,7 +67,9 @@ def read_buffer(f):
             else:
                 parameters["default"] = param["default"]
         elif line.startswith("INDOM"):
-            parameters.update(_read_indom(f))
+            indom = _read_indom(f)
+            for k, v in indom["rocks"].items():
+                parameters["rocks"][k].update(v)
         elif line.startswith("MOMOP"):
             parameters.update(_read_momop(f))
         elif line.startswith("TIMES"):
@@ -94,6 +96,7 @@ def read_buffer(f):
             parameters["nover"] = True
         elif line.startswith("ENDFI"):
             parameters["endfi"] = True
+            break
         elif line.startswith("ENDCY"):
             break
 
@@ -297,7 +300,7 @@ def _read_indom(f):
             line = f.readline()
             data = read_record(line, "20e,20e,20e,20e")
             data = prune_nones_list(data)
-            indom["rocks"][rock]["initial_condition"] = data
+            indom["rocks"][rock] = {"initial_condition": data}
         else:
             break
 
@@ -308,7 +311,7 @@ def _read_momop(f):
     """Read MOMOP block data."""
     line = f.readline()
     data = read_record(line, "40S")
-    momop = {"more_options": {i+1: int(x) for i, x in enumerate(data[5]) if x.isdigit()}}
+    momop = {"more_options": {i+1: int(x) for i, x in enumerate(data[0]) if x.isdigit()}}
 
     return momop
 
@@ -327,6 +330,9 @@ def _read_times(f):
         line = f.readline()
         data = read_record(line, "10e,10e,10e,10e,10e,10e,10e,10e")
         times["times"] += prune_nones_list(data)
+
+    if n_times == 1:
+        times["times"] = times["times"][0]
 
     return times
 

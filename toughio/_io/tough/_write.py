@@ -97,7 +97,7 @@ def write_buffer(parameters):
         _write_goft(parameters) if parameters["generator_history"] is not None else []
     )
     out += _write_gener(parameters) if parameters["generators"] else []
-    out += _write_diffu(parameters) if parameters["diffusion"] else []
+    out += _write_diffu(parameters) if parameters["diffusion"] is not None else []
     out += _write_outpu(parameters) if parameters["output"] else []
     out += _write_nover() if parameters["nover"] else []
     out += _write_endfi() if parameters["endfi"] else _write_endcy()
@@ -139,7 +139,7 @@ def _write_rocks(parameters):
 
         # Permeability
         per = data["permeability"]
-        per = [per] * 3 if isinstance(per, float) else per
+        per = [per] * 3 if not numpy.ndim(per) else per
         if not (isinstance(per, (list, tuple, numpy.ndarray)) and len(per) == 3):
             raise TypeError()
 
@@ -493,6 +493,7 @@ def _write_times(parameters):
 
     """
     data = parameters["times"]
+    data = data if numpy.ndim(data) else [data]
     n = len(data)
     out = write_record(format_data([(n, "{:>5g}")]))
     out += write_multi_record(format_data([(i, "{:>10.4e}") for i in data]))
