@@ -1,4 +1,5 @@
 import os
+import tempfile
 
 import numpy
 
@@ -31,6 +32,35 @@ hybrid_mesh = toughio.Mesh(
         ("wedge", numpy.array([[1, 11, 5, 2, 12, 6], [13, 0, 4, 14, 3, 7]])),
     ],
 )
+
+def tempdir(filename):
+    temp_dir = tempfile.mkdtemp().replace("\\", "/")
+    return os.path.join(temp_dir, filename)
+
+
+def write_read(filename, obj, writer, reader, writer_kws=None, reader_kws=None):
+    writer_kws = writer_kws if writer_kws else {}
+    reader_kws = reader_kws if reader_kws else {}
+
+    filepath = tempdir(filename)
+    writer(filepath, obj, **writer_kws)
+
+    return reader(filepath, **reader_kws)
+
+
+def random_string(n):
+    import random
+    from string import ascii_lowercase
+
+    return "".join(random.choice(ascii_lowercase) for _ in range(n))
+
+
+def allclose_dict(a, b, atol=1.0e-8):
+    for k, v in a.items():
+        if v is not None:
+            assert numpy.allclose(v, b[k], atol=atol)
+        else:
+            assert b[k] is None
 
 
 def relative_permeability(model, parameters, sl=None, atol=1.0e-8):
