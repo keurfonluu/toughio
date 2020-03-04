@@ -125,7 +125,9 @@ def read_output(filename, file_format="tough", labels_order=None):
         raise TypeError()
     if file_format not in {"tough", "tecplot"}:
         raise ValueError()
-    if not (labels_order is None or isinstance(labels_order, list)):
+    if not (
+        labels_order is None or isinstance(labels_order, (list, tuple, numpy.ndarray))
+    ):
         raise TypeError()
 
     with open(filename, "r") as f:
@@ -312,7 +314,9 @@ def read_save(filename, labels_order=None):
 
     if not isinstance(filename, str):
         raise TypeError()
-    if not (labels_order is None or isinstance(labels_order, list)):
+    if not (
+        labels_order is None or isinstance(labels_order, (list, tuple, numpy.ndarray))
+    ):
         raise TypeError()
 
     with open(filename, "r") as f:

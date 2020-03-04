@@ -366,7 +366,7 @@ class Mesh(object):
 
         if len(out.labels) != self.n_cells:
             raise ValueError()
-        out = _reorder_labels(out, self.labels)
+        out = _reorder_labels(out, numpy.concatenate(self.labels))
         for k, v in out.data.items():
             self.cell_data[k] = self.split(v)
 
