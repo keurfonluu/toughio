@@ -1,5 +1,7 @@
 from __future__ import print_function
 
+import numpy
+
 __all__ = [
     "export",
 ]
@@ -101,7 +103,7 @@ def export(argv=None):
         if args.file_format != "xdmf":
             mesh.read_output(output)
         else:
-            output = [_reorder_labels(data, mesh.labels) for data in output]
+            output = [_reorder_labels(data, numpy.concatenate(mesh.labels)) for data in output]
     print(" Done!")
 
     # Output file name
