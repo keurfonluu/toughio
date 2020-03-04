@@ -348,7 +348,7 @@ def _reorder_labels(data, labels):
     """Reorder output or save cell data according to input labels."""
     if len(data.labels) != len(labels):
         raise ValueError()
-    
+
     mapper = {k: v for v, k in enumerate(data.labels)}
     idx = [mapper[label] for label in labels]
     data.labels[:] = data.labels[idx]
