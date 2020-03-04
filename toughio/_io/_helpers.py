@@ -113,7 +113,7 @@ def read_output(filename, file_format="tough", labels_order=None):
     file_format : str ('tough' or 'tecplot'), optional, default 'tough'
         TOUGH output file format.
     labels_order : list of array_like or None, optional, default None
-        List of labels as returned by :property:`toughio.Mesh.labels`.
+        List of labels.
 
     Returns
     -------
@@ -288,7 +288,7 @@ def read_save(filename, labels_order=None):
     filename : str
         Input file name.
     labels_order : list of array_like or None, optional, default None
-        List of labels as returned by :property:`toughio.Mesh.labels`.
+        List of labels.
 
     Returns
     -------
@@ -346,12 +346,14 @@ def read_save(filename, labels_order=None):
 
 def _reorder_labels(data, labels):
     """Reorder output or save cell data according to input labels."""
+    if len(data.labels) != len(labels):
+        raise ValueError()
+    
     mapper = {k: v for v, k in enumerate(data.labels)}
-    idx = [mapper[label] for label in numpy.concatenate(labels)]
+    idx = [mapper[label] for label in labels]
     data.labels[:] = data.labels[idx]
 
-    n_labels = numpy.cumsum([len(label) for label in labels[:-1]])
     for k, v in data.data.items():
-        data.data[k] = numpy.split(v[idx], n_labels)
+        data.data[k] = v[idx]
 
     return data
