@@ -23,7 +23,7 @@ materials = numpy.concatenate(mesh.materials)
 bcond = (materials == "BOUND").astype(int)
 mesh.add_cell_data("boundary_condition", bcond)
 
-##% [markdown]
+#%% [markdown]
 # Initial conditions can be defined as a cell data array associated to key "initial_condition" where each column of the array corresponds to a primary variable. Note that `toughio` will not write any initial condition value that is lower than the threshold flag -1.0e9.
 centers = numpy.concatenate(mesh.centers)
 incon = numpy.full((mesh.n_cells, 4), -1.0e9)
