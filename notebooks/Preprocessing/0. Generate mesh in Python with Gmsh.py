@@ -6,15 +6,17 @@
 # pip install pygmsh --user
 # ```
 #
-# The mesh can also be generated from scratch directly in Gmsh either using its GUI or its internal scripting language.
+# The mesh can also be generated from scratch directly in Gmsh either using its GUI and/or its internal scripting language.
 # 
-# Note that `toughio` is not required at this preliminary stage of the pre-processing. This notebook only intends to show how the mesh that used in this sample problem has been generated. The user is free to use whatever meshing software as long as the mesh format is supported by `toughio` (through `meshio`).
+# Note that `toughio` is not required at this preliminary stage of the pre-processing. This notebook only intends to show how the mesh used in this sample problem has been generated. The user is free to use any meshing software as long as the mesh format is supported by `toughio` (through `meshio`).
 
 #%% [markdown]
-# The model geometry used for this sample problem is described in the paper from Cappa and Rutqvist, "Modeling of coupled deformation and permeability evolution during the fault reactivation induced by deep underground injection of CO2", International Journal of Greenhouse Gas Control, 2011.
+# The model geometry used for this sample problem is described in the paper:
+#
+# Cappa, Frédéric, and Jonny Rutqvist. "Modeling of Coupled Deformation and Permeability Evolution during Fault Reactivation Induced by Deep Underground Injection of CO<sub>2</sub>." International Journal of Greenhouse Gas Control 5, no. 2 (March 2011): 336–346. https://doi.org/10.1016/j.ijggc.2010.08.005.
 
 #%% [markdown]
-# First, we import `numpy` and `pygmsh` and initialize a `pygmsh.Geometry` object that will be used to construct all the geometrical entities of the model.
+# First, we import `numpy` and `pygmsh`, and initialize a `pygmsh.Geometry` object that will be used to construct all the geometrical entities of the model.
 import numpy
 import pygmsh
 
@@ -279,8 +281,18 @@ mesh = pygmsh.generate_mesh(
 #%% [markdown]
 # The function `pygmsh.generate_mesh` returns a `meshio.Mesh` object that can be visualized with `pyvista`.
 import pyvista
+pyvista.set_plot_theme("document")
 
-p = pyvista.Plotter(notebook=True)
-p.add_mesh(mesh=pyvista.from_meshio(mesh).extract_all_edges())
-p.view_xy()
+p = pyvista.Plotter(window_size=(800, 800), notebook=True)
+p.add_mesh(
+    mesh=pyvista.from_meshio(mesh),
+    stitle="Materials",
+    show_scalar_bar=False,
+    show_edges=True,
+)
+p.camera_position = [
+    (1005.0, -1500.0, 3760.0569123906835),
+    (1005.0, -1500.0, 0.0),
+    (0.0, 1.0, 0.0),
+]
 p.show()
