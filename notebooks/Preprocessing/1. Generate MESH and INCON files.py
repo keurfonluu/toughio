@@ -17,14 +17,14 @@ mesh.points[:, [1, 2]] = mesh.points[:, [2, 1]]
 mesh.extrude_to_3d(height=1.0, axis=1)
 
 #%% [markdown]
-# We start by defining the boundary conditions. `toughio` recognizes the cell data key "boundary_condition" and automatically imposes Dirichlet boundary conditions to cells that have any value other than 0 in this cell data array.
-# In this example, we simply set 1 to cells that belong to the group "BOUND" and 0 to others.
+# We start by defining the boundary conditions. `toughio` recognizes the cell data key `"boundary_condition"` and automatically imposes Dirichlet boundary conditions to cells that have any value other than 0 in this cell data array.
+# In this example, we simply set 1 to cells that belong to the group `"BOUND"` and 0 to others.
 materials = numpy.concatenate(mesh.materials)
 bcond = (materials == "BOUND").astype(int)
 mesh.add_cell_data("boundary_condition", bcond)
 
 #%% [markdown]
-# Initial conditions can be defined as a cell data array associated to key "initial_condition" where each column of the array corresponds to a primary variable. Note that `toughio` will not write any initial condition value that is lower than the threshold flag -1.0e9.
+# Initial conditions can be defined as a cell data array associated to key `"initial_condition"` where each column of the array corresponds to a primary variable. Note that `toughio` will not write any initial condition value that is lower than the threshold flag -1.0e9.
 centers = numpy.concatenate(mesh.centers)
 incon = numpy.full((mesh.n_cells, 4), -1.0e9)
 incon[:, 0] = 1.0e5 - 9810.0 * centers[:, 2]
@@ -34,10 +34,10 @@ incon[:, 3] = 10.0 - 0.025 * centers[:, 2]
 mesh.add_cell_data("initial_condition", incon)
 
 #%% [markdown]
-# `toughio` also recognizes the cell data keys "porosity" and "permeability" in case we want to initialize porosity and/or permeability fields (e.g. if well logs data are available). Like boundary and initial conditions, we only have to associate new cell data arrays to keys "porosity" and/or "permeability". The way these arrays are generated does not matter, they can be the results of simple interpolations (e.g. with `scipy`) or more advanced geostatistical interpolations (e.g. with `pykrige`).
+# `toughio` also recognizes the cell data keys `"porosity"` and `"permeability"` in case we want to initialize porosity and/or permeability fields (e.g. if well logs data are available). Like boundary and initial conditions, we only have to associate new cell data arrays to keys `"porosity"` and/or `"permeability"`. The way these arrays are generated does not matter, they can be the results of simple interpolations (e.g. with `scipy`) or more advanced geostatistical interpolations (e.g. with `pykrige`).
 
 #%% [markdown]
-# We can now write the MESH and INCON files by calling the method `to_tough`.
+# We can now write the `MESH` and `INCON` files by calling the method `to_tough`.
 # Additionally, we can also pickle the final mesh for later use (reading a pickle file is much faster than reading any mesh format).
 mesh.to_tough("MESH", incon_eos="eco2n")
 mesh.write("mesh.pickle")
