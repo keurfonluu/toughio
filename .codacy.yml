@@ -2,3 +2,4 @@
 exclude_paths:
   - '**/__init__.py'
   - 'samples/**'
+  - 'CODE_OF_CONDUCT.md'
