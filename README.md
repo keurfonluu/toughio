@@ -4,7 +4,7 @@
 [![version](https://img.shields.io/pypi/v/toughio.svg?style=flat)](https://pypi.org/project/toughio)
 [![PyPi downloads](https://img.shields.io/pypi/dm/toughio.svg?style=flat)](https://pypistats.org/packages/toughio)
 ![black](https://img.shields.io/badge/style-black-black)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/037f16f4e7544afbb1b99bf0d66df4a6)](https://www.codacy.com/manual/keurfonluu/toughio?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=keurfonluu/toughio&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/037f16f4e7544afbb1b99bf0d66df4a6)](https://www.codacy.com/manual/keurfonluu/toughio?utm_source=github.com&utm_medium=referral&utm_content=keurfonluu/toughio&utm_campaign=Badge_Grade)
 
 [TOUGH](https://tough.lbl.gov/) (Transport Of Unsaturated Groundwater and Heat) is a general purpose numerical simulation software designed for fluid and heat flows of multiphase, multicomponent fluid mixtures in porous and fractured media developed at Lawrence Berkeley National Laboratory. It solves mass and energy balance equations that describe fluid and heat flow in multiphase and multicomponent systems. TOUGH handles all types of multiphase and multicomponent flow systems since the governing equations for fluid and heat flow have the same mathematical form. The nature and properties of fluid mixtures are described by thermophysical variables (e.g. density, viscosity, enthalpy) which are provided by an equation-of-state (EOS) module.
 
