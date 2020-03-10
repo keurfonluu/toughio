@@ -69,12 +69,12 @@ def write(filename, mesh, nodal_distance, material_name, material_end, incon_eos
 
     # Required variables for blocks ELEME and CONNE
     num_cells = mesh.n_cells
-    labels = numpy.concatenate(mesh.labels)
-    nodes = numpy.concatenate(mesh.centers)
-    materials = numpy.concatenate(mesh.materials)
+    labels = mesh.labels
+    nodes = mesh.centers
+    materials = mesh.materials
     volumes = numpy.concatenate(mesh.volumes)
     boundary_conditions = (
-        numpy.concatenate(mesh.cell_data["boundary_condition"])
+        mesh.cell_data["boundary_condition"]
         if "boundary_condition" in mesh.cell_data.keys()
         else numpy.zeros(num_cells, dtype=int)
     )
@@ -93,17 +93,17 @@ def write(filename, mesh, nodal_distance, material_name, material_end, incon_eos
     permeabilities = None
     if incon_eos:
         primary_variables = (
-            numpy.concatenate(mesh.cell_data["initial_condition"])
+            mesh.cell_data["initial_condition"]
             if "initial_condition" in mesh.cell_data.keys()
             else primary_variables
         )
         porosities = (
-            numpy.concatenate(mesh.cell_data["porosity"])
+            mesh.cell_data["porosity"]
             if "porosity" in mesh.cell_data.keys()
             else porosities
         )
         permeabilities = (
-            numpy.concatenate(mesh.cell_data["permeability"])
+            mesh.cell_data["permeability"]
             if "permeability" in mesh.cell_data.keys()
             else permeabilities
         )
