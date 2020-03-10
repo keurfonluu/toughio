@@ -119,7 +119,7 @@ def _face_areas(mesh):
     for i, area in zip(iface, areas):
         face_areas[i].append(area)
 
-    return face_areas
+    return [numpy.array(face) for face in face_areas]
 
 
 def _volumes(mesh):
@@ -153,7 +153,7 @@ def _volumes(mesh):
             )
             / 6.0
         )
-    return out
+    return numpy.concatenate(out)
 
 
 def _connections(mesh):
