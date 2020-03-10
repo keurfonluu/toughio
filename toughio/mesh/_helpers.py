@@ -62,10 +62,14 @@ def read(filename, file_format=None, **kwargs):
         interface, args, default_kwargs = format_to_reader[fmt]
         _kwargs = default_kwargs.copy()
         _kwargs.update(kwargs)
-        return interface.read(filename, *args, **_kwargs)
+        mesh = interface.read(filename, *args, **_kwargs)
     else:
         mesh = meshio.read(filename, file_format)
-        return from_meshio(mesh)
+    return (
+        mesh
+        if fmt in {"tough", "pickle"}
+        else from_meshio(mesh)
+    ) 
 
 
 def write(filename, mesh, file_format=None, **kwargs):
@@ -123,13 +127,17 @@ def write(filename, mesh, file_format=None, **kwargs):
         "pickle": (pickle, (), {}),
         "tecplot": (tecplot, (), {}),
     }
+    mesh = (
+        mesh
+        if fmt in {"tough", "pickle"}
+        else mesh.to_meshio()
+    )
     if fmt in format_to_writer.keys():
         interface, args, default_kwargs = format_to_writer[fmt]
         _kwargs = default_kwargs.copy()
         _kwargs.update(kwargs)
         interface.write(filename, mesh, *args, **_kwargs)
     else:
-        mesh = mesh.to_meshio()
         meshio.write(filename, mesh, file_format=file_format, **kwargs)
 
 
@@ -229,6 +237,11 @@ def read_time_series(filename):
                 cell_data.append(cdata)
                 time_steps.append(t)
 
+    # Concatenate cell data arrays
+    for cdata in cell_data:
+        for k in cdata.keys():
+            cdata[k] = numpy.concatenate(cdata[k])
+
     return points, cells, point_data, cell_data, time_steps
 
 
@@ -282,6 +295,11 @@ def write_time_series(
     point_data = point_data if point_data else [{}] * nt
     cell_data = cell_data if cell_data else [{}] * nt
     time_steps = time_steps if time_steps is not None else list(range(nt))
+
+    # Split cell data arrays
+    for cdata in cell_data:
+        for k in cdata.keys():
+            cdata[k] = numpy.split(cdata[k], numpy.cumsum([len(c.data) for c in cells[:-1]]))
 
     # Sort data with time steps
     idx = numpy.argsort(time_steps)
