@@ -20,7 +20,7 @@ def _materials(mesh):
             out = mesh.cell_data["material"]
             try:
                 field_data_dict = {v[0]: k for k, v in mesh.field_data.items()}
-                return mesh.split([field_data_dict[mat] for mat in out])
+                return [field_data_dict[mat] for mat in out]
             except KeyError:
                 logging.warning(
                     (
