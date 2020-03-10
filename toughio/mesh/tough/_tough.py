@@ -72,20 +72,20 @@ def write(filename, mesh, nodal_distance, material_name, material_end, incon_eos
     labels = mesh.labels
     nodes = mesh.centers
     materials = mesh.materials
-    volumes = numpy.concatenate(mesh.volumes)
+    volumes = mesh.volumes
     boundary_conditions = (
         mesh.cell_data["boundary_condition"]
         if "boundary_condition" in mesh.cell_data.keys()
         else numpy.zeros(num_cells, dtype=int)
     )
     points = mesh.points
-    connections = numpy.concatenate(mesh.connections)
+    connections = mesh.connections
     gravity = numpy.array([0.0, 0.0, -1.0])
 
     # Define parameters related to faces
-    faces = numpy.concatenate(mesh.faces)
-    face_normals = [fn for face in mesh.face_normals for fn in face]
-    face_areas = [fa for face in mesh.face_areas for fa in face]
+    faces = mesh.faces
+    face_normals = mesh.face_normals
+    face_areas = mesh.face_areas
 
     # Required variables for block INCON
     primary_variables = None

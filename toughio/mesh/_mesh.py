@@ -640,23 +640,17 @@ class Mesh(object):
             arr[i, : len(x[0]), : x[0].shape[1]] = x[0]
             if len(x) > 1:
                 arr[i, len(x[0]) : len(x[0]) + len(x[1]), : x[1].shape[1]] = x[1]
-        return self.split(arr)
+        return arr
 
     @property
     def face_normals(self):
         """Return normal vectors of faces in mesh."""
-        return [
-            numpy.array([face for face in faces])
-            for faces in self.split(_face_normals(self))
-        ]
+        return _face_normals(self)
 
     @property
     def face_areas(self):
         """Return areas of faces in mesh."""
-        return [
-            numpy.array([face for face in faces])
-            for faces in self.split(_face_areas(self))
-        ]
+        return _face_areas(self)
 
     @property
     def volumes(self):
@@ -675,7 +669,7 @@ class Mesh(object):
         Only for 3D meshes and first order cells.
 
         """
-        return self.split(_connections(self))
+        return _connections(self)
 
 
 def from_meshio(mesh):
