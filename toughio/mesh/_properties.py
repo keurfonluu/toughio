@@ -17,7 +17,7 @@ def _materials(mesh):
     """Return materials of cell in mesh."""
     if "material" in mesh.cell_data.keys():
         if mesh.field_data:
-            out = numpy.concatenate(mesh.cell_data["material"])
+            out = mesh.cell_data["material"]
             try:
                 field_data_dict = {v[0]: k for k, v in mesh.field_data.items()}
                 return mesh.split([field_data_dict[mat] for mat in out])
@@ -32,7 +32,7 @@ def _materials(mesh):
         else:
             out = mesh.cell_data["material"]
     else:
-        out = mesh.split(numpy.ones(mesh.n_cells, dtype=int))
+        out = numpy.ones(mesh.n_cells, dtype=int)
 
     return out
 
