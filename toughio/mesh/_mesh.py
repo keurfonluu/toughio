@@ -198,14 +198,15 @@ class Mesh(object):
                 cells[ic][1] = pinv[v]
 
         # Prune duplicate cells
+        cell_data = {k: mesh.split(v) for k, v in mesh.cell_data.items()}
         for ic, (k, v) in enumerate(cells):
             vsort = numpy.sort(v, axis=1)
             _, order = numpy.unique(vsort, axis=0, return_index=True)
             cells[ic][1] = v[order]
-            if mesh.cell_data:
-                for kk, vv in mesh.cell_data.items():
-                    mesh.cell_data[kk][ic] = vv[ic][order]
+            for kk, vv in cell_data.items():
+                cell_data[kk][ic] = vv[ic][order]
         mesh.cells = cells
+        mesh.cell_data = {k: numpy.concatenate(v) for k, v in cell_data.items()}
 
         if not inplace:
             return mesh
