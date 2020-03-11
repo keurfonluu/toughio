@@ -20,7 +20,7 @@ def _materials(mesh):
             out = mesh.cell_data["material"]
             try:
                 field_data_dict = {v[0]: k for k, v in mesh.field_data.items()}
-                return [field_data_dict[mat] for mat in out]
+                out = [field_data_dict[mat] for mat in out]
             except KeyError:
                 logging.warning(
                     (
@@ -34,7 +34,7 @@ def _materials(mesh):
     else:
         out = numpy.ones(mesh.n_cells, dtype=int)
 
-    return out
+    return numpy.asarray(out)
 
 
 def _faces(mesh):
