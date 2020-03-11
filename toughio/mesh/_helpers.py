@@ -65,11 +65,7 @@ def read(filename, file_format=None, **kwargs):
         mesh = interface.read(filename, *args, **_kwargs)
     else:
         mesh = meshio.read(filename, file_format)
-    return (
-        mesh
-        if fmt in {"tough", "pickle"}
-        else from_meshio(mesh)
-    ) 
+    return mesh if fmt in {"tough", "pickle"} else from_meshio(mesh)
 
 
 def write(filename, mesh, file_format=None, **kwargs):
@@ -127,11 +123,7 @@ def write(filename, mesh, file_format=None, **kwargs):
         "pickle": (pickle, (), {}),
         "tecplot": (tecplot, (), {}),
     }
-    mesh = (
-        mesh
-        if fmt in {"tough", "pickle"}
-        else mesh.to_meshio()
-    )
+    mesh = mesh if fmt in {"tough", "pickle"} else mesh.to_meshio()
     if fmt in format_to_writer.keys():
         interface, args, default_kwargs = format_to_writer[fmt]
         _kwargs = default_kwargs.copy()
@@ -298,7 +290,9 @@ def write_time_series(
 
     # Split cell data arrays
     sizes = numpy.cumsum([len(c.data) for c in cells[:-1]])
-    cell_data = [{k: numpy.split(v, sizes) for k, v in cdata.items()} for cdata in cell_data]
+    cell_data = [
+        {k: numpy.split(v, sizes) for k, v in cdata.items()} for cdata in cell_data
+    ]
 
     # Sort data with time steps
     idx = numpy.argsort(time_steps)
