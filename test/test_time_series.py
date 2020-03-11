@@ -19,8 +19,7 @@ def test_time_series():
         {"points": numpy.random.rand(mesh_ref.n_points)} for _ in range(num_steps)
     ]
     cell_data_ref = [
-        {"cells": mesh_ref.split(numpy.random.rand(mesh_ref.n_cells))}
-        for i in range(num_steps)
+        {"cells": numpy.random.rand(mesh_ref.n_cells)} for i in range(num_steps)
     ]
     time_steps_ref = numpy.sort(numpy.random.rand(num_steps))
 
@@ -50,8 +49,6 @@ def test_time_series():
 
     for t, cdata in enumerate(cell_data):
         for k, v in cdata.items():
-            assert numpy.allclose(
-                numpy.concatenate(v), numpy.concatenate(cell_data_ref[t][k])
-            )
+            assert numpy.allclose(v, cell_data_ref[t][k])
 
     assert numpy.allclose(time_steps, time_steps_ref)
