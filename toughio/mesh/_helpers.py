@@ -297,9 +297,8 @@ def write_time_series(
     time_steps = time_steps if time_steps is not None else list(range(nt))
 
     # Split cell data arrays
-    for cdata in cell_data:
-        for k in cdata.keys():
-            cdata[k] = numpy.split(cdata[k], numpy.cumsum([len(c.data) for c in cells[:-1]]))
+    sizes = numpy.cumsum([len(c.data) for c in cells[:-1]])
+    cell_data = [{k: numpy.split(v, sizes) for k, v in cdata.items()} for cdata in cell_data]
 
     # Sort data with time steps
     idx = numpy.argsort(time_steps)
