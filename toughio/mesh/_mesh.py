@@ -364,7 +364,7 @@ class Mesh(object):
 
         if len(out.labels) != self.n_cells:
             raise ValueError()
-        out = _reorder_labels(out, numpy.concatenate(self.labels))
+        out = _reorder_labels(out, self.labels)
         self.cell_data.update(out.data)
 
     def write(self, filename, file_format=None, **kwargs):
