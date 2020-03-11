@@ -321,7 +321,7 @@ def _write_conne(
     int_normals = numpy.array(int_normals)
     bounds = numpy.array(bounds)
 
-    # Calculate remaining variables not available in itasca module
+    # Calculate remaining variables
     lines = numpy.diff(centers, axis=1)[:, 0]
     isot = _isot(lines)
     angles = numpy.dot(lines, gravity) / numpy.linalg.norm(lines, axis=1)
