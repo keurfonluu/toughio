@@ -140,6 +140,7 @@ class Mesh(object):
             "quad": "hexahedron",
         }
         cells = []
+        cell_data = {k: mesh.split(v) for k, v in mesh.cell_data.items()}
         for ic, c in enumerate(mesh.cells):
             if c.type in extruded_types.keys():
                 extruded_type = extruded_types[c.type]
@@ -151,10 +152,10 @@ class Mesh(object):
                     cell.data[ibeg:iend, nc:] += (i + 1) * npts
                 cells.append(cell)
 
-                if mesh.cell_data:
-                    for k, v in mesh.cell_data.items():
-                        v[ic] = numpy.tile(v[ic], nh)
+                for k, v in cell_data.items():
+                    v[ic] = numpy.tile(v[ic], nh)
         mesh.cells = cells
+        mesh.cell_data = {k: numpy.concatenate(v) for k, v in cell_data.items()}
 
         if mesh.field_data:
             for k in mesh.field_data.keys():
