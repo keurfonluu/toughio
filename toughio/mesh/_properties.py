@@ -10,6 +10,7 @@ __all__ = [
     "_face_areas",
     "_volumes",
     "_connections",
+    "_qualities",
 ]
 
 
@@ -191,6 +192,38 @@ def _connections(mesh):
         out[i2, j2] = i1
 
     return out
+
+
+def _qualities(mesh):
+    """Return quality of cells as average measure of the orthogonality of its
+    connections."""
+    nodes = mesh.centers
+    connections = mesh.connections
+    face_normals = mesh.face_normals
+
+    cell_list = set()
+    centers, int_normals, mapper = [], [], []
+    for i, connection in enumerate(connections):
+        for iface, j in enumerate(connection):
+            if j >= 0 and j not in cell_list:
+                centers.append([nodes[i], nodes[j]])
+                int_normals.append(face_normals[i][iface])
+                mapper.append((i, j))
+
+        cell_list.add(i)
+
+    int_normals = numpy.array(int_normals)
+    lines = numpy.diff(centers, axis=1)[:, 0]
+    lines /= numpy.linalg.norm(lines, axis=1)[:, None]
+    angles = numpy.abs((lines * int_normals).sum(axis=1))
+
+    # Reorganize output
+    out = [[] for _ in range(mesh.n_cells)]
+    for (i, j), angle in zip(mapper, angles):
+        out[i].append(angle)
+        out[j].append(angle)
+
+    return numpy.array([numpy.mean(angles) for angles in out])
 
 
 def _get_faces(faces):

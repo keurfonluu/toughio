@@ -17,6 +17,7 @@ from ._properties import (
     _face_normals,
     _faces,
     _materials,
+    _qualities,
     _volumes,
 )
 
@@ -674,6 +675,17 @@ class Mesh(object):
 
         """
         return _connections(self)
+
+    @property
+    def qualities(self):
+        """
+        Return qualities of cells in mesh.
+
+        The quality of a cell is measured as the average cosine angle between the
+        connection line and the interface normal vectors.
+
+        """
+        return _qualities(self)
 
 
 def from_meshio(mesh):
