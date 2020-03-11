@@ -134,6 +134,8 @@ class Mesh(object):
         for h in height:
             extra_points[:, axis] += h
             mesh.points = numpy.vstack((mesh.points, extra_points))
+        for k, v in mesh.point_data.items():
+            mesh.point_data[k] = numpy.tile(v, nh + 1)
 
         extruded_types = {
             "triangle": "wedge",
