@@ -10,23 +10,6 @@ __all__ = [
 ]
 
 
-_eos_to_neq = {
-    "eos1": 2,
-    "eos2": 3,
-    "eos3": 3,
-    "eos4": 3,
-    "eos5": 3,
-    "eos7": 3,
-    "eos8": 3,
-    "eos9": 1,
-    "eosmvoc": 4,
-    "eoswasg": 4,
-    "eco2n": 4,
-    "eco2n_v2": 4,
-    "eco2m": 4,
-}
-
-
 def block(keyword):
     """Decorate block writing functions."""
 
@@ -56,7 +39,7 @@ def read(filename):
     raise NotImplementedError("Reading TOUGH MESH file is not supported.")
 
 
-def write(filename, mesh, nodal_distance, material_name, material_end, incon_eos):
+def write(filename, mesh, nodal_distance, material_name, material_end, incon):
     """Write TOUGH MESH file."""
     if nodal_distance not in {"line", "orthogonal"}:
         raise ValueError()
@@ -64,8 +47,8 @@ def write(filename, mesh, nodal_distance, material_name, material_end, incon_eos
         raise TypeError()
     if not (material_end is None or isinstance(material_end, (str, list, tuple))):
         raise TypeError()
-    if not (incon_eos is None or incon_eos in _eos_to_neq.keys()):
-        raise ValueError("EOS '{}' is unknown or not supported.".format(incon_eos))
+    if not isinstance(incon, bool):
+        raise TypeError()
 
     # Required variables for blocks ELEME and CONNE
     num_cells = mesh.n_cells
@@ -91,7 +74,7 @@ def write(filename, mesh, nodal_distance, material_name, material_end, incon_eos
     primary_variables = None
     porosities = None
     permeabilities = None
-    if incon_eos:
+    if incon:
         primary_variables = (
             mesh.cell_data["initial_condition"]
             if "initial_condition" in mesh.cell_data.keys()
@@ -129,7 +112,7 @@ def write(filename, mesh, nodal_distance, material_name, material_end, incon_eos
         nodal_distance,
         material_name,
         material_end,
-        incon_eos,
+        incon,
     )
 
 
@@ -153,7 +136,7 @@ def write_buffer(
     nodal_distance,
     material_name,
     material_end,
-    incon_eos,
+    incon,
 ):
     materials = [
         "{:5}".format(material.strip()) if isinstance(material, str) else material
@@ -164,22 +147,22 @@ def write_buffer(
     material_end = [material_end] if isinstance(material_end, str) else material_end
 
     # Check INCON inputs and show warnings if necessary
-    if incon_eos and primary_variables is None:
+    if incon and primary_variables is None:
         logging.warning(
             ("Initial conditions are not defined. " "Writing INCON will be ignored.")
         )
 
     if porosities is not None:
-        if not incon_eos:
-            logging.warning("Porosity is only exported if incon_eos is provided.")
+        if not incon:
+            logging.warning("Porosity is only exported if incon is provided.")
         else:
             if not (len(porosities) == num_cells and porosities.ndim == 1):
                 raise ValueError("Inconsistent porosity array.")
 
     if permeabilities is not None:
-        if not incon_eos:
+        if not incon:
             logging.warning(
-                "Permeability modifiers are only exported if incon_eos is provided."
+                "Permeability modifiers are only exported if incon is provided."
             )
         else:
             if permeabilities.ndim not in {1, 2}:
@@ -218,13 +201,14 @@ def write_buffer(
         )
 
     # Write INCON file
-    if incon_eos and primary_variables is not None:
+    if incon and primary_variables is not None:
         import os
 
         head = os.path.split(filename)[0]
-        with open(head + ("/" if head else "") + "INCON", "w") as f:
+        filename = os.path.join(head, "INCON") if head else "INCON"
+        with open(filename, "w") as f:
             _write_incon(
-                f, incon_eos, labels, primary_variables, porosities, permeabilities,
+                f, labels, primary_variables, porosities, permeabilities,
             )
 
 
@@ -357,9 +341,7 @@ def _write_conne(
 
 
 @block("INCON")
-def _write_incon(
-    f, incon_eos, labels, primary_variables, porosities, permeabilities,
-):
+def _write_incon(f, labels, primary_variables, porosities, permeabilities):
     """Write INCON block."""
     # Check initial pore pressures
     cond = numpy.logical_and(

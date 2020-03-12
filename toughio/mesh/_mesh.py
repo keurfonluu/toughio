@@ -333,6 +333,21 @@ class Mesh(object):
         filename : str, optional, default 'MESH'
             Output file name.
 
+        Other Parameters
+        ----------------
+        nodal_distance : str ('line' or 'orthogonal'), optional, default 'line'
+            Method to calculate connection nodal distances:
+            - 'line': distance between node and common face along connecting
+            line (distance is not normal),
+            - 'orthogonal' : distance between node and its orthogonal
+            projection onto common face (shortest distance).
+        material_name : dict or None, default None
+            Rename cell material.
+        material_end : str, array_like or None, default None
+            Move cells to bottom of block 'ELEME' if their materials is in `material_end`.
+        incon : bool, optional, default False
+            If `True`, initial conditions will be written in file `INCON`.
+
         """
         self.write(filename, file_format="tough", **kwargs)
 
