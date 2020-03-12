@@ -195,8 +195,7 @@ def _connections(mesh):
 
 
 def _qualities(mesh):
-    """Return quality of cells as average measure of the orthogonality of its
-    connections."""
+    """Return quality of cells as a measure of the orthogonality of its connections."""
     nodes = mesh.centers
     connections = mesh.connections
     face_normals = mesh.face_normals
