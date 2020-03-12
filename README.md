@@ -32,7 +32,7 @@ Meshing:
 Pre-processing:
 
 -   Easily add initial conditions, boundary conditions or other physical properties (e.g. porosity, permeability) using the convenient class `toughio.Mesh`,
--   Import previous TOUGH simulation input file into Python or define simulation parameters in a human-readable and jsonable dictionary [JSON](http://json.org/),
+-   Import previous TOUGH simulation input file into Python or define simulation parameters in a human-readable and [JSON](http://json.org/)able dictionary,
 -   Export simulation parameters dictionary to a TOUGH input file.
 
 Post-processing:
