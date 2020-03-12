@@ -64,7 +64,9 @@ def read(filename, file_format=None, **kwargs):
         _kwargs.update(kwargs)
         mesh = interface.read(filename, *args, **_kwargs)
         if fmt not in {"tough", "pickle"}:
-            mesh.cell_data = {k: numpy.concatenate(v) for k, v in mesh.cell_data.items()}
+            mesh.cell_data = {
+                k: numpy.concatenate(v) for k, v in mesh.cell_data.items()
+            }
     else:
         mesh = meshio.read(filename, file_format)
         mesh = from_meshio(mesh)
