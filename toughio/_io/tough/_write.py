@@ -146,7 +146,7 @@ def _write_rocks(parameters):
             data[k] is not None
             for k in [
                 "compressibility",
-                "expansion",
+                "expansivity",
                 "conductivity_dry",
                 "tortuosity",
                 "klinkenberg_parameter",
@@ -189,7 +189,7 @@ def _write_rocks(parameters):
                 format_data(
                     [
                         (data["compressibility"], "{:>10.4e}"),
-                        (data["expansion"], "{:>10.4e}"),
+                        (data["expansivity"], "{:>10.4e}"),
                         (data["conductivity_dry"], "{:>10.4e}"),
                         (data["tortuosity"], "{:>10.4e}"),
                         (data["klinkenberg_parameter"], "{:>10.4e}"),

@@ -28,7 +28,7 @@ def test_rocks():
         "conductivity",
         "specific_heat",
         "compressibility",
-        "expansion",
+        "expansivity",
         "conductivity_dry",
         "tortuosity",
         "klinkenberg_parameter",

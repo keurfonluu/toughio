@@ -132,7 +132,7 @@ def _read_rocks(f):
                 rocks["rocks"][rock].update(
                     {
                         "compressibility": data[0],
-                        "expansion": data[1],
+                        "expansivity": data[1],
                         "conductivity_dry": data[2],
                         "tortuosity": data[3],
                         "klinkenberg_parameter": data[4],
