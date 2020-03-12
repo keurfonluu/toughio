@@ -223,7 +223,7 @@ def _qualities(mesh):
         out[i].append(angle)
         out[j].append(angle)
 
-    return numpy.array([numpy.mean(angles) for angles in out])
+    return out
 
 
 def _get_faces(faces):
