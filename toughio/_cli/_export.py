@@ -1,7 +1,5 @@
 from __future__ import print_function
 
-import numpy
-
 __all__ = [
     "export",
 ]
@@ -103,9 +101,7 @@ def export(argv=None):
         if args.file_format != "xdmf":
             mesh.read_output(output)
         else:
-            output = [
-                _reorder_labels(data, numpy.concatenate(mesh.labels)) for data in output
-            ]
+            output = [_reorder_labels(data, mesh.labels) for data in output]
     print(" Done!")
 
     # Output file name
@@ -176,17 +172,17 @@ def _get_parser():
 
     # Mesh file
     parser.add_argument(
-        "--mesh", "-m", type=str, default=None, help="Pickled toughio.Mesh",
+        "--mesh", "-m", type=str, default=None, help="pickled toughio.Mesh",
     )
 
     # Time step
     parser.add_argument(
-        "--time-step", "-t", type=int, default=None, help="Time step to export",
+        "--time-step", "-t", type=int, default=None, help="time step to export",
     )
 
     # Output file
     parser.add_argument(
-        "--output-file", "-o", type=str, default=None, help="Exported file",
+        "--output-file", "-o", type=str, default=None, help="exported file",
     )
 
     # File format
@@ -196,7 +192,7 @@ def _get_parser():
         type=str,
         choices=("tecplot", "vtk", "vtu", "xdmf"),
         default="vtk",
-        help="Exported file format",
+        help="exported file format",
     )
 
     return parser

@@ -10,6 +10,7 @@ __all__ = [
     "_face_areas",
     "_volumes",
     "_connections",
+    "_qualities",
 ]
 
 
@@ -17,10 +18,10 @@ def _materials(mesh):
     """Return materials of cell in mesh."""
     if "material" in mesh.cell_data.keys():
         if mesh.field_data:
-            out = numpy.concatenate(mesh.cell_data["material"])
+            out = mesh.cell_data["material"]
             try:
                 field_data_dict = {v[0]: k for k, v in mesh.field_data.items()}
-                return mesh.split([field_data_dict[mat] for mat in out])
+                out = [field_data_dict[mat] for mat in out]
             except KeyError:
                 logging.warning(
                     (
@@ -32,9 +33,9 @@ def _materials(mesh):
         else:
             out = mesh.cell_data["material"]
     else:
-        out = mesh.split(numpy.ones(mesh.n_cells, dtype=int))
+        out = numpy.ones(mesh.n_cells, dtype=int)
 
-    return out
+    return numpy.asarray(out)
 
 
 def _faces(mesh):
@@ -119,7 +120,7 @@ def _face_areas(mesh):
     for i, area in zip(iface, areas):
         face_areas[i].append(area)
 
-    return face_areas
+    return [numpy.array(face) for face in face_areas]
 
 
 def _volumes(mesh):
@@ -153,7 +154,7 @@ def _volumes(mesh):
             )
             / 6.0
         )
-    return out
+    return numpy.concatenate(out)
 
 
 def _connections(mesh):
@@ -189,6 +190,37 @@ def _connections(mesh):
     for (i1, i2), (j1, j2) in zip(conne, iface):
         out[i1, j1] = i2
         out[i2, j2] = i1
+
+    return out
+
+
+def _qualities(mesh):
+    """Return quality of cells as a measure of the orthogonality of its connections."""
+    nodes = mesh.centers
+    connections = mesh.connections
+    face_normals = mesh.face_normals
+
+    cell_list = set()
+    centers, int_normals, mapper = [], [], []
+    for i, connection in enumerate(connections):
+        for iface, j in enumerate(connection):
+            if j >= 0 and j not in cell_list:
+                centers.append([nodes[i], nodes[j]])
+                int_normals.append(face_normals[i][iface])
+                mapper.append((i, j))
+
+        cell_list.add(i)
+
+    int_normals = numpy.array(int_normals)
+    lines = numpy.diff(centers, axis=1)[:, 0]
+    lines /= numpy.linalg.norm(lines, axis=1)[:, None]
+    angles = numpy.abs((lines * int_normals).sum(axis=1))
+
+    # Reorganize output
+    out = [[] for _ in range(mesh.n_cells)]
+    for (i, j), angle in zip(mapper, angles):
+        out[i].append(angle)
+        out[j].append(angle)
 
     return out
 

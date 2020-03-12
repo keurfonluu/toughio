@@ -5,7 +5,6 @@ import meshio
 import numpy
 
 from ._common import (
-    get_local_index,
     get_meshio_version,
     get_new_meshio_cells,
     get_old_meshio_cells,
@@ -17,6 +16,7 @@ from ._properties import (
     _face_normals,
     _faces,
     _materials,
+    _qualities,
     _volumes,
 )
 
@@ -134,12 +134,15 @@ class Mesh(object):
         for h in height:
             extra_points[:, axis] += h
             mesh.points = numpy.vstack((mesh.points, extra_points))
+        for k, v in mesh.point_data.items():
+            mesh.point_data[k] = numpy.tile(v, nh + 1)
 
         extruded_types = {
             "triangle": "wedge",
             "quad": "hexahedron",
         }
         cells = []
+        cell_data = {k: mesh.split(v) for k, v in mesh.cell_data.items()}
         for ic, c in enumerate(mesh.cells):
             if c.type in extruded_types.keys():
                 extruded_type = extruded_types[c.type]
@@ -151,10 +154,10 @@ class Mesh(object):
                     cell.data[ibeg:iend, nc:] += (i + 1) * npts
                 cells.append(cell)
 
-                if mesh.cell_data:
-                    for k, v in mesh.cell_data.items():
-                        v[ic] = numpy.tile(v[ic], nh)
+                for k, v in cell_data.items():
+                    v[ic] = numpy.tile(v[ic], nh)
         mesh.cells = cells
+        mesh.cell_data = {k: numpy.concatenate(v) for k, v in cell_data.items()}
 
         if mesh.field_data:
             for k in mesh.field_data.keys():
@@ -197,14 +200,15 @@ class Mesh(object):
                 cells[ic][1] = pinv[v]
 
         # Prune duplicate cells
+        cell_data = {k: mesh.split(v) for k, v in mesh.cell_data.items()}
         for ic, (k, v) in enumerate(cells):
             vsort = numpy.sort(v, axis=1)
             _, order = numpy.unique(vsort, axis=0, return_index=True)
             cells[ic][1] = v[order]
-            if mesh.cell_data:
-                for kk, vv in mesh.cell_data.items():
-                    mesh.cell_data[kk][ic] = vv[ic][order]
+            for kk, vv in cell_data.items():
+                cell_data[kk][ic] = vv[ic][order]
         mesh.cells = cells
+        mesh.cell_data = {k: numpy.concatenate(v) for k, v in cell_data.items()}
 
         if not inplace:
             return mesh
@@ -244,17 +248,18 @@ class Mesh(object):
         kwargs = {key: getattr(self, key) for key in keys}
 
         version = get_meshio_version()
+        cell_data = {k: self.split(v) for k, v in self.cell_data.items()}
         if version[0] >= 4:
             kwargs.update(
                 {
                     "cells": self.cells,
-                    "cell_data": self.cell_data,
+                    "cell_data": cell_data,
                     "point_sets": self.point_sets,
                     "cell_sets": self.cell_sets,
                 }
             )
         else:
-            cells, cell_data = get_old_meshio_cells(self.cells, self.cell_data)
+            cells, cell_data = get_old_meshio_cells(self.cells, cell_data)
             kwargs.update(
                 {"cells": cells, "cell_data": cell_data, "node_sets": self.point_sets,}
             )
@@ -297,9 +302,6 @@ class Mesh(object):
             cell_type += [vtk_type] * len(c.data)
             next_offset = offset[-1] + numnodes + 1
 
-        # Extract cell data from toughio.Mesh object
-        cell_data = {k: numpy.concatenate(v) for k, v in self.cell_data.items()}
-
         # Create pyvista.UnstructuredGrid object
         points = self.points
         if points.shape[1] == 2:
@@ -318,7 +320,7 @@ class Mesh(object):
         )
 
         # Set cell data
-        mesh.cell_arrays.update(cell_data)
+        mesh.cell_arrays.update(self.cell_data)
 
         return mesh
 
@@ -330,6 +332,21 @@ class Mesh(object):
         ----------
         filename : str, optional, default 'MESH'
             Output file name.
+
+        Other Parameters
+        ----------------
+        nodal_distance : str ('line' or 'orthogonal'), optional, default 'line'
+            Method to calculate connection nodal distances:
+            - 'line': distance between node and common face along connecting
+            line (distance is not normal),
+            - 'orthogonal' : distance between node and its orthogonal
+            projection onto common face (shortest distance).
+        material_name : dict or None, default None
+            Rename cell material.
+        material_end : str, array_like or None, default None
+            Move cells to bottom of block 'ELEME' if their materials is in `material_end`.
+        incon : bool, optional, default False
+            If `True`, initial conditions will be written in file `INCON`.
 
         """
         self.write(filename, file_format="tough", **kwargs)
@@ -366,9 +383,8 @@ class Mesh(object):
 
         if len(out.labels) != self.n_cells:
             raise ValueError()
-        out = _reorder_labels(out, numpy.concatenate(self.labels))
-        for k, v in out.data.items():
-            self.cell_data[k] = self.split(v)
+        out = _reorder_labels(out, self.labels)
+        self.cell_data.update(out.data)
 
     def write(self, filename, file_format=None, **kwargs):
         """
@@ -431,7 +447,7 @@ class Mesh(object):
             raise TypeError()
         if len(data) != self.n_cells:
             raise ValueError()
-        self.cell_data[label] = self.split(data)
+        self.cell_data[label] = numpy.asarray(data)
 
     def set_material(self, material, xlim=None, ylim=None, zlim=None):
         """
@@ -484,14 +500,14 @@ class Mesh(object):
         ):
             raise ValueError()
 
-        x, y, z = numpy.concatenate(self.centers).T
+        x, y, z = self.centers.T
         mask_x = isinbounds(x, xlim)
         mask_y = isinbounds(y, ylim)
         mask_z = isinbounds(z, zlim)
         mask = numpy.logical_and(numpy.logical_and(mask_x, mask_y), mask_z)
 
         if mask.any():
-            data = numpy.concatenate(self.cell_data["material"])
+            data = self.cell_data["material"]
             imat = (
                 self.field_data[material][0]
                 if material in self.field_data.keys()
@@ -523,11 +539,10 @@ class Mesh(object):
         if len(point) != self.points.shape[1]:
             raise ValueError()
 
-        centers = numpy.concatenate(self.centers)
         idx = numpy.arange(self.n_cells)
-        idx = idx[numpy.argmin(numpy.linalg.norm(centers - point, axis=1))]
+        idx = idx[numpy.argmin(numpy.linalg.norm(self.centers - point, axis=1))]
 
-        return get_local_index(self, idx)
+        return idx
 
     @property
     def points(self):
@@ -623,12 +638,12 @@ class Mesh(object):
         """Return labels of cell in mesh."""
         from ._common import labeler
 
-        return self.split([labeler(i) for i in range(self.n_cells)])
+        return numpy.array([labeler(i) for i in range(self.n_cells)])
 
     @property
     def centers(self):
         """Return node centers of cell in mesh."""
-        return [self.points[c.data].mean(axis=1) for c in self.cells]
+        return numpy.concatenate([self.points[c.data].mean(axis=1) for c in self.cells])
 
     @property
     def materials(self):
@@ -644,23 +659,17 @@ class Mesh(object):
             arr[i, : len(x[0]), : x[0].shape[1]] = x[0]
             if len(x) > 1:
                 arr[i, len(x[0]) : len(x[0]) + len(x[1]), : x[1].shape[1]] = x[1]
-        return self.split(arr)
+        return arr
 
     @property
     def face_normals(self):
         """Return normal vectors of faces in mesh."""
-        return [
-            numpy.array([face for face in faces])
-            for faces in self.split(_face_normals(self))
-        ]
+        return _face_normals(self)
 
     @property
     def face_areas(self):
         """Return areas of faces in mesh."""
-        return [
-            numpy.array([face for face in faces])
-            for faces in self.split(_face_areas(self))
-        ]
+        return _face_areas(self)
 
     @property
     def volumes(self):
@@ -679,7 +688,18 @@ class Mesh(object):
         Only for 3D meshes and first order cells.
 
         """
-        return self.split(_connections(self))
+        return _connections(self)
+
+    @property
+    def qualities(self):
+        """
+        Return qualities of cells in mesh.
+
+        The quality of a cell is measured as the average cosine angle between the
+        connection line and the interface normal vectors.
+
+        """
+        return numpy.array([numpy.mean(out) for out in _qualities(self)])
 
 
 def from_meshio(mesh):
@@ -709,6 +729,8 @@ def from_meshio(mesh):
             if k in meshio_data:
                 cell_data["material"] = cell_data.pop(k)
                 break
+
+        cell_data = {k: numpy.concatenate(v) for k, v in cell_data.items()}
     else:
         cell_data = {}
 
@@ -734,7 +756,7 @@ def from_meshio(mesh):
             if mesh.field_data
             else 1
         )
-        out.cell_data["material"] = out.split(numpy.full(out.n_cells, imat, dtype=int))
+        out.cell_data["material"] = numpy.full(out.n_cells, imat, dtype=int)
         out.field_data["dfalt"] = numpy.array([imat, 3])
 
     return out

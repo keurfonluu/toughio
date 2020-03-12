@@ -97,7 +97,7 @@ def _get_parser():
         "-s",
         default=False,
         action="store_true",
-        help="Write one file per time step",
+        help="write one file per time step",
     )
 
     return parser

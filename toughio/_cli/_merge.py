@@ -80,6 +80,6 @@ def _get_parser():
     )
 
     # Output file
-    parser.add_argument("outfile", type=str, help="Merged TOUGH input file")
+    parser.add_argument("outfile", type=str, help="merged TOUGH input file")
 
     return parser
