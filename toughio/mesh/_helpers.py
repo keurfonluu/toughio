@@ -62,10 +62,13 @@ def read(filename, file_format=None, **kwargs):
         interface, args, default_kwargs = format_to_reader[fmt]
         _kwargs = default_kwargs.copy()
         _kwargs.update(kwargs)
-        return interface.read(filename, *args, **_kwargs)
+        mesh = interface.read(filename, *args, **_kwargs)
+        if fmt not in {"tough", "pickle"}:
+            mesh.cell_data = {k: numpy.concatenate(v) for k, v in mesh.cell_data.items()}
     else:
         mesh = meshio.read(filename, file_format)
-        return from_meshio(mesh)
+        mesh = from_meshio(mesh)
+    return mesh
 
 
 def write(filename, mesh, file_format=None, **kwargs):
@@ -95,10 +98,8 @@ def write(filename, mesh, file_format=None, **kwargs):
     material_end : str, array_like or None, default None
         Only if ``file_format = "tough"``. Move cells to bottom of block
         'ELEME' if their materials is in `material_end`.
-    incon_eos : str or None, optional, default None
-        Equation-of-state identifier to determine the actual number of
-        primary variables to initialize. If `None`, TOUGH input `INCON`
-        file will not be written.
+    incon : bool, optional, default False
+        Only if ``file_format = "tough"``. If `True`, initial conditions will be written in file `INCON`.
 
     """
     # Check file format
@@ -115,7 +116,7 @@ def write(filename, mesh, file_format=None, **kwargs):
                 "nodal_distance": "line",
                 "material_name": None,
                 "material_end": None,
-                "incon_eos": None,
+                "incon": False,
             },
         ),
         "avsucd": (avsucd, (), {}),
@@ -123,13 +124,13 @@ def write(filename, mesh, file_format=None, **kwargs):
         "pickle": (pickle, (), {}),
         "tecplot": (tecplot, (), {}),
     }
+    mesh = mesh if fmt in {"tough", "pickle"} else mesh.to_meshio()
     if fmt in format_to_writer.keys():
         interface, args, default_kwargs = format_to_writer[fmt]
         _kwargs = default_kwargs.copy()
         _kwargs.update(kwargs)
         interface.write(filename, mesh, *args, **_kwargs)
     else:
-        mesh = mesh.to_meshio()
         meshio.write(filename, mesh, file_format=file_format, **kwargs)
 
 
@@ -229,6 +230,11 @@ def read_time_series(filename):
                 cell_data.append(cdata)
                 time_steps.append(t)
 
+    # Concatenate cell data arrays
+    for cdata in cell_data:
+        for k in cdata.keys():
+            cdata[k] = numpy.concatenate(cdata[k])
+
     return points, cells, point_data, cell_data, time_steps
 
 
@@ -282,6 +288,12 @@ def write_time_series(
     point_data = point_data if point_data else [{}] * nt
     cell_data = cell_data if cell_data else [{}] * nt
     time_steps = time_steps if time_steps is not None else list(range(nt))
+
+    # Split cell data arrays
+    sizes = numpy.cumsum([len(c.data) for c in cells[:-1]])
+    cell_data = [
+        {k: numpy.split(v, sizes) for k, v in cdata.items()} for cdata in cell_data
+    ]
 
     # Sort data with time steps
     idx = numpy.argsort(time_steps)

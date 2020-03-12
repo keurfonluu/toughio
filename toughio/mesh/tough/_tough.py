@@ -10,23 +10,6 @@ __all__ = [
 ]
 
 
-_eos_to_neq = {
-    "eos1": 2,
-    "eos2": 3,
-    "eos3": 3,
-    "eos4": 3,
-    "eos5": 3,
-    "eos7": 3,
-    "eos8": 3,
-    "eos9": 1,
-    "eosmvoc": 4,
-    "eoswasg": 4,
-    "eco2n": 4,
-    "eco2n_v2": 4,
-    "eco2m": 4,
-}
-
-
 def block(keyword):
     """Decorate block writing functions."""
 
@@ -56,7 +39,7 @@ def read(filename):
     raise NotImplementedError("Reading TOUGH MESH file is not supported.")
 
 
-def write(filename, mesh, nodal_distance, material_name, material_end, incon_eos):
+def write(filename, mesh, nodal_distance, material_name, material_end, incon):
     """Write TOUGH MESH file."""
     if nodal_distance not in {"line", "orthogonal"}:
         raise ValueError()
@@ -64,46 +47,46 @@ def write(filename, mesh, nodal_distance, material_name, material_end, incon_eos
         raise TypeError()
     if not (material_end is None or isinstance(material_end, (str, list, tuple))):
         raise TypeError()
-    if not (incon_eos is None or incon_eos in _eos_to_neq.keys()):
-        raise ValueError("EOS '{}' is unknown or not supported.".format(incon_eos))
+    if not isinstance(incon, bool):
+        raise TypeError()
 
     # Required variables for blocks ELEME and CONNE
     num_cells = mesh.n_cells
-    labels = numpy.concatenate(mesh.labels)
-    nodes = numpy.concatenate(mesh.centers)
-    materials = numpy.concatenate(mesh.materials)
-    volumes = numpy.concatenate(mesh.volumes)
+    labels = mesh.labels
+    nodes = mesh.centers
+    materials = mesh.materials
+    volumes = mesh.volumes
     boundary_conditions = (
-        numpy.concatenate(mesh.cell_data["boundary_condition"])
+        mesh.cell_data["boundary_condition"]
         if "boundary_condition" in mesh.cell_data.keys()
         else numpy.zeros(num_cells, dtype=int)
     )
     points = mesh.points
-    connections = numpy.concatenate(mesh.connections)
+    connections = mesh.connections
     gravity = numpy.array([0.0, 0.0, -1.0])
 
     # Define parameters related to faces
-    faces = numpy.concatenate(mesh.faces)
-    face_normals = [fn for face in mesh.face_normals for fn in face]
-    face_areas = [fa for face in mesh.face_areas for fa in face]
+    faces = mesh.faces
+    face_normals = mesh.face_normals
+    face_areas = mesh.face_areas
 
     # Required variables for block INCON
     primary_variables = None
     porosities = None
     permeabilities = None
-    if incon_eos:
+    if incon:
         primary_variables = (
-            numpy.concatenate(mesh.cell_data["initial_condition"])
+            mesh.cell_data["initial_condition"]
             if "initial_condition" in mesh.cell_data.keys()
             else primary_variables
         )
         porosities = (
-            numpy.concatenate(mesh.cell_data["porosity"])
+            mesh.cell_data["porosity"]
             if "porosity" in mesh.cell_data.keys()
             else porosities
         )
         permeabilities = (
-            numpy.concatenate(mesh.cell_data["permeability"])
+            mesh.cell_data["permeability"]
             if "permeability" in mesh.cell_data.keys()
             else permeabilities
         )
@@ -129,7 +112,7 @@ def write(filename, mesh, nodal_distance, material_name, material_end, incon_eos
         nodal_distance,
         material_name,
         material_end,
-        incon_eos,
+        incon,
     )
 
 
@@ -153,7 +136,7 @@ def write_buffer(
     nodal_distance,
     material_name,
     material_end,
-    incon_eos,
+    incon,
 ):
     materials = [
         "{:5}".format(material.strip()) if isinstance(material, str) else material
@@ -164,22 +147,22 @@ def write_buffer(
     material_end = [material_end] if isinstance(material_end, str) else material_end
 
     # Check INCON inputs and show warnings if necessary
-    if incon_eos and primary_variables is None:
+    if incon and primary_variables is None:
         logging.warning(
             ("Initial conditions are not defined. " "Writing INCON will be ignored.")
         )
 
     if porosities is not None:
-        if not incon_eos:
-            logging.warning("Porosity is only exported if incon_eos is provided.")
+        if not incon:
+            logging.warning("Porosity is only exported if incon is provided.")
         else:
             if not (len(porosities) == num_cells and porosities.ndim == 1):
                 raise ValueError("Inconsistent porosity array.")
 
     if permeabilities is not None:
-        if not incon_eos:
+        if not incon:
             logging.warning(
-                "Permeability modifiers are only exported if incon_eos is provided."
+                "Permeability modifiers are only exported if incon is provided."
             )
         else:
             if permeabilities.ndim not in {1, 2}:
@@ -218,13 +201,14 @@ def write_buffer(
         )
 
     # Write INCON file
-    if incon_eos and primary_variables is not None:
+    if incon and primary_variables is not None:
         import os
 
         head = os.path.split(filename)[0]
-        with open(head + ("/" if head else "") + "INCON", "w") as f:
+        filename = os.path.join(head, "INCON") if head else "INCON"
+        with open(filename, "w") as f:
             _write_incon(
-                f, incon_eos, labels, primary_variables, porosities, permeabilities,
+                f, labels, primary_variables, porosities, permeabilities,
             )
 
 
@@ -321,7 +305,7 @@ def _write_conne(
     int_normals = numpy.array(int_normals)
     bounds = numpy.array(bounds)
 
-    # Calculate remaining variables not available in itasca module
+    # Calculate remaining variables
     lines = numpy.diff(centers, axis=1)[:, 0]
     isot = _isot(lines)
     angles = numpy.dot(lines, gravity) / numpy.linalg.norm(lines, axis=1)
@@ -357,9 +341,7 @@ def _write_conne(
 
 
 @block("INCON")
-def _write_incon(
-    f, incon_eos, labels, primary_variables, porosities, permeabilities,
-):
+def _write_incon(f, labels, primary_variables, porosities, permeabilities):
     """Write INCON block."""
     # Check initial pore pressures
     cond = numpy.logical_and(

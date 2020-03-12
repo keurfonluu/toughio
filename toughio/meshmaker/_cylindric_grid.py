@@ -46,24 +46,22 @@ class CylindricMesh(Mesh):
         areas, heights = self._get_areas_heights()
         sections = numpy.tile(self._dr, nz) * heights
 
-        return [
-            numpy.transpose(
-                [
-                    areas,
-                    areas,
-                    sections,
-                    perimeters_out * heights,
-                    sections,
-                    perimeters_in * heights,
-                ]
-            )
-        ]
+        return numpy.transpose(
+            [
+                areas,
+                areas,
+                sections,
+                perimeters_out * heights,
+                sections,
+                perimeters_in * heights,
+            ]
+        )
 
     @property
     def volumes(self):
         """Volumes of cell in mesh."""
         areas, heights = self._get_areas_heights()
-        return [areas * heights]
+        return areas * heights
 
 
 def cylindric_grid(dr, dz, origin_z=None, material="dfalt"):
