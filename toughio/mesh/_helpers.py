@@ -95,10 +95,8 @@ def write(filename, mesh, file_format=None, **kwargs):
     material_end : str, array_like or None, default None
         Only if ``file_format = "tough"``. Move cells to bottom of block
         'ELEME' if their materials is in `material_end`.
-    incon_eos : str or None, optional, default None
-        Equation-of-state identifier to determine the actual number of
-        primary variables to initialize. If `None`, TOUGH input `INCON`
-        file will not be written.
+    incon : bool, optional, default False
+        Only if ``file_format = "tough"``. If `True`, initial conditions will be written in file `INCON`.
 
     """
     # Check file format
@@ -115,7 +113,7 @@ def write(filename, mesh, file_format=None, **kwargs):
                 "nodal_distance": "line",
                 "material_name": None,
                 "material_end": None,
-                "incon_eos": None,
+                "incon": False,
             },
         ),
         "avsucd": (avsucd, (), {}),
