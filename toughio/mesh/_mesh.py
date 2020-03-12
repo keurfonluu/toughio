@@ -685,7 +685,7 @@ class Mesh(object):
         connection line and the interface normal vectors.
 
         """
-        return _qualities(self)
+        return numpy.array([numpy.mean(out) for out in _qualities(self)])
 
 
 def from_meshio(mesh):
