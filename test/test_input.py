@@ -371,10 +371,11 @@ def test_diffu():
     )
 
 
-def test_outpu():
+@pytest.mark.parametrize("fmt", [None, helpers.random_string(20)])
+def test_outpu(fmt):
     parameters_ref = {
         "output": {
-            "format": helpers.random_string(20).upper(),
+            "format": fmt,
             "variables": {
                 helpers.random_string(20): None,
                 helpers.random_string(20): [numpy.random.randint(10)],
