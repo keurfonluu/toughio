@@ -99,7 +99,7 @@ generators = {
 }
 
 output = {
-    "format": "csv",
+    "format": None,
     "variables": None,
 }
 

@@ -474,10 +474,11 @@ def _read_outpu(f):
 
     # Format
     line = f.readline().strip()
-    outpu["output"]["format"] = line if line else None
+    if line and not line.isdigit():
+        outpu["output"]["format"] = line if line else None
+        line = f.readline().strip()
 
     # Variables
-    line = f.readline().strip()
     if line.isdigit():
         n_var = int(line)
         outpu["output"]["variables"] = {}

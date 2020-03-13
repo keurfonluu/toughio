@@ -721,9 +721,11 @@ def _write_outpu(parameters):
     data = deepcopy(output)
     data.update(parameters["output"])
 
-    # Format
     out = []
-    out += "{:20}\n".format(data["format"].upper()) if data["format"] else "\n"
+
+    # Format
+    if data["format"]:
+        out += "{:20}\n".format(data["format"].upper())
 
     # Variables
     if data["variables"]:
