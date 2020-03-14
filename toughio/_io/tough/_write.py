@@ -741,22 +741,21 @@ def _write_outpu(parameters):
 
     # Format
     if data["format"]:
-        out += "{:20}\n".format(data["format"].upper())
+        out += write_record(format_data([(data["format"].upper(), "{:20}")]))
 
     # Variables
     if data["variables"]:
-        out += "{:15}\n".format(str(len(data["variables"])))
+        out += write_record(format_data([(str(len(data["variables"])), "{:15}")]))
 
         for k, v in data["variables"].items():
-            fmt = "{:20}"
+            tmp = [(k.upper(), "{:20}")]
             if v:
                 v = v if isinstance(v, (list, tuple, numpy.ndarray)) else [v]
                 if not (0 < len(v) < 3):
                     raise ValueError()
-                fmt += "{:5}" * len(v)
-                out += "{}\n".format(fmt.format(k.upper(), *v))
-            else:
-                out += "{}\n".format(fmt.format(k.upper()))
+                else:
+                    tmp += [(vv, "{:5}") for vv in v]
+            out += write_record(format_data(tmp))
 
     return out
 
