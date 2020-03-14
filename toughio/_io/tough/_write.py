@@ -199,19 +199,19 @@ def _write_rocks(parameters):
                 )
             )
         else:
-            out += ["{:80}\n".format("")] if nad == 2 else []
+            out += write_record([]) if nad == 2 else []
 
         # Relative permeability / Capillary pressure
         if nad == 2:
             out += (
                 add_record(data["relative_permeability"])
                 if "relative_permeability" in data.keys()
-                else ["{:80}\n".format("")]
+                else write_record([])
             )
             out += (
                 add_record(data["capillarity"])
                 if "capillarity" in data.keys()
-                else ["{:80}\n".format("")]
+                else write_record([])
             )
 
     return out
@@ -234,12 +234,12 @@ def _write_rpcap(parameters):
     out += (
         add_record(data["relative_permeability"])
         if "relative_permeability" in data.keys()
-        else ["{:80}\n".format("")]
+        else write_record([])
     )
     out += (
         add_record(data["capillarity"])
         if "capillarity" in data.keys()
-        else ["{:80}\n".format("")]
+        else write_record([])
     )
     return out
 
