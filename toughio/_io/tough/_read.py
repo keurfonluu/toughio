@@ -163,10 +163,11 @@ def _read_rpcap(f):
     for key in ["relative_permeability", "capillarity"]:
         line = f.readline()
         data = read_record(line, "5d,5s,10e,10e,10e,10e,10e,10e,10e")
-        rpcap[key] = {
-            "id": data[0],
-            "parameters": prune_nones_list(data[2:]),
-        }
+        if data[0] is not None:
+            rpcap[key] = {
+                "id": data[0],
+                "parameters": prune_nones_list(data[2:]),
+            }
 
     return rpcap
 
