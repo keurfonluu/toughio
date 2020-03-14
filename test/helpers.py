@@ -5,6 +5,8 @@ import numpy
 
 import toughio
 
+numpy.random.seed(42)
+
 hybrid_mesh = toughio.Mesh(
     points=numpy.array(
         [
