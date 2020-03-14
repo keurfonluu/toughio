@@ -99,7 +99,7 @@ generators = {
 }
 
 output = {
-    "format": "csv",
+    "format": None,
     "variables": None,
 }
 
@@ -110,7 +110,7 @@ default = {
     "conductivity": None,
     "specific_heat": None,
     "compressibility": None,
-    "expansion": None,
+    "expansivity": None,
     "conductivity_dry": None,
     "tortuosity": None,
     "klinkenberg_parameter": None,

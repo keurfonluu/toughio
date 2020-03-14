@@ -54,7 +54,7 @@ dtypes = {
         "conductivity": "scalar",
         "specific_heat": "scalar",
         "compressibility": "scalar",
-        "expansion": "scalar",
+        "expansivity": "scalar",
         "conductivity_dry": "scalar",
         "tortuosity": "scalar",
         "klinkenberg_parameter": "scalar",

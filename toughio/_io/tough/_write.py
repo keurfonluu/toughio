@@ -146,7 +146,7 @@ def _write_rocks(parameters):
             data[k] is not None
             for k in [
                 "compressibility",
-                "expansion",
+                "expansivity",
                 "conductivity_dry",
                 "tortuosity",
                 "klinkenberg_parameter",
@@ -189,7 +189,7 @@ def _write_rocks(parameters):
                 format_data(
                     [
                         (data["compressibility"], "{:>10.4e}"),
-                        (data["expansion"], "{:>10.4e}"),
+                        (data["expansivity"], "{:>10.4e}"),
                         (data["conductivity_dry"], "{:>10.4e}"),
                         (data["tortuosity"], "{:>10.4e}"),
                         (data["klinkenberg_parameter"], "{:>10.4e}"),
@@ -199,12 +199,20 @@ def _write_rocks(parameters):
                 )
             )
         else:
-            out += ["{:80}\n".format("")] if nad == 2 else []
+            out += write_record([]) if nad == 2 else []
 
         # Relative permeability / Capillary pressure
         if nad == 2:
-            out += add_record(data["relative_permeability"])
-            out += add_record(data["capillarity"])
+            out += (
+                add_record(data["relative_permeability"])
+                if "relative_permeability" in data.keys()
+                else write_record([])
+            )
+            out += (
+                add_record(data["capillarity"])
+                if "capillarity" in data.keys()
+                else write_record([])
+            )
 
     return out
 
@@ -223,8 +231,16 @@ def _write_rpcap(parameters):
     data.update(parameters["default"])
 
     out = []
-    out += add_record(data["relative_permeability"])
-    out += add_record(data["capillarity"])
+    out += (
+        add_record(data["relative_permeability"])
+        if "relative_permeability" in data.keys()
+        else write_record([])
+    )
+    out += (
+        add_record(data["capillarity"])
+        if "capillarity" in data.keys()
+        else write_record([])
+    )
     return out
 
 
@@ -721,24 +737,25 @@ def _write_outpu(parameters):
     data = deepcopy(output)
     data.update(parameters["output"])
 
-    # Format
     out = []
-    out += "{:20}\n".format(data["format"].upper()) if data["format"] else "\n"
+
+    # Format
+    if data["format"]:
+        out += write_record(format_data([(data["format"].upper(), "{:20}")]))
 
     # Variables
     if data["variables"]:
-        out += "{:15}\n".format(str(len(data["variables"])))
+        out += write_record(format_data([(str(len(data["variables"])), "{:15}")]))
 
         for k, v in data["variables"].items():
-            fmt = "{:20}"
+            tmp = [(k.upper(), "{:20}")]
             if v:
                 v = v if isinstance(v, (list, tuple, numpy.ndarray)) else [v]
                 if not (0 < len(v) < 3):
                     raise ValueError()
-                fmt += "{:5}" * len(v)
-                out += "{}\n".format(fmt.format(k.upper(), *v))
-            else:
-                out += "{}\n".format(fmt.format(k.upper()))
+                else:
+                    tmp += [(vv, "{:5}") for vv in v]
+            out += write_record(format_data(tmp))
 
     return out
 

@@ -28,7 +28,7 @@ def test_rocks():
         "conductivity",
         "specific_heat",
         "compressibility",
-        "expansion",
+        "expansivity",
         "conductivity_dry",
         "tortuosity",
         "klinkenberg_parameter",
@@ -46,9 +46,28 @@ def test_rocks():
             },
             helpers.random_string(5): {key: numpy.random.rand() for key in keys},
             helpers.random_string(5): {key: numpy.random.rand() for key in keys},
+            helpers.random_string(5): {key: numpy.random.rand() for key in keys},
+            helpers.random_string(5): {key: numpy.random.rand() for key in keys},
         }
     }
-    parameters_ref["rocks"][list(parameters_ref["rocks"].keys())[-1]].update(
+    names = list(parameters_ref["rocks"].keys())
+    parameters_ref["rocks"][names[-1]].update(
+        {
+            "relative_permeability": {
+                "id": numpy.random.randint(10),
+                "parameters": numpy.random.rand(numpy.random.randint(7) + 1),
+            },
+        }
+    )
+    parameters_ref["rocks"][names[-2]].update(
+        {
+            "capillarity": {
+                "id": numpy.random.randint(10),
+                "parameters": numpy.random.rand(numpy.random.randint(7) + 1),
+            },
+        }
+    )
+    parameters_ref["rocks"][names[-3]].update(
         {
             "relative_permeability": {
                 "id": numpy.random.randint(10),
@@ -72,19 +91,19 @@ def test_rocks():
                 helpers.allclose_dict(vv, parameters["rocks"][k][kk], atol=1.0e-4)
 
 
-def test_rpcap():
-    parameters_ref = {
-        "default": {
-            "relative_permeability": {
-                "id": numpy.random.randint(10),
-                "parameters": numpy.random.rand(numpy.random.randint(7) + 1),
-            },
-            "capillarity": {
-                "id": numpy.random.randint(10),
-                "parameters": numpy.random.rand(numpy.random.randint(7) + 1),
-            },
-        },
-    }
+@pytest.mark.parametrize("rpcap", ["rp", "cap", "both"])
+def test_rpcap(rpcap):
+    parameters_ref = {"default": {}}
+    if rpcap in {"rp", "both"}:
+        parameters_ref["default"]["relative_permeability"] = {
+            "id": numpy.random.randint(10),
+            "parameters": numpy.random.rand(numpy.random.randint(7) + 1),
+        }
+    if rpcap in {"cap", "both"}:
+        parameters_ref["default"]["capillarity"] = {
+            "id": numpy.random.randint(10),
+            "parameters": numpy.random.rand(numpy.random.randint(7) + 1),
+        }
     parameters = write_read(parameters_ref)
 
     for k, v in parameters_ref["default"].items():
@@ -371,10 +390,11 @@ def test_diffu():
     )
 
 
-def test_outpu():
+@pytest.mark.parametrize("fmt", [None, helpers.random_string(20)])
+def test_outpu(fmt):
     parameters_ref = {
         "output": {
-            "format": helpers.random_string(20).upper(),
+            "format": fmt,
             "variables": {
                 helpers.random_string(20): None,
                 helpers.random_string(20): [numpy.random.randint(10)],
