@@ -132,7 +132,7 @@ def _read_rocks(f):
                 rocks["rocks"][rock].update(
                     {
                         "compressibility": data[0],
-                        "expansion": data[1],
+                        "expansivity": data[1],
                         "conductivity_dry": data[2],
                         "tortuosity": data[3],
                         "klinkenberg_parameter": data[4],
@@ -163,10 +163,11 @@ def _read_rpcap(f):
     for key in ["relative_permeability", "capillarity"]:
         line = f.readline()
         data = read_record(line, "5d,5s,10e,10e,10e,10e,10e,10e,10e")
-        rpcap[key] = {
-            "id": data[0],
-            "parameters": prune_nones_list(data[2:]),
-        }
+        if data[0] is not None:
+            rpcap[key] = {
+                "id": data[0],
+                "parameters": prune_nones_list(data[2:]),
+            }
 
     return rpcap
 
@@ -474,10 +475,11 @@ def _read_outpu(f):
 
     # Format
     line = f.readline().strip()
-    outpu["output"]["format"] = line if line else None
+    if line and not line.isdigit():
+        outpu["output"]["format"] = line if line else None
+        line = f.readline().strip()
 
     # Variables
-    line = f.readline().strip()
     if line.isdigit():
         n_var = int(line)
         outpu["output"]["variables"] = {}
