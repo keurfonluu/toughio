@@ -95,7 +95,7 @@ def read_buffer(f):
         elif line.startswith("ELEME"):
             parameters.update(_read_eleme(f))
         elif line.startswith("CONNE"):
-            logging.warning("Reading block CONNE is not supported. Skipping.")
+            parameters.update(_read_conne(f))
         elif line.startswith("INCON"):
             logging.warning("Reading block INCON is not supported. Skipping.")
         elif line.startswith("NOVER"):
@@ -530,3 +530,30 @@ def _read_eleme(f):
     }
 
     return eleme
+
+
+def _read_conne(f):
+    """Read CONNE block data."""
+    conne = {"connections": {}}
+
+    while True:
+        line = next(f)
+
+        if line.strip():
+            data = read_record(line, "10s,5d,5d,5d,5d,10e,10e,10e,10e,10e")
+            label = data[0]
+            conne["connections"][label] = {
+                "permeability_direction": data[4],
+                "nodal_distances": data[5:7],
+                "interface_area": data[7],
+                "gravity_cosine_angle": data[8],
+                "radiant_emittance_factor": data[9],
+            }
+        else:
+            break
+
+    conne = {
+        k: {kk: prune_nones_dict(vv) for kk, vv in v.items()} for k, v in conne.items()
+    }
+
+    return conne
