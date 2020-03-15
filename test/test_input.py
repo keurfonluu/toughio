@@ -418,9 +418,7 @@ def test_eleme():
         "volume",
         "heat_exchange_area",
         "permeability_modifier",
-        "x",
-        "y",
-        "z",
+        "center",
     ]
     parameters_ref = {
         "elements": {
@@ -428,6 +426,8 @@ def test_eleme():
                 key: (
                     helpers.random_string(5)
                     if key == "material"
+                    else numpy.random.rand(3)
+                    if key == "center"
                     else numpy.random.rand()
                 ) for key in keys
             }

@@ -526,9 +526,7 @@ def _read_eleme(f):
                 "volume": data[4],
                 "heat_exchange_area": data[5],
                 "permeability_modifier": data[6],
-                "x": data[7],
-                "y": data[8],
-                "z": data[9],
+                "center": data[7:10],
             }
         else:
             break
