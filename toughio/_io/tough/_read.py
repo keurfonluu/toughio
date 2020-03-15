@@ -91,7 +91,7 @@ def read_buffer(f):
         elif line.startswith("OUTPU"):
             parameters.update(_read_outpu(f))
         elif line.startswith("ELEME"):
-            logging.warning("Reading block ELEME is not supported. Skipping.")
+            parameters.update(_read_eleme(f))
         elif line.startswith("CONNE"):
             logging.warning("Reading block CONNE is not supported. Skipping.")
         elif line.startswith("INCON"):
@@ -498,3 +498,33 @@ def _read_outpu(f):
             )
 
     return outpu
+
+
+def _read_eleme(f):
+    """Read ELEME block data."""
+    eleme = {"elements": {}}
+
+    while True:
+        line = f.readline()
+
+        if line.strip():
+            data = read_record(line, "5s,5d,5d,5s,10e,10e,10e,10e,10e,10e")
+            label = data[0]
+            rock = data[3].strip()
+            eleme["elements"][label] = {
+                "rock": int(rock) if all(r.isdigit() for r in rock) else rock,
+                "volume": data[4],
+                "heat_exchange_area": data[5],
+                "permeability_modifier": data[6],
+                "x": data[7],
+                "y": data[8],
+                "z": data[9],
+            }
+        else:
+            break
+
+    eleme = {
+        k: {kk: prune_nones_dict(vv) for kk, vv in v.items()} for k, v in eleme.items()
+    }
+
+    return eleme
