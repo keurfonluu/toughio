@@ -115,9 +115,7 @@ dtypes = {
         "volume": "float",
         "heat_exchange_area": "float",
         "permeability_modifier": "float",
-        "x": "float",
-        "y": "float",
-        "z": "float",
+        "center": "array_like",
     },
 }
 

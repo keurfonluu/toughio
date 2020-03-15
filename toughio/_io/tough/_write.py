@@ -787,9 +787,9 @@ def _write_eleme(parameters):
                     (data["volume"], "{:10.4e}"),
                     (data["heat_exchange_area"], "{:10.3e}"),
                     (data["permeability_modifier"], "{:10.3e}"),
-                    (data["x"], "{:10.3e}"),
-                    (data["y"], "{:10.3e}"),
-                    (data["z"], "{:10.3e}"),
+                    (data["center"][0], "{:10.3e}"),
+                    (data["center"][1], "{:10.3e}"),
+                    (data["center"][2], "{:10.3e}"),
                 ]
             )
         )
