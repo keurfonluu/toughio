@@ -412,6 +412,40 @@ def test_outpu(fmt):
     )
 
 
+def test_eleme():
+    keys = [
+        "rock",
+        "volume",
+        "heat_exchange_area",
+        "permeability_modifier",
+        "x",
+        "y",
+        "z",
+    ]
+    parameters_ref = {
+        "elements": {
+            helpers.random_string(5): {
+                key: (
+                    helpers.random_string(5)
+                    if key == "rock"
+                    else numpy.random.rand()
+                ) for key in keys
+            }
+            for _ in numpy.random.rand(10) + 1
+        }
+    }
+    parameters = write_read(parameters_ref)
+
+    assert sorted(parameters_ref["elements"].keys()) == sorted(parameters["elements"].keys())
+
+    for k, v in parameters_ref["elements"].items():
+        for kk, vv in v.items():
+            if not isinstance(vv, str):
+                assert numpy.allclose(vv, parameters["elements"][k][kk], atol=1.0e-4)
+            else:
+                assert vv == parameters["elements"][k][kk]
+
+
 @pytest.mark.parametrize(
     "flag, enable",
     [("start", True), ("start", False), ("nover", True), ("nover", False)],
