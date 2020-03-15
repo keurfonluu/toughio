@@ -97,7 +97,15 @@ def read_buffer(f):
         elif line.startswith("CONNE"):
             parameters.update(_read_conne(f))
         elif line.startswith("INCON"):
-            logging.warning("Reading block INCON is not supported. Skipping.")
+            incon = _read_incon(f)
+            if "elements" in parameters.keys():
+                for k, v in incon["elements"].items():
+                    if k in parameters["elements"].keys():
+                        parameters["elements"][k].update(v)
+                    else:
+                        parameters["elements"][k] = v
+            else:
+                parameters["elements"] = incon["elements"]
         elif line.startswith("NOVER"):
             parameters["nover"] = True
         elif line.startswith("ENDCY"):
@@ -557,3 +565,33 @@ def _read_conne(f):
     }
 
     return conne
+
+
+def _read_incon(f):
+    """Read INCON block data."""
+    incon = {"elements": {}}
+
+    while True:
+        line = next(f)
+
+        if line.strip() and not line.startswith("+++"):
+            # Record 1
+            data = read_record(line, "5s,5d,5d,15e,10e,10e,10e,10e,10e")
+            label = data[0]
+            incon["elements"][label] = {
+                "porosity": data[3],
+                "userx": prune_nones_list(data[4:9]),
+            }
+
+            # Record 2
+            line = next(f)
+            data = read_record(line, "20e,20e,20e,20e")
+            incon["elements"][label] = {"initial_condition": prune_nones_list(data)}
+        else:
+            break
+
+    incon = {
+        k: {kk: prune_nones_dict(vv) for kk, vv in v.items()} for k, v in incon.items()
+    }
+
+    return incon
