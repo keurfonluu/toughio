@@ -38,6 +38,8 @@ _Parameters = {
     "connection_history": None,
     "generator_history": None,
     "output": None,
+    "elements": {},
+    "elements_order": None,
     "default": {},
 }
 

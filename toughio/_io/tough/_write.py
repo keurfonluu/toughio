@@ -111,6 +111,7 @@ def write_buffer(parameters):
     out += _write_gener(parameters) if parameters["generators"] else []
     out += _write_diffu(parameters) if parameters["diffusion"] is not None else []
     out += _write_outpu(parameters) if parameters["output"] else []
+    out += _write_eleme(parameters) if parameters["elements"] else []
     out += _write_nover() if parameters["nover"] else []
     out += _write_endcy()
     return out
@@ -756,6 +757,42 @@ def _write_outpu(parameters):
                 else:
                     tmp += [(vv, "{:5}") for vv in v]
             out += write_record(format_data(tmp))
+
+    return out
+
+
+@check_parameters(dtypes["ELEME"], keys="elements", is_list=True)
+@block("ELEME", multi=True)
+def _write_eleme(parameters):
+    """TOUGH input ELEME block data (optional)."""
+    # Reorder elements
+    if parameters["elements_order"] is not None:
+        order = parameters["elements_order"]
+    else:
+        order = parameters["elements"].keys()
+
+    out = []
+    for k in order:
+        # Load data
+        data = parameters["elements"][k]
+
+        # Record 1
+        out += write_record(
+            format_data(
+                [
+                    (k, "{:5.5}"),
+                    (None, "{:>5}"),
+                    (None, "{:>5}"),
+                    (data["rock"], "{:>5}"),
+                    (data["volume"], "{:10.4e}"),
+                    (data["heat_exchange_area"], "{:10.3e}"),
+                    (data["permeability_modifier"], "{:10.3e}"),
+                    (data["x"], "{:10.3e}"),
+                    (data["y"], "{:10.3e}"),
+                    (data["z"], "{:10.3e}"),
+                ]
+            )
+        )
 
     return out
 
