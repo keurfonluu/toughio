@@ -34,12 +34,13 @@ def read_buffer(f):
     parameters = {}
 
     # Title
-    parameters["title"] = f.readline().strip()
+    line = f.readline().strip()
+    if not line.startswith("ROCKS"):
+        parameters["title"] = line
+        line = f.readline().strip()
 
     # Loop over blocks
     while True:
-        line = f.readline().strip()
-
         if line.startswith("ROCKS"):
             rocks, rocks_order = _read_rocks(f)
             parameters.update(rocks)
@@ -100,6 +101,8 @@ def read_buffer(f):
             parameters["nover"] = True
         elif line.startswith("ENDCY"):
             break
+
+        line = f.readline().strip()
 
     return parameters
 
