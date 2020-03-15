@@ -113,6 +113,7 @@ def write_buffer(parameters):
     out += _write_outpu(parameters) if parameters["output"] else []
     out += _write_eleme(parameters) if parameters["elements"] else []
     out += _write_conne(parameters) if parameters["connections"] else []
+    out += _write_incon(parameters) if parameters["initial_conditions"] else []
     out += _write_nover() if parameters["nover"] else []
     out += _write_endcy()
     return out
@@ -820,6 +821,38 @@ def _write_conne(parameters):
                 ]
             )
         )
+
+    return out
+
+
+@check_parameters(dtypes["INCON"], keys="initial_conditions", is_list=True)
+@block("INCON", multi=True)
+def _write_incon(parameters):
+    out = []
+    for k, v in parameters["initial_conditions"].items():
+        # Userx
+        userx = [None for _ in range(5)]
+        userx[:len(v["userx"])] = v["userx"]
+
+        # Record 1
+        out += write_record(
+            format_data(
+                [
+                    (k, "{:5.5}"),
+                    (None, "{:>5}"),
+                    (None, "{:>5}"),
+                    (v["porosity"], "{:>15.9e}"),
+                    (v["userx"][0], "{:>10.3e}"),
+                    (v["userx"][1], "{:>10.3e}"),
+                    (v["userx"][2], "{:>10.3e}"),
+                    (v["userx"][3], "{:>10.3e}"),
+                    (v["userx"][4], "{:>10.3e}"),
+                ]
+            )
+        )
+
+        # Record 2
+        out += write_record(format_data([(x, "{:20.4e}") for x in v["values"]]))
 
     return out
 

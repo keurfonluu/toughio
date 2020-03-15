@@ -48,6 +48,7 @@ dtypes = {
         "elements": "dict",
         "elements_order": "array_like",
         "connections": "dict",
+        "initial_conditions": "dict",
         "default": "dict",
     },
     "ROCKS": {
@@ -124,6 +125,11 @@ dtypes = {
         "interface_area": "scalar",
         "gravity_cosine_angle": "scalar",
         "radiant_emittance_factor": "scalar",
+    },
+    "INCON": {
+        "porosity": "scalar",
+        "userx": "array_like",
+        "values": "array_like",
     },
 }
 
