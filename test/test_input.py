@@ -446,6 +446,37 @@ def test_eleme():
                 assert vv == parameters["elements"][k][kk]
 
 
+def test_conne():
+    keys = [
+        "permeability_direction",
+        "nodal_distances",
+        "interface_area",
+        "gravity_cosine_angle",
+        "radiant_emittance_factor",
+    ]
+    parameters_ref = {
+        "connections": {
+            helpers.random_string(10): {
+                key: (
+                    numpy.random.randint(1, 4)
+                    if key == "permeability_direction"
+                    else numpy.random.rand(2)
+                    if key == "nodal_distances"
+                    else numpy.random.rand()
+                ) for key in keys
+            }
+            for _ in numpy.random.rand(10) + 1
+        }
+    }
+    parameters = write_read(parameters_ref)
+
+    assert sorted(parameters_ref["connections"].keys()) == sorted(parameters["connections"].keys())
+
+    for k, v in parameters_ref["connections"].items():
+        for kk, vv in v.items():
+            assert numpy.allclose(vv, parameters["connections"][k][kk], atol=1.0e-4)
+
+
 @pytest.mark.parametrize(
     "flag, enable",
     [("start", True), ("start", False), ("nover", True), ("nover", False)],
