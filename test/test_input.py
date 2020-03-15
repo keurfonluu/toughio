@@ -414,7 +414,7 @@ def test_outpu(fmt):
 
 def test_eleme():
     keys = [
-        "rock",
+        "material",
         "volume",
         "heat_exchange_area",
         "permeability_modifier",
@@ -427,7 +427,7 @@ def test_eleme():
             helpers.random_string(5): {
                 key: (
                     helpers.random_string(5)
-                    if key == "rock"
+                    if key == "material"
                     else numpy.random.rand()
                 ) for key in keys
             }

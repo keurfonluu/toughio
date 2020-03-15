@@ -111,7 +111,7 @@ dtypes = {
     },
     "OUTPU": {"format": "str", "variables": "dict"},
     "ELEME": {
-        "rock": "str_int",
+        "material": "str_int",
         "volume": "float",
         "heat_exchange_area": "float",
         "permeability_modifier": "float",

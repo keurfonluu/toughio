@@ -783,7 +783,7 @@ def _write_eleme(parameters):
                     (k, "{:5.5}"),
                     (None, "{:>5}"),
                     (None, "{:>5}"),
-                    (data["rock"], "{:>5}"),
+                    (data["material"], "{:>5}"),
                     (data["volume"], "{:10.4e}"),
                     (data["heat_exchange_area"], "{:10.3e}"),
                     (data["permeability_modifier"], "{:10.3e}"),
