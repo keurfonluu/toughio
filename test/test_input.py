@@ -477,6 +477,35 @@ def test_conne():
             assert numpy.allclose(vv, parameters["connections"][k][kk], atol=1.0e-4)
 
 
+def test_incon():
+    keys = [
+        "porosity",
+        "userx",
+        "values",
+    ]
+    parameters_ref = {
+        "initial_conditions": {
+            helpers.random_string(5): {
+                key: (
+                    numpy.random.rand()
+                    if key == "porosity"
+                    else numpy.random.rand(numpy.random.randint(6)) + 1
+                    if key == "userx"
+                    else numpy.random.rand(numpy.random.randint(5)) + 1
+                ) for key in keys
+            }
+            for _ in numpy.random.rand(10) + 1
+        }
+    }
+    parameters = write_read(parameters_ref)
+
+    assert sorted(parameters_ref["initial_conditions"].keys()) == sorted(parameters["initial_conditions"].keys())
+
+    for k, v in parameters_ref["initial_conditions"].items():
+        for kk, vv in v.items():
+            assert numpy.allclose(vv, parameters["initial_conditions"][k][kk], atol=1.0e-3)
+
+
 @pytest.mark.parametrize(
     "flag, enable",
     [("start", True), ("start", False), ("nover", True), ("nover", False)],
