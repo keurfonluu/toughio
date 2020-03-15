@@ -113,9 +113,9 @@ dtypes = {
     "OUTPU": {"format": "str", "variables": "dict"},
     "ELEME": {
         "material": "str_int",
-        "volume": "float",
-        "heat_exchange_area": "float",
-        "permeability_modifier": "float",
+        "volume": "scalar",
+        "heat_exchange_area": "scalar",
+        "permeability_modifier": "scalar",
         "center": "array_like",
     },
     "CONNE": {
