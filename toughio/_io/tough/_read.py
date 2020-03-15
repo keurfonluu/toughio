@@ -522,7 +522,7 @@ def _read_eleme(f):
             label = data[0]
             rock = data[3].strip()
             eleme["elements"][label] = {
-                "rock": int(rock) if all(r.isdigit() for r in rock) else rock,
+                "material": int(rock) if all(r.isdigit() for r in rock) else rock,
                 "volume": data[4],
                 "heat_exchange_area": data[5],
                 "permeability_modifier": data[6],
