@@ -835,21 +835,15 @@ def _write_incon(parameters):
         userx[:len(v["userx"])] = v["userx"]
 
         # Record 1
-        out += write_record(
-            format_data(
-                [
-                    (k, "{:5.5}"),
-                    (None, "{:>5}"),
-                    (None, "{:>5}"),
-                    (v["porosity"], "{:>15.9e}"),
-                    (v["userx"][0], "{:>10.3e}"),
-                    (v["userx"][1], "{:>10.3e}"),
-                    (v["userx"][2], "{:>10.3e}"),
-                    (v["userx"][3], "{:>10.3e}"),
-                    (v["userx"][4], "{:>10.3e}"),
-                ]
-            )
-        )
+        tmp = [
+            (k, "{:5.5}"),
+            (None, "{:>5}"),
+            (None, "{:>5}"),
+            (v["porosity"], "{:>15.9e}"),
+        ]
+        if v["userx"] is not None:
+            tmp += [(x, "{:>10.3e}") for x in v["userx"]]
+        out += write_record(format_data(tmp))
 
         # Record 2
         out += write_record(format_data([(x, "{:20.4e}") for x in v["values"]]))
