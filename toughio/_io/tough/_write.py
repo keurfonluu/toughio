@@ -112,6 +112,7 @@ def write_buffer(parameters):
     out += _write_diffu(parameters) if parameters["diffusion"] is not None else []
     out += _write_outpu(parameters) if parameters["output"] else []
     out += _write_eleme(parameters) if parameters["elements"] else []
+    out += _write_conne(parameters) if parameters["connections"] else []
     out += _write_nover() if parameters["nover"] else []
     out += _write_endcy()
     return out
@@ -790,6 +791,32 @@ def _write_eleme(parameters):
                     (data["center"][0], "{:10.3e}"),
                     (data["center"][1], "{:10.3e}"),
                     (data["center"][2], "{:10.3e}"),
+                ]
+            )
+        )
+
+    return out
+
+
+@check_parameters(dtypes["CONNE"], keys="connections", is_list=True)
+@block("CONNE", multi=True)
+def _write_conne(parameters):
+    """TOUGH input CONNE block data (optional)."""
+    out = []
+    for k, v in parameters["connections"].items():
+        out += write_record(
+            format_data(
+                [
+                    (k, "{:10.10}"),
+                    (None, "{:>5}"),
+                    (None, "{:>5}"),
+                    (None, "{:>5}"),
+                    (v["permeability_direction"], "{:>5g}"),
+                    (v["nodal_distances"][0], "{:10.4e}"),
+                    (v["nodal_distances"][1], "{:10.4e}"),
+                    (v["interface_area"], "{:10.4e}"),
+                    (v["gravity_cosine_angle"], "{:10.4e}"),
+                    (v["radiant_emittance_factor"], "{:10.3e}"),
                 ]
             )
         )

@@ -40,6 +40,7 @@ _Parameters = {
     "output": None,
     "elements": {},
     "elements_order": None,
+    "connections": {},
     "default": {},
 }
 

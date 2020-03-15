@@ -47,6 +47,7 @@ dtypes = {
         "output": "dict",
         "elements": "dict",
         "elements_order": "array_like",
+        "connections": "dict",
         "default": "dict",
     },
     "ROCKS": {
@@ -116,6 +117,13 @@ dtypes = {
         "heat_exchange_area": "float",
         "permeability_modifier": "float",
         "center": "array_like",
+    },
+    "CONNE": {
+        "permeability_direction": "int",
+        "nodal_distances": "array_like",
+        "interface_area": "scalar",
+        "gravity_cosine_angle": "scalar",
+        "radiant_emittance_factor": "scalar",
     },
 }
 
