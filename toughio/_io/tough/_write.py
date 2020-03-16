@@ -767,6 +767,8 @@ def _write_outpu(parameters):
 @block("ELEME", multi=True)
 def _write_eleme(parameters):
     """TOUGH input ELEME block data (optional)."""
+    from ._common import elements
+
     # Reorder elements
     if parameters["elements_order"] is not None:
         order = parameters["elements_order"]
@@ -775,10 +777,9 @@ def _write_eleme(parameters):
 
     out = []
     for k in order:
-        # Load data
-        data = parameters["elements"][k]
+        data = deepcopy(elements)
+        data.update(parameters["elements"][k])
 
-        # Record 1
         out += write_record(
             format_data(
                 [
@@ -803,8 +804,13 @@ def _write_eleme(parameters):
 @block("CONNE", multi=True)
 def _write_conne(parameters):
     """TOUGH input CONNE block data (optional)."""
+    from ._common import connections
+
     out = []
     for k, v in parameters["connections"].items():
+        data = deepcopy(connections)
+        data.update(v)
+
         out += write_record(
             format_data(
                 [
@@ -812,12 +818,12 @@ def _write_conne(parameters):
                     (None, "{:>5}"),
                     (None, "{:>5}"),
                     (None, "{:>5}"),
-                    (v["permeability_direction"], "{:>5g}"),
-                    (v["nodal_distances"][0], "{:10.4e}"),
-                    (v["nodal_distances"][1], "{:10.4e}"),
-                    (v["interface_area"], "{:10.4e}"),
-                    (v["gravity_cosine_angle"], "{:10.4e}"),
-                    (v["radiant_emittance_factor"], "{:10.3e}"),
+                    (data["permeability_direction"], "{:>5g}"),
+                    (data["nodal_distances"][0], "{:10.4e}"),
+                    (data["nodal_distances"][1], "{:10.4e}"),
+                    (data["interface_area"], "{:10.4e}"),
+                    (data["gravity_cosine_angle"], "{:10.4e}"),
+                    (data["radiant_emittance_factor"], "{:10.3e}"),
                 ]
             )
         )
@@ -828,25 +834,25 @@ def _write_conne(parameters):
 @check_parameters(dtypes["INCON"], keys="initial_conditions", is_list=True)
 @block("INCON", multi=True)
 def _write_incon(parameters):
+    from ._common import initial_conditions
+
     out = []
     for k, v in parameters["initial_conditions"].items():
-        # Userx
-        userx = [None for _ in range(5)]
-        userx[:len(v["userx"])] = v["userx"]
+        data = deepcopy(initial_conditions)
+        data.update(v)
 
         # Record 1
         tmp = [
             (k, "{:5.5}"),
             (None, "{:>5}"),
             (None, "{:>5}"),
-            (v["porosity"], "{:>15.9e}"),
+            (data["porosity"], "{:>15.9e}"),
         ]
-        if v["userx"] is not None:
-            tmp += [(x, "{:>10.3e}") for x in v["userx"]]
+        tmp += [(x, "{:>10.3e}") for x in data["userx"]]
         out += write_record(format_data(tmp))
 
         # Record 2
-        out += write_record(format_data([(x, "{:20.4e}") for x in v["values"]]))
+        out += write_record(format_data([(x, "{:20.4e}") for x in data["values"]]))
 
     return out
 
