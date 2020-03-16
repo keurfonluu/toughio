@@ -376,7 +376,7 @@ def _write_solvr(parameters):
     """
     from ._common import solver
 
-    data = solver.copy()
+    data = deepcopy(solver)
     data.update(parameters["solver"])
     return write_record(
         format_data(
@@ -423,7 +423,7 @@ def _write_param(parameters):
     # Load data
     from ._common import options
 
-    data = options.copy()
+    data = deepcopy(options)
     data.update(parameters["options"])
 
     # Table
@@ -527,7 +527,7 @@ def _write_momop(parameters):
     """
     from ._common import more_options
 
-    _momop = more_options.copy()
+    _momop = deepcopy(more_options)
     _momop.update(parameters["more_options"])
     out = write_record(
         format_data([(_momop[k], "{:>1g}") for k in sorted(_momop.keys())])
