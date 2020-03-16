@@ -8,6 +8,9 @@ __all__ = [
     "solver",
     "generators",
     "output",
+    "elements",
+    "connections",
+    "initial_conditions",
     "default",
     "eos",
     "header",
@@ -105,6 +108,28 @@ generators = {
 output = {
     "format": None,
     "variables": None,
+}
+
+elements = {
+    "material": "",
+    "volume": None,
+    "heat_exchange_area": None,
+    "permeability_modifier": None,
+    "center": None,
+}
+
+connections = {
+    "permeability_direction": None,
+    "nodal_distances": None,
+    "interface_area": None,
+    "gravity_cosine_angle": None,
+    "radiant_emittance_factor": None,
+}
+
+initial_conditions = {
+    "porosity": None,
+    "userx": [None for _ in range(5)],
+    "values": [None for _ in range(4)],
 }
 
 default = {
