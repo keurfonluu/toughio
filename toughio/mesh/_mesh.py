@@ -19,6 +19,7 @@ from ._properties import (
     _qualities,
     _volumes,
 )
+from .._common import deprecated
 
 __all__ = [
     "Cells",
@@ -324,7 +325,24 @@ class Mesh(object):
 
         return mesh
 
+    @deprecated("1.3.0", "Use function 'write_tough' instead.")
     def to_tough(self, filename="MESH", **kwargs):
+        """
+        Write TOUGH `MESH` file.
+
+        Parameters
+        ----------
+        filename : str, optional, default 'MESH'
+            Output file name.
+
+        Note
+        ----
+        Deprecated in version `1.3.0` in favor of :method:`toughio.write_tough`.
+            
+        """
+        self.write_tough(filename, **kwargs)
+
+    def write_tough(self, filename="MESH", **kwargs):
         """
         Write TOUGH `MESH` file.
 
