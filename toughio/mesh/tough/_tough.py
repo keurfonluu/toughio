@@ -5,6 +5,8 @@ import os
 
 import numpy
 
+from ._helpers import block
+
 __all__ = [
     "read",
     "write",
@@ -185,6 +187,7 @@ def write_incon(
         )
 
 
+@block("ELEME")
 def _write_eleme(
     f,
     labels,
@@ -196,7 +199,7 @@ def _write_eleme(
     material_end,
 ):
     """Write ELEME block."""
-    from ..._io.tough._write import _write_eleme as writer
+    from ._helpers import _write_eleme as writer
 
     # Check materials
     materials = [
@@ -211,31 +214,21 @@ def _write_eleme(
     volumes[boundary_conditions.astype(bool)] *= 1.0e50
 
     # Write ELEME block
-    parameters = {"elements": {}, "elements_order": []}
-
     ending = []
-    iterables = zip(labels, materials, volumes, nodes)
-    for label, material, volume, node in iterables:
-        parameters["elements"][label] = {
-            "material": (
-                material_name[material]
-                if material in material_name.keys()
-                else material
-            ),
-            "volume": volume,
-            "center": node,
-        }
-
+    iterables = zip(materials, writer(labels, materials, volumes, nodes, material_name))
+    for material, record in iterables:
         if material not in material_end:
-            parameters["elements_order"].append(label)
+            f.write(record)
         else:
-            ending.append(label)
-    parameters["elements_order"] += ending
+            ending.append(record)
 
-    for line in writer(parameters):
-        f.write(line)
+    # Append ending cells at the end of the block
+    if material_end:
+        for record in ending:
+            f.write(record)
 
 
+@block("CONNE")
 def _write_conne(
     f,
     labels,
@@ -250,7 +243,7 @@ def _write_conne(
     nodal_distance,
 ):
     """Write CONNE block."""
-    from ..._io.tough._write import _write_conne as writer
+    from ._helpers import _write_conne as writer
 
     # Define unique connection variables
     cell_list = set()
@@ -304,53 +297,23 @@ def _write_conne(
         d2 = _distance_point_plane(centers[:, 1], int_points, int_normals, bounds[:, 1])
 
     # Write CONNE block
-    parameters = {"connections": {}}
-
-    iterables = zip(clabels, isot, d1, d2, areas, angles)
-    for label, isot, d1, d2, area, angle in iterables:
-        parameters["connections"][label] = {
-            "permeability_direction": isot,
-            "nodal_distances": [d1, d2],
-            "interface_area": area,
-            "gravity_cosine_angle": angle,
-        }
-
-    for line in writer(parameters):
+    for line in writer(clabels, isot, d1, d2, areas, angles):
         f.write(line)
 
 
+@block("INCON")
 def _write_incon(f, labels, primary_variables, porosities, permeabilities):
     """Write INCON block."""
-    from ..._io.tough._write import _write_incon as writer
+    from ._helpers import _write_incon as writer
 
     # Write INCON block
-    parameters = {"initial_conditions": {}}
-
-    for label, pvar in zip(labels, primary_variables):
-        if (pvar > -1.0e9).any():
-            parameters["initial_conditions"][label] = {
-                "values": [x if x > -1.0e9 else None for x in pvar],
-            }
-
-    if porosities is not None:
-        for label, porosity in zip(labels, porosities):
-            if label in parameters["initial_conditions"].keys():
-                parameters["initial_conditions"][label]["porosity"] = porosity
-            else:
-                parameters["initial_conditions"][label] = {"porosity": porosity}
-
     if permeabilities is not None:
         permeabilities = (
             permeabilities[:, None] if permeabilities.ndim == 1 else permeabilities
         )
-        for label, permeability in zip(labels, permeabilities):
-            if label in parameters["initial_conditions"].keys():
-                parameters["initial_conditions"][label]["userx"] = permeability
-            else:
-                parameters["initial_conditions"][label] = {"userx": permeability}
 
-    for line in writer(parameters):
-        f.write(line)
+    for record in writer(labels, primary_variables, porosities, permeabilities):
+        f.write(record)
 
 
 def init_incon(mesh):
