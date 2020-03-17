@@ -213,7 +213,7 @@ def _write_eleme(
     material_end = [material_end] if isinstance(material_end, str) else material_end
 
     # Apply time-independent Dirichlet boundary conditions
-    volumes[boundary_conditions] *= 1.0e50
+    volumes[boundary_conditions.astype(bool)] *= 1.0e50
 
     # Write ELEME block
     parameters = {"elements": {}, "elements_order": []}
