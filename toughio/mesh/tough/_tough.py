@@ -12,13 +12,10 @@ __all__ = [
 
 
 def read(filename):
-    """
-    Read TOUGH MESH file is not supported yet.
+    """Read TOUGH MESH file."""
+    from ... import read_input
 
-    MESH file does not store any geometrical information except node centers.
-
-    """
-    raise NotImplementedError("Reading TOUGH MESH file is not supported.")
+    return read_input(filename, file_format="tough")
 
 
 def write(filename, mesh, nodal_distance, material_name, material_end, incon):
