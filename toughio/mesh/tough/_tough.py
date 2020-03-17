@@ -15,7 +15,8 @@ def read(filename):
     """Read TOUGH MESH file."""
     from ... import read_input
 
-    return read_input(filename, file_format="tough")
+    mesh = read_input(filename, file_format="tough")
+    return {k: v for k, v in mesh.items() if k in {"elements", "connections", "initial_conditions"}}
 
 
 def write(filename, mesh, nodal_distance, material_name, material_end, incon):
