@@ -334,7 +334,7 @@ def _write_incon(f, labels, primary_variables, porosities, permeabilities):
             }
 
     if porosities is not None:
-        for label, porosity in zip(label, porosities):
+        for label, porosity in zip(labels, porosities):
             if label in parameters["initial_conditions"].keys():
                 parameters["initial_conditions"][label]["porosity"] = porosity
             else:
@@ -342,7 +342,7 @@ def _write_incon(f, labels, primary_variables, porosities, permeabilities):
 
     if permeabilities is not None:
         permeabilities = permeabilities[:, None] if permeabilities.ndim == 1 else permeabilities
-        for label, permeability in zip(label, permeabilities):
+        for label, permeability in zip(labels, permeabilities):
             if label in parameters["initial_conditions"].keys():
                 parameters["initial_conditions"][label]["userx"] = permeability
             else:
