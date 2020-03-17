@@ -822,7 +822,7 @@ def _write_conne(parameters):
                     (data["nodal_distances"][0], "{:10.4e}"),
                     (data["nodal_distances"][1], "{:10.4e}"),
                     (data["interface_area"], "{:10.4e}"),
-                    (data["gravity_cosine_angle"], "{:10.4e}"),
+                    (data["gravity_cosine_angle"], "{:10.3e}"),
                     (data["radiant_emittance_factor"], "{:10.3e}"),
                 ]
             )
