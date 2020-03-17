@@ -139,7 +139,7 @@ str_to_dtype = {
     "float": (float, numpy.float32, numpy.float64),
     "str": (str,),
     "bool": (bool,),
-    "str_int": (str, int),
+    "str_int": (str, int, numpy.int32, numpy.int64),
     "array_like": (list, tuple, numpy.ndarray),
     "dict": (dict,),
     "scalar": (int, float, numpy.int32, numpy.int64, numpy.float32, numpy.float64),
