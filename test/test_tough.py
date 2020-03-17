@@ -80,3 +80,48 @@ def test_mesh(nodal_distance, bound):
         distances_ref = ny * nz * (xmax - xmin) + nx * nz * (ymax - ymin) + nx * ny * (zmax - zmin)
         distances = [v["nodal_distances"] for v in parameters["connections"].values()]
         assert numpy.allclose(distances_ref, numpy.sum(distances))
+
+
+@pytest.mark.parametrize("anisotropic", [True, False, None])
+def test_incon(anisotropic):
+    # Create 3D mesh
+    dx = numpy.arange(3) + 1
+    dy = numpy.arange(4) + 1
+    dz = numpy.arange(5) + 1
+    mesh = toughio.meshmaker.structured_grid(dx, dy, dz, material=helpers.random_string(5))
+
+    initial_condition = numpy.random.rand(mesh.n_cells, 4)
+    mesh.add_cell_data("initial_condition", initial_condition)
+
+    porosity = numpy.random.rand(mesh.n_cells)
+    mesh.add_cell_data("porosity", porosity)
+
+    if anisotropic is not None:
+        permeability = (
+            numpy.random.rand(mesh.n_cells, 3)
+            if anisotropic
+            else numpy.random.rand(mesh.n_cells)
+        )
+        mesh.add_cell_data("permeability", permeability)
+
+    parameters = helpers.write_read(
+        filename="INCON",
+        obj=None,
+        writer=mesh.write_incon,
+        reader=toughio.read_mesh,
+        reader_kws={"file_format": "tough"},
+    )
+
+    # Check block INCON
+    assert sorted(mesh.labels) == sorted(parameters["initial_conditions"].keys())
+
+    values = [parameters["initial_conditions"][label]["values"] for label in mesh.labels]
+    assert numpy.allclose(mesh.cell_data["initial_condition"], values)
+
+    porosity = [parameters["initial_conditions"][label]["porosity"] for label in mesh.labels]
+    assert numpy.allclose(mesh.cell_data["porosity"], porosity)
+
+    if anisotropic is not None:
+        userx = numpy.array([parameters["initial_conditions"][label]["userx"] for label in mesh.labels])
+        permeability = userx[:, :3] if anisotropic else userx[:, 0]
+        assert numpy.allclose(mesh.cell_data["permeability"], permeability, atol=1.0e-4)
