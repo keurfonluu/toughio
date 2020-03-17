@@ -51,6 +51,10 @@ def read_input(filename, file_format="tough", **kwargs):
     dict
         TOUGH input parameters.
 
+    Note
+    ----
+    If ``file_format == 'tough'``, can also read `MESH`, `INCON` and `GENER` files.
+
     """
     if not isinstance(filename, str):
         raise TypeError()

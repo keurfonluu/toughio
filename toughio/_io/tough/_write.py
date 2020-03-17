@@ -111,6 +111,9 @@ def write_buffer(parameters):
     out += _write_gener(parameters) if parameters["generators"] else []
     out += _write_diffu(parameters) if parameters["diffusion"] is not None else []
     out += _write_outpu(parameters) if parameters["output"] else []
+    out += _write_eleme(parameters) if parameters["elements"] else []
+    out += _write_conne(parameters) if parameters["connections"] else []
+    out += _write_incon(parameters) if parameters["initial_conditions"] else []
     out += _write_nover() if parameters["nover"] else []
     out += _write_endcy()
     return out
@@ -373,7 +376,7 @@ def _write_solvr(parameters):
     """
     from ._common import solver
 
-    data = solver.copy()
+    data = deepcopy(solver)
     data.update(parameters["solver"])
     return write_record(
         format_data(
@@ -420,7 +423,7 @@ def _write_param(parameters):
     # Load data
     from ._common import options
 
-    data = options.copy()
+    data = deepcopy(options)
     data.update(parameters["options"])
 
     # Table
@@ -485,7 +488,7 @@ def _write_param(parameters):
     # Record 4
     data = parameters["default"]["initial_condition"]
     n = len(data)
-    out += write_record(format_data([(i, "{:>20.4e}") for i in data[: min(n, 4)]]))
+    out += write_record(format_data([(i, "{:>20.13e}") for i in data[: min(n, 4)]]))
     return out
 
 
@@ -509,7 +512,7 @@ def _write_indom(parameters):
             data = data[: min(len(data), 4)]
             if any(x is not None for x in data):
                 out += ["{:5.5}\n".format(k)]
-                out += write_record(format_data([(i, "{:>20.4e}") for i in data]))
+                out += write_record(format_data([(i, "{:>20.13e}") for i in data]))
     return out
 
 
@@ -524,7 +527,7 @@ def _write_momop(parameters):
     """
     from ._common import more_options
 
-    _momop = more_options.copy()
+    _momop = deepcopy(more_options)
     _momop.update(parameters["more_options"])
     out = write_record(
         format_data([(_momop[k], "{:>1g}") for k in sorted(_momop.keys())])
@@ -756,6 +759,100 @@ def _write_outpu(parameters):
                 else:
                     tmp += [(vv, "{:5}") for vv in v]
             out += write_record(format_data(tmp))
+
+    return out
+
+
+@check_parameters(dtypes["ELEME"], keys="elements", is_list=True)
+@block("ELEME", multi=True)
+def _write_eleme(parameters):
+    """TOUGH input ELEME block data (optional)."""
+    from ._common import elements
+
+    # Reorder elements
+    if parameters["elements_order"] is not None:
+        order = parameters["elements_order"]
+    else:
+        order = parameters["elements"].keys()
+
+    out = []
+    for k in order:
+        data = deepcopy(elements)
+        data.update(parameters["elements"][k])
+
+        out += write_record(
+            format_data(
+                [
+                    (k, "{:5.5}"),
+                    (None, "{:>5}"),
+                    (None, "{:>5}"),
+                    (data["material"], "{:>5}"),
+                    (data["volume"], "{:10.4e}"),
+                    (data["heat_exchange_area"], "{:10.3e}"),
+                    (data["permeability_modifier"], "{:10.3e}"),
+                    (data["center"][0], "{:10.3e}"),
+                    (data["center"][1], "{:10.3e}"),
+                    (data["center"][2], "{:10.3e}"),
+                ]
+            )
+        )
+
+    return out
+
+
+@check_parameters(dtypes["CONNE"], keys="connections", is_list=True)
+@block("CONNE", multi=True)
+def _write_conne(parameters):
+    """TOUGH input CONNE block data (optional)."""
+    from ._common import connections
+
+    out = []
+    for k, v in parameters["connections"].items():
+        data = deepcopy(connections)
+        data.update(v)
+
+        out += write_record(
+            format_data(
+                [
+                    (k, "{:10.10}"),
+                    (None, "{:>5}"),
+                    (None, "{:>5}"),
+                    (None, "{:>5}"),
+                    (data["permeability_direction"], "{:>5g}"),
+                    (data["nodal_distances"][0], "{:10.4e}"),
+                    (data["nodal_distances"][1], "{:10.4e}"),
+                    (data["interface_area"], "{:10.4e}"),
+                    (data["gravity_cosine_angle"], "{:10.3e}"),
+                    (data["radiant_emittance_factor"], "{:10.3e}"),
+                ]
+            )
+        )
+
+    return out
+
+
+@check_parameters(dtypes["INCON"], keys="initial_conditions", is_list=True)
+@block("INCON", multi=True)
+def _write_incon(parameters):
+    from ._common import initial_conditions
+
+    out = []
+    for k, v in parameters["initial_conditions"].items():
+        data = deepcopy(initial_conditions)
+        data.update(v)
+
+        # Record 1
+        tmp = [
+            (k, "{:5.5}"),
+            (None, "{:>5}"),
+            (None, "{:>5}"),
+            (data["porosity"], "{:>15.9e}"),
+        ]
+        tmp += [(x, "{:>10.3e}") for x in data["userx"]]
+        out += write_record(format_data(tmp))
+
+        # Record 2
+        out += write_record(format_data([(x, "{:20.13e}") for x in data["values"]]))
 
     return out
 

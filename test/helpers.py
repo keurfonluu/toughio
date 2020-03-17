@@ -46,7 +46,10 @@ def write_read(filename, obj, writer, reader, writer_kws=None, reader_kws=None):
     reader_kws = reader_kws if reader_kws else {}
 
     filepath = tempdir(filename)
-    writer(filepath, obj, **writer_kws)
+    if obj is not None:
+        writer(filepath, obj, **writer_kws)
+    else:
+        writer(filepath, **writer_kws)
 
     return reader(filepath, **reader_kws)
 

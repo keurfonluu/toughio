@@ -45,6 +45,10 @@ dtypes = {
         "generator_history": "array_like",
         "diffusion": "array_like",
         "output": "dict",
+        "elements": "dict",
+        "elements_order": "array_like",
+        "connections": "dict",
+        "initial_conditions": "dict",
         "default": "dict",
     },
     "ROCKS": {
@@ -108,6 +112,21 @@ dtypes = {
         "layer_thickness": "scalar_array_like",
     },
     "OUTPU": {"format": "str", "variables": "dict"},
+    "ELEME": {
+        "material": "str_int",
+        "volume": "scalar",
+        "heat_exchange_area": "scalar",
+        "permeability_modifier": "scalar",
+        "center": "array_like",
+    },
+    "CONNE": {
+        "permeability_direction": "int",
+        "nodal_distances": "array_like",
+        "interface_area": "scalar",
+        "gravity_cosine_angle": "scalar",
+        "radiant_emittance_factor": "scalar",
+    },
+    "INCON": {"porosity": "scalar", "userx": "array_like", "values": "array_like"},
 }
 
 
@@ -116,6 +135,7 @@ str_to_dtype = {
     "float": (float, numpy.float32, numpy.float64),
     "str": (str,),
     "bool": (bool,),
+    "str_int": (str, int, numpy.int32, numpy.int64),
     "array_like": (list, tuple, numpy.ndarray),
     "dict": (dict,),
     "scalar": (int, float, numpy.int32, numpy.int64, numpy.float32, numpy.float64),
