@@ -1,7 +1,7 @@
 from __future__ import division, unicode_literals, with_statement
 
-import os
 import logging
+import os
 
 import numpy
 
@@ -16,7 +16,11 @@ def read(filename):
     from ... import read_input
 
     mesh = read_input(filename, file_format="tough")
-    return {k: v for k, v in mesh.items() if k in {"elements", "connections", "initial_conditions"}}
+    return {
+        k: v
+        for k, v in mesh.items()
+        if k in {"elements", "connections", "initial_conditions"}
+    }
 
 
 def write(filename, mesh, nodal_distance, material_name, material_end, incon):
@@ -87,18 +91,12 @@ def write(filename, mesh, nodal_distance, material_name, material_end, incon):
 
 
 def check_incon(
-    incon,
-    primary_variables,
-    porosities,
-    permeabilities,
-    num_cells,
-    ):
+    incon, primary_variables, porosities, permeabilities, num_cells,
+):
     """Check INCON inputs and show warnings if necessary."""
     do_incon = incon
     if incon and (primary_variables == -1.0e9).all():
-        logging.warning(
-            ("Initial conditions are not defined. " "Skipping INCON.")
-        )
+        logging.warning("Initial conditions are not defined. Skipping INCON.")
         do_incon = False
 
     cond = numpy.logical_and(
@@ -149,7 +147,7 @@ def write_mesh(
     nodal_distance,
     material_name,
     material_end,
-    ):
+):
     """Write MESH file."""
     with open(filename, "w") as f:
         _write_eleme(
@@ -178,12 +176,8 @@ def write_mesh(
 
 
 def write_incon(
-    filename,
-    labels,
-    primary_variables,
-    porosities,
-    permeabilities,
-    ):
+    filename, labels, primary_variables, porosities, permeabilities,
+):
     """Write INCON file."""
     with open(filename, "w") as f:
         _write_incon(
@@ -223,7 +217,11 @@ def _write_eleme(
     iterables = zip(labels, materials, volumes, nodes)
     for label, material, volume, node in iterables:
         parameters["elements"][label] = {
-            "material": material_name[material] if material in material_name.keys() else material,
+            "material": (
+                material_name[material]
+                if material in material_name.keys()
+                else material
+            ),
             "volume": volume,
             "center": node,
         }
@@ -316,7 +314,7 @@ def _write_conne(
             "interface_area": area,
             "gravity_cosine_angle": angle,
         }
-    
+
     for line in writer(parameters):
         f.write(line)
 
@@ -342,7 +340,9 @@ def _write_incon(f, labels, primary_variables, porosities, permeabilities):
                 parameters["initial_conditions"][label] = {"porosity": porosity}
 
     if permeabilities is not None:
-        permeabilities = permeabilities[:, None] if permeabilities.ndim == 1 else permeabilities
+        permeabilities = (
+            permeabilities[:, None] if permeabilities.ndim == 1 else permeabilities
+        )
         for label, permeability in zip(labels, permeabilities):
             if label in parameters["initial_conditions"].keys():
                 parameters["initial_conditions"][label]["userx"] = permeability
@@ -361,9 +361,7 @@ def init_incon(mesh):
         else numpy.full((mesh.n_cells, 4), -1.0e9)
     )
     porosities = (
-        mesh.cell_data["porosity"]
-        if "porosity" in mesh.cell_data.keys()
-        else None
+        mesh.cell_data["porosity"] if "porosity" in mesh.cell_data.keys() else None
     )
     permeabilities = (
         mesh.cell_data["permeability"]

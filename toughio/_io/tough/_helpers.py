@@ -126,11 +126,7 @@ dtypes = {
         "gravity_cosine_angle": "scalar",
         "radiant_emittance_factor": "scalar",
     },
-    "INCON": {
-        "porosity": "scalar",
-        "userx": "array_like",
-        "values": "array_like",
-    },
+    "INCON": {"porosity": "scalar", "userx": "array_like", "values": "array_like"},
 }
 
 
