@@ -8,7 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [2.7, 3.5, 3.6, 3.7]
+        # Python 2,7 and 3.5 cannot find `numpy` right now
+        # python-version: [2.7, 3.5, 3.6, 3.7]
+        python-version: [3.6, 3.7]
 
     steps:
     - uses: actions/checkout@v2

@@ -412,6 +412,111 @@ def test_outpu(fmt):
     )
 
 
+def test_eleme():
+    keys = [
+        "material",
+        "volume",
+        "heat_exchange_area",
+        "permeability_modifier",
+        "center",
+    ]
+    parameters_ref = {
+        "elements": {
+            helpers.random_string(5): {
+                key: (
+                    helpers.random_string(5)
+                    if key == "material"
+                    else numpy.random.rand(3)
+                    if key == "center"
+                    else numpy.random.rand()
+                )
+                for key in keys
+            }
+            for _ in numpy.random.rand(10) + 1
+        }
+    }
+    parameters = write_read(parameters_ref)
+
+    assert sorted(parameters_ref["elements"].keys()) == sorted(
+        parameters["elements"].keys()
+    )
+
+    for k, v in parameters_ref["elements"].items():
+        for kk, vv in v.items():
+            if not isinstance(vv, str):
+                assert numpy.allclose(vv, parameters["elements"][k][kk], atol=1.0e-4)
+            else:
+                assert vv == parameters["elements"][k][kk]
+
+
+def test_conne():
+    keys = [
+        "permeability_direction",
+        "nodal_distances",
+        "interface_area",
+        "gravity_cosine_angle",
+        "radiant_emittance_factor",
+    ]
+    parameters_ref = {
+        "connections": {
+            helpers.random_string(10): {
+                key: (
+                    numpy.random.randint(1, 4)
+                    if key == "permeability_direction"
+                    else numpy.random.rand(2)
+                    if key == "nodal_distances"
+                    else numpy.random.rand()
+                )
+                for key in keys
+            }
+            for _ in numpy.random.rand(10) + 1
+        }
+    }
+    parameters = write_read(parameters_ref)
+
+    assert sorted(parameters_ref["connections"].keys()) == sorted(
+        parameters["connections"].keys()
+    )
+
+    for k, v in parameters_ref["connections"].items():
+        for kk, vv in v.items():
+            assert numpy.allclose(vv, parameters["connections"][k][kk], atol=1.0e-4)
+
+
+def test_incon():
+    keys = [
+        "porosity",
+        "userx",
+        "values",
+    ]
+    parameters_ref = {
+        "initial_conditions": {
+            helpers.random_string(5): {
+                key: (
+                    numpy.random.rand()
+                    if key == "porosity"
+                    else numpy.random.rand(numpy.random.randint(6)) + 1
+                    if key == "userx"
+                    else numpy.random.rand(numpy.random.randint(5)) + 1
+                )
+                for key in keys
+            }
+            for _ in numpy.random.rand(10) + 1
+        }
+    }
+    parameters = write_read(parameters_ref)
+
+    assert sorted(parameters_ref["initial_conditions"].keys()) == sorted(
+        parameters["initial_conditions"].keys()
+    )
+
+    for k, v in parameters_ref["initial_conditions"].items():
+        for kk, vv in v.items():
+            assert numpy.allclose(
+                vv, parameters["initial_conditions"][k][kk], atol=1.0e-3
+            )
+
+
 @pytest.mark.parametrize(
     "flag, enable",
     [("start", True), ("start", False), ("nover", True), ("nover", False)],
