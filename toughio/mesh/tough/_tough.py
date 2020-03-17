@@ -50,7 +50,7 @@ def write(filename, mesh, nodal_distance, material_name, material_end, incon):
     face_areas = mesh.face_areas
 
     # Required variables for block INCON
-    primary_variables, porosities, permeabilities = _init_incon(mesh)
+    primary_variables, porosities, permeabilities = init_incon(mesh)
     incon = check_incon(incon, primary_variables, porosities, permeabilities, num_cells)
 
     # Write MESH file
@@ -352,7 +352,7 @@ def _write_incon(f, labels, primary_variables, porosities, permeabilities):
         f.write(line)
 
 
-def _init_incon(mesh):
+def init_incon(mesh):
     """Initialize primary variables, porosity and permeability arrays."""
     primary_variables = (
         mesh.cell_data["initial_condition"]
