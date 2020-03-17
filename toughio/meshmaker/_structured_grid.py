@@ -107,7 +107,7 @@ def _grid_3d(dx, dy, dz):
         for i, j, k in zip(I, J, K)
     ]
 
-    return numpy.array(points), [Cells("hexahedron", numpy.array(cells))]
+    return numpy.array(points, dtype=float), [Cells("hexahedron", numpy.array(cells))]
 
 
 def _grid_2d(dx, dy):
@@ -142,4 +142,4 @@ def _grid_2d(dx, dy):
         for i, j in zip(I, J)
     ]
 
-    return numpy.array(points), [Cells("quad", numpy.array(cells))]
+    return numpy.array(points, dtype=float), [Cells("quad", numpy.array(cells))]
