@@ -4,6 +4,7 @@ from copy import deepcopy
 import meshio
 import numpy
 
+from .._common import deprecated
 from ._common import (
     get_meshio_version,
     get_new_meshio_cells,
@@ -19,7 +20,6 @@ from ._properties import (
     _qualities,
     _volumes,
 )
-from .._common import deprecated
 
 __all__ = [
     "Cells",
@@ -338,7 +338,7 @@ class Mesh(object):
         Note
         ----
         Deprecated in version `1.3.0` in favor of :method:`toughio.write_tough`.
-            
+
         """
         self.write_tough(filename, **kwargs)
 
@@ -382,20 +382,18 @@ class Mesh(object):
         ----
         Mostly useful to restart a simulation with other initial conditions but with the same
         mesh.
-        
+
         """
         from .tough._tough import init_incon, check_incon, write_incon
 
         primary_variables, porosities, permeabilities = init_incon(self)
-        incon = check_incon(True, primary_variables, porosities, permeabilities, self.n_cells)
+        incon = check_incon(
+            True, primary_variables, porosities, permeabilities, self.n_cells
+        )
 
         if incon:
             write_incon(
-                filename,
-                self.labels,
-                primary_variables,
-                porosities,
-                permeabilities,
+                filename, self.labels, primary_variables, porosities, permeabilities,
             )
 
     def read_output(self, file_or_output, time_step=-1):

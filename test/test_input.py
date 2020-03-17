@@ -429,14 +429,17 @@ def test_eleme():
                     else numpy.random.rand(3)
                     if key == "center"
                     else numpy.random.rand()
-                ) for key in keys
+                )
+                for key in keys
             }
             for _ in numpy.random.rand(10) + 1
         }
     }
     parameters = write_read(parameters_ref)
 
-    assert sorted(parameters_ref["elements"].keys()) == sorted(parameters["elements"].keys())
+    assert sorted(parameters_ref["elements"].keys()) == sorted(
+        parameters["elements"].keys()
+    )
 
     for k, v in parameters_ref["elements"].items():
         for kk, vv in v.items():
@@ -463,14 +466,17 @@ def test_conne():
                     else numpy.random.rand(2)
                     if key == "nodal_distances"
                     else numpy.random.rand()
-                ) for key in keys
+                )
+                for key in keys
             }
             for _ in numpy.random.rand(10) + 1
         }
     }
     parameters = write_read(parameters_ref)
 
-    assert sorted(parameters_ref["connections"].keys()) == sorted(parameters["connections"].keys())
+    assert sorted(parameters_ref["connections"].keys()) == sorted(
+        parameters["connections"].keys()
+    )
 
     for k, v in parameters_ref["connections"].items():
         for kk, vv in v.items():
@@ -492,18 +498,23 @@ def test_incon():
                     else numpy.random.rand(numpy.random.randint(6)) + 1
                     if key == "userx"
                     else numpy.random.rand(numpy.random.randint(5)) + 1
-                ) for key in keys
+                )
+                for key in keys
             }
             for _ in numpy.random.rand(10) + 1
         }
     }
     parameters = write_read(parameters_ref)
 
-    assert sorted(parameters_ref["initial_conditions"].keys()) == sorted(parameters["initial_conditions"].keys())
+    assert sorted(parameters_ref["initial_conditions"].keys()) == sorted(
+        parameters["initial_conditions"].keys()
+    )
 
     for k, v in parameters_ref["initial_conditions"].items():
         for kk, vv in v.items():
-            assert numpy.allclose(vv, parameters["initial_conditions"][k][kk], atol=1.0e-3)
+            assert numpy.allclose(
+                vv, parameters["initial_conditions"][k][kk], atol=1.0e-3
+            )
 
 
 @pytest.mark.parametrize(
