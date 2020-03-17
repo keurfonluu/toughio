@@ -369,6 +369,35 @@ class Mesh(object):
         """
         self.write(filename, file_format="tough", **kwargs)
 
+    def write_incon(self, filename="INCON"):
+        """
+        Write TOUGH `INCON` file.
+
+        Parameters
+        ----------
+        filename : str, optional, default 'INCON'
+            Output file name.
+
+        Note
+        ----
+        Mostly useful to restart a simulation with other initial conditions but with the same
+        mesh.
+        
+        """
+        from .tough._tough import init_incon, check_incon, write_incon
+
+        primary_variables, porosities, permeabilities = init_incon(self)
+        incon = check_incon(True, primary_variables, porosities, permeabilities, self.n_cells)
+
+        if incon:
+            write_incon(
+                filename,
+                self.labels,
+                primary_variables,
+                porosities,
+                permeabilities,
+            )
+
     def read_output(self, file_or_output, time_step=-1):
         """
         Import TOUGH results to the mesh.
