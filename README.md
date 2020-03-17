@@ -66,7 +66,7 @@ mesh = toughio.read_mesh(
     filename,
     file_format="flac3d",   # Optional, inferred from file extension otherwise
 )
-mesh.to_tough()             # Write MESH file
+mesh.write_tough()             # Write MESH file
 ```
 
 Parameters of a TOUGH simulation can be defined as a dictionary with specific keywords following the JSON standard, for instance
