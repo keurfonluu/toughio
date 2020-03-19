@@ -274,12 +274,22 @@ def add_record(data, id_fmt="{:>5g}     "):
 
 def read_record(data, fmt):
     """Parse string to data given format."""
+
+    def str2float(s):
+        """Convert variable string to float."""
+        try:
+            return float(s)
+        except ValueError:
+            # It's probably something like "0.0001-001"
+            significand, exponent = s[:-4], s[-4:]
+            return float("{}e{}".format(significand, exponent))
+        
     token_to_type = {
         "s": str,
         "S": str,
         "d": int,
-        "f": float,
-        "e": float,
+        "f": str2float,
+        "e": str2float,
     }
 
     i = 0
@@ -301,4 +311,5 @@ def prune_nones_dict(data):
 
 def prune_nones_list(data):
     """Remove trailing None values from list."""
-    return [x for i, x in enumerate(data) if any(xx is not None for xx in data[i:])]
+    out = [x for i, x in enumerate(data) if any(xx is not None for xx in data[i:])]
+    return out if out else None
