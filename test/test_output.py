@@ -47,4 +47,10 @@ def test_save():
     save = toughio.read_save(filename)
 
     x_ref = [6.35804123e05, 1.42894499e02, 9.91868799e-01]
-    assert numpy.allclose(x_ref, numpy.mean([save.data["X1"], save.data["X2"], save.data["X3"]], axis=1))
+    assert numpy.allclose(
+        x_ref, numpy.mean([save.data["X1"], save.data["X2"], save.data["X3"]], axis=1)
+    )
+
+    assert numpy.allclose(0.01, save.data["porosity"].mean())
+
+    assert "userx" not in save.data.keys()
