@@ -174,9 +174,11 @@ def read_output(filename, file_format="tough", labels_order=None):
                 line = f.readline().strip().replace('"', "")
 
         elif file_format == "tecplot":
-            from ..mesh.tecplot._tecplot import zone_key_to_type
-
-            zone_key_to_type.update({"T": str, "I": int, "J": int})
+            from ..mesh.tecplot._tecplot import (
+                zone_key_to_type,
+                _read_variables,
+                _read_zone,
+            )
 
             # Look for header (VARIABLES)
             while True:
@@ -185,9 +187,7 @@ def read_output(filename, file_format="tough", labels_order=None):
                     break
 
             # Read header (VARIABLES)
-            line = line.split("=")[1]
-            headers = [l.strip() for l in line.replace('"', "").split()]
-            headers = [header for header in headers if "(" not in header]
+            headers = _read_variables(line)
 
             # Loop until end of file
             times, labels, variables = [], [], []
@@ -195,63 +195,7 @@ def read_output(filename, file_format="tough", labels_order=None):
             while True:
                 # Read zone
                 if line.startswith("ZONE"):
-                    line = " ".join(line[5:].split())
-                    line = "=".join(l.strip() for l in line.split("="))
-
-                    zone = {}
-                    i = 0
-                    key, value, read_key = "", "", True
-                    is_title, is_end = False, False
-                    while True:
-                        char = line[i]
-
-                        if char == "=":
-                            key = key.strip()
-                            read_key = False
-                            is_title = key == "T"
-
-                        if is_title:
-                            # Look for first '"'
-                            i += 1
-                            while True:
-                                if line[i] == '"':
-                                    break
-                                else:
-                                    i += 1
-
-                            # Look for second '"'
-                            i += 1
-                            while True:
-                                value += line[i]
-                                if line[i] == '"':
-                                    value = value[:-1]
-                                    break
-                                else:
-                                    i += 1
-                            is_title, is_end = False, True
-                        else:
-                            if char != " ":
-                                if char != "=":
-                                    if read_key:
-                                        key += char
-                                    else:
-                                        value += char
-                            else:
-                                is_end = True
-
-                        if is_end:
-                            if key in zone_key_to_type.keys():
-                                zone[key] = zone_key_to_type[key](value)
-                            key, value, read_key = "", "", True
-                            is_end = False
-
-                        if i >= len(line) - 1:
-                            if key in zone_key_to_type.keys():
-                                zone[key] = zone_key_to_type[key](value)
-                            break
-                        else:
-                            i += 1
-
+                    zone = _read_zone(line)
                     zone["T"] = (
                         float(zone["T"].split()[0]) if "T" in zone.keys() else None
                     )
@@ -259,7 +203,13 @@ def read_output(filename, file_format="tough", labels_order=None):
                         raise ValueError()
 
                 # Read data
-                data = numpy.genfromtxt(f, max_rows=zone["I"])
+                # Python 2.7 does not allow mix of for and while loops when reading a file
+                # data = numpy.genfromtxt(f, max_rows=zone["I"])
+                data = []
+                for _ in range(zone["I"]):
+                    line = f.readline().strip()
+                    data.append([float(x) for x in line.split()])
+                data = numpy.array(data)
 
                 # Output
                 times.append(zone["T"])
