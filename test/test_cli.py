@@ -89,3 +89,70 @@ def test_export(filename, file_format, mesh, ext):
 
         time_steps_ref = [output.time for output in outputs]
         assert numpy.allclose(time_steps, time_steps_ref)
+
+
+@pytest.mark.parametrize("incon", [True, False])
+def test_merge(incon):
+    tempdir = helpers.tempdir()
+    filename = os.path.join(tempdir, "INFILE")
+    mesh_file = os.path.join(tempdir, "MESH")
+    output_filename = os.path.join(tempdir, "OUTFILE")
+
+    with open(filename, "w") as f:
+        n_lines_rocks, n_lines_param = numpy.random.randint(20, size=2) + 1
+
+        f.write("ROCKS\n")
+        for _ in range(n_lines_rocks):
+            f.write("{}\n".format(helpers.random_string(80)))
+        f.write("\n")
+
+        f.write("PARAM\n")
+        for _ in range(n_lines_param):
+            f.write("{}\n".format(helpers.random_string(80)))
+
+        f.write("ENDCY\n")
+
+    with open(mesh_file, "w") as f:
+        n_lines_eleme, n_lines_conne = numpy.random.randint(20, size=2) + 1
+
+        f.write("ELEME\n")
+        for _ in range(n_lines_eleme):
+            f.write("{}\n".format(helpers.random_string(80)))
+        f.write("\n")
+
+        f.write("CONNE\n")
+        for _ in range(n_lines_conne):
+            f.write("{}\n".format(helpers.random_string(80)))
+        f.write("\n")
+
+    if incon:
+        incon_file = os.path.join(tempdir, "INCON")
+
+        with open(incon_file, "w") as f:
+            n_lines_incon = numpy.random.randint(20) + 1
+            
+            f.write("INCON\n")
+            for _ in range(n_lines_incon):
+                f.write("{}\n".format(helpers.random_string(80)))
+            f.write("\n")
+
+    argv = [filename, output_filename]
+    toughio._cli.merge(argv)
+
+    with open(output_filename, "r") as f:
+        n_lines = 0
+        keywords = []
+        for line in f:
+            n_lines += 1
+            if line[:5] in {"ROCKS", "PARAM", "ENDCY", "ELEME", "CONNE", "INCON"}:
+                keywords.append(line[:5])
+
+    n_lines_ref = n_lines_rocks + n_lines_param + n_lines_eleme + n_lines_conne
+    n_lines_ref += n_lines_incon + 10 if incon else 8
+    assert n_lines == n_lines_ref
+
+    assert (
+        keywords == ["ROCKS", "PARAM", "ELEME", "CONNE", "ENDCY"]
+        if not incon
+        else keywords == ["ROCKS", "PARAM", "ELEME", "CONNE", "INCON", "ENDCY"]
+    )
