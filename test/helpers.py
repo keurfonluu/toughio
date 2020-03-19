@@ -36,9 +36,13 @@ hybrid_mesh = toughio.Mesh(
 )
 
 
-def tempdir(filename):
-    temp_dir = tempfile.mkdtemp().replace("\\", "/")
-    return os.path.join(temp_dir, filename)
+def tempdir(filename=None):
+    temp_dir = tempfile.mkdtemp()
+    return (
+        os.path.join(temp_dir, filename)
+        if filename
+        else temp_dir
+    )
 
 
 def write_read(filename, obj, writer, reader, writer_kws=None, reader_kws=None):
