@@ -762,8 +762,9 @@ def from_meshio(mesh):
         Output mesh.
 
     """
+    version = get_meshio_version()
+
     if mesh.cell_data:
-        version = get_meshio_version()
         if version[0] >= 4:
             cells = mesh.cells
             cell_data = mesh.cell_data
@@ -777,6 +778,11 @@ def from_meshio(mesh):
 
         cell_data = {k: numpy.concatenate(v) for k, v in cell_data.items()}
     else:
+        cells = (
+            mesh.cells
+            if version[0] >= 4
+            else get_new_meshio_cells(mesh.cells)
+        )
         cell_data = {}
 
     out = Mesh(
