@@ -444,6 +444,25 @@ class Mesh(object):
             extension. To write TOUGH MESH, `file_format` must be specified
             as 'tough' (no specific extension exists for TOUGH MESH).
 
+        Other Parameters
+        ----------------
+        nodal_distance : str ('line' or 'orthogonal'), optional, default 'line'
+            Only if ``file_format = "tough"``. Method to calculate connection
+            nodal distances:
+            - 'line': distance between node and common face along connecting
+            line (distance is not normal),
+            - 'orthogonal' : distance between node and its orthogonal
+            projection onto common face (shortest distance).
+        material_name : dict or None, default None
+            Only if ``file_format = "tough"``. Rename cell material.
+        material_end : str, array_like or None, default None
+            Only if ``file_format = "tough"``. Move cells to bottom of block
+            'ELEME' if their materials is in `material_end`.
+        incon : bool, optional, default False
+            Only if ``file_format = "tough"``. If `True`, initial conditions will be written in file `INCON`.
+        protocol : integer, optional, default `pickle.HIGHEST_PROTOCOL`
+            Only if ``file_format = "pickle"``. :module:`pickle` protocol version.
+
         """
         from ._helpers import write
 
