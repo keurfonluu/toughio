@@ -1,5 +1,5 @@
-import os
 import glob
+import os
 
 import numpy
 import pytest
@@ -28,19 +28,25 @@ def test_export(filename, file_format, mesh, ext):
     output_filename = "{}.{}".format(helpers.tempdir(helpers.random_string(10)), ext)
     argv = [
         filename,
-        "-i", file_format,
-        "-o", output_filename,
-        "-f", ext,
+        "-i",
+        file_format,
+        "-o",
+        output_filename,
+        "-f",
+        ext,
     ]
 
     if mesh:
-        argv += ["-m", os.path.join(this_dir, "support_files", "outputs", "mesh.pickle")]
+        argv += [
+            "-m",
+            os.path.join(this_dir, "support_files", "outputs", "mesh.pickle"),
+        ]
 
     if ext != "xdmf":
         t = numpy.random.randint(len(outputs))
         argv += ["-t", str(t)]
         output = outputs[t]
-    
+
     toughio._cli.export(argv)
 
     if ext != "xdmf":
@@ -64,9 +70,14 @@ def test_export(filename, file_format, mesh, ext):
         mesh_in = toughio.read_time_series(output_filename)
         points, cells, point_data, cell_data, time_steps = mesh_in
 
-        centers_ref = numpy.column_stack([outputs[-1].data[dim] for dim in ["X", "Y", "Z"]])
+        centers_ref = numpy.column_stack(
+            [outputs[-1].data[dim] for dim in ["X", "Y", "Z"]]
+        )
         assert (
-            numpy.allclose(centers_ref, numpy.concatenate([points[c.data].mean(axis=1) for c in cells]))
+            numpy.allclose(
+                centers_ref,
+                numpy.concatenate([points[c.data].mean(axis=1) for c in cells]),
+            )
             if mesh
             else numpy.allclose(centers_ref[:, :2], points[:, :2])
         )
@@ -95,7 +106,9 @@ def test_export(filename, file_format, mesh, ext):
 @pytest.mark.parametrize("split", [True, False])
 def test_extract(split):
     this_dir = os.path.dirname(os.path.abspath(__file__))
-    filename = os.path.join(this_dir, "support_files", "outputs", "tough2", "OUTPUT.out")
+    filename = os.path.join(
+        this_dir, "support_files", "outputs", "tough2", "OUTPUT.out"
+    )
     mesh_file = os.path.join(this_dir, "support_files", "outputs", "MESH.out")
 
     tempdir = helpers.tempdir()
@@ -105,7 +118,9 @@ def test_extract(split):
     argv += ["--split"] if split else []
     toughio._cli.extract(argv)
 
-    filename_ref = os.path.join(this_dir, "support_files", "outputs", "tough3", "OUTPUT_ELEME.csv")
+    filename_ref = os.path.join(
+        this_dir, "support_files", "outputs", "tough3", "OUTPUT_ELEME.csv"
+    )
     outputs_ref = toughio.read_output(filename_ref)
 
     atols = [1.0, 1.0, 10000.0, 10000.0, 100000.0]
@@ -117,11 +132,19 @@ def test_extract(split):
             assert numpy.allclose(output_ref.data["X"].mean(), output.data["X"].mean())
             assert numpy.allclose(output_ref.data["Y"].mean(), output.data["Y"].mean())
             assert numpy.allclose(output_ref.data["Z"].mean(), output.data["Z"].mean())
-            assert numpy.allclose(output_ref.data["PRES"].mean(), output.data["P"].mean(), atol=atol)
-            assert numpy.allclose(output_ref.data["TEMP"].mean(), output.data["T"].mean(), atol=1.0e-2)
-            assert numpy.allclose(output_ref.data["SAT_G"].mean(), output.data["SG"].mean())
+            assert numpy.allclose(
+                output_ref.data["PRES"].mean(), output.data["P"].mean(), atol=atol
+            )
+            assert numpy.allclose(
+                output_ref.data["TEMP"].mean(), output.data["T"].mean(), atol=1.0e-2
+            )
+            assert numpy.allclose(
+                output_ref.data["SAT_G"].mean(), output.data["SG"].mean()
+            )
     else:
-        for i, output_filename in enumerate(glob.glob(os.path.join(tempdir, "OUTPUT_ELEME_*.csv"))):
+        for i, output_filename in enumerate(
+            glob.glob(os.path.join(tempdir, "OUTPUT_ELEME_*.csv"))
+        ):
             outputs = toughio.read_output(output_filename)
 
             assert len(outputs) == 1
@@ -133,9 +156,15 @@ def test_extract(split):
             assert numpy.allclose(output_ref.data["X"].mean(), output.data["X"].mean())
             assert numpy.allclose(output_ref.data["Y"].mean(), output.data["Y"].mean())
             assert numpy.allclose(output_ref.data["Z"].mean(), output.data["Z"].mean())
-            assert numpy.allclose(output_ref.data["PRES"].mean(), output.data["P"].mean(), atol=atols[i])
-            assert numpy.allclose(output_ref.data["TEMP"].mean(), output.data["T"].mean(), atol=1.0e-2)
-            assert numpy.allclose(output_ref.data["SAT_G"].mean(), output.data["SG"].mean())
+            assert numpy.allclose(
+                output_ref.data["PRES"].mean(), output.data["P"].mean(), atol=atols[i]
+            )
+            assert numpy.allclose(
+                output_ref.data["TEMP"].mean(), output.data["T"].mean(), atol=1.0e-2
+            )
+            assert numpy.allclose(
+                output_ref.data["SAT_G"].mean(), output.data["SG"].mean()
+            )
 
 
 @pytest.mark.parametrize("incon", [True, False])
@@ -177,7 +206,7 @@ def test_merge(incon):
 
         with open(incon_file, "w") as f:
             n_lines_incon = numpy.random.randint(20) + 1
-            
+
             f.write("INCON\n")
             for _ in range(n_lines_incon):
                 f.write("{}\n".format(helpers.random_string(80)))
