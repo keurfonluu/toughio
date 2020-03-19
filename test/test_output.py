@@ -39,3 +39,12 @@ def test_output(filename, file_format):
 
     assert numpy.allclose(save.data["X1"], outputs[-1].data["PRES"])
     assert numpy.allclose(save.data["X2"], outputs[-1].data["TEMP"])
+
+
+def test_save():
+    this_dir = os.path.dirname(os.path.abspath(__file__))
+    filename = os.path.join(this_dir, "support_files", "outputs", "SAVE.out")
+    save = toughio.read_save(filename)
+
+    x_ref = [6.35804123e+05, 1.42894499e+02, 9.91868799e-01]
+    assert numpy.allclose(x_ref, numpy.mean([v for v in save.data.values()], axis=1))
