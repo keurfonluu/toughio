@@ -15,6 +15,7 @@ __all__ = [
 
 _extension_to_filetype = {
     ".dat": "tecplot",
+    ".tec": "tecplot",
     ".f3grid": "flac3d",
     ".pickle": "pickle",
 }
