@@ -174,11 +174,7 @@ def read_output(filename, file_format="tough", labels_order=None):
                 line = f.readline().strip().replace('"', "")
 
         elif file_format == "tecplot":
-            from ..mesh.tecplot._tecplot import (
-                zone_key_to_type,
-                _read_variables,
-                _read_zone,
-            )
+            from ..mesh.tecplot._tecplot import _read_variables, _read_zone
 
             # Look for header (VARIABLES)
             while True:
