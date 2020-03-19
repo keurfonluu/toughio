@@ -249,19 +249,9 @@ def read_save(filename, labels_order=None):
 
     Note
     ----
-    Does not support porosity, USERX and hysteresis values yet.
+    Does not support hysteresis values yet.
 
     """
-
-    def str2float(s):
-        """Convert variable string to float."""
-        try:
-            return float(s)
-        except ValueError:
-            # It's probably something like "0.0001-001"
-            significand, exponent = s[:-4], s[-4:]
-            return float("{}e{}".format(significand, exponent))
-
     if not isinstance(filename, str):
         raise TypeError()
     if not (
@@ -275,27 +265,27 @@ def read_save(filename, labels_order=None):
         if not line.startswith("INCON"):
             raise ValueError("Invalid SAVE file '{}'.".format(filename))
 
-        # Read data
-        labels, variables = [], []
-        line = f.readline().strip()
-        while line:
-            # Label
-            line = line.split()
-            labels.append(line[0])
+    parameters = read_input(filename)
+    labels = list(parameters["initial_conditions"].keys())
+    variables = [v["values"] for v in parameters["initial_conditions"].values()]
+    
+    data = {"X{}".format(i + 1): x for i, x in enumerate(numpy.transpose(variables))}
+    
+    data["porosity"] = numpy.array([
+        v["porosity"] for v in parameters["initial_conditions"].values()
+    ])
 
-            # Primary variables
-            line = f.readline().strip().split()
-            variables.append([str2float(l) for l in line])
+    userx = [
+        v["userx"]
+        for v in parameters["initial_conditions"].values()
+        if "userx" in v.keys()
+    ]
+    if userx:
+        data["userx"] = numpy.array(userx)
 
-            line = f.readline().strip()
-            if line.startswith("+++"):
-                break
-
-    output = Save(
-        numpy.array(labels),
-        {"X{}".format(i + 1): x for i, x in enumerate(numpy.transpose(variables))},
-    )
-    return _reorder_labels(output, labels_order) if labels_order is not None else output
+    labels_order = labels_order if labels_order else parameters["initial_conditions_order"]
+    output = Save(numpy.array(labels), data)
+    return _reorder_labels(output, labels_order)
 
 
 def _reorder_labels(data, labels):
