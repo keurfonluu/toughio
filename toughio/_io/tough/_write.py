@@ -806,10 +806,16 @@ def _write_conne(parameters):
     """TOUGH input CONNE block data (optional)."""
     from ._common import connections
 
+    # Reorder connections
+    if parameters["connections_order"] is not None:
+        order = parameters["connections_order"]
+    else:
+        order = parameters["connections"].keys()
+
     out = []
-    for k, v in parameters["connections"].items():
+    for k in order:
         data = deepcopy(connections)
-        data.update(v)
+        data.update(parameters["connections"][k])
 
         out += write_record(
             format_data(
@@ -836,10 +842,16 @@ def _write_conne(parameters):
 def _write_incon(parameters):
     from ._common import initial_conditions
 
+    # Reorder connections
+    if parameters["initial_conditions_order"] is not None:
+        order = parameters["initial_conditions_order"]
+    else:
+        order = parameters["initial_conditions"].keys()
+
     out = []
-    for k, v in parameters["initial_conditions"].items():
+    for k in order:
         data = deepcopy(initial_conditions)
-        data.update(v)
+        data.update(parameters["initial_conditions"][k])
 
         # Record 1
         tmp = [

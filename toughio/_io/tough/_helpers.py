@@ -48,7 +48,9 @@ dtypes = {
         "elements": "dict",
         "elements_order": "array_like",
         "connections": "dict",
+        "connections_order": "array_like",
         "initial_conditions": "dict",
+        "initial_conditions_order": "array_like",
         "default": "dict",
     },
     "ROCKS": {

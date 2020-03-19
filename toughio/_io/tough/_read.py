@@ -43,8 +43,7 @@ def read_buffer(f):
     # Loop over blocks
     for line in f:
         if line.startswith("ROCKS"):
-            rocks, rocks_order = _read_rocks(f)
-            parameters.update(rocks)
+            parameters.update(_read_rocks(f))
         elif line.startswith("RPCAP"):
             rpcap = _read_rpcap(f)
             if "default" in parameters.keys():
@@ -52,7 +51,7 @@ def read_buffer(f):
             else:
                 parameters["default"] = rpcap
         elif line.startswith("FLAC"):
-            flac = _read_flac(f, rocks_order)
+            flac = _read_flac(f, parameters["rocks_order"])
             parameters["flac"] = flac["flac"]
             for k, v in flac["rocks"].items():
                 parameters["rocks"][k].update(v)
@@ -108,8 +107,7 @@ def read_buffer(f):
 
 def _read_rocks(f):
     """Read ROCKS block data."""
-    rocks = {"rocks": {}}
-    rocks_order = []
+    rocks = {"rocks": {}, "rocks_order": []}
 
     while True:
         line = next(f)
@@ -146,16 +144,13 @@ def _read_rocks(f):
             if nad and nad > 1:
                 rocks["rocks"][rock].update(_read_rpcap(f))
 
-            rocks_order.append(rock)
-
+            rocks["rocks_order"].append(rock)
         else:
             break
 
-    rocks = {
-        k: {kk: prune_nones_dict(vv) for kk, vv in v.items()} for k, v in rocks.items()
-    }
+    rocks["rocks"] = {k: prune_nones_dict(v) for k, v in rocks["rocks"].items()}
 
-    return rocks, rocks_order
+    return rocks
 
 
 def _read_rpcap(f):
@@ -504,7 +499,7 @@ def _read_outpu(f):
 
 def _read_eleme(f):
     """Read ELEME block data."""
-    eleme = {"elements": {}}
+    eleme = {"elements": {}, "elements_order": []}
 
     while True:
         line = next(f)
@@ -520,19 +515,19 @@ def _read_eleme(f):
                 "permeability_modifier": data[6],
                 "center": data[7:10],
             }
+
+            eleme["elements_order"].append(label)
         else:
             break
 
-    eleme = {
-        k: {kk: prune_nones_dict(vv) for kk, vv in v.items()} for k, v in eleme.items()
-    }
+    eleme["elements"] = {k: prune_nones_dict(v) for k, v in eleme["elements"].items()}
 
     return eleme
 
 
 def _read_conne(f):
     """Read CONNE block data."""
-    conne = {"connections": {}}
+    conne = {"connections": {}, "connections_order": []}
 
     while True:
         line = next(f)
@@ -547,19 +542,19 @@ def _read_conne(f):
                 "gravity_cosine_angle": data[8],
                 "radiant_emittance_factor": data[9],
             }
+
+            conne["connections_order"].append(label)
         else:
             break
 
-    conne = {
-        k: {kk: prune_nones_dict(vv) for kk, vv in v.items()} for k, v in conne.items()
-    }
+    conne["connections"] = {k: prune_nones_dict(v) for k, v in conne["connections"].items()}
 
     return conne
 
 
 def _read_incon(f):
     """Read INCON block data."""
-    incon = {"initial_conditions": {}}
+    incon = {"initial_conditions": {}, "initial_conditions_order": []}
 
     while True:
         line = next(f)
@@ -577,11 +572,11 @@ def _read_incon(f):
             line = next(f)
             data = read_record(line, "20e,20e,20e,20e")
             incon["initial_conditions"][label]["values"] = prune_nones_list(data)
+
+            incon["initial_conditions_order"].append(label)
         else:
             break
 
-    incon = {
-        k: {kk: prune_nones_dict(vv) for kk, vv in v.items()} for k, v in incon.items()
-    }
+    incon["initial_conditions"] = {k: prune_nones_dict(v) for k, v in incon["initial_conditions"].items()}
 
     return incon
