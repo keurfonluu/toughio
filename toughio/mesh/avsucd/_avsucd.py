@@ -110,7 +110,9 @@ def _read_cells(f, num_cells, point_ids):
 
     # Convert to numpy arrays
     for k, c in enumerate(cells):
-        cells[k] = CellBlock(c.type, numpy.array(c.data)[:, avsucd_to_meshio_order[c.type]])
+        cells[k] = CellBlock(
+            c.type, numpy.array(c.data)[:, avsucd_to_meshio_order[c.type]]
+        )
         cell_data["avsucd:material"][k] = numpy.array(cell_data["avsucd:material"][k])
     return cell_ids, cells, cell_data
 

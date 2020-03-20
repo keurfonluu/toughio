@@ -547,7 +547,9 @@ def _read_conne(f):
         else:
             break
 
-    conne["connections"] = {k: prune_nones_dict(v) for k, v in conne["connections"].items()}
+    conne["connections"] = {
+        k: prune_nones_dict(v) for k, v in conne["connections"].items()
+    }
 
     return conne
 
@@ -578,6 +580,8 @@ def _read_incon(f):
         else:
             break
 
-    incon["initial_conditions"] = {k: prune_nones_dict(v) for k, v in incon["initial_conditions"].items()}
+    incon["initial_conditions"] = {
+        k: prune_nones_dict(v) for k, v in incon["initial_conditions"].items()
+    }
 
     return incon
