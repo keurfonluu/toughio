@@ -127,12 +127,7 @@ def write_buffer(parameters):
 @check_parameters(dtypes["MODEL"], keys=("rocks", "capillarity"), is_list=True)
 @block("ROCKS", multi=True)
 def _write_rocks(parameters):
-    """
-    TOUGH input ROCKS block data.
-
-    Introduces material parameters for up to 27 different reservoir domains.
-
-    """
+    """Write ROCKS block data."""
     # Reorder rocks
     if parameters["rocks_order"] is not None:
         order = parameters["rocks_order"]
@@ -224,12 +219,7 @@ def _write_rocks(parameters):
 @check_parameters(dtypes["MODEL"], keys=("default", "capillarity"))
 @block("RPCAP")
 def _write_rpcap(parameters):
-    """
-    TOUGH input RPCAP block data (optional).
-
-    Introduces information on relative permeability and capillary pressure functions.
-
-    """
+    """Write RPCAP block data."""
     data = deepcopy(default)
     data.update(parameters["default"])
 
@@ -256,12 +246,7 @@ def _write_rpcap(parameters):
 )
 @block("FLAC", multi=True)
 def _write_flac(parameters):
-    """
-    TOUGH input FLAC block data (optional).
-
-    Introduces mechanical parameters for each material in ROCKS block data.
-
-    """
+    """Write FLAC block data."""
     # Load data
     from ._common import flac
 
@@ -302,15 +287,7 @@ def _write_flac(parameters):
 
 @block("MULTI")
 def _write_multi(parameters):
-    """
-    TOUGH input MULTI block (optional).
-
-    Permits the user to select the number and nature of balance equations that will be
-    solved. The keyword MULTI is followed by a single data record. For most EOS modules,
-    this data block is not needed, as default values are provided internally. Available
-    parameter choices are different for different EOS modules.
-
-    """
+    """Write MULTI block data."""
     from ._common import eos
 
     out = list(eos[parameters["eos"]]) if parameters["eos"] else [0, 0, 0, 6]
@@ -333,13 +310,7 @@ def _write_multi(parameters):
 @check_parameters(dtypes["SELEC"], keys="selections")
 @block("SELEC")
 def _write_selec(parameters):
-    """
-    TOUGH input SELEC block (optional).
-
-    Introduces a number of integer and floating point parameters that are used for
-    different purposes in different TOUGH modules (EOS7, EOS7R, EWASG, T2DM, ECO2N).
-
-    """
+    """Write SELEC block data."""
     # Load data
     from ._common import selections
 
@@ -367,13 +338,7 @@ def _write_selec(parameters):
 @check_parameters(dtypes["SOLVR"], keys="solver")
 @block("SOLVR")
 def _write_solvr(parameters):
-    """
-    TOUGH input SOLVR block (optional).
-
-    Introduces computation parameters, time stepping information, and default initial
-    conditions.
-
-    """
+    """Write SOLVR block data."""
     from ._common import solver
 
     data = deepcopy(solver)
@@ -393,16 +358,7 @@ def _write_solvr(parameters):
 
 @block("START")
 def _write_start():
-    """
-    TOUGH input START block (optional).
-
-    A record with START typed in columns 1-5 allows a more flexible initialization. More
-    specifically, when START is present, INCON data can be in arbitrary order, and need
-    not be present for all grid blocks (in which case defaults will be used). Without
-    START, there must be a one-to-one correspondence between the data in blocks ELEME
-    and INCON.
-
-    """
+    """Write START block data."""
     from ._common import header
 
     out = "{:5}{}\n".format("----*", header)
@@ -413,13 +369,7 @@ def _write_start():
 @check_parameters(dtypes["MOP"], keys="extra_options")
 @block("PARAM")
 def _write_param(parameters):
-    """
-    TOUGH input PARAM block data.
-
-    Introduces computation parameters, time stepping information, and default initial
-    conditions.
-
-    """
+    """Write PARAM block data."""
     # Load data
     from ._common import options
 
@@ -494,12 +444,7 @@ def _write_param(parameters):
 
 @block("INDOM", multi=True)
 def _write_indom(parameters):
-    """
-    TOUGH input INDOM block data (optional).
-
-    Introduces domain-specific initial conditions.
-
-    """
+    """Write INDOM block data."""
     if parameters["rocks_order"]:
         order = parameters["rocks_order"]
     else:
@@ -519,12 +464,7 @@ def _write_indom(parameters):
 @check_parameters(dtypes["MOMOP"], keys="more_options")
 @block("MOMOP")
 def _write_momop(parameters):
-    """
-    TOUGH input MOMOP block data (optional).
-
-    Provides additional options.
-
-    """
+    """Write MOMOP block data."""
     from ._common import more_options
 
     _momop = deepcopy(more_options)
@@ -537,12 +477,7 @@ def _write_momop(parameters):
 
 @block("TIMES")
 def _write_times(parameters):
-    """
-    TOUGH input TIMES block data (optional).
-
-    Permits the user to obtain printout at specified times.
-
-    """
+    """Write TIMES block data."""
     data = parameters["times"]
     data = data if numpy.ndim(data) else [data]
     n = len(data)
@@ -553,13 +488,7 @@ def _write_times(parameters):
 
 @block("FOFT", multi=True)
 def _write_foft(parameters):
-    """
-    TOUGH input FOFT block data (optional).
-
-    Introduces a list of elements (grid blocks) for which time-dependent data are to be
-    written out for plotting to a file called FOFT during the simulation.
-
-    """
+    """Write FOFT block data."""
     return write_multi_record(
         format_data([(i, "{:>5g}") for i in parameters["element_history"]]), ncol=1
     )
@@ -567,13 +496,7 @@ def _write_foft(parameters):
 
 @block("COFT", multi=True)
 def _write_coft(parameters):
-    """
-    TOUGH input COFT block data (optional).
-
-    Introduces a list of connections for which time-dependent data are to be written out
-    for plotting to a file called COFT during the simulation.
-
-    """
+    """Write COFT block data."""
     return write_multi_record(
         format_data([(i, "{:>10g}") for i in parameters["connection_history"]]), ncol=1
     )
@@ -581,13 +504,7 @@ def _write_coft(parameters):
 
 @block("GOFT", multi=True)
 def _write_goft(parameters):
-    """
-    TOUGH input GOFT block data (optional).
-
-    Introduces a list of sinks/sources for which time-dependent data are to be written
-    out for plotting to a file called GOFT during the simulation.
-
-    """
+    """Write GOFT block data."""
     return write_multi_record(
         format_data([(i, "{:>5g}") for i in parameters["generator_history"]]), ncol=1
     )
@@ -596,12 +513,7 @@ def _write_goft(parameters):
 @check_parameters(dtypes["GENER"], keys="generators", is_list=True)
 @block("GENER", multi=True)
 def _write_gener(parameters):
-    """
-    TOUGH input GENER block data (optional).
-
-    Introduces sinks and/or sources.
-
-    """
+    """Write GENER block data."""
     from ._common import generators
 
     # Handle multicomponent generators
@@ -710,12 +622,7 @@ def _write_gener(parameters):
 
 @block("DIFFU")
 def _write_diffu(parameters):
-    """
-    TOUGH input DIFFU block data (optional).
-
-    Introduces diffusion coefficients.
-
-    """
+    """Write DIFFU block data."""
     if numpy.shape(parameters["diffusion"]) != (2, parameters["n_phase"]):
         raise ValueError()
     mass1, mass2 = parameters["diffusion"]
@@ -729,12 +636,7 @@ def _write_diffu(parameters):
 @check_parameters(dtypes["OUTPU"], keys="output")
 @block("OUTPU")
 def _write_outpu(parameters):
-    """
-    TOUGH input OUTPU block data (optional).
-
-    Specifies variables/parameters for printout.
-
-    """
+    """Write OUTPU block data."""
     from ._common import output
 
     data = deepcopy(output)
@@ -766,7 +668,7 @@ def _write_outpu(parameters):
 @check_parameters(dtypes["ELEME"], keys="elements", is_list=True)
 @block("ELEME", multi=True)
 def _write_eleme(parameters):
-    """TOUGH input ELEME block data (optional)."""
+    """Write ELEME block data."""
     from ._common import elements
 
     # Reorder elements
@@ -803,7 +705,7 @@ def _write_eleme(parameters):
 @check_parameters(dtypes["CONNE"], keys="connections", is_list=True)
 @block("CONNE", multi=True)
 def _write_conne(parameters):
-    """TOUGH input CONNE block data (optional)."""
+    """Write CONNE block data."""
     from ._common import connections
 
     # Reorder connections
@@ -840,6 +742,7 @@ def _write_conne(parameters):
 @check_parameters(dtypes["INCON"], keys="initial_conditions", is_list=True)
 @block("INCON", multi=True)
 def _write_incon(parameters):
+    """Write INCON block data."""
     from ._common import initial_conditions
 
     # Reorder connections
@@ -871,11 +774,11 @@ def _write_incon(parameters):
 
 @block("NOVER")
 def _write_nover():
-    """TOUGH input NOVER block data (optional)."""
+    """Write NOVER block data."""
     return []
 
 
 @block("ENDCY", noend=True)
 def _write_endcy():
-    """TOUGH input ENDCY block data (optional)."""
+    """Write ENDCY block data."""
     return []
