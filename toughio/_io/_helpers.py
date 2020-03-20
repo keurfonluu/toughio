@@ -268,12 +268,12 @@ def read_save(filename, labels_order=None):
     parameters = read_input(filename)
     labels = list(parameters["initial_conditions"].keys())
     variables = [v["values"] for v in parameters["initial_conditions"].values()]
-    
+
     data = {"X{}".format(i + 1): x for i, x in enumerate(numpy.transpose(variables))}
-    
-    data["porosity"] = numpy.array([
-        v["porosity"] for v in parameters["initial_conditions"].values()
-    ])
+
+    data["porosity"] = numpy.array(
+        [v["porosity"] for v in parameters["initial_conditions"].values()]
+    )
 
     userx = [
         v["userx"]
@@ -283,7 +283,9 @@ def read_save(filename, labels_order=None):
     if userx:
         data["userx"] = numpy.array(userx)
 
-    labels_order = labels_order if labels_order else parameters["initial_conditions_order"]
+    labels_order = (
+        labels_order if labels_order else parameters["initial_conditions_order"]
+    )
     output = Save(numpy.array(labels), data)
     return _reorder_labels(output, labels_order)
 

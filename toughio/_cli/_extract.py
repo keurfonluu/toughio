@@ -1,8 +1,8 @@
 import numpy
 
-from ..mesh import read as read_mesh
 from .._io._helpers import Output
 from .._io.tough._helpers import str2float
+from ..mesh import read as read_mesh
 
 __all__ = [
     "extract",
