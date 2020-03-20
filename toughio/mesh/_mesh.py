@@ -22,13 +22,13 @@ from ._properties import (
 )
 
 __all__ = [
-    "Cells",
+    "CellBlock",
     "Mesh",
     "from_meshio",
 ]
 
 
-Cells = collections.namedtuple("Cells", ["type", "data"])
+CellBlock = collections.namedtuple("CellBlock", ["type", "data"])
 
 
 class Mesh(object):
@@ -148,7 +148,7 @@ class Mesh(object):
             if c.type in extruded_types.keys():
                 extruded_type = extruded_types[c.type]
                 nr, nc = c.data.shape
-                cell = Cells(extruded_type, numpy.tile(c.data, (nh, 2)))
+                cell = CellBlock(extruded_type, numpy.tile(c.data, (nh, 2)))
                 for i in range(nh):
                     ibeg, iend = i * nr, (i + 1) * nr
                     cell.data[ibeg:iend, :nc] += i * npts
@@ -623,7 +623,7 @@ class Mesh(object):
         if self._cells:
             return self._cells
         else:
-            return [Cells(k, v) for k, v in self._cells_dict.items()]
+            return [CellBlock(k, v) for k, v in self._cells_dict.items()]
 
     @cells.setter
     def cells(self, value):
@@ -631,7 +631,7 @@ class Mesh(object):
             self._cells = []
             self._cells_dict = value
         else:
-            self._cells = [Cells(k, v) for k, v in value]
+            self._cells = [CellBlock(k, v) for k, v in value]
             self._cells_dict = {}
 
     @property

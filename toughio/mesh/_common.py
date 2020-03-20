@@ -190,9 +190,9 @@ def get_new_meshio_cells(cells, cell_data=None):
         New-style cell data (only if `cell_data` is not None).
 
     """
-    from ._mesh import Cells
+    from ._mesh import CellBlock
 
-    new_cells = [Cells(k, v) for k, v in cells.items()]
+    new_cells = [CellBlock(k, v) for k, v in cells.items()]
 
     if cell_data is not None:
         labels = numpy.unique([kk for k, v in cell_data.items() for kk in v.keys()])

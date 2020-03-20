@@ -1,6 +1,6 @@
 import numpy
 
-from ..mesh._mesh import Cells, Mesh
+from ..mesh._mesh import CellBlock, Mesh
 
 __all__ = [
     "triangulate",
@@ -41,7 +41,7 @@ def triangulate(points, material="dfalt"):
     points = numpy.asarray(points)
     connectivity = Delaunay(points).simplices
     cell_type = "triangle" if points.shape[1] == 2 else "tetra"
-    cells = [Cells(cell_type, connectivity)]
+    cells = [CellBlock(cell_type, connectivity)]
     mesh = Mesh(points, cells)
     mesh.add_cell_data("material", numpy.ones(mesh.n_cells, dtype=int))
     mesh.field_data[material] = numpy.array([1, 3])
