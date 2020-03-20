@@ -563,9 +563,10 @@ def _read_incon(f):
             # Record 1
             data = read_record(line, "5s,5d,5d,15e,10e,10e,10e,10e,10e")
             label = data[0]
+            userx = prune_nones_list(data[4:9])
             incon["initial_conditions"][label] = {
                 "porosity": data[3],
-                "userx": prune_nones_list(data[4:9]),
+                "userx": userx if userx else None,
             }
 
             # Record 2

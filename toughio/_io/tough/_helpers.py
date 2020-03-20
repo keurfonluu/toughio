@@ -312,5 +312,4 @@ def prune_nones_dict(data):
 
 def prune_nones_list(data):
     """Remove trailing None values from list."""
-    out = [x for i, x in enumerate(data) if any(xx is not None for xx in data[i:])]
-    return out if out else None
+    return [x for i, x in enumerate(data) if any(xx is not None for xx in data[i:])]
