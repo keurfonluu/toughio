@@ -15,6 +15,7 @@ __all__ = [
     "write_multi_record",
     "add_record",
     "read_record",
+    "str2float",
     "prune_nones_dict",
     "prune_nones_list",
 ]
@@ -274,16 +275,6 @@ def add_record(data, id_fmt="{:>5g}     "):
 
 def read_record(data, fmt):
     """Parse string to data given format."""
-
-    def str2float(s):
-        """Convert variable string to float."""
-        try:
-            return float(s)
-        except ValueError:
-            # It's probably something like "0.0001-001"
-            significand, exponent = s[:-4], s[-4:]
-            return float("{}e{}".format(significand, exponent))
-        
     token_to_type = {
         "s": str,
         "S": str,
@@ -302,6 +293,16 @@ def read_record(data, fmt):
         i += n
 
     return out
+
+
+def str2float(s):
+    """Convert variable string to float."""
+    try:
+        return float(s)
+    except ValueError:
+        # It's probably something like "0.0001-001"
+        significand, exponent = s[:-4], s[-4:]
+        return float("{}e{}".format(significand, exponent))
 
 
 def prune_nones_dict(data):
