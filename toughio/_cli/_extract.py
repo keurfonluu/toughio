@@ -1,6 +1,8 @@
 import numpy
 
 from .._io._helpers import Output
+from .._io.tough._helpers import str2float
+from ..mesh import read as read_mesh
 
 __all__ = [
     "extract",
@@ -20,24 +22,11 @@ def extract(argv=None):
         raise ValueError("MESH file '{}' not found.".format(args.mesh))
 
     # Read MESH and extract X, Y and Z
-    nodes, is_eleme = {}, False
-    with open(args.mesh, "r") as f:
-        for line in f:
-            line = line.upper().strip()
-            if line[:5].startswith("ELEME"):
-                is_eleme = True
-                line = next(f)
-                while line.strip():
-                    label = line[:5]
-                    X = float(line[50:60]) if line[50:60].strip() else 0.0
-                    Y = float(line[60:70]) if line[60:70].strip() else 0.0
-                    Z = float(line[70:80]) if line[70:80].strip() else 0.0
-                    nodes[label] = [X, Y, Z]
-                    line = next(f)
-                headers = ["X", "Y", "Z"]
-                break
-    if not is_eleme:
+    parameters = read_mesh(args.mesh, file_format="tough")
+    if "elements" not in parameters.keys():
         raise ValueError("Invalid MESH file '{}'.".format(args.mesh))
+    else:
+        nodes = {k: v["center"] for k, v in parameters["elements"].items()}
 
     # Read TOUGH output file
     out = []
@@ -48,6 +37,7 @@ def extract(argv=None):
                 out.append(_read_table(f, nodes))
 
     # Write TOUGH3 element output file
+    headers = ["X", "Y", "Z"]
     if not args.split or len(out) == 1:
         with open(args.output_file, "w") as f:
             _write_header(f, headers, out[0])
@@ -104,15 +94,6 @@ def _get_parser():
 
 
 def _read_table(f, points):
-    def str2float(s):
-        """Convert variable string to float."""
-        try:
-            return float(s)
-        except ValueError:
-            # It's probably something like "0.0001-001"
-            significand, exponent = s[:-4], s[-4:]
-            return float("{}e{}".format(significand, exponent))
-
     # Look for "TOTAL TIME"
     while True:
         line = next(f).strip()

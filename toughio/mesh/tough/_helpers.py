@@ -77,17 +77,23 @@ def _write_incon(labels, values, porosity=None, userx=None):
 
     iterables = zip(labels, values, porosity, userx)
     for label, value, phi, usrx in iterables:
-        record = "{:5.5}{:10}".format(label, "")
+        cond1 = any(v > -1.0e-9 for v in value)
+        cond2 = phi is not None
+        cond3 = usrx is not None
+        if cond1 or cond2 or cond3:
+            record = "{:5.5}{:10}".format(label, "")
 
-        record += "{:15.9e}".format(phi) if phi is not None else "{:15}".format("")
+            record += "{:15.9e}".format(phi) if phi is not None else "{:15}".format("")
 
-        if usrx is not None:
-            fmt = "{:10.3e}" * len(usrx)
-            record += fmt.format(*usrx)
-        record += "\n"
+            if usrx is not None:
+                fmt = "{:10.3e}" * len(usrx)
+                record += fmt.format(*usrx)
+            record += "\n"
 
-        for v in value:
-            record += "{:20.13e}".format(v) if v > -1.0e9 else "{:20}".format("")
-        record += "\n"
+            for v in value:
+                record += "{:20.13e}".format(v) if v > -1.0e9 else "{:20}".format("")
+            record += "\n"
 
-        yield record
+            yield record
+        else:
+            continue

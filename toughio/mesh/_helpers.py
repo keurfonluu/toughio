@@ -15,6 +15,7 @@ __all__ = [
 
 _extension_to_filetype = {
     ".dat": "tecplot",
+    ".tec": "tecplot",
     ".f3grid": "flac3d",
     ".pickle": "pickle",
 }
@@ -102,6 +103,8 @@ def write(filename, mesh, file_format=None, **kwargs):
         'ELEME' if their materials is in `material_end`.
     incon : bool, optional, default False
         Only if ``file_format = "tough"``. If `True`, initial conditions will be written in file `INCON`.
+    protocol : integer, optional, default `pickle.HIGHEST_PROTOCOL`
+        Only if ``file_format = "pickle"``. :module:`pickle` protocol version.
 
     """
     # Check file format

@@ -95,8 +95,8 @@ def export(argv=None):
 
         try:
             mesh = read_mesh(args.mesh, file_format="pickle")
-        except:
-            raise ValueError("Cannot unpickle mesh file {}.".format(args.mesh))
+        except Exception as e:
+            raise ValueError("Cannot unpickle mesh file {}: {}.".format(args.mesh, e))
 
         if args.file_format != "xdmf":
             mesh.read_output(output)

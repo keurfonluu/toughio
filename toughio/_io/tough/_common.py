@@ -44,7 +44,9 @@ _Parameters = {
     "elements": {},
     "elements_order": None,
     "connections": {},
+    "connections_order": None,
     "initial_conditions": {},
+    "initial_conditions_order": None,
     "default": {},
 }
 

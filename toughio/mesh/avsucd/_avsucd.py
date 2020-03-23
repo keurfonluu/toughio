@@ -6,7 +6,7 @@ import numpy
 
 from ...__about__ import __version__ as version
 from .._common import meshio_data
-from .._mesh import Cells, Mesh
+from .._mesh import CellBlock, Mesh
 
 __all__ = [
     "read",
@@ -102,7 +102,7 @@ def _read_cells(f, num_cells, point_ids):
             cells[-1].data.append(corner)
             cell_data["avsucd:material"][-1].append(cell_mat)
         else:
-            cells.append(Cells(cell_type, [corner]))
+            cells.append(CellBlock(cell_type, [corner]))
             cell_data["avsucd:material"].append([cell_mat])
 
         cell_ids[cell_id] = count
@@ -110,7 +110,9 @@ def _read_cells(f, num_cells, point_ids):
 
     # Convert to numpy arrays
     for k, c in enumerate(cells):
-        cells[k] = Cells(c.type, numpy.array(c.data)[:, avsucd_to_meshio_order[c.type]])
+        cells[k] = CellBlock(
+            c.type, numpy.array(c.data)[:, avsucd_to_meshio_order[c.type]]
+        )
         cell_data["avsucd:material"][k] = numpy.array(cell_data["avsucd:material"][k])
     return cell_ids, cells, cell_data
 
