@@ -174,9 +174,7 @@ def read_output(filename, file_format="tough", labels_order=None):
                 line = f.readline().strip().replace('"', "")
 
         elif file_format == "tecplot":
-            from ..mesh.tecplot._tecplot import zone_key_to_type
-
-            zone_key_to_type.update({"T": str, "I": int, "J": int})
+            from ..mesh.tecplot._tecplot import _read_variables, _read_zone
 
             # Look for header (VARIABLES)
             while True:
@@ -185,9 +183,7 @@ def read_output(filename, file_format="tough", labels_order=None):
                     break
 
             # Read header (VARIABLES)
-            line = line.split("=")[1]
-            headers = [l.strip() for l in line.replace('"', "").split()]
-            headers = [header for header in headers if "(" not in header]
+            headers = _read_variables(line)
 
             # Loop until end of file
             times, labels, variables = [], [], []
@@ -195,63 +191,7 @@ def read_output(filename, file_format="tough", labels_order=None):
             while True:
                 # Read zone
                 if line.startswith("ZONE"):
-                    line = " ".join(line[5:].split())
-                    line = "=".join(l.strip() for l in line.split("="))
-
-                    zone = {}
-                    i = 0
-                    key, value, read_key = "", "", True
-                    is_title, is_end = False, False
-                    while True:
-                        char = line[i]
-
-                        if char == "=":
-                            key = key.strip()
-                            read_key = False
-                            is_title = key == "T"
-
-                        if is_title:
-                            # Look for first '"'
-                            i += 1
-                            while True:
-                                if line[i] == '"':
-                                    break
-                                else:
-                                    i += 1
-
-                            # Look for second '"'
-                            i += 1
-                            while True:
-                                value += line[i]
-                                if line[i] == '"':
-                                    value = value[:-1]
-                                    break
-                                else:
-                                    i += 1
-                            is_title, is_end = False, True
-                        else:
-                            if char != " ":
-                                if char != "=":
-                                    if read_key:
-                                        key += char
-                                    else:
-                                        value += char
-                            else:
-                                is_end = True
-
-                        if is_end:
-                            if key in zone_key_to_type.keys():
-                                zone[key] = zone_key_to_type[key](value)
-                            key, value, read_key = "", "", True
-                            is_end = False
-
-                        if i >= len(line) - 1:
-                            if key in zone_key_to_type.keys():
-                                zone[key] = zone_key_to_type[key](value)
-                            break
-                        else:
-                            i += 1
-
+                    zone = _read_zone(line)
                     zone["T"] = (
                         float(zone["T"].split()[0]) if "T" in zone.keys() else None
                     )
@@ -259,7 +199,13 @@ def read_output(filename, file_format="tough", labels_order=None):
                         raise ValueError()
 
                 # Read data
-                data = numpy.genfromtxt(f, max_rows=zone["I"])
+                # Python 2.7 does not allow mix of for and while loops when reading a file
+                # data = numpy.genfromtxt(f, max_rows=zone["I"])
+                data = []
+                for _ in range(zone["I"]):
+                    line = f.readline().strip()
+                    data.append([float(x) for x in line.split()])
+                data = numpy.array(data)
 
                 # Output
                 times.append(zone["T"])
@@ -303,19 +249,9 @@ def read_save(filename, labels_order=None):
 
     Note
     ----
-    Does not support porosity, USERX and hysteresis values yet.
+    Does not support hysteresis values yet.
 
     """
-
-    def str2float(s):
-        """Convert variable string to float."""
-        try:
-            return float(s)
-        except ValueError:
-            # It's probably something like "0.0001-001"
-            significand, exponent = s[:-4], s[-4:]
-            return float("{}e{}".format(significand, exponent))
-
     if not isinstance(filename, str):
         raise TypeError()
     if not (
@@ -329,27 +265,29 @@ def read_save(filename, labels_order=None):
         if not line.startswith("INCON"):
             raise ValueError("Invalid SAVE file '{}'.".format(filename))
 
-        # Read data
-        labels, variables = [], []
-        line = f.readline().strip()
-        while line:
-            # Label
-            line = line.split()
-            labels.append(line[0])
+    parameters = read_input(filename)
+    labels = list(parameters["initial_conditions"].keys())
+    variables = [v["values"] for v in parameters["initial_conditions"].values()]
 
-            # Primary variables
-            line = f.readline().strip().split()
-            variables.append([str2float(l) for l in line])
+    data = {"X{}".format(i + 1): x for i, x in enumerate(numpy.transpose(variables))}
 
-            line = f.readline().strip()
-            if line.startswith("+++"):
-                break
-
-    output = Save(
-        numpy.array(labels),
-        {"X{}".format(i + 1): x for i, x in enumerate(numpy.transpose(variables))},
+    data["porosity"] = numpy.array(
+        [v["porosity"] for v in parameters["initial_conditions"].values()]
     )
-    return _reorder_labels(output, labels_order) if labels_order is not None else output
+
+    userx = [
+        v["userx"]
+        for v in parameters["initial_conditions"].values()
+        if "userx" in v.keys()
+    ]
+    if userx:
+        data["userx"] = numpy.array(userx)
+
+    labels_order = (
+        labels_order if labels_order else parameters["initial_conditions_order"]
+    )
+    output = Save(numpy.array(labels), data)
+    return _reorder_labels(output, labels_order)
 
 
 def _reorder_labels(data, labels):

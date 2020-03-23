@@ -12,6 +12,10 @@ __all__ = [
 
 
 zone_key_to_type = {
+    "T": str,
+    "I": int,
+    "J": int,
+    "K": int,
     "N": int,
     "NODES": int,
     "E": int,
@@ -113,11 +117,16 @@ def read_buffer(f):
                 else:
                     f.seek(i)
                     break
-            line = "".join(lines)
+            line = " ".join(lines)
 
-            num_nodes, num_cells, zone_format, zone_type, is_cell_centered = _read_zone(
-                line, variables
-            )
+            zone = _read_zone(line)
+            (
+                num_nodes,
+                num_cells,
+                zone_format,
+                zone_type,
+                is_cell_centered,
+            ) = _parse_fezone(zone, variables)
 
             num_data = [num_cells if i else num_nodes for i in is_cell_centered]
             data, cells = _read_zone_data(
@@ -159,85 +168,97 @@ def read_buffer(f):
 
 def _read_variables(line):
     # Gather variables in a list
-    line = line.split("=")[1].split(",")
-    variables = [str(var).replace('"', "").strip() for var in line]
+    line = line.split("=")[1]
+    line = [x for x in line.replace(",", " ").split()]
+    variables = []
+
+    i = 0
+    while i < len(line):
+        if '"' in line[i] and not (line[i].startswith('"') and line[i].endswith('"')):
+            var = "{}_{}".format(line[i], line[i + 1])
+            i += 1
+        else:
+            var = line[i]
+
+        variables.append(var.replace('"', ""))
+        i += 1
 
     # Check that at least X and Y are defined
     if "X" not in variables and "x" not in variables:
-        raise AssertionError("Variable 'X' not found")
+        raise ValueError("Variable 'X' not found")
     if "Y" not in variables and "y" not in variables:
-        raise AssertionError("Variable 'Y' not found")
+        raise ValueError("Variable 'Y' not found")
 
     return variables
 
 
-def _read_zone(line, variables):
+def _read_zone(line):
     # Gather zone entries in a dict
-    # We can only process the zone record character by character due to
-    # value of VARLOCATION containing both comma and equality characters.
     line = line[5:]
     zone = {}
+
+    # Look for zone title
+    ivar = line.find('"')
+
+    # If zone contains a title, process it and save the title
+    if ivar >= 0:
+        i1, i2 = ivar, ivar + line[ivar + 1 :].find('"') + 2
+        zone_title = line[i1 + 1 : i2 - 1]
+        line = line.replace(line[i1:i2], "PLACEHOLDER")
+    else:
+        zone_title = None
+
+    # Look for VARLOCATION (problematic since it contains both ',' and '=')
+    ivar = line.find("VARLOCATION")
+
+    # If zone contains VARLOCATION, process it and remove the key/value pair
+    if ivar >= 0:
+        i1, i2 = line.find("("), line.find(")")
+        zone["VARLOCATION"] = line[i1 : i2 + 1].replace(" ", "")
+        line = line[:ivar] + line[i2 + 1 :]
+
+    # Split remaining key/value pairs separated by '='
+    line = [x for x in line.replace(",", " ").split() if x != "="]
     i = 0
-    key, value, read_key = "", "", True
-    is_varlocation, is_end = False, False
-    while True:
-        char = line[i] if line[i] != " " else ""
-
-        if char == "=":
-            read_key = False
-            is_varlocation = key == "VARLOCATION"
-
-        if is_varlocation:
-            i += 1
-            while True:
-                char = line[i] if line[i] != " " else ""
-                value += char
-                if line[i] == ")":
-                    break
-                else:
-                    i += 1
-            is_varlocation, is_end = False, True
-            i += 1  # Skip comma
-        else:
-            if char != ",":
-                if char != "=":
-                    if read_key:
-                        key += char
-                    else:
-                        value += char
+    while i < len(line) - 1:
+        if "=" in line[i]:
+            if not (line[i].startswith("=") or line[i].endswith("=")):
+                key, value = line[i].split("=")
             else:
-                is_end = True
-
-        if is_end:
-            if key in zone_key_to_type.keys():
-                zone[key] = zone_key_to_type[key](value)
-            key, value, read_key = "", "", True
-            is_end = False
-
-        if i >= len(line) - 1:
-            if key in zone_key_to_type.keys():
-                zone[key] = zone_key_to_type[key](value)
-            break
+                key = line[i].replace("=", "")
+                value = line[i + 1]
+                i += 1
         else:
+            key = line[i]
+            value = line[i + 1].replace("=", "")
             i += 1
 
+        zone[key] = zone_key_to_type[key](value)
+        i += 1
+
+    # Add zone title to zone dict
+    if zone_title:
+        zone["T"] = zone_title
+
+    return zone
+
+
+def _parse_fezone(zone, variables):
     # Check that the grid is unstructured
     if "F" in zone.keys():
         if zone["F"] not in {"FEPOINT", "FEBLOCK"}:
-            raise AssertionError(
-                "Tecplot reader can only read finite-element type grids"
-            )
+            raise ValueError("Tecplot reader can only read finite-element type grids")
         if "ET" not in zone.keys():
-            raise AssertionError("Element type 'ET' not found")
+            raise ValueError("Element type 'ET' not found")
         zone_format = zone.pop("F")
         zone_type = zone.pop("ET")
     elif "DATAPACKING" in zone.keys():
         if "ZONETYPE" not in zone.keys():
-            raise AssertionError("Zone type 'ZONETYPE' not found")
+            raise ValueError("Zone type 'ZONETYPE' not found")
         zone_format = "FE" + zone.pop("DATAPACKING")
         zone_type = zone.pop("ZONETYPE")
     else:
-        raise AssertionError("Data format 'F' or 'DATAPACKING' not found")
+        raise ValueError("Data format 'F' or 'DATAPACKING' not found")
 
     # Number of nodes
     if "N" in zone.keys():
@@ -245,7 +266,7 @@ def _read_zone(line, variables):
     elif "NODES" in zone.keys():
         num_nodes = zone.pop("NODES")
     else:
-        raise AssertionError("Number of nodes not found")
+        raise ValueError("Number of nodes not found")
 
     # Number of elements
     if "E" in zone.keys():
@@ -253,7 +274,7 @@ def _read_zone(line, variables):
     elif "ELEMENTS" in zone.keys():
         num_cells = zone.pop("ELEMENTS")
     else:
-        raise AssertionError("Number of elements not found")
+        raise ValueError("Number of elements not found")
 
     # Variable locations
     is_cell_centered = numpy.zeros(len(variables), dtype=int)

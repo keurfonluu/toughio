@@ -15,6 +15,7 @@ __all__ = [
     "write_multi_record",
     "add_record",
     "read_record",
+    "str2float",
     "prune_nones_dict",
     "prune_nones_list",
 ]
@@ -48,7 +49,9 @@ dtypes = {
         "elements": "dict",
         "elements_order": "array_like",
         "connections": "dict",
+        "connections_order": "array_like",
         "initial_conditions": "dict",
+        "initial_conditions_order": "array_like",
         "default": "dict",
     },
     "ROCKS": {
@@ -276,8 +279,8 @@ def read_record(data, fmt):
         "s": str,
         "S": str,
         "d": int,
-        "f": float,
-        "e": float,
+        "f": str2float,
+        "e": str2float,
     }
 
     i = 0
@@ -290,6 +293,16 @@ def read_record(data, fmt):
         i += n
 
     return out
+
+
+def str2float(s):
+    """Convert variable string to float."""
+    try:
+        return float(s)
+    except ValueError:
+        # It's probably something like "0.0001-001"
+        significand, exponent = s[:-4], s[-4:]
+        return float("{}e{}".format(significand, exponent))
 
 
 def prune_nones_dict(data):

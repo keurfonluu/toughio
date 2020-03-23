@@ -22,13 +22,13 @@ from ._properties import (
 )
 
 __all__ = [
-    "Cells",
+    "CellBlock",
     "Mesh",
     "from_meshio",
 ]
 
 
-Cells = collections.namedtuple("Cells", ["type", "data"])
+CellBlock = collections.namedtuple("CellBlock", ["type", "data"])
 
 
 class Mesh(object):
@@ -148,7 +148,7 @@ class Mesh(object):
             if c.type in extruded_types.keys():
                 extruded_type = extruded_types[c.type]
                 nr, nc = c.data.shape
-                cell = Cells(extruded_type, numpy.tile(c.data, (nh, 2)))
+                cell = CellBlock(extruded_type, numpy.tile(c.data, (nh, 2)))
                 for i in range(nh):
                     ibeg, iend = i * nr, (i + 1) * nr
                     cell.data[ibeg:iend, :nc] += i * npts
@@ -444,6 +444,25 @@ class Mesh(object):
             extension. To write TOUGH MESH, `file_format` must be specified
             as 'tough' (no specific extension exists for TOUGH MESH).
 
+        Other Parameters
+        ----------------
+        nodal_distance : str ('line' or 'orthogonal'), optional, default 'line'
+            Only if ``file_format = "tough"``. Method to calculate connection
+            nodal distances:
+            - 'line': distance between node and common face along connecting
+            line (distance is not normal),
+            - 'orthogonal' : distance between node and its orthogonal
+            projection onto common face (shortest distance).
+        material_name : dict or None, default None
+            Only if ``file_format = "tough"``. Rename cell material.
+        material_end : str, array_like or None, default None
+            Only if ``file_format = "tough"``. Move cells to bottom of block
+            'ELEME' if their materials is in `material_end`.
+        incon : bool, optional, default False
+            Only if ``file_format = "tough"``. If `True`, initial conditions will be written in file `INCON`.
+        protocol : integer, optional, default `pickle.HIGHEST_PROTOCOL`
+            Only if ``file_format = "pickle"``. :module:`pickle` protocol version.
+
         """
         from ._helpers import write
 
@@ -604,7 +623,7 @@ class Mesh(object):
         if self._cells:
             return self._cells
         else:
-            return [Cells(k, v) for k, v in self._cells_dict.items()]
+            return [CellBlock(k, v) for k, v in self._cells_dict.items()]
 
     @cells.setter
     def cells(self, value):
@@ -612,7 +631,7 @@ class Mesh(object):
             self._cells = []
             self._cells_dict = value
         else:
-            self._cells = [Cells(k, v) for k, v in value]
+            self._cells = [CellBlock(k, v) for k, v in value]
             self._cells_dict = {}
 
     @property
@@ -762,8 +781,9 @@ def from_meshio(mesh):
         Output mesh.
 
     """
+    version = get_meshio_version()
+
     if mesh.cell_data:
-        version = get_meshio_version()
         if version[0] >= 4:
             cells = mesh.cells
             cell_data = mesh.cell_data
@@ -777,6 +797,7 @@ def from_meshio(mesh):
 
         cell_data = {k: numpy.concatenate(v) for k, v in cell_data.items()}
     else:
+        cells = mesh.cells if version[0] >= 4 else get_new_meshio_cells(mesh.cells)
         cell_data = {}
 
     out = Mesh(

@@ -32,7 +32,7 @@ def read(filename):
     return mesh
 
 
-def write(filename, mesh):
+def write(filename, mesh, protocol=pickle.HIGHEST_PROTOCOL):
     """
     Pickle :class:`toughio.Mesh`.
 
@@ -42,7 +42,9 @@ def write(filename, mesh):
         Output file name.
     mesh : toughio.Mesh
         Mesh to pickle.
+    protocol : integer, optional, default `pickle.HIGHEST_PROTOCOL`
+        :module:`pickle` protocol version.
 
     """
     with open(filename, "wb") as f:
-        pickle.dump(mesh, f, protocol=pickle.HIGHEST_PROTOCOL)
+        pickle.dump(mesh, f, protocol=protocol)

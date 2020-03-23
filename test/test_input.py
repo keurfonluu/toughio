@@ -432,7 +432,7 @@ def test_eleme():
                 )
                 for key in keys
             }
-            for _ in numpy.random.rand(10) + 1
+            for _ in range(numpy.random.randint(10) + 1)
         }
     }
     parameters = write_read(parameters_ref)
@@ -469,7 +469,7 @@ def test_conne():
                 )
                 for key in keys
             }
-            for _ in numpy.random.rand(10) + 1
+            for _ in range(numpy.random.randint(10) + 1)
         }
     }
     parameters = write_read(parameters_ref)
@@ -495,13 +495,13 @@ def test_incon():
                 key: (
                     numpy.random.rand()
                     if key == "porosity"
-                    else numpy.random.rand(numpy.random.randint(6)) + 1
+                    else numpy.random.rand(numpy.random.randint(5) + 1)
                     if key == "userx"
-                    else numpy.random.rand(numpy.random.randint(5)) + 1
+                    else numpy.random.rand(numpy.random.randint(4) + 1)
                 )
                 for key in keys
             }
-            for _ in numpy.random.rand(10) + 1
+            for _ in range(numpy.random.randint(10) + 1)
         }
     }
     parameters = write_read(parameters_ref)
