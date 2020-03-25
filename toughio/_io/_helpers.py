@@ -144,10 +144,8 @@ def read_output(filename, file_format="tough", labels_order=None):
             # Skip second line (unit)
             line = f.readline()
 
-            # Check third line (does it starts with TIME?)
-            i = f.tell()
+            # Check third line (does it start with TIME?)
             line = f.readline()
-            f.seek(i)
             single = not line.startswith('"TIME')
 
             # Read data
@@ -155,7 +153,8 @@ def read_output(filename, file_format="tough", labels_order=None):
                 times, labels, variables = [None], [[]], [[]]
             else:
                 times, labels, variables = [], [], []
-            line = f.readline().replace('"', "").strip()
+
+            line = line.replace('"', "").strip()
             while line:
                 line = line.split(",")
 
