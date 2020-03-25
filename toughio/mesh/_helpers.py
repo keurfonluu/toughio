@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 import meshio
 import numpy
 
@@ -129,13 +131,16 @@ def write(filename, mesh, file_format=None, **kwargs):
         "pickle": (pickle, (), {}),
         "tecplot": (tecplot, (), {}),
     }
-    mesh = mesh if fmt in {"tough", "pickle"} else mesh.to_meshio()
     if fmt in format_to_writer.keys():
+        if fmt not in {"tough", "pickle"}:
+            mesh = deepcopy(mesh)
+            mesh.cell_data = {k: mesh.split(v) for k, v in mesh.cell_data.items()}
         interface, args, default_kwargs = format_to_writer[fmt]
         _kwargs = default_kwargs.copy()
         _kwargs.update(kwargs)
         interface.write(filename, mesh, *args, **_kwargs)
     else:
+        mesh = mesh.to_meshio()
         meshio.write(filename, mesh, file_format=file_format, **kwargs)
 
 
