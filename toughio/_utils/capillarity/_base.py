@@ -63,7 +63,7 @@ class BaseCapillarity(ABC):
         figsize : array_like or None, optional, default None
             New figure size if `ax` is `None`.
         plt_kws : dict or None, optional, default None
-            Additional keywords passed to :function:`matplotlib.pyplot.semilogy`.
+            Additional keywords passed to :func:`matplotlib.pyplot.semilogy`.
 
         """
         import matplotlib.pyplot as plt
