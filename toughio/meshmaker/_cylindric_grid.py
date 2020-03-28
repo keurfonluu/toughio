@@ -13,7 +13,7 @@ class CylindricMesh(Mesh):
         """
         Cylindric mesh.
 
-        This class is only intended to be used as output of :function:`cylindric_grid`.
+        This class is only intended to be used as output of :func:`cylindric_grid`.
 
         Note
         ----
