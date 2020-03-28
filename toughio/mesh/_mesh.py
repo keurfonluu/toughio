@@ -45,7 +45,7 @@ class Mesh(object):
         """
         Unstructured toughio mesh.
 
-        This class is updated following the latest :module:`meshio` version and
+        This class is updated following the latest :mod:`meshio` version and
         brings backward compatibility with its previous versions.
 
         Parameters
@@ -461,7 +461,7 @@ class Mesh(object):
         incon : bool, optional, default False
             Only if ``file_format = "tough"``. If `True`, initial conditions will be written in file `INCON`.
         protocol : integer, optional, default `pickle.HIGHEST_PROTOCOL`
-            Only if ``file_format = "pickle"``. :module:`pickle` protocol version.
+            Only if ``file_format = "pickle"``. :mod:`pickle` protocol version.
 
         """
         from ._helpers import write
