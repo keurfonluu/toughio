@@ -32,13 +32,12 @@ def voxelize(points, material="dfalt"):
     points = numpy.asarray(points)
     idx = numpy.argsort(points)
     dx = 0.5 * (points[idx[1:]] - points[idx[:-1]])
-    dx = numpy.concatenate(([dx[0]], dx))
+    dx = numpy.insert(dx, 0, dx[0])
     dy = [0.05 * (points.max() - points.min())]
     dz = dy
     origin = -0.5 * numpy.array([dx[0], dy[0], dz[0]])
 
     mesh = structured_grid(dx, dy, dz, origin)
-    cell_type, cells = mesh.cells[0]
-    mesh.cells = [(cell_type, cells[idx])]
+    mesh.cells[0].data[:] = mesh.cells[0].data[numpy.argsort(idx)]
 
     return mesh
