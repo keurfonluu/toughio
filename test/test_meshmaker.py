@@ -37,6 +37,22 @@ def test_cylindric_grid():
 
 
 @pytest.mark.parametrize("ndim", [2, 3])
+def test_structured_grid(ndim):
+    dx = numpy.array([1.0, 2.0, 3.0, 4.0])
+    dy = numpy.array([1.0, 2.0, 3.0])
+    dz = numpy.array([1.0, 2.0]) if ndim == 3 else None
+
+    origin = numpy.random.rand(ndim)
+    mesh = toughio.meshmaker.structured_grid(dx, dy, dz, origin=origin)
+
+    assert numpy.allclose(origin, mesh.points.min(axis=0)[:ndim])
+    
+    if ndim == 3:
+        volumes_ref = dx.sum() * dy.sum() * dz.sum()
+        assert numpy.allclose(volumes_ref, mesh.volumes.sum())
+
+
+@pytest.mark.parametrize("ndim", [2, 3])
 def test_triangulate(ndim):
     points = numpy.random.rand(100, ndim)
     mesh = toughio.meshmaker.triangulate(points)
