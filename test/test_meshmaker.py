@@ -46,7 +46,7 @@ def test_structured_grid(ndim):
     mesh = toughio.meshmaker.structured_grid(dx, dy, dz, origin=origin)
 
     assert numpy.allclose(origin, mesh.points.min(axis=0)[:ndim])
-    
+
     if ndim == 3:
         volumes_ref = dx.sum() * dy.sum() * dz.sum()
         assert numpy.allclose(volumes_ref, mesh.volumes.sum())
@@ -56,6 +56,7 @@ def test_structured_grid(ndim):
 def test_triangulate(ndim):
     points = numpy.random.rand(100, ndim)
     mesh = toughio.meshmaker.triangulate(points)
+
     assert numpy.allclose(points, mesh.points)
     assert mesh.cells[0].type == ("triangle" if ndim == 2 else "tetra")
 
@@ -63,4 +64,5 @@ def test_triangulate(ndim):
 def test_voxelize():
     points = numpy.random.rand(numpy.random.randint(10) + 1)
     mesh = toughio.meshmaker.voxelize(points)
+
     assert numpy.allclose(numpy.argsort(points), numpy.argsort(mesh.centers[:, 0]))
