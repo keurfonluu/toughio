@@ -1,45 +1,36 @@
-import helpers
+import os
+
+import numpy
+import pytest
+
 import toughio
 
 
-def test_linear():
-    helpers.relative_permeability(
-        model=toughio.relative_permeability.Linear, parameters=[0.2, 0.3, 0.8, 0.9],
+@pytest.mark.parametrize(
+    "model, parameters",
+    [
+        (toughio.relative_permeability.Linear, [0.2, 0.3, 0.8, 0.9]),
+        (toughio.relative_permeability.Pickens, [2.0]),
+        (toughio.relative_permeability.Corey, [0.3, 0.05]),
+        (toughio.relative_permeability.Grant, [0.3, 0.05]),
+        (toughio.relative_permeability.FattKlikoff, [0.3]),
+        (toughio.relative_permeability.vanGenuchtenMualem, [0.457, 0.15, 1.0, 0.1]),
+        (toughio.relative_permeability.Verma, []),
+    ],
+)
+def test_relative_permeability(model, parameters):
+    import json
+
+    this_dir = os.path.dirname(os.path.abspath(__file__))
+    filename = os.path.join(
+        this_dir, "support_files", "relative_permeability_references.json"
     )
+    with open(filename, "r") as f:
+        relperm_ref = json.load(f)
 
+    sl = numpy.linspace(0.0, 1.0, 201)
 
-def test_pickens():
-    helpers.relative_permeability(
-        model=toughio.relative_permeability.Pickens, parameters=[2.0],
-    )
+    perm = model(*parameters)
+    relperm = numpy.transpose(perm(sl))
 
-
-def test_corey():
-    helpers.relative_permeability(
-        model=toughio.relative_permeability.Corey, parameters=[0.3, 0.05],
-    )
-
-
-def test_grant():
-    helpers.relative_permeability(
-        model=toughio.relative_permeability.Grant, parameters=[0.3, 0.05],
-    )
-
-
-def test_fatt_klikoff():
-    helpers.relative_permeability(
-        model=toughio.relative_permeability.FattKlikoff, parameters=[0.3],
-    )
-
-
-def test_vanGenuchten_mualem():
-    helpers.relative_permeability(
-        model=toughio.relative_permeability.vanGenuchtenMualem,
-        parameters=[0.457, 0.15, 1.0, 0.1],
-    )
-
-
-def test_verma():
-    helpers.relative_permeability(
-        model=toughio.relative_permeability.Verma, parameters=[],
-    )
+    assert numpy.allclose(relperm, relperm_ref[perm.name])
