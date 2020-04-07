@@ -28,6 +28,9 @@ jobs:
     - name: Test with pytest
       run: |
         pip install pytest
-        pytest
-    - name: Submit to codecov
-      run: bash <(curl -s https://codecov.io/bash)
+        pip install coverage
+        coverage run -m pytest
+    - name: Submit coverage
+      run: |
+        pip install codecov
+        codecov --token=${{ secrets.CODECOV_TOKEN }}
