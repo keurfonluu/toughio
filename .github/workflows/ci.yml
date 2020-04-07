@@ -27,7 +27,9 @@ jobs:
         pip install .[full]
     - name: Test with pytest
       run: |
-        pip install pytest
-        pytest
+        pip install pytest pytest-cov
+        pytest --cov=toughio
     - name: Submit to codecov
-      run: bash <(curl -s https://codecov.io/bash)
+      run: |
+        pip install codecov
+        codecov
