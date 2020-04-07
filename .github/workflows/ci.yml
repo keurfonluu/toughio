@@ -27,9 +27,5 @@ jobs:
         pip install .[full]
     - name: Test with pytest
       run: |
-        pip install pytest pytest-cov
-        pytest --cov=./
-    - name: Submit to codecov
-      run: |
-        pip install codecov
-        codecov --token=a8381784-e378-43e7-a337-ab61c23f3944
+        pip install pytest
+        pytest
