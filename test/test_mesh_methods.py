@@ -86,3 +86,10 @@ def test_to_meshio():
 
     mesh = helpers.hybrid_mesh.to_meshio()
     assert isinstance(mesh, meshio.Mesh)
+
+
+def test_to_pyvista():
+    import pyvista
+
+    mesh = helpers.hybrid_mesh.to_pyvista()
+    assert isinstance(mesh, pyvista.UnstructuredGrid)
