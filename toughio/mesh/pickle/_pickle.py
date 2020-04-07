@@ -43,7 +43,7 @@ def write(filename, mesh, protocol=pickle.HIGHEST_PROTOCOL):
     mesh : toughio.Mesh
         Mesh to pickle.
     protocol : integer, optional, default `pickle.HIGHEST_PROTOCOL`
-        :module:`pickle` protocol version.
+        :mod:`pickle` protocol version.
 
     """
     with open(filename, "wb") as f:
