@@ -583,7 +583,7 @@ class Mesh(object):
 
     def near(self, point):
         """
-        Return local index of cell nearest to query point.
+        Return index of cell nearest to query point.
 
         Parameters
         ----------
@@ -593,7 +593,7 @@ class Mesh(object):
         Returns
         -------
         tuple
-            Local index of cell as a tuple (iblock, icell).
+            Index of cell.
 
         """
         if not isinstance(point, (list, tuple, numpy.ndarray)):
