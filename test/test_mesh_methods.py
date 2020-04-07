@@ -103,3 +103,11 @@ def test_add_point_data():
     mesh.add_point_data("a", data)
 
     assert numpy.allclose(data, mesh.point_data["a"])
+
+
+def test_add_cell_data():
+    mesh = deepcopy(helpers.hybrid_mesh)
+    data = numpy.random.rand(mesh.n_cells)
+    mesh.add_cell_data("a", data)
+
+    assert numpy.allclose(data, mesh.cell_data["a"])
