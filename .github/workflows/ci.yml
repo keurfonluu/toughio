@@ -27,7 +27,9 @@ jobs:
         pip install .[full]
     - name: Test with pytest
       run: |
-        pip install pytest
-        pytest
-    - name: Submit coverage
-      run: bash <(curl -Ls https://coverage.codacy.com/get.sh)
+        pip install pytest pytest-cov
+        pytest --cov=./
+    - name: Run codacy-coverage-reporter
+      uses: mrfyda/codacy-coverage-reporter-action@master
+      with:
+        project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
