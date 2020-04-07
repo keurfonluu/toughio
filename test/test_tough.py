@@ -32,10 +32,10 @@ def test_mesh(nodal_distance, bound):
 
     parameters = helpers.write_read(
         filename="MESH",
-        obj=mesh,
-        writer=toughio.write_mesh,
+        obj=None,
+        writer=mesh.write_tough,
         reader=toughio.read_mesh,
-        writer_kws={"file_format": "tough", "nodal_distance": nodal_distance},
+        writer_kws={"nodal_distance": nodal_distance},
         reader_kws={"file_format": "tough"},
     )
 

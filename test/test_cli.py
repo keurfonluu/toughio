@@ -8,6 +8,9 @@ import helpers
 import toughio
 
 
+@pytest.mark.skipif(
+    toughio.mesh._common.get_meshio_version() < (4, 0, 11), reason="XDMF fix"
+)
 @pytest.mark.parametrize(
     "filename, file_format, mesh, ext",
     [
@@ -142,9 +145,8 @@ def test_extract(split):
                 output_ref.data["SAT_G"].mean(), output.data["SG"].mean()
             )
     else:
-        for i, output_filename in enumerate(
-            glob.glob(os.path.join(tempdir, "OUTPUT_ELEME_*.csv"))
-        ):
+        filenames = glob.glob(os.path.join(tempdir, "OUTPUT_ELEME_*.csv"))
+        for i, output_filename in enumerate(sorted(filenames)):
             outputs = toughio.read_output(output_filename)
 
             assert len(outputs) == 1
