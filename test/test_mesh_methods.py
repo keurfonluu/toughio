@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 import numpy
 
 import helpers
@@ -93,3 +95,11 @@ def test_to_pyvista():
 
     mesh = helpers.hybrid_mesh.to_pyvista()
     assert isinstance(mesh, pyvista.UnstructuredGrid)
+
+
+def test_add_point_data():
+    mesh = deepcopy(helpers.hybrid_mesh)
+    data = numpy.random.rand(mesh.n_points)
+    mesh.add_point_data("a", data)
+
+    assert numpy.allclose(data, mesh.point_data["a"])
