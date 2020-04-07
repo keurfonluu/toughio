@@ -1,5 +1,6 @@
 import numpy
 
+import helpers
 import toughio
 
 
@@ -78,3 +79,10 @@ def test_prune_duplicates():
     assert mesh.n_cells == 5
     assert mesh.point_data["points"].size == 13
     assert mesh.cell_data["cells"].size == 5
+
+
+def test_to_meshio():
+    import meshio
+
+    mesh = helpers.hybrid_mesh.to_meshio()
+    assert isinstance(mesh, meshio.Mesh)
