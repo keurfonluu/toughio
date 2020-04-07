@@ -32,4 +32,4 @@ jobs:
     - name: Submit to codecov
       run: |
         pip install codecov
-        codecov
+        codecov --token=a8381784-e378-43e7-a337-ab61c23f3944
