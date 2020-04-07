@@ -1,4 +1,4 @@
-__version__ = "1.2.4"
+__version__ = "1.2.5"
 __author__ = "Keurfon Luu"
 __author_email__ = "keurfonluu@lbl.gov"
 __website__ = "https://github.com/keurfonluu/toughio"
