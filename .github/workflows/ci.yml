@@ -30,6 +30,7 @@ jobs:
         pip install pytest
         pip install coverage
         coverage run -m pytest
+        coverage xml
     - name: Run codacy-coverage-reporter
       uses: mrfyda/codacy-coverage-reporter-action@master
       with:
