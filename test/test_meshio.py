@@ -1,6 +1,3 @@
-from copy import deepcopy
-
-import numpy
 import pytest
 
 import helpers
