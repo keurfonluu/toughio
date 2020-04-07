@@ -1,6 +1,5 @@
-from copy import deepcopy
-
 import os
+from copy import deepcopy
 
 import numpy
 import pytest
@@ -127,7 +126,7 @@ def test_set_material():
     dz = numpy.ones(10)
     mesh = toughio.meshmaker.structured_grid(dx, dy, dz, origin=numpy.zeros(3))
     mesh.set_material("test", xlim=(4.0, 6.0), ylim=(4.0, 6.0), zlim=(4.0, 6.0))
-    
+
     assert (mesh.materials == "test").sum() == 8
 
 
@@ -136,5 +135,5 @@ def test_near():
     dy = numpy.ones(3)
     dz = numpy.ones(3)
     mesh = toughio.meshmaker.structured_grid(dx, dy, dz, origin=numpy.zeros(3))
-    
+
     assert mesh.near((1.5, 1.5, 1.5)) == 13
