@@ -31,4 +31,8 @@ jobs:
     - name: Test with pytest
       run: |
         pip install pytest
-        pytest
+        pip install coverage
+        coverage run -m pytest
+    - name: Submit coverage
+        pip install codecov
+        codecov --token=${{ secrets.CODECOV_TOKEN }}
