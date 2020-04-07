@@ -27,8 +27,9 @@ jobs:
         pip install .[full]
     - name: Test with pytest
       run: |
-        pip install pytest pytest-cov
-        pytest --cov=./
+        pip install pytest
+        pip install coverage
+        coverage run -m pytest
     - name: Run codacy-coverage-reporter
       uses: mrfyda/codacy-coverage-reporter-action@master
       with:
