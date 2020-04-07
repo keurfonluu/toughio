@@ -29,3 +29,5 @@ jobs:
       run: |
         pip install pytest
         pytest
+    - name: Submit coverage
+      run: bash <(curl -Ls https://coverage.codacy.com/get.sh)
