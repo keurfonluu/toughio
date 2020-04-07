@@ -23,11 +23,8 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install netcdf4
-        pip install h5py
-        pip install lxml
-        pip install scipy
-        pip install .[base]
+        pip install matplotlib
+        pip install .[full]
     - name: Test with pytest
       run: |
         pip install pytest
