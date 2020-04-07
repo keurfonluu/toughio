@@ -1,5 +1,9 @@
-import numpy
+from copy import deepcopy
 
+import numpy
+import pytest
+
+import helpers
 import toughio
 
 
@@ -78,3 +82,57 @@ def test_prune_duplicates():
     assert mesh.n_cells == 5
     assert mesh.point_data["points"].size == 13
     assert mesh.cell_data["cells"].size == 5
+
+
+def test_to_meshio():
+    import meshio
+
+    mesh = helpers.hybrid_mesh.to_meshio()
+    assert isinstance(mesh, meshio.Mesh)
+
+
+def test_to_pyvista():
+    import pyvista
+
+    mesh = helpers.hybrid_mesh.to_pyvista()
+    assert isinstance(mesh, pyvista.UnstructuredGrid)
+
+
+def test_to_tough():
+    with pytest.deprecated_call():
+        helpers.hybrid_mesh.to_tough(helpers.tempdir("MESH"))
+
+
+def test_add_point_data():
+    mesh = deepcopy(helpers.hybrid_mesh)
+    data = numpy.random.rand(mesh.n_points)
+    mesh.add_point_data("a", data)
+
+    assert numpy.allclose(data, mesh.point_data["a"])
+
+
+def test_add_cell_data():
+    mesh = deepcopy(helpers.hybrid_mesh)
+    data = numpy.random.rand(mesh.n_cells)
+    mesh.add_cell_data("a", data)
+
+    assert numpy.allclose(data, mesh.cell_data["a"])
+
+
+def test_set_material():
+    dx = numpy.ones(10)
+    dy = numpy.ones(10)
+    dz = numpy.ones(10)
+    mesh = toughio.meshmaker.structured_grid(dx, dy, dz, origin=numpy.zeros(3))
+    mesh.set_material("test", xlim=(4.0, 6.0), ylim=(4.0, 6.0), zlim=(4.0, 6.0))
+
+    assert (mesh.materials == "test").sum() == 8
+
+
+def test_near():
+    dx = numpy.ones(3)
+    dy = numpy.ones(3)
+    dz = numpy.ones(3)
+    mesh = toughio.meshmaker.structured_grid(dx, dy, dz, origin=numpy.zeros(3))
+
+    assert mesh.near((1.5, 1.5, 1.5)) == 13

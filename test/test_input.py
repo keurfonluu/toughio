@@ -4,23 +4,35 @@ import pytest
 import helpers
 import toughio
 
-write_read = lambda x: helpers.write_read(
+write_read_tough = lambda x: helpers.write_read(
     "INFILE",
     x,
     toughio.write_input,
     toughio.read_input,
+    writer_kws={"file_format": "tough"},
     reader_kws={"file_format": "tough"},
 )
 
+write_read_json = lambda x: helpers.write_read(
+    "INFILE",
+    x,
+    toughio.write_input,
+    toughio.read_input,
+    writer_kws={"file_format": "json"},
+    reader_kws={"file_format": "json"},
+)
 
-def test_title():
+
+@pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
+def test_title(write_read):
     parameters_ref = {"title": helpers.random_string(80)}
     parameters = write_read(parameters_ref)
 
     assert parameters_ref["title"] == parameters["title"]
 
 
-def test_rocks():
+@pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
+def test_rocks(write_read):
     keys = [
         "density",
         "porosity",
@@ -91,8 +103,18 @@ def test_rocks():
                 helpers.allclose_dict(vv, parameters["rocks"][k][kk], atol=1.0e-4)
 
 
-@pytest.mark.parametrize("rpcap", ["rp", "cap", "both"])
-def test_rpcap(rpcap):
+@pytest.mark.parametrize(
+    "write_read, rpcap",
+    [
+        (write_read_tough, "rp"),
+        (write_read_tough, "cap"),
+        (write_read_tough, "both"),
+        (write_read_json, "rp"),
+        (write_read_json, "cap"),
+        (write_read_json, "both"),
+    ],
+)
+def test_rpcap(write_read, rpcap):
     parameters_ref = {"default": {}}
     if rpcap in {"rp", "both"}:
         parameters_ref["default"]["relative_permeability"] = {
@@ -110,7 +132,8 @@ def test_rpcap(rpcap):
         helpers.allclose_dict(v, parameters["default"][k], atol=1.0e-4)
 
 
-def test_flac():
+@pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
+def test_flac(write_read):
     parameters_ref = {
         "flac": {
             "creep": bool(numpy.random.randint(2)),
@@ -139,8 +162,10 @@ def test_flac():
             helpers.allclose_dict(vv, parameters["rocks"][k][kk], atol=1.0e-4)
 
 
-@pytest.mark.parametrize("isothermal", [True, False])
-def test_multi(isothermal):
+@pytest.mark.parametrize(
+    "write_read, isothermal", [(write_read_tough, True), (write_read_tough, False)],
+)
+def test_multi(write_read, isothermal):
     import random
     from toughio._io.tough._common import eos
 
@@ -163,7 +188,8 @@ def test_multi(isothermal):
     assert parameters_ref["isothermal"] == parameters["isothermal"]
 
 
-def test_selec():
+@pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
+def test_selec(write_read):
     parameters_ref = {
         "selections": {
             "integers": {
@@ -190,7 +216,8 @@ def test_selec():
         assert parameters_ref["selections"]["integers"][1] == 0
 
 
-def test_solvr():
+@pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
+def test_solvr(write_read):
     parameters_ref = {
         "solver": {
             "method": numpy.random.randint(10),
@@ -216,9 +243,15 @@ def test_solvr():
 
 
 @pytest.mark.parametrize(
-    "t_steps", [numpy.random.rand(), numpy.random.rand(numpy.random.randint(100) + 1)]
+    "write_read, t_steps",
+    [
+        (write_read_tough, numpy.random.rand()),
+        (write_read_tough, numpy.random.rand(numpy.random.randint(100) + 1)),
+        (write_read_json, numpy.random.rand()),
+        (write_read_json, numpy.random.rand(numpy.random.randint(100) + 1)),
+    ],
 )
-def test_param(t_steps):
+def test_param(write_read, t_steps):
     parameters_ref = {
         "options": {
             "n_iteration": numpy.random.randint(10),
@@ -260,7 +293,8 @@ def test_param(t_steps):
         assert not len(parameters_ref["default"]["initial_condition"])
 
 
-def test_indom():
+@pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
+def test_indom(write_read):
     parameters_ref = {
         "rocks": {
             helpers.random_string(5): {
@@ -279,7 +313,8 @@ def test_indom():
         )
 
 
-def test_momop():
+@pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
+def test_momop(write_read):
     parameters_ref = {
         "more_options": {
             k + 1: v for k, v in enumerate(numpy.random.randint(10, size=40))
@@ -291,9 +326,15 @@ def test_momop():
 
 
 @pytest.mark.parametrize(
-    "times", [numpy.random.rand(), numpy.random.rand(numpy.random.randint(100) + 1)]
+    "write_read, times",
+    [
+        (write_read_tough, numpy.random.rand()),
+        (write_read_tough, numpy.random.rand(numpy.random.randint(100) + 1)),
+        (write_read_json, numpy.random.rand()),
+        (write_read_json, numpy.random.rand(numpy.random.randint(100) + 1)),
+    ],
 )
-def test_times(times):
+def test_times(write_read, times):
     parameters_ref = {"times": times}
     parameters = write_read(parameters_ref)
 
@@ -301,10 +342,17 @@ def test_times(times):
 
 
 @pytest.mark.parametrize(
-    "oft, n",
-    [("element_history", 5), ("connection_history", 10), ("generator_history", 5)],
+    "write_read, oft, n",
+    [
+        (write_read_tough, "element_history", 5),
+        (write_read_tough, "connection_history", 10),
+        (write_read_tough, "generator_history", 5),
+        (write_read_json, "element_history", 5),
+        (write_read_json, "connection_history", 10),
+        (write_read_json, "generator_history", 5),
+    ],
 )
-def test_oft(oft, n):
+def test_oft(write_read, oft, n):
     parameters_ref = {
         oft: [helpers.random_string(n) for _ in range(numpy.random.randint(10) + 1)]
     }
@@ -313,7 +361,8 @@ def test_oft(oft, n):
     assert parameters_ref[oft] == parameters[oft]
 
 
-def test_gener():
+@pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
+def test_gener(write_read):
     n_rnd = numpy.random.randint(100) + 1
     parameters_ref = {
         "generators": {
@@ -377,7 +426,8 @@ def test_gener():
                     )
 
 
-def test_diffu():
+@pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
+def test_diffu(write_read):
     n_phase = numpy.random.randint(8) + 1
     parameters_ref = {
         "n_phase": n_phase,
@@ -390,8 +440,16 @@ def test_diffu():
     )
 
 
-@pytest.mark.parametrize("fmt", [None, helpers.random_string(20)])
-def test_outpu(fmt):
+@pytest.mark.parametrize(
+    "write_read, fmt",
+    [
+        (write_read_tough, None),
+        (write_read_tough, helpers.random_string(20)),
+        (write_read_json, None),
+        (write_read_json, helpers.random_string(20)),
+    ],
+)
+def test_outpu(write_read, fmt):
     parameters_ref = {
         "output": {
             "format": fmt,
@@ -412,7 +470,8 @@ def test_outpu(fmt):
     )
 
 
-def test_eleme():
+@pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
+def test_eleme(write_read):
     keys = [
         "material",
         "volume",
@@ -449,7 +508,8 @@ def test_eleme():
                 assert vv == parameters["elements"][k][kk]
 
 
-def test_conne():
+@pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
+def test_conne(write_read):
     keys = [
         "permeability_direction",
         "nodal_distances",
@@ -483,7 +543,8 @@ def test_conne():
             assert numpy.allclose(vv, parameters["connections"][k][kk], atol=1.0e-4)
 
 
-def test_incon():
+@pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
+def test_incon(write_read):
     keys = [
         "porosity",
         "userx",
@@ -518,10 +579,19 @@ def test_incon():
 
 
 @pytest.mark.parametrize(
-    "flag, enable",
-    [("start", True), ("start", False), ("nover", True), ("nover", False)],
+    "write_read, flag, enable",
+    [
+        (write_read_tough, "start", True),
+        (write_read_tough, "start", False),
+        (write_read_tough, "nover", True),
+        (write_read_tough, "nover", False),
+        (write_read_json, "start", True),
+        (write_read_json, "start", False),
+        (write_read_json, "nover", True),
+        (write_read_json, "nover", False),
+    ],
 )
-def test_flag(flag, enable):
+def test_flag(write_read, flag, enable):
     parameters_ref = {flag: enable}
     parameters = write_read(parameters_ref)
 

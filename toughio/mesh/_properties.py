@@ -259,7 +259,7 @@ def _get_triangle_normals(mesh, faces, islice=None):
 
 
 def _cross(a, b):
-    """Calculate cross product (faster than :function:`numpy.cross`)."""
+    """Calculate cross product (faster than :func:`numpy.cross`)."""
     return a[:, [1, 2, 0]] * b[:, [2, 0, 1]] - a[:, [2, 0, 1]] * b[:, [1, 2, 0]]
 
 
