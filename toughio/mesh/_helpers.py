@@ -106,7 +106,7 @@ def write(filename, mesh, file_format=None, **kwargs):
     incon : bool, optional, default False
         Only if ``file_format = "tough"``. If `True`, initial conditions will be written in file `INCON`.
     protocol : integer, optional, default `pickle.HIGHEST_PROTOCOL`
-        Only if ``file_format = "pickle"``. :module:`pickle` protocol version.
+        Only if ``file_format = "pickle"``. :mod:`pickle` protocol version.
 
     """
     # Check file format

@@ -7,6 +7,39 @@ import toughio
 
 numpy.random.seed(42)
 
+tet_mesh = toughio.Mesh(
+    points=numpy.array(
+        [
+            [0.0, 0.0, 0.0],
+            [1.0, 0.0, 0.0],
+            [1.0, 1.0, 0.0],
+            [0.0, 1.0, 0.0],
+            [0.5, 0.5, 0.5],
+        ]
+    ),
+    cells=[("tetra", numpy.array([[0, 1, 2, 4], [0, 2, 3, 4]]))],
+    point_data={"a": numpy.random.rand(5), "b": numpy.random.rand(5)},
+    cell_data={"c": numpy.random.rand(2), "d": numpy.random.rand(2)},
+)
+
+hex_mesh = toughio.Mesh(
+    points=numpy.array(
+        [
+            [0.0, 0.0, 0.0],
+            [1.0, 0.0, 0.0],
+            [1.0, 1.0, 0.0],
+            [0.0, 1.0, 0.0],
+            [0.0, 0.0, 1.0],
+            [1.0, 0.0, 1.0],
+            [1.0, 1.0, 1.0],
+            [0.0, 1.0, 1.0],
+        ]
+    ),
+    cells=[("hexahedron", numpy.array([[0, 1, 2, 3, 4, 5, 6, 7]]))],
+    point_data={"a": numpy.random.rand(8), "b": numpy.random.rand(8)},
+    cell_data={"c": numpy.random.rand(1), "d": numpy.random.rand(1)},
+)
+
 hybrid_mesh = toughio.Mesh(
     points=numpy.array(
         [
@@ -33,6 +66,8 @@ hybrid_mesh = toughio.Mesh(
         ("tetra", numpy.array([[4, 8, 7, 9], [5, 6, 8, 10]])),
         ("wedge", numpy.array([[1, 11, 5, 2, 12, 6], [13, 0, 4, 14, 3, 7]])),
     ],
+    point_data={"a": numpy.random.rand(15), "b": numpy.random.rand(15)},
+    cell_data={"c": numpy.random.rand(6), "d": numpy.random.rand(6)},
 )
 
 
@@ -69,33 +104,17 @@ def allclose_dict(a, b, atol=1.0e-8):
             assert b[k] is None
 
 
-def relative_permeability(model, parameters, sl=None, atol=1.0e-8):
-    import json
+def allclose_mesh(mesh_ref, mesh):
+    assert numpy.allclose(mesh_ref.points, mesh.points)
 
-    this_dir = os.path.dirname(os.path.abspath(__file__))
-    filename = os.path.join(
-        this_dir, "support_files", "relative_permeability_references.json"
-    )
-    with open(filename, "r") as f:
-        relperm_ref = json.load(f)
+    for i, cell in enumerate(mesh_ref.cells):
+        assert cell.type == mesh.cells[i].type
+        assert numpy.allclose(cell.data, mesh.cells[i].data)
 
-    sl = numpy.linspace(0.0, 1.0, 201) if sl is None else sl
+    if mesh.point_data:
+        for k, v in mesh_ref.point_data.items():
+            assert numpy.allclose(v, mesh.point_data[k])
 
-    perm = model(*parameters)
-    relperm = numpy.transpose(perm(sl))
-    assert numpy.allclose(relperm, relperm_ref[perm.name], atol=atol)
-
-
-def capillarity(model, parameters, sl=None, atol=1.0e-8):
-    import json
-
-    this_dir = os.path.dirname(os.path.abspath(__file__))
-    filename = os.path.join(this_dir, "support_files", "capillarity_references.json")
-    with open(filename, "r") as f:
-        pcap_ref = json.load(f)
-
-    sl = numpy.linspace(0.0, 1.0, 51) if sl is None else sl
-
-    cap = model(*parameters)
-    pcap = cap(sl)
-    assert numpy.allclose(pcap, pcap_ref[cap.name][: len(pcap)], atol=atol)
+    if mesh.cell_data:
+        for k, v in mesh_ref.cell_data.items():
+            assert numpy.allclose(v, mesh.cell_data[k])

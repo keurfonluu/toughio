@@ -114,12 +114,12 @@ nomen = ["{:1}".format(i + 1) for i in range(9)] + alpha
 
 def get_meshio_version():
     """
-    Return :module:`meshio` version as a tuple.
+    Return :mod:`meshio` version as a tuple.
 
     Returns
     -------
     tuple
-        :module:`meshio` version as tuple (major, minor, patch).
+        :mod:`meshio` version as tuple (major, minor, patch).
 
     """
     return tuple(int(i) for i in meshio.__version__.split("."))
