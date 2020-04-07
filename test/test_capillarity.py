@@ -1,5 +1,6 @@
 import os
 
+import matplotlib.pyplot as plt
 import numpy
 import pytest
 
@@ -24,7 +25,7 @@ import toughio
         ),
     ],
 )
-def test_capillarity(model, parameters, sl):
+def test_capillarity(model, parameters, sl, monkeypatch):
     import json
 
     this_dir = os.path.dirname(os.path.abspath(__file__))
@@ -37,3 +38,6 @@ def test_capillarity(model, parameters, sl):
     cap = model(*parameters)
     pcap = cap(sl)
     assert numpy.allclose(pcap, pcap_ref[cap.name][: len(pcap)])
+
+    monkeypatch.setattr(plt, "show", lambda: None)
+    cap.plot()
