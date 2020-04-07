@@ -1,6 +1,9 @@
 from copy import deepcopy
 
+import os
+
 import numpy
+import pytest
 
 import helpers
 import toughio
@@ -95,6 +98,11 @@ def test_to_pyvista():
 
     mesh = helpers.hybrid_mesh.to_pyvista()
     assert isinstance(mesh, pyvista.UnstructuredGrid)
+
+
+def test_to_tough():
+    with pytest.deprecated_call():
+        helpers.hybrid_mesh.to_tough(helpers.tempdir("MESH"))
 
 
 def test_add_point_data():
