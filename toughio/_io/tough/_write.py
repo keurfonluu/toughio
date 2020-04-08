@@ -71,8 +71,14 @@ def write_buffer(parameters):
         )
 
     # Set some flags
-    cond1 = "relative_permeability" in parameters["default"].keys()
-    cond2 = "capillarity" in parameters["default"].keys()
+    cond1 = (
+        "relative_permeability" in parameters["default"].keys()
+        and parameters["default"]["relative_permeability"]["id"] is not None
+    )
+    cond2 = (
+        "capillarity" in parameters["default"].keys()
+        and parameters["default"]["capillarity"]["id"] is not None
+    )
     rpcap = cond1 or cond2
 
     indom = False
@@ -131,6 +137,9 @@ def _write_rocks(parameters):
     # Reorder rocks
     if parameters["rocks_order"] is not None:
         order = parameters["rocks_order"]
+        for rock in parameters["rocks"].keys():
+            if rock not in order:
+                order.append(rock)
     else:
         order = parameters["rocks"].keys()
 
@@ -256,6 +265,9 @@ def _write_flac(parameters):
     # Reorder rocks
     if parameters["rocks_order"]:
         order = parameters["rocks_order"]
+        for rock in parameters["rocks"].keys():
+            if rock not in order:
+                order.append(rock)
     else:
         order = parameters["rocks"].keys()
 
@@ -447,6 +459,9 @@ def _write_indom(parameters):
     """Write INDOM block data."""
     if parameters["rocks_order"]:
         order = parameters["rocks_order"]
+        for rock in parameters["rocks"].keys():
+            if rock not in order:
+                order.append(rock)
     else:
         order = parameters["rocks"].keys()
 
@@ -580,7 +595,7 @@ def _write_gener(parameters):
         out += write_record(
             format_data(
                 [
-                    (k, "{:5.5}"),
+                    (k, "{:>5.5}"),
                     (v["name"], "{:>5g}"),
                     (None, "{:>5g}"),
                     (None, "{:>5g}"),
@@ -685,7 +700,7 @@ def _write_eleme(parameters):
         out += write_record(
             format_data(
                 [
-                    (k, "{:5.5}"),
+                    (k, "{:>5.5}"),
                     (None, "{:>5}"),
                     (None, "{:>5}"),
                     (data["material"], "{:>5}"),
@@ -722,7 +737,7 @@ def _write_conne(parameters):
         out += write_record(
             format_data(
                 [
-                    (k, "{:10.10}"),
+                    (k, "{:>10.10}"),
                     (None, "{:>5}"),
                     (None, "{:>5}"),
                     (None, "{:>5}"),
@@ -758,7 +773,7 @@ def _write_incon(parameters):
 
         # Record 1
         tmp = [
-            (k, "{:5.5}"),
+            (k, "{:>5.5}"),
             (None, "{:>5}"),
             (None, "{:>5}"),
             (data["porosity"], "{:>15.9e}"),
