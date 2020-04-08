@@ -580,7 +580,7 @@ def _write_gener(parameters):
         out += write_record(
             format_data(
                 [
-                    (k, "{:5.5}"),
+                    (k, "{:>5.5}"),
                     (v["name"], "{:>5g}"),
                     (None, "{:>5g}"),
                     (None, "{:>5g}"),
@@ -685,7 +685,7 @@ def _write_eleme(parameters):
         out += write_record(
             format_data(
                 [
-                    (k, "{:5.5}"),
+                    (k, "{:>5.5}"),
                     (None, "{:>5}"),
                     (None, "{:>5}"),
                     (data["material"], "{:>5}"),
@@ -722,7 +722,7 @@ def _write_conne(parameters):
         out += write_record(
             format_data(
                 [
-                    (k, "{:10.10}"),
+                    (k, "{:>10.10}"),
                     (None, "{:>5}"),
                     (None, "{:>5}"),
                     (None, "{:>5}"),
@@ -758,7 +758,7 @@ def _write_incon(parameters):
 
         # Record 1
         tmp = [
-            (k, "{:5.5}"),
+            (k, "{:>5.5}"),
             (None, "{:>5}"),
             (None, "{:>5}"),
             (data["porosity"], "{:>15.9e}"),

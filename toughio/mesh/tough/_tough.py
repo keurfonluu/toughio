@@ -253,7 +253,7 @@ def _write_conne(
             for iface, j in enumerate(connection):
                 if j >= 0 and j not in cell_list:
                     # Label
-                    clabels.append("{:5.5}{:5.5}".format(labels[i], labels[j]))
+                    clabels.append("{:>5.5}{:>5.5}".format(labels[i], labels[j]))
 
                     # Nodal points
                     centers.append([nodes[i], nodes[j]])
