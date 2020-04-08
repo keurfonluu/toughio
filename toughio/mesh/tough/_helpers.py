@@ -26,7 +26,7 @@ def block(keyword):
 
 def _write_eleme(labels, materials, volumes, nodes, material_name=None):
     """Return a generator that iterates over the records of block ELEME."""
-    fmt = "{:5.5}{:>5}{:>5}{:>5}{:10.4e}{:>10}{:>10}{:10.3e}{:10.3e}{:10.3e}\n"
+    fmt = "{:>5.5}{:>5}{:>5}{:>5}{:10.4e}{:>10}{:>10}{:10.3e}{:10.3e}{:10.3e}\n"
 
     iterables = zip(labels, materials, volumes, nodes)
     for label, material, volume, node in iterables:
@@ -52,7 +52,7 @@ def _write_eleme(labels, materials, volumes, nodes, material_name=None):
 
 def _write_conne(clabels, isot, d1, d2, areas, angles):
     """Return a generator that iterates over the records of block CONNE."""
-    fmt = "{:10.10}{:>5}{:>5}{:>5}{:>5g}{:10.4e}{:10.4e}{:10.4e}{:10.3e}\n"
+    fmt = "{:>10.10}{:>5}{:>5}{:>5}{:>5g}{:10.4e}{:10.4e}{:10.4e}{:10.3e}\n"
 
     iterables = zip(clabels, isot, d1, d2, areas, angles)
     for label, isot, d1, d2, area, angle in iterables:
@@ -81,7 +81,7 @@ def _write_incon(labels, values, porosity=None, userx=None):
         cond2 = phi is not None
         cond3 = usrx is not None
         if cond1 or cond2 or cond3:
-            record = "{:5.5}{:10}".format(label, "")
+            record = "{:>5.5}{:10}".format(label, "")
 
             record += "{:15.9e}".format(phi) if phi is not None else "{:15}".format("")
 
