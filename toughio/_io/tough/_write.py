@@ -137,6 +137,9 @@ def _write_rocks(parameters):
     # Reorder rocks
     if parameters["rocks_order"] is not None:
         order = parameters["rocks_order"]
+        for rock in parameters["rocks"].keys():
+            if rock not in order:
+                order.append(rock)
     else:
         order = parameters["rocks"].keys()
 
@@ -262,6 +265,9 @@ def _write_flac(parameters):
     # Reorder rocks
     if parameters["rocks_order"]:
         order = parameters["rocks_order"]
+        for rock in parameters["rocks"].keys():
+            if rock not in order:
+                order.append(rock)
     else:
         order = parameters["rocks"].keys()
 
@@ -453,6 +459,9 @@ def _write_indom(parameters):
     """Write INDOM block data."""
     if parameters["rocks_order"]:
         order = parameters["rocks_order"]
+        for rock in parameters["rocks"].keys():
+            if rock not in order:
+                order.append(rock)
     else:
         order = parameters["rocks"].keys()
 
