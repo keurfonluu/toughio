@@ -71,8 +71,8 @@ def write_buffer(parameters):
         )
 
     # Set some flags
-    cond1 = "relative_permeability" in parameters["default"].keys()
-    cond2 = "capillarity" in parameters["default"].keys()
+    cond1 = "relative_permeability" in parameters["default"].keys() and parameters["default"]["relative_permeability"]["id"] is not None
+    cond2 = "capillarity" in parameters["default"].keys() and parameters["default"]["capillarity"]["id"] is not None
     rpcap = cond1 or cond2
 
     indom = False
