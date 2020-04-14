@@ -21,7 +21,15 @@ def read(filename):
     return {
         k: v
         for k, v in mesh.items()
-        if k in {"elements", "connections", "initial_conditions"}
+        if k
+        in {
+            "elements",
+            "elements_order",
+            "connections",
+            "connections_order",
+            "initial_conditions",
+            "initial_conditions_order",
+        }
     }
 
 
