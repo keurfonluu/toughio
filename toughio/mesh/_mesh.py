@@ -25,6 +25,7 @@ __all__ = [
     "CellBlock",
     "Mesh",
     "from_meshio",
+    "from_pyvista",
 ]
 
 
@@ -814,6 +815,93 @@ def from_meshio(mesh):
             else None
         ),
         cell_sets=mesh.cell_sets if hasattr(mesh, "cell_sets") else None,
+    )
+
+    if "material" not in out.cell_data.keys():
+        imat = (
+            numpy.max([v[0] for v in mesh.field_data.values() if v[1] == 3]) + 1
+            if mesh.field_data
+            else 1
+        )
+        out.cell_data["material"] = numpy.full(out.n_cells, imat, dtype=int)
+        out.field_data["dfalt"] = numpy.array([imat, 3])
+
+    return out
+
+
+def from_pyvista(mesh):
+    """
+    Convert a :class:`pyvista.UnstructuredGrid` to :class:`toughio.Mesh`.
+
+    Parameters
+    ----------
+    mesh : pyvista.UnstructuredGrid
+        Input mesh.
+
+    Returns
+    -------
+    toughio.Mesh
+        Output mesh.
+
+    """
+    try:
+        import pyvista
+        from ._common import vtk_to_meshio_type
+    except ImportError:
+        raise ImportError(
+            "Converting pyvista.UnstructuredGrid requires pyvista to be installed."
+        )
+
+    # Copy useful arrays to avoid repeated calls to properties
+    vtk_offset = mesh.offset
+    vtk_cells = mesh.cells
+    vtk_cell_type = mesh.celltypes
+
+    # Check that meshio supports all cell types in input mesh
+    pixel_voxel = {8, 11}  # Handle pixels and voxels
+    for cell_type in numpy.unique(vtk_cell_type):
+        if not (cell_type in vtk_to_meshio_type.keys() or cell_type in pixel_voxel):
+            raise ValueError("toughio does not support VTK type {}.".format(cell_type))
+
+    # Get cells
+    cells = []
+    for offset, cell_type in zip(vtk_offset, vtk_cell_type):
+        numnodes = vtk_cells[offset]
+        cell = vtk_cells[offset + 1 : offset + 1 + numnodes]
+        cell = (
+            cell
+            if cell_type not in pixel_voxel
+            else cell[[0, 1, 3, 2]]
+            if cell_type == 8
+            else cell[[0, 1, 3, 2, 4, 5, 7, 6]]
+        )
+        cell_type = cell_type if cell_type not in pixel_voxel else cell_type + 1
+        cell_type = (
+            vtk_to_meshio_type[cell_type]
+            if cell_type != 7
+            else "polygon{}".format(numnodes)
+        )
+
+        if len(cells) > 0 and cells[-1][0] == cell_type:
+            cells[-1][1].append(cell)
+        else:
+            cells.append((cell_type, [cell]))
+
+    for k, c in enumerate(cells):
+        cells[k] = (c[0], numpy.array(c[1]))
+
+    # Get point data
+    point_data = {k.replace(" ", "_"): v for k, v in mesh.point_arrays.items()}
+
+    # Get cell data
+    cell_data = {k.replace(" ", "_"): v for k, v in mesh.cell_arrays.items()}
+
+    # Create toughio.Mesh
+    out = Mesh(
+        points=numpy.array(mesh.points),
+        cells=cells,
+        point_data=point_data,
+        cell_data=cell_data,
     )
 
     if "material" not in out.cell_data.keys():
