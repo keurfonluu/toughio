@@ -7,7 +7,7 @@ from ._helpers import (
     write_points_cells,
     write_time_series,
 )
-from ._mesh import Mesh, from_meshio
+from ._mesh import Mesh, from_meshio, from_pyvista
 
 __all__ = [
     "read",
@@ -17,4 +17,5 @@ __all__ = [
     "write_time_series",
     "Mesh",
     "from_meshio",
+    "from_pyvista",
 ]
