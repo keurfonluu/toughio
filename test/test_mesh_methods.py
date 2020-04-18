@@ -84,20 +84,6 @@ def test_prune_duplicates():
     assert mesh.cell_data["cells"].size == 5
 
 
-def test_to_meshio():
-    import meshio
-
-    mesh = helpers.hybrid_mesh.to_meshio()
-    assert isinstance(mesh, meshio.Mesh)
-
-
-def test_to_pyvista():
-    import pyvista
-
-    mesh = helpers.hybrid_mesh.to_pyvista()
-    assert isinstance(mesh, pyvista.UnstructuredGrid)
-
-
 @pytest.mark.parametrize(
     "mesh_ref, from_, to_",
     [
