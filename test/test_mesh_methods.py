@@ -84,18 +84,19 @@ def test_prune_duplicates():
     assert mesh.cell_data["cells"].size == 5
 
 
-def test_to_meshio():
-    import meshio
+@pytest.mark.parametrize(
+    "mesh_ref, from_, to_",
+    [
+        (helpers.tet_mesh, toughio.from_meshio, "to_meshio"),
+        (helpers.tet_mesh, toughio.from_pyvista, "to_pyvista"),
+        (helpers.hex_mesh, toughio.from_meshio, "to_meshio"),
+        (helpers.hex_mesh, toughio.from_pyvista, "to_pyvista"),
+    ],
+)
+def test_from_to(mesh_ref, from_, to_):
+    mesh = from_(getattr(mesh_ref, to_)())
 
-    mesh = helpers.hybrid_mesh.to_meshio()
-    assert isinstance(mesh, meshio.Mesh)
-
-
-def test_to_pyvista():
-    import pyvista
-
-    mesh = helpers.hybrid_mesh.to_pyvista()
-    assert isinstance(mesh, pyvista.UnstructuredGrid)
+    helpers.allclose_mesh(mesh_ref, mesh)
 
 
 def test_to_tough():

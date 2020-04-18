@@ -6,6 +6,9 @@ import pytest
 
 import toughio
 
+if not os.environ.get("DISPLAY", ""):
+    plt.switch_backend("Agg")
+
 
 @pytest.mark.parametrize(
     "model, parameters, sl",

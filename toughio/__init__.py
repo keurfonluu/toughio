@@ -8,7 +8,7 @@ from .__about__ import (
 )
 from ._io import read_input, read_output, read_save, write_input
 from ._utils import capillarity, relative_permeability
-from .mesh import Mesh
+from .mesh import Mesh, from_meshio, from_pyvista
 from .mesh import read as read_mesh
 from .mesh import read_time_series
 from .mesh import write as write_mesh
@@ -22,6 +22,8 @@ __all__ = [
     "write_input",
     "read_output",
     "read_save",
+    "from_meshio",
+    "from_pyvista",
     "read_mesh",
     "write_mesh",
     "read_time_series",
