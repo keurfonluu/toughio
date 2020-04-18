@@ -905,11 +905,7 @@ def from_pyvista(mesh):
     )
 
     if "material" not in out.cell_data.keys():
-        imat = (
-            numpy.max([v[0] for v in mesh.field_data.values() if v[1] == 3]) + 1
-            if mesh.field_data
-            else 1
-        )
+        imat = 1
         out.cell_data["material"] = numpy.full(out.n_cells, imat, dtype=int)
         out.field_data["dfalt"] = numpy.array([imat, 3])
 
