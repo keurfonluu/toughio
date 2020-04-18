@@ -54,9 +54,13 @@ def read(filename):
 
 def read_buffer(f):
     # Skip comments and unpack first line
-    num_nodes, num_cells, num_node_data, num_cell_data, _ = numpy.genfromtxt(
-        f, max_rows=1, dtype=int, comments="#"
-    )
+    while True:
+        line = f.readline().strip()
+        if not line.startswith("#"):
+            break
+    num_nodes, num_cells, num_node_data, num_cell_data = [
+        int(i) for i in line.split()[:4]
+    ]
 
     # Read nodes
     point_ids, points = _read_nodes(f, num_nodes)
@@ -81,7 +85,11 @@ def read_buffer(f):
 
 
 def _read_nodes(f, num_nodes):
-    data = numpy.genfromtxt(f, max_rows=num_nodes)
+    data = []
+    for _ in range(num_nodes):
+        line = f.readline().strip()
+        data += [[float(x) for x in line.split()]]
+    data = numpy.array(data)
     points_ids = {int(pid): i for i, pid in enumerate(data[:, 0])}
     return points_ids, data[:, 1:]
 
