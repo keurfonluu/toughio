@@ -782,6 +782,9 @@ def from_meshio(mesh):
         Output mesh.
 
     """
+    if not isinstance(mesh, meshio.Mesh):
+        raise TypeError()
+
     version = get_meshio_version()
 
     if mesh.cell_data:
@@ -851,6 +854,9 @@ def from_pyvista(mesh):
         raise ImportError(
             "Converting pyvista.UnstructuredGrid requires pyvista to be installed."
         )
+
+    if not isinstance(mesh, pyvista.UnstructuredGrid):
+        raise TypeError()
 
     # Copy useful arrays to avoid repeated calls to properties
     vtk_offset = mesh.offset
