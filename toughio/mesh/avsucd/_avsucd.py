@@ -58,7 +58,9 @@ def read_buffer(f):
         line = f.readline().strip()
         if not line.startswith("#"):
             break
-    num_nodes, num_cells, num_node_data, num_cell_data = [int(i) for i in line.split()[:4]]
+    num_nodes, num_cells, num_node_data, num_cell_data = [
+        int(i) for i in line.split()[:4]
+    ]
 
     # Read nodes
     point_ids, points = _read_nodes(f, num_nodes)
