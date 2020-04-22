@@ -88,7 +88,6 @@ options = {
 extra_options = {k + 1: None for k in range(24)}
 
 more_options = {k + 1: None for k in range(40)}
-more_options[2] = 5
 
 solver = {
     "id": 3,
