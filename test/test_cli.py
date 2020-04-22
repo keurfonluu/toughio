@@ -8,9 +8,6 @@ import helpers
 import toughio
 
 
-@pytest.mark.skipif(
-    toughio.mesh._common.get_meshio_version() < (4, 0, 11), reason="XDMF fix"
-)
 @pytest.mark.parametrize(
     "filename, file_format, mesh, ext",
     [
