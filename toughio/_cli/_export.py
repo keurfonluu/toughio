@@ -72,6 +72,7 @@ def export(argv=None):
             sys.stdout.flush()
 
             mesh = triangulate(points)
+            mesh.cell_dada = {}
 
             if args.file_format != "xdmf":
                 for label, data in output.data.items():
@@ -83,6 +84,7 @@ def export(argv=None):
             sys.stdout.flush()
 
             mesh = voxelize(points)
+            mesh.cell_dada = {}
 
             if args.file_format != "xdmf":
                 for label, data in output.data.items():
@@ -99,6 +101,11 @@ def export(argv=None):
             raise ValueError("Cannot unpickle mesh file {}: {}.".format(args.mesh, e))
 
         if args.file_format != "xdmf":
+            mesh.point_data = {}
+            mesh.cell_dada = {}
+            mesh.field_data = {}
+            mesh.point_sets = {}
+            mesh.cell_sets = {}
             mesh.read_output(output)
         else:
             output = [_reorder_labels(data, mesh.labels) for data in output]
@@ -116,7 +123,6 @@ def export(argv=None):
     sys.stdout.flush()
 
     if args.file_format != "xdmf":
-        mesh.cell_data.pop("material")
         mesh.write(filename, file_format=args.file_format)
 
     else:
