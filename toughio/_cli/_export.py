@@ -42,7 +42,7 @@ def export(argv=None):
         raise ValueError("TOUGH output file '{}' not found.".format(args.infile))
     if with_mesh:
         if not os.path.isfile(args.mesh):
-            raise ValueError("Pickled mesh file '{}' not found.".format(args.mesh))
+            raise ValueError("Mesh file '{}' not found.".format(args.mesh))
 
     # Read output file
     print("Reading file '{}' ...".format(args.infile), end="")
@@ -96,9 +96,9 @@ def export(argv=None):
         sys.stdout.flush()
 
         try:
-            mesh = read_mesh(args.mesh, file_format="pickle")
+            mesh = read_mesh(args.mesh)
         except Exception as e:
-            raise ValueError("Cannot unpickle mesh file {}: {}.".format(args.mesh, e))
+            raise ValueError("Unable to read mesh file {}: {}.".format(args.mesh, e))
 
         if args.file_format != "xdmf":
             mesh.point_data = {}
