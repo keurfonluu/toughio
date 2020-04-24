@@ -57,6 +57,7 @@ ENTRY_POINTS = {
         "toughio-export = toughio._cli:export",
         "toughio-extract = toughio._cli:extract",
         "toughio-merge = toughio._cli:merge",
+        "toughio-save2incon = toughio._cli:save2incon",
     ],
 }
 
