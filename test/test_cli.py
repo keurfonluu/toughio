@@ -8,6 +8,18 @@ import helpers
 import toughio
 
 
+@pytest.mark.parametrize("dirname", [helpers.tempdir(), "abc"])
+def test_co2tab(dirname):
+    argv = [dirname]
+
+    if os.path.isdir(dirname):
+        toughio._cli.co2tab(argv)
+        assert os.path.isfile(os.path.join(dirname, "CO2TAB"))
+    else:
+        with pytest.raises(ValueError):
+            toughio._cli.co2tab(argv)
+
+
 @pytest.mark.parametrize(
     "filename, file_format, mesh, ext",
     [
