@@ -44,7 +44,6 @@ def _get_parser():
     parser.add_argument(
         "infile",
         type=str,
-        default="SAVE",
         help="SAVE file to convert",
     )
 
@@ -52,7 +51,6 @@ def _get_parser():
     parser.add_argument(
         "outfile",
         type=str,
-        default="INCON",
         help="converted INCON file",
     )
 
