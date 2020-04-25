@@ -19,7 +19,7 @@ def co2tab(argv=None):
     filename = pkg_resources.resource_filename("toughio", "data/CO2TAB")
     output_filename = os.path.join(args.path, "CO2TAB")
     shutil.copy(filename, output_filename)
-    
+
 
 def _get_parser():
     import argparse
@@ -32,9 +32,7 @@ def _get_parser():
 
     # Output path
     parser.add_argument(
-        "path",
-        type=str,
-        help="directory path",
+        "path", type=str, help="directory path",
     )
 
     return parser

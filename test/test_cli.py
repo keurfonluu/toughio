@@ -256,12 +256,12 @@ def test_save2incon(reset):
         filename,
         output_filename,
     ]
-    
+
     if reset:
         argv += ["-r"]
 
     toughio._cli.save2incon(argv)
-    
+
     incon = toughio.read_save(output_filename)
 
     assert save.labels.tolist() == incon.labels.tolist()
