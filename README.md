@@ -115,6 +115,8 @@ output = toughio.read_output(
 
 **`toughio`** is mainly intended to be used as a Python scripting library for TOUGH. Nevertheless, several utility command line scripts are available for users who are not familiar with Python. From a console or terminal, the user can execute the following scripts:
 
+-   `toughio-co2tab`: copy file _CO2TAB_ to the target directory,
 -   `toughio-export`: export TOUGH simulation results to a file for visualization (VTK, VTU, Tecplot or XDMF),
 -   `toughio-extract`: extract results from TOUGH main output file and reformat as a TOUGH3 element output file (mostly useful for TOUGH2 output _before_ calling `toughio-export`),
--   `toughio-merge`: merge input file, MESH and/or INCON into a single file (for storage or sharing).
+-   `toughio-merge`: merge input file, MESH and/or INCON into a single file (for storage or sharing),
+-   `toughio-save2incon`: convert a _SAVE_ file to an _INCON_ file (mostly useful to automatically restart a simulation and reset the counters).
