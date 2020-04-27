@@ -10,3 +10,4 @@
 *.csv filter=lfs diff=lfs merge=lfs -text
 *.out filter=lfs diff=lfs merge=lfs -text
 *.pickle filter=lfs diff=lfs merge=lfs -text
+*CO2TAB filter=lfs diff=lfs merge=lfs -text
