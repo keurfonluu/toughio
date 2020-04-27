@@ -8,6 +8,18 @@ import helpers
 import toughio
 
 
+@pytest.mark.parametrize("dirname", [helpers.tempdir(), "abc"])
+def test_co2tab(dirname):
+    argv = [dirname]
+
+    if os.path.isdir(dirname):
+        toughio._cli.co2tab(argv)
+        assert os.path.isfile(os.path.join(dirname, "CO2TAB"))
+    else:
+        with pytest.raises(ValueError):
+            toughio._cli.co2tab(argv)
+
+
 @pytest.mark.parametrize(
     "filename, file_format, mesh, ext",
     [
@@ -231,3 +243,26 @@ def test_merge(incon):
         if not incon
         else keywords == ["ROCKS", "PARAM", "ELEME", "CONNE", "INCON", "ENDCY"]
     )
+
+
+@pytest.mark.parametrize("reset", [True, False])
+def test_save2incon(reset):
+    this_dir = os.path.dirname(os.path.abspath(__file__))
+    filename = os.path.join(this_dir, "support_files", "outputs", "SAVE.out")
+    save = toughio.read_save(filename)
+
+    output_filename = helpers.tempdir(helpers.random_string(10))
+    argv = [
+        filename,
+        output_filename,
+    ]
+
+    if reset:
+        argv += ["-r"]
+
+    toughio._cli.save2incon(argv)
+
+    incon = toughio.read_save(output_filename)
+
+    assert save.labels.tolist() == incon.labels.tolist()
+    helpers.allclose_dict(save.data, incon.data)
