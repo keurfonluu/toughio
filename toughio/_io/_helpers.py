@@ -9,6 +9,7 @@ from . import json, tough
 __all__ = [
     "Output",
     "Save",
+    "read_history",
     "read_input",
     "write_input",
     "read_output",
@@ -104,6 +105,42 @@ def write_input(filename, parameters, file_format="tough", **kwargs):
     _kwargs = default_kwargs.copy()
     _kwargs.update(kwargs)
     interface.write(filename, parameters, *args, **_kwargs)
+
+
+def read_history(filename):
+    """
+    Read history file.
+
+    Parameters
+    ----------
+    filename : str
+        Input file name.
+
+    Returns
+    -------
+    dict
+        History data.
+    
+    """
+    if not isinstance(filename, str):
+        raise TypeError()
+
+    with open(filename, "r") as f:
+        line = f.readline().strip()
+        headers = line.split()[1:]
+
+        data = []
+        line = f.readline().strip()
+        while line:
+            data += [[float(x) for x in line.split()]]
+            line = f.readline().strip()
+        data = numpy.transpose(data)
+
+        out = {"TIME": data[0]}
+        for header, X in zip(headers, data[1:]):
+            out[header] = X
+
+        return out
 
 
 def read_output(filename, file_format="tough", labels_order=None):

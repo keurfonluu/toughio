@@ -6,7 +6,7 @@ from .__about__ import (
     __version__,
     __website__,
 )
-from ._io import read_input, read_output, read_save, write_input
+from ._io import read_input, read_history, read_output, read_save, write_input
 from ._utils import capillarity, relative_permeability
 from .mesh import Mesh, from_meshio, from_pyvista
 from .mesh import read as read_mesh
@@ -19,6 +19,7 @@ __all__ = [
     "mesh",
     "meshmaker",
     "read_input",
+    "read_history",
     "write_input",
     "read_output",
     "read_save",
