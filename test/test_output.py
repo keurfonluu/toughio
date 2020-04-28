@@ -7,6 +7,22 @@ import toughio
 
 
 @pytest.mark.parametrize(
+    "filename, data_ref",
+    [
+        ("FOFT_A1912.csv", {"TIME": 3.06639400e9, "PRES": 1.83000721e8, "TEMP": 660.0, "SAT_G": 0.0, "SAT_L": 22.0}),
+        ("GOFT_A1162.csv", {"TIME": 3.06639400e9, "GEN": -27.5, "ENTG": 1.40141971e7, "PWB": 0.0}),
+    ],
+)
+def test_history(filename, data_ref):
+    this_dir = os.path.dirname(os.path.abspath(__file__))
+    filename = os.path.join(this_dir, "support_files", "outputs", filename)
+    data = toughio.read_history(filename)
+
+    for k, v in data_ref.items():
+        assert numpy.allclose(v, data[k].sum())
+
+
+@pytest.mark.parametrize(
     "filename, file_format",
     [("OUTPUT_ELEME.csv", "tough"), ("OUTPUT_ELEME.tec", "tecplot")],
 )
