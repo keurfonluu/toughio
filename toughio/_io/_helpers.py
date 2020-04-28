@@ -120,7 +120,7 @@ def read_history(filename):
     -------
     dict
         History data.
-    
+
     """
     if not isinstance(filename, str):
         raise TypeError()
