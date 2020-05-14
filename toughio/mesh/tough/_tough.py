@@ -5,6 +5,7 @@ import os
 
 import numpy
 
+from .._helpers import register
 from ._helpers import block
 
 __all__ = [
@@ -33,7 +34,14 @@ def read(filename):
     }
 
 
-def write(filename, mesh, nodal_distance, material_name, material_end, incon):
+def write(
+    filename,
+    mesh,
+    nodal_distance="line",
+    material_name=None,
+    material_end=None,
+    incon=False,
+):
     """Write TOUGH MESH file (and INCON file)."""
     if nodal_distance not in {"line", "orthogonal"}:
         raise ValueError()
@@ -385,3 +393,6 @@ def _isot(lines):
 def _dot(A, B):
     """Calculate dot product when arrays A and B have the same shape."""
     return (A * B).sum(axis=1)
+
+
+register("tough", [], read, {"tough": write})

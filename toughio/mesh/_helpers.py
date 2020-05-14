@@ -3,7 +3,6 @@ from copy import deepcopy
 import meshio
 import numpy
 
-from . import avsucd, flac3d, pickle, tecplot, tough
 from ._mesh import Mesh, from_meshio
 
 __all__ = [
@@ -15,12 +14,19 @@ __all__ = [
 ]
 
 
-_extension_to_filetype = {
-    ".dat": "tecplot",
-    ".tec": "tecplot",
-    ".f3grid": "flac3d",
-    ".pickle": "pickle",
-}
+_extension_to_filetype = {}
+_reader_map = {}
+_writer_map = {}
+
+
+def register(name, extensions, reader, writer_map):
+    """Register a new format."""
+    for ext in extensions:
+        _extension_to_filetype[ext] = name
+
+    if reader is not None:
+        _reader_map[name] = reader
+    _writer_map.update(writer_map)
 
 
 def _filetype_from_filename(filename):
@@ -54,18 +60,8 @@ def read(filename, file_format=None, **kwargs):
     fmt = file_format if file_format else _filetype_from_filename(filename)
 
     # Call custom readers
-    format_to_reader = {
-        "tough": (tough, (), {}),
-        "avsucd": (avsucd, (), {}),
-        "flac3d": (flac3d, (), {}),
-        "pickle": (pickle, (), {}),
-        "tecplot": (tecplot, (), {}),
-    }
-    if fmt in format_to_reader.keys():
-        interface, args, default_kwargs = format_to_reader[fmt]
-        _kwargs = default_kwargs.copy()
-        _kwargs.update(kwargs)
-        mesh = interface.read(filename, *args, **_kwargs)
+    if fmt in _reader_map.keys():
+        mesh = _reader_map[fmt](filename, **kwargs)
         if fmt not in {"tough", "pickle"}:
             mesh.cell_data = {
                 k: numpy.concatenate(v) for k, v in mesh.cell_data.items()
@@ -92,17 +88,13 @@ def write(filename, mesh, file_format=None, **kwargs):
     Other Parameters
     ----------------
     nodal_distance : str ('line' or 'orthogonal'), optional, default 'line'
-        Only if ``file_format = "tough"``. Method to calculate connection
-        nodal distances:
-        - 'line': distance between node and common face along connecting
-        line (distance is not normal),
-        - 'orthogonal' : distance between node and its orthogonal
-        projection onto common face (shortest distance).
+        Only if ``file_format = "tough"``. Method to calculate connection nodal distances:
+        - 'line': distance between node and common face along connecting line (distance is not normal),
+        - 'orthogonal' : distance between node and its orthogonal projection onto common face (shortest distance).
     material_name : dict or None, default None
         Only if ``file_format = "tough"``. Rename cell material.
     material_end : str, array_like or None, default None
-        Only if ``file_format = "tough"``. Move cells to bottom of block
-        'ELEME' if their materials is in `material_end`.
+        Only if ``file_format = "tough"``. Move cells to bottom of block 'ELEME' if their materials is in `material_end`.
     incon : bool, optional, default False
         Only if ``file_format = "tough"``. If `True`, initial conditions will be written in file `INCON`.
     protocol : integer, optional, default `pickle.HIGHEST_PROTOCOL`
@@ -115,30 +107,11 @@ def write(filename, mesh, file_format=None, **kwargs):
     fmt = file_format if file_format else _filetype_from_filename(filename)
 
     # Call custom writer
-    format_to_writer = {
-        "tough": (
-            tough,
-            (),
-            {
-                "nodal_distance": "line",
-                "material_name": None,
-                "material_end": None,
-                "incon": False,
-            },
-        ),
-        "avsucd": (avsucd, (), {}),
-        "flac3d": (flac3d, (), {}),
-        "pickle": (pickle, (), {}),
-        "tecplot": (tecplot, (), {}),
-    }
-    if fmt in format_to_writer.keys():
+    if fmt in _writer_map.keys():
         if fmt not in {"tough", "pickle"}:
             mesh = deepcopy(mesh)
             mesh.cell_data = {k: mesh.split(v) for k, v in mesh.cell_data.items()}
-        interface, args, default_kwargs = format_to_writer[fmt]
-        _kwargs = default_kwargs.copy()
-        _kwargs.update(kwargs)
-        interface.write(filename, mesh, *args, **_kwargs)
+        _writer_map[fmt](filename, mesh, **kwargs)
     else:
         mesh = mesh.to_meshio()
         meshio.write(filename, mesh, file_format=file_format, **kwargs)

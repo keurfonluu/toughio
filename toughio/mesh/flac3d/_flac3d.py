@@ -1,11 +1,13 @@
 from __future__ import division, unicode_literals, with_statement
 
+import struct
 import time
 
 import numpy
 
 from ...__about__ import __version__ as version
 from .._common import meshio_data
+from .._helpers import register
 from .._mesh import Mesh
 
 __all__ = [
@@ -72,20 +74,22 @@ meshio_to_flac3d_order_2 = {
 
 
 def read(filename):
-    """Read FLAC3D f3grid grid file (only ASCII)."""
-    with open(filename, "r") as f:
-        out = read_buffer(f)
+    """Read FLAC3D f3grid grid file."""
+    # Read a small block of the file to assess its type
+    # See <http://code.activestate.com/recipes/173220/>
+    with open(filename, "rb") as f:
+        block = f.read(8)
+        binary = b"\x00" in block
+
+    mode = "rb" if binary else "r"
+    with open(filename, mode) as f:
+        out = read_buffer(f, binary)
+
     return out
 
 
-def read_buffer(f):
-    """
-    Read ASCII file line by line.
-
-    Use combination of readline, tell and seek since we need to rewind to the previous
-    line when we read last data line of a ZGROUP section.
-
-    """
+def read_buffer(f, binary):
+    """Read binary or ASCII file."""
     points = []
     point_ids = {}
     cells = []
@@ -93,42 +97,63 @@ def read_buffer(f):
     field_data = {}
     slots = set()
 
-    pidx = 0
-    zidx = 0
-    count = 0
-    line = f.readline().rstrip().split()
-    while line:
-        if line[0] == "G":
-            pid, point = _read_point(line)
+    if binary:
+        # Not sure what the first bytes represent, the format might be wrong
+        # It does not seem to be useful anyway
+        _ = struct.unpack("<2I", f.read(8))
+
+        (num_nodes,) = struct.unpack("<I", f.read(4))
+        for pidx in range(num_nodes):
+            pid, point = _read_point(f, binary)
             points.append(point)
             point_ids[pid] = pidx
-            pidx += 1
-        elif line[0] == "Z":
-            cid, cell = _read_cell(line, point_ids)
-            cell_type = numnodes_to_meshio_type[len(cell)]
-            if len(cells) > 0 and cell_type == cells[-1][0]:
-                cells[-1][1].append(cell)
-            else:
-                cells.append((cell_type, [cell]))
-            mapper[cid] = [count]
-            count += 1
-        elif line[0] == "ZGROUP":
-            name, data, slot = _read_zgroup(f, line)
-            zidx += 1
-            for cid in data:
-                mapper[cid].append(zidx)
-            field_data[name] = numpy.array([zidx, 3])
-            slots.add(slot)
-            if len(slots) > 1:
-                raise AssertionError("Multiple slots are not supported.")
-        line = f.readline().rstrip().split()
 
-    if zidx:
-        n_cells = numpy.cumsum([len(c[1]) for c in cells])
-        cell_data = numpy.empty(n_cells[-1], dtype=int)
+        (num_cells,) = struct.unpack("<I", f.read(4))
+        for cidx in range(num_cells):
+            cid, cell = _read_cell(f, point_ids, binary)
+            cells = _update_cells(cells, cell)
+            mapper[cid] = [cidx]
+
+        (num_groups,) = struct.unpack("<I", f.read(4))
+        for zidx in range(num_groups):
+            name, slot, data = _read_zgroup(f, binary)
+            field_data, mapper = _update_field_data(
+                field_data, mapper, data, name, zidx + 1
+            )
+            slots = _update_slots(slots, slot)
+    else:
+        pidx = 0
+        zidx = 0
+        count = 0
+
+        line = f.readline().rstrip().split()
+        while line:
+            if line[0] == "G":
+                pid, point = _read_point(line, binary)
+                points.append(point)
+                point_ids[pid] = pidx
+                pidx += 1
+            elif line[0] == "Z":
+                cid, cell = _read_cell(line, point_ids, binary)
+                cells = _update_cells(cells, cell)
+                mapper[cid] = [count]
+                count += 1
+            elif line[0] == "ZGROUP":
+                name, slot, data = _read_zgroup(f, binary, line)
+                field_data, mapper = _update_field_data(
+                    field_data, mapper, data, name, zidx + 1
+                )
+                slots = _update_slots(slots, slot)
+                zidx += 1
+
+            line = f.readline().rstrip().split()
+
+    if field_data:
+        num_cells = numpy.cumsum([len(c[1]) for c in cells])
+        cell_data = numpy.empty(num_cells[-1], dtype=int)
         for cid, zid in mapper.values():
             cell_data[cid] = zid
-        cell_data = {"flac3d:zone": numpy.split(cell_data, n_cells[:-1])}
+        cell_data = {"flac3d:zone": numpy.split(cell_data, num_cells[:-1])}
     else:
         cell_data = {}
 
@@ -140,78 +165,215 @@ def read_buffer(f):
     )
 
 
-def _read_point(line):
+def _read_point(buf_or_line, binary):
     """Read point coordinates."""
-    return int(line[1]), [float(l) for l in line[2:]]
+    if binary:
+        pid, x, y, z = struct.unpack("<I3d", buf_or_line.read(28))
+        point = [x, y, z]
+    else:
+        pid = int(buf_or_line[1])
+        point = [float(l) for l in buf_or_line[2:]]
+
+    return pid, point
 
 
-def _read_cell(line, point_ids):
-    """Read cell corners."""
-    cell = [point_ids[int(l)] for l in line[3:]]
-    if line[1] == "B7":
+def _read_cell(buf_or_line, point_ids, binary):
+    """Read cell connectivity."""
+    if binary:
+        cid, num_verts = struct.unpack("<2I", buf_or_line.read(8))
+        cell = struct.unpack("<{}I".format(num_verts), buf_or_line.read(4 * num_verts))
+        is_b7 = num_verts == 7
+    else:
+        cid = int(buf_or_line[2])
+        cell = buf_or_line[3:]
+        is_b7 = buf_or_line[1] == "B7"
+
+    cell = [point_ids[int(l)] for l in cell]
+    if is_b7:
         cell.append(cell[-1])
-    return int(line[2]), cell
+
+    return cid, cell
 
 
-def _read_zgroup(f, line):
+def _read_zgroup(buf_or_line, binary, line=None):
     """Read cell group."""
-    name = line[1].replace('"', "")
-    data = []
-    slot = "" if "SLOT" not in line else line[-1]
+    if binary:
+        # Group name
+        (num_chars,) = struct.unpack("<H", buf_or_line.read(2))
+        (name,) = struct.unpack("<{}s".format(num_chars), buf_or_line.read(num_chars))
+        name = name.decode("utf-8")
 
-    i = f.tell()
-    line = f.readline()
-    while True:
-        line = line.rstrip().split()
-        if line and (line[0] not in {"*", "ZGROUP"}):
-            data += [int(l) for l in line]
-        else:
-            f.seek(i)
-            break
-        i = f.tell()
-        line = f.readline()
-    return name, data, slot
+        # Slot name
+        (num_chars,) = struct.unpack("<H", buf_or_line.read(2))
+        (slot,) = struct.unpack("<{}s".format(num_chars), buf_or_line.read(num_chars))
+        slot = slot.decode("utf-8")
+
+        # Zones
+        (num_zones,) = struct.unpack("<I", buf_or_line.read(4))
+        data = struct.unpack("<{}I".format(num_zones), buf_or_line.read(4 * num_zones))
+    else:
+        name = line[1].replace('"', "")
+        data = []
+        slot = "" if "SLOT" not in line else line[-1]
+
+        i = buf_or_line.tell()
+        line = buf_or_line.readline()
+        while True:
+            line = line.rstrip().split()
+            if line and (line[0] not in {"*", "ZGROUP"}):
+                data += [int(l) for l in line]
+            else:
+                buf_or_line.seek(i)
+                break
+            i = buf_or_line.tell()
+            line = buf_or_line.readline()
+
+    return name, slot, data
 
 
-def write(filename, mesh):
-    """Write FLAC3D f3grid grid file (only ASCII)."""
+def _update_cells(cells, cell):
+    """Update cell list."""
+    cell_type = numnodes_to_meshio_type[len(cell)]
+    if len(cells) > 0 and cell_type == cells[-1][0]:
+        cells[-1][1].append(cell)
+    else:
+        cells.append((cell_type, [cell]))
+
+    return cells
+
+
+def _update_field_data(field_data, mapper, data, name, zidx):
+    """Update field data dict."""
+    for cid in data:
+        mapper[cid].append(zidx)
+    field_data[name] = numpy.array([zidx, 3])
+
+    return field_data, mapper
+
+
+def _update_slots(slots, slot):
+    """
+    Update slot set.
+
+    Only one slot is supported.
+
+    """
+    slots.add(slot)
+    if len(slots) > 1:
+        raise ValueError("Multiple slots are not supported")
+
+    return slots
+
+
+def write(filename, mesh, float_fmt=".16e", binary=False):
+    """Write FLAC3D f3grid grid file."""
     if not any(c.type in meshio_only.keys() for c in mesh.cells):
-        raise AssertionError("FLAC3D format only supports 3D cells.")
+        raise ValueError("FLAC3D format only supports 3D cells")
 
-    with open(filename, "w") as f:
-        f.write("* FLAC3D grid produced by toughio v{}\n".format(version))
-        f.write("* {}\n".format(time.ctime()))
-        f.write("* GRIDPOINTS\n")
-        _write_points(f, mesh.points)
-        f.write("* ZONES\n")
-        _write_cells(f, mesh.points, mesh.cells)
+    mode = "wb" if binary else "w"
+    with open(filename, mode) as f:
+        if binary:
+            f.write(
+                struct.pack("<2I", 1375135718, 3)
+            )  # Don't know what these values represent
+        else:
+            f.write("* FLAC3D grid produced by toughio v{}\n".format(version))
+            f.write("* {}\n".format(time.ctime()))
 
-        if mesh.cell_data:
-            if set(list(mesh.cell_data)).intersection(meshio_data):
-                f.write("* ZONE GROUPS\n")
-                _write_cell_data(f, mesh.cells, mesh.cell_data, mesh.field_data)
+        _write_points(f, mesh.points, binary, float_fmt)
+        _write_cells(f, mesh.points, mesh.cells, binary)
+        _write_zgroups(f, mesh.cell_data, mesh.field_data, binary)
+
+        if binary:
+            f.write(struct.pack("<2I", 0, 0))  # No face and face group
 
 
-def _write_points(f, points):
+def _write_points(f, points, binary, float_fmt=None):
     """Write points coordinates."""
-    for i, point in enumerate(points):
-        f.write("G\t{:8}\t{:.14e}\t{:.14e}\t{:.14e}\n".format(i + 1, *point))
+    if binary:
+        f.write(struct.pack("<I", len(points)))
+        for i, point in enumerate(points):
+            f.write(struct.pack("<I3d", i + 1, *point))
+    else:
+        f.write("* GRIDPOINTS\n")
+        for i, point in enumerate(points):
+            fmt = "G\t{:8}\t" + "\t".join(3 * ["{:" + float_fmt + "}"]) + "\n"
+            f.write(fmt.format(i + 1, *point))
 
 
-def _write_cells(f, points, cells):
+def _write_cells(f, points, cells, binary):
     """Write zones."""
     zones = _translate_zones(points, cells)
-    i = 1
-    for meshio_type, zone in zones:
-        fmt = "Z {} {} " + " ".join(["{}"] * zone.shape[1]) + "\n"
-        for entry in zone + 1:
-            f.write(fmt.format(meshio_to_flac3d_type[meshio_type], i, *entry))
-            i += 1
+
+    count = 0
+    if binary:
+        f.write(struct.pack("<I", sum(len(c.data) for c in cells)))
+        for _, zone in zones:
+            num_cells, num_verts = zone.shape
+            tmp = numpy.column_stack(
+                (
+                    numpy.arange(1, num_cells + 1) + count,
+                    numpy.full(num_cells, num_verts),
+                    zone + 1,
+                )
+            )
+            f.write(
+                struct.pack("<{}I".format((num_verts + 2) * num_cells), *tmp.ravel())
+            )
+            count += num_cells
+    else:
+        f.write("* ZONES\n")
+        for meshio_type, zone in zones:
+            fmt = "Z {} {} " + " ".join(["{}"] * zone.shape[1]) + "\n"
+            for entry in zone + 1:
+                count += 1
+                f.write(fmt.format(meshio_to_flac3d_type[meshio_type], count, *entry))
+
+
+def _write_zgroups(f, cell_data, field_data, binary):
+    """Write zone groups."""
+    zgroups = None
+    if cell_data:
+        # Pick out material
+        key = None
+        for k in cell_data.keys():
+            if k in meshio_data:
+                key = k
+                break
+        if key:
+            material = numpy.concatenate(cell_data[key])
+            zgroups, labels = _translate_zgroups(material, field_data)
+
+    if zgroups:
+        if binary:
+            slot = "Default".encode("utf-8")
+
+            f.write(struct.pack("<I", len(zgroups)))
+            for k in sorted(zgroups.keys()):
+                num_chars, num_zones = len(labels[k]), len(zgroups[k])
+                fmt = "<H{}sH7sI{}I".format(num_chars, num_zones)
+                tmp = [
+                    num_chars,
+                    labels[k].encode("utf-8"),
+                    7,
+                    slot,
+                    num_zones,
+                ]
+                tmp += zgroups[k].tolist()
+                f.write(struct.pack(fmt, *tmp))
+        else:
+            f.write("* ZONE GROUPS\n")
+            for k in sorted(zgroups.keys()):
+                f.write('ZGROUP "{}"\n'.format(labels[k]))
+                _write_table(f, zgroups[k])
+    else:
+        if binary:
+            f.write(struct.pack("<I", 0))
 
 
 def _translate_zones(points, cells):
     """
-    Reorder meshio cells to FLAC3D zones.
+    Reorder toughio cells to FLAC3D zones.
 
     Four first points must form a right-handed coordinate system (outward normal
     vectors). Reorder corner points according to sign of scalar triple products.
@@ -244,29 +406,8 @@ def _translate_zones(points, cells):
     return zones
 
 
-def _write_cell_data(f, cells, cell_data, field_data):
-    """Write zone groups."""
-    zgroups, labels = _translate_zgroups(cells, cell_data, field_data)
-    for k in sorted(zgroups.keys()):
-        f.write('ZGROUP "{}"\n'.format(labels[k]))
-        _write_zgroup(f, zgroups[k])
-
-
-def _translate_zgroups(cells, cell_data, field_data):
-    """Convert meshio cell_data to FLAC3D zone groups."""
-    mat_data = None
-    for k in cell_data.keys():
-        if k in meshio_data:
-            mat_data = k
-            break
-
-    num_cells = sum(len(c.data) for c in cells)
-    zone_data = (
-        numpy.concatenate(cell_data[mat_data])
-        if mat_data
-        else numpy.zeros(num_cells, dtype=int)
-    )
-
+def _translate_zgroups(zone_data, field_data):
+    """Convert toughio cell_data to FLAC3D zone groups."""
     zgroups = {k: numpy.nonzero(zone_data == k)[0] + 1 for k in numpy.unique(zone_data)}
 
     labels = {k: str(k) for k in zgroups.keys()}
@@ -276,10 +417,13 @@ def _translate_zgroups(cells, cell_data, field_data):
     return zgroups, labels
 
 
-def _write_zgroup(f, data, ncol=20):
-    """Write zone group data."""
+def _write_table(f, data, ncol=20):
+    """Write zone group data table."""
     nrow = len(data) // ncol
     lines = numpy.split(data, numpy.full(nrow, ncol).cumsum())
     for line in lines:
         if len(line):
             f.write(" {}\n".format(" ".join([str(l) for l in line])))
+
+
+register("flac3d", [".f3grid"], read, {"flac3d": write})

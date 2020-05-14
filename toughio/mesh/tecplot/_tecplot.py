@@ -3,6 +3,7 @@ import logging
 import numpy
 
 from ...__about__ import __version__ as version
+from .._helpers import register
 from .._mesh import Mesh
 
 __all__ = [
@@ -447,3 +448,6 @@ def _write_table(f, data, ncol=20):
     for line in lines:
         if len(line):
             f.write("{}\n".format(" ".join(str(l) for l in line)))
+
+
+register("tecplot", [".dat", ".tec"], read, {"tecplot": write})
