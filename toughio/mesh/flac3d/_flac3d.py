@@ -358,8 +358,8 @@ def _write_zgroups(f, cell_data, field_data, binary):
                     7,
                     slot,
                     num_zones,
-                    *zgroups[k],
                 ]
+                tmp += zgroups[k].tolist()
                 f.write(struct.pack(fmt, *tmp))
         else:
             f.write("* ZONE GROUPS\n")
