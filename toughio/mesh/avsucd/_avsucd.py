@@ -6,6 +6,7 @@ import numpy
 
 from ...__about__ import __version__ as version
 from .._common import meshio_data
+from .._helpers import register
 from .._mesh import CellBlock, Mesh
 
 __all__ = [
@@ -259,3 +260,6 @@ def _write_data(f, labels, data_array, num_entities, num_data, num_data_sum):
 
     data_array = numpy.column_stack((numpy.arange(1, num_entities + 1), data_array))
     numpy.savetxt(f, data_array, delimiter=" ", fmt=["%d"] + ["%.14e"] * num_data_sum)
+
+
+register("avsucd", [], read, {"avsucd": write})

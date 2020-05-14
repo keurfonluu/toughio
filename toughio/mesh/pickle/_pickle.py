@@ -1,5 +1,7 @@
 from __future__ import with_statement
 
+from .._helpers import register
+
 try:
     import cPickle as pickle
 except ImportError:
@@ -48,3 +50,6 @@ def write(filename, mesh, protocol=pickle.HIGHEST_PROTOCOL):
     """
     with open(filename, "wb") as f:
         pickle.dump(mesh, f, protocol=protocol)
+
+
+register("pickle", [".pickle", ".pkl"], read, {"pickle": write})
