@@ -3,8 +3,27 @@ from __future__ import with_statement
 import numpy
 
 __all__ = [
+    "get_output_type",
     "read_eleme",
 ]
+
+
+def get_output_type(filename):
+    """Get output file type and format."""
+    with open(filename, "r") as f:
+        line = f.readline().strip()
+
+    if "=" in line:
+        return "element", "tecplot"
+    else:
+        header = line.split(",")[0].replace('"', "").strip()
+        
+        if header == "ELEM":
+            return "element", "tough"
+        elif header == "ELEM1":
+            return "connection", "tough"
+        else:
+            raise ValueError()
 
 
 def read_eleme(filename, file_format):

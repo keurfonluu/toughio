@@ -34,14 +34,11 @@ def test_history(filename, data_ref):
         assert numpy.allclose(v, data[k].sum())
 
 
-@pytest.mark.parametrize(
-    "filename, file_format",
-    [("OUTPUT_ELEME.csv", "tough"), ("OUTPUT_ELEME.tec", "tecplot")],
-)
-def test_output(filename, file_format):
+@pytest.mark.parametrize("filename", ["OUTPUT_ELEME.csv", "OUTPUT_ELEME.tec"])
+def test_output(filename):
     this_dir = os.path.dirname(os.path.abspath(__file__))
     filename = os.path.join(this_dir, "support_files", "outputs", "tough3", filename)
-    outputs = toughio.read_output(filename, file_format=file_format)
+    outputs = toughio.read_output(filename)
 
     filename = os.path.join(this_dir, "support_files", "outputs", "SAVE.out")
     save = toughio.read_save(filename)
@@ -60,7 +57,7 @@ def test_output(filename, file_format):
         assert time_ref == output.time
         assert (
             save.labels.tolist() == output.labels.tolist()
-            if file_format == "tough"
+            if output.format == "tough"
             else output.labels == None
         )
         assert keys_ref == sorted(list(output.data.keys()))
