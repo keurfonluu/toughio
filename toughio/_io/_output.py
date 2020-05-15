@@ -2,9 +2,12 @@ from __future__ import with_statement
 
 import numpy
 
+from . import tough
+
 __all__ = [
     "get_output_type",
     "read_eleme",
+    "read_save",
 ]
 
 
@@ -13,7 +16,9 @@ def get_output_type(filename):
     with open(filename, "r") as f:
         line = f.readline().strip()
 
-    if "=" in line:
+    if line.startswith("INCON"):
+        return "save", "tough"
+    elif "=" in line:
         return "element", "tecplot"
     else:
         header = line.split(",")[0].replace('"', "").strip()
@@ -39,6 +44,7 @@ def read_eleme(filename, file_format):
 def read_eleme_csv(f):
     """Read OUTPUT_ELEME.csv."""
     headers, times, variables = _read_csv(f)
+
     headers = headers[1:]
     labels = [[v[0] for v in variable] for variable in variables]
     variables = numpy.array([[v[1:] for v in variable] for variable in variables])
@@ -72,8 +78,6 @@ def read_eleme_tecplot(f):
                 raise ValueError()
 
         # Read data
-        # Python 2.7 does not allow mix of for and while loops when reading a file
-        # data = numpy.genfromtxt(f, max_rows=zone["I"])
         data = []
         for _ in range(zone["I"]):
             line = f.readline().strip()
@@ -90,6 +94,33 @@ def read_eleme_tecplot(f):
             break
 
     return headers, times, labels, variables
+
+
+def read_save(filename, labels_order):
+    """Read SAVE."""
+    parameters = tough.read(filename)
+
+    labels = list(parameters["initial_conditions"].keys())
+    variables = [v["values"] for v in parameters["initial_conditions"].values()]
+
+    data = {"X{}".format(i + 1): x for i, x in enumerate(numpy.transpose(variables))}
+
+    data["porosity"] = numpy.array(
+        [v["porosity"] for v in parameters["initial_conditions"].values()]
+    )
+
+    userx = [
+        v["userx"]
+        for v in parameters["initial_conditions"].values()
+        if "userx" in v.keys()
+    ]
+    if userx:
+        data["userx"] = numpy.array(userx)
+
+    labels_order = (
+        labels_order if labels_order else parameters["initial_conditions_order"]
+    )
+    return numpy.array(labels), data, labels_order
 
 
 def _read_csv(f):

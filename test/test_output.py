@@ -41,7 +41,7 @@ def test_output(filename):
     outputs = toughio.read_output(filename)
 
     filename = os.path.join(this_dir, "support_files", "outputs", "SAVE.out")
-    save = toughio.read_save(filename)
+    save = toughio.read_output(filename)
 
     assert len(outputs) == 5
 
@@ -69,7 +69,7 @@ def test_output(filename):
 def test_save():
     this_dir = os.path.dirname(os.path.abspath(__file__))
     filename = os.path.join(this_dir, "support_files", "outputs", "SAVE.out")
-    save = toughio.read_save(filename)
+    save = toughio.read_output(filename)
 
     x_ref = [6.35804123e05, 1.42894499e02, 9.91868799e-01]
     assert numpy.allclose(
