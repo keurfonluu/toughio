@@ -19,41 +19,7 @@ def read_eleme(filename, file_format):
 
 def read_eleme_csv(f):
     """Read OUTPUT_ELEME.csv."""
-    # Read header
-    line = f.readline().replace('"', "")
-    headers = [l.strip() for l in line.split(",")]
-
-    # Skip second line (unit)
-    line = f.readline()
-
-    # Check third line (does it start with TIME?)
-    line = f.readline()
-    single = not line.startswith('"TIME')
-
-    # Read data
-    if single:
-        times, variables = [None], [[]]
-    else:
-        times, variables = [], []
-
-    line = line.replace('"', "").strip()
-    while line:
-        line = line.split(",")
-
-        # Time step
-        if line[0].startswith("TIME"):
-            line = line[0].split()
-            times.append(float(line[-1]))
-            variables.append([])
-
-        # Output
-        else:
-            tmp = [line[0].strip()]
-            tmp += [float(l.strip()) for l in line[1:]]
-            variables[-1].append(tmp)
-
-        line = f.readline().strip().replace('"', "")
-
+    headers, times, variables = _read_csv(f)
     headers = headers[1:]
     labels = [[v[0] for v in variable] for variable in variables]
     variables = numpy.array([[v[1:] for v in variable] for variable in variables])
@@ -105,3 +71,43 @@ def read_eleme_tecplot(f):
             break
 
     return headers, times, labels, variables
+
+
+def _read_csv(f):
+    """Read OUTPUT_{ELEME, CONNE}.csv."""
+    # Read header
+    line = f.readline().replace('"', "")
+    headers = [l.strip() for l in line.split(",")]
+
+    # Skip second line (unit)
+    line = f.readline()
+
+    # Check third line (does it start with TIME?)
+    line = f.readline()
+    single = not line.startswith('"TIME')
+
+    # Read data
+    if single:
+        times, variables = [None], [[]]
+    else:
+        times, variables = [], []
+
+    line = line.replace('"', "").strip()
+    while line:
+        line = line.split(",")
+
+        # Time step
+        if line[0].startswith("TIME"):
+            line = line[0].split()
+            times.append(float(line[-1]))
+            variables.append([])
+
+        # Output
+        else:
+            tmp = [line[0].strip()]
+            tmp += [float(l.strip()) for l in line[1:]]
+            variables[-1].append(tmp)
+
+        line = f.readline().strip().replace('"', "")
+
+    return headers, times, variables
