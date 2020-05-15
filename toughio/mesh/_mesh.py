@@ -410,9 +410,9 @@ class Mesh(object):
 
         """
         from .. import read_output
-        from .._io._helpers import Output, Save, _reorder_labels
+        from .._io._helpers import Output, _reorder_labels
 
-        if not isinstance(file_or_output, (str, list, tuple, Output, Save)):
+        if not isinstance(file_or_output, (str, list, tuple, Output)):
             raise TypeError()
         if not isinstance(time_step, int):
             raise TypeError()
@@ -422,7 +422,7 @@ class Mesh(object):
         else:
             out = file_or_output
 
-        if not isinstance(out, (Output, Save)):
+        if not isinstance(out, Output):
             if not (-len(out) <= time_step < len(out)):
                 raise ValueError()
             out = out[time_step]
