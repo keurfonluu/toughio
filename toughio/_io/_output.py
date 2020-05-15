@@ -22,7 +22,6 @@ def read_eleme_csv(f):
     # Read header
     line = f.readline().replace('"', "")
     headers = [l.strip() for l in line.split(",")]
-    headers = headers[1:]
 
     # Skip second line (unit)
     line = f.readline()
@@ -33,9 +32,9 @@ def read_eleme_csv(f):
 
     # Read data
     if single:
-        times, labels, variables = [None], [[]], [[]]
+        times, variables = [None], [[]]
     else:
-        times, labels, variables = [], [], []
+        times, variables = [], []
 
     line = line.replace('"', "").strip()
     while line:
@@ -46,15 +45,18 @@ def read_eleme_csv(f):
             line = line[0].split()
             times.append(float(line[-1]))
             variables.append([])
-            labels.append([])
 
         # Output
         else:
-            labels[-1].append(line[0].strip())
-            variables[-1].append([float(l.strip()) for l in line[1:]])
+            tmp = [line[0].strip()]
+            tmp += [float(l.strip()) for l in line[1:]]
+            variables[-1].append(tmp)
 
         line = f.readline().strip().replace('"', "")
 
+    headers = headers[1:]
+    labels = [[v[0] for v in variable] for variable in variables]
+    variables = numpy.array([[v[1:] for v in variable] for variable in variables])
     return headers, times, labels, variables
 
 
