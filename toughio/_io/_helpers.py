@@ -9,7 +9,6 @@ from ._output import read_eleme
 
 __all__ = [
     "Output",
-    "Save",
     "read_history",
     "read_input",
     "write_input",
@@ -18,8 +17,7 @@ __all__ = [
 ]
 
 
-Output = collections.namedtuple("Output", ["time", "labels", "data"])
-Save = collections.namedtuple("Save", ["labels", "data"])
+Output = collections.namedtuple("Output", ["type", "time", "labels", "data"])
 
 
 _extension_to_filetype = {
@@ -160,7 +158,7 @@ def read_output(filename, file_format="tough", labels_order=None):
     Returns
     -------
     list of namedtuple
-        List of namedtuple (time, labels, data) for each time step.
+        List of namedtuple (type, time, labels, data) for each time step.
 
     """
     if not isinstance(filename, str):
@@ -175,6 +173,7 @@ def read_output(filename, file_format="tough", labels_order=None):
     headers, times, labels, variables = read_eleme(filename, file_format)
     outputs = [
         Output(
+            "element",
             time,
             numpy.array(label),
             {k: v for k, v in zip(headers, numpy.transpose(variable))},
@@ -202,7 +201,7 @@ def read_save(filename, labels_order=None):
     Returns
     -------
     list of namedtuple
-        SAVE data as namedtuple (labels, data).
+        SAVE data as namedtuple (type, time, labels, data).
 
     Note
     ----
@@ -243,7 +242,7 @@ def read_save(filename, labels_order=None):
     labels_order = (
         labels_order if labels_order else parameters["initial_conditions_order"]
     )
-    output = Save(numpy.array(labels), data)
+    output = Output("save", None, numpy.array(labels), data)
     return _reorder_labels(output, labels_order)
 
 
