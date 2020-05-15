@@ -5,7 +5,7 @@ import collections
 import numpy
 
 from . import json, tough
-from ._output import get_output_type, read_eleme
+from ._output import get_output_type, read_eleme, read_save
 
 __all__ = [
     "Output",
@@ -13,7 +13,6 @@ __all__ = [
     "read_input",
     "write_input",
     "read_output",
-    "read_save",
 ]
 
 
@@ -144,7 +143,7 @@ def read_history(filename):
 
 def read_output(filename, labels_order=None):
     """
-    Read TOUGH output file for each time step.
+    Read TOUGH SAVE or output file for each time step.
 
     Parameters
     ----------
@@ -155,8 +154,8 @@ def read_output(filename, labels_order=None):
 
     Returns
     -------
-    list of namedtuple
-        List of namedtuple (type, time, labels, data) for each time step.
+    namedtuple or list of namedtuple
+        namedtuple (type, time, labels, data) or list of namedtuple for each time step.
 
     """
     if not isinstance(filename, str):
@@ -168,81 +167,27 @@ def read_output(filename, labels_order=None):
 
     file_type, file_format = get_output_type(filename)
 
-    headers, times, labels, variables = read_eleme(filename, file_format)
-    outputs = [
-        Output(
-            file_type,
-            file_format,
-            time,
-            numpy.array(label),
-            {k: v for k, v in zip(headers, numpy.transpose(variable))},
+    if file_type == "save":
+        labels, data, labels_order = read_save(filename, labels_order)
+        output = Output(file_type, file_format, None, numpy.array(labels), data)
+        return _reorder_labels(output, labels_order)
+    else:
+        headers, times, labels, variables = read_eleme(filename, file_format)
+        outputs = [
+            Output(
+                file_type,
+                file_format,
+                time,
+                numpy.array(label),
+                {k: v for k, v in zip(headers, numpy.transpose(variable))},
+            )
+            for time, label, variable in zip(times, labels, variables)
+        ]
+        return (
+            [_reorder_labels(out, labels_order) for out in outputs]
+            if labels_order is not None
+            else outputs
         )
-        for time, label, variable in zip(times, labels, variables)
-    ]
-    return (
-        [_reorder_labels(out, labels_order) for out in outputs]
-        if labels_order is not None
-        else outputs
-    )
-
-
-def read_save(filename, labels_order=None):
-    """
-    Read TOUGH SAVE file.
-
-    Parameters
-    ----------
-    filename : str
-        Input file name.
-    labels_order : list of array_like or None, optional, default None
-        List of labels.
-
-    Returns
-    -------
-    list of namedtuple
-        SAVE data as namedtuple (type, time, labels, data).
-
-    Note
-    ----
-    Does not support hysteresis values yet.
-
-    """
-    if not isinstance(filename, str):
-        raise TypeError()
-    if not (
-        labels_order is None or isinstance(labels_order, (list, tuple, numpy.ndarray))
-    ):
-        raise TypeError()
-
-    with open(filename, "r") as f:
-        # Check first line
-        line = f.readline()
-        if not line.startswith("INCON"):
-            raise ValueError("Invalid SAVE file '{}'.".format(filename))
-
-    parameters = read_input(filename)
-    labels = list(parameters["initial_conditions"].keys())
-    variables = [v["values"] for v in parameters["initial_conditions"].values()]
-
-    data = {"X{}".format(i + 1): x for i, x in enumerate(numpy.transpose(variables))}
-
-    data["porosity"] = numpy.array(
-        [v["porosity"] for v in parameters["initial_conditions"].values()]
-    )
-
-    userx = [
-        v["userx"]
-        for v in parameters["initial_conditions"].values()
-        if "userx" in v.keys()
-    ]
-    if userx:
-        data["userx"] = numpy.array(userx)
-
-    labels_order = (
-        labels_order if labels_order else parameters["initial_conditions_order"]
-    )
-    output = Output("save", "tough", None, numpy.array(labels), data)
-    return _reorder_labels(output, labels_order)
 
 
 def _reorder_labels(data, labels):

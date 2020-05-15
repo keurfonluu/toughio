@@ -247,7 +247,7 @@ def test_merge(incon):
 def test_save2incon(reset):
     this_dir = os.path.dirname(os.path.abspath(__file__))
     filename = os.path.join(this_dir, "support_files", "outputs", "SAVE.out")
-    save = toughio.read_save(filename)
+    save = toughio.read_output(filename)
 
     output_filename = helpers.tempdir(helpers.random_string(10))
     argv = [
@@ -260,7 +260,7 @@ def test_save2incon(reset):
 
     toughio._cli.save2incon(argv)
 
-    incon = toughio.read_save(output_filename)
+    incon = toughio.read_output(output_filename)
 
     assert save.labels.tolist() == incon.labels.tolist()
     helpers.allclose_dict(save.data, incon.data)
