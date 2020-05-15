@@ -5,7 +5,7 @@ import collections
 import numpy
 
 from . import json, tough
-from ._output import read_eleme
+from ._output import get_output_type, read_eleme
 
 __all__ = [
     "Output",
@@ -17,7 +17,7 @@ __all__ = [
 ]
 
 
-Output = collections.namedtuple("Output", ["type", "time", "labels", "data"])
+Output = collections.namedtuple("Output", ["type", "format", "time", "labels", "data"])
 
 
 _extension_to_filetype = {
@@ -142,7 +142,7 @@ def read_history(filename):
         return out
 
 
-def read_output(filename, file_format="tough", labels_order=None):
+def read_output(filename, labels_order=None):
     """
     Read TOUGH output file for each time step.
 
@@ -150,8 +150,6 @@ def read_output(filename, file_format="tough", labels_order=None):
     ----------
     filename : str
         Input file name.
-    file_format : str ('tough' or 'tecplot'), optional, default 'tough'
-        TOUGH output file format.
     labels_order : list of array_like or None, optional, default None
         List of labels.
 
@@ -163,17 +161,18 @@ def read_output(filename, file_format="tough", labels_order=None):
     """
     if not isinstance(filename, str):
         raise TypeError()
-    if file_format not in {"tough", "tecplot"}:
-        raise ValueError()
     if not (
         labels_order is None or isinstance(labels_order, (list, tuple, numpy.ndarray))
     ):
         raise TypeError()
 
+    file_type, file_format = get_output_type(filename)
+
     headers, times, labels, variables = read_eleme(filename, file_format)
     outputs = [
         Output(
-            "element",
+            file_type,
+            file_format,
             time,
             numpy.array(label),
             {k: v for k, v in zip(headers, numpy.transpose(variable))},
@@ -242,7 +241,7 @@ def read_save(filename, labels_order=None):
     labels_order = (
         labels_order if labels_order else parameters["initial_conditions_order"]
     )
-    output = Output("save", None, numpy.array(labels), data)
+    output = Output("save", "tough", None, numpy.array(labels), data)
     return _reorder_labels(output, labels_order)
 
 

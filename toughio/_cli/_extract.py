@@ -135,7 +135,7 @@ def _read_table(f, points):
         raise ValueError("Inconsistent number of elements.")
 
     return Output(
-        "element", time, labels, {k: v for k, v in zip(headers, numpy.transpose(variables))}
+        "element", "tough", time, labels, {k: v for k, v in zip(headers, numpy.transpose(variables))}
     )
 
 

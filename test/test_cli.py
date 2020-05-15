@@ -21,27 +21,25 @@ def test_co2tab(dirname):
 
 
 @pytest.mark.parametrize(
-    "filename, file_format, mesh, ext",
+    "filename, mesh, ext",
     [
-        ("OUTPUT_ELEME.csv", "tough", True, "vtu"),
-        ("OUTPUT_ELEME.csv", "tough", False, "vtu"),
-        ("OUTPUT_ELEME.tec", "tecplot", False, "vtu"),
-        ("OUTPUT_ELEME.csv", "tough", True, "xdmf"),
-        ("OUTPUT_ELEME.csv", "tough", False, "xdmf"),
-        ("OUTPUT_ELEME.tec", "tecplot", False, "xdmf"),
+        ("OUTPUT_ELEME.csv", True, "vtu"),
+        ("OUTPUT_ELEME.csv", False, "vtu"),
+        ("OUTPUT_ELEME.tec", False, "vtu"),
+        ("OUTPUT_ELEME.csv", True, "xdmf"),
+        ("OUTPUT_ELEME.csv", False, "xdmf"),
+        ("OUTPUT_ELEME.tec", False, "xdmf"),
     ],
 )
-def test_export(filename, file_format, mesh, ext):
+def test_export(filename, mesh, ext):
     this_dir = os.path.dirname(os.path.abspath(__file__))
     filename = os.path.join(this_dir, "support_files", "outputs", "tough3", filename)
 
-    outputs = toughio.read_output(filename, file_format=file_format)
+    outputs = toughio.read_output(filename)
 
     output_filename = "{}.{}".format(helpers.tempdir(helpers.random_string(10)), ext)
     argv = [
         filename,
-        "-i",
-        file_format,
         "-o",
         output_filename,
         "-f",
