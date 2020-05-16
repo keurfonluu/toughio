@@ -5,7 +5,7 @@ import collections
 import numpy
 
 from . import json, tough
-from ._output import get_output_type, read_eleme, read_save
+from ._output import get_output_type, read_eleme, read_conne, read_save
 
 __all__ = [
     "Output",
@@ -172,7 +172,11 @@ def read_output(filename, labels_order=None):
         output = Output(file_type, file_format, None, numpy.array(labels), data)
         return _reorder_labels(output, labels_order)
     else:
-        headers, times, labels, variables = read_eleme(filename, file_format)
+        headers, times, labels, variables = (
+            read_eleme(filename, file_format)
+            if file_type == "element"
+            else read_conne(filename)
+        )
         outputs = [
             Output(
                 file_type,
@@ -185,7 +189,7 @@ def read_output(filename, labels_order=None):
         ]
         return (
             [_reorder_labels(out, labels_order) for out in outputs]
-            if labels_order is not None
+            if labels_order is not None and file_type == "element"
             else outputs
         )
 

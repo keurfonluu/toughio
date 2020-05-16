@@ -7,6 +7,7 @@ from . import tough
 __all__ = [
     "get_output_type",
     "read_eleme",
+    "read_conne",
     "read_save",
 ]
 
@@ -43,7 +44,7 @@ def read_eleme(filename, file_format):
 
 def read_eleme_csv(f):
     """Read OUTPUT_ELEME.csv."""
-    headers, times, variables = _read_csv(f)
+    headers, times, variables = _read_csv(f, "element")
 
     headers = headers[1:]
     labels = [[v[0] for v in variable] for variable in variables]
@@ -96,6 +97,17 @@ def read_eleme_tecplot(f):
     return headers, times, labels, variables
 
 
+def read_conne(filename):
+    """Read OUTPUT_CONNE.csv."""
+    with open(filename, "r") as f:
+        headers, times, variables = _read_csv(f, "connection")
+
+    headers = headers[2:]
+    labels = [[v[:2] for v in variable] for variable in variables]
+    variables = numpy.array([[v[2:] for v in variable] for variable in variables])
+    return headers, times, labels, variables
+
+
 def read_save(filename, labels_order):
     """Read SAVE."""
     parameters = tough.read(filename)
@@ -123,8 +135,8 @@ def read_save(filename, labels_order):
     return numpy.array(labels), data, labels_order
 
 
-def _read_csv(f):
-    """Read OUTPUT_{ELEME, CONNE}.csv."""
+def _read_csv(f, file_type):
+    """Read OUTPUT_{ELEME, CONNE}.csv."""    
     # Read header
     line = f.readline().replace('"', "")
     headers = [l.strip() for l in line.split(",")]
@@ -143,6 +155,7 @@ def _read_csv(f):
         times, variables = [], []
 
     line = line.replace('"', "").strip()
+    ilab = 1 if file_type == "element" else 2
     while line:
         line = line.split(",")
 
@@ -154,8 +167,8 @@ def _read_csv(f):
 
         # Output
         else:
-            tmp = [line[0].strip()]
-            tmp += [float(l.strip()) for l in line[1:]]
+            tmp = [l.strip() for l in line[:ilab]]
+            tmp += [float(l.strip()) for l in line[ilab:]]
             variables[-1].append(tmp)
 
         line = f.readline().strip().replace('"', "")

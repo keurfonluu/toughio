@@ -35,7 +35,7 @@ def test_history(filename, data_ref):
 
 
 @pytest.mark.parametrize("filename", ["OUTPUT_ELEME.csv", "OUTPUT_ELEME.tec"])
-def test_output(filename):
+def test_output_eleme(filename):
     this_dir = os.path.dirname(os.path.abspath(__file__))
     filename = os.path.join(this_dir, "support_files", "outputs", "tough3", filename)
     outputs = toughio.read_output(filename)
@@ -64,6 +64,32 @@ def test_output(filename):
 
     assert numpy.allclose(save.data["X1"], outputs[-1].data["PRES"])
     assert numpy.allclose(save.data["X2"], outputs[-1].data["TEMP"])
+
+
+@pytest.mark.parametrize(
+    "filename, data_ref",
+    [
+        (
+            "OUTPUT_CONNE.csv",
+            [2.55892117e-07, -3.14508436e-05, -2.91600309e-09, 1.69222382e-08, 8.60831090e-08],
+        ),
+    ],
+)
+def test_output_conne(filename, data_ref):
+    this_dir = os.path.dirname(os.path.abspath(__file__))
+    filename = os.path.join(this_dir, "support_files", "outputs", "tough3", "OUTPUT_CONNE.csv")
+    outputs = toughio.read_output(filename)
+
+    times_ref = [
+        0.2592000e08,
+        0.3155800e08,
+        0.1577900e09,
+        0.3155800e09,
+        0.7889400e09,
+    ]
+    for output, time_ref, data in zip(outputs, times_ref, data_ref):
+        assert time_ref == output.time
+        assert numpy.allclose(data, output.data["HEAT"].mean())
 
 
 def test_save():
