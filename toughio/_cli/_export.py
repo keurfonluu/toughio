@@ -17,7 +17,7 @@ def export(argv=None):
     import os
     import sys
     from .. import read_mesh, read_output, write_time_series
-    from .._io._helpers import _reorder_labels
+    from .._io.output._common import reorder_labels
     from ..meshmaker import voxelize, triangulate
 
     parser = _get_parser()
@@ -112,7 +112,7 @@ def export(argv=None):
             mesh.cell_sets = {}
             mesh.read_output(output)
         else:
-            output = [_reorder_labels(data, mesh.labels) for data in output]
+            output = [reorder_labels(data, mesh.labels) for data in output]
     print(" Done!")
 
     # Output file name

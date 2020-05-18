@@ -410,7 +410,7 @@ class Mesh(object):
 
         """
         from .. import read_output
-        from .._io._helpers import Output, _reorder_labels
+        from .._io.output._common import Output, reorder_labels
 
         if not isinstance(file_or_output, (str, list, tuple, Output)):
             raise TypeError()
@@ -431,7 +431,7 @@ class Mesh(object):
             if len(out.labels) != self.n_cells:
                 raise ValueError()
             
-            out = _reorder_labels(out, self.labels)
+            out = reorder_labels(out, self.labels)
             self.cell_data.update(out.data)
         elif out.type == "connection":
             centers = self.centers
