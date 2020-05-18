@@ -21,19 +21,25 @@ def get_output_type(filename):
     with open(filename, "r") as f:
         line = f.readline().strip()
 
-    if line.startswith("INCON"):
-        return "element", "save"
-    elif "=" in line:
-        return "element", "tecplot"
-    else:
-        header = line.split(",")[0].replace('"', "").strip()
-        
-        if header == "ELEM":
-            return "element", "csv"
-        elif header == "ELEM1":
-            return "connection", "csv"
+        if not line:
+            line = f.readline().strip()
+            if line.startswith("@@@@@"):
+                return "element", "tough"
+            else:
+                raise ValueError()
+        elif line.startswith("INCON"):
+            return "element", "save"
+        elif "=" in line:
+            return "element", "tecplot"
         else:
-            raise ValueError()
+            header = line.split(",")[0].replace('"', "").strip()
+            
+            if header == "ELEM":
+                return "element", "csv"
+            elif header == "ELEM1":
+                return "connection", "csv"
+            else:
+                raise ValueError()
 
 
 def read(filename, labels_order=None):

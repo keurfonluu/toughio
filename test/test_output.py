@@ -34,7 +34,10 @@ def test_history(filename, data_ref):
         assert numpy.allclose(v, data[k].sum())
 
 
-@pytest.mark.parametrize("filename", ["OUTPUT_ELEME.csv", "OUTPUT_ELEME.tec"])
+@pytest.mark.parametrize(
+    "filename", 
+    ["OUTPUT_ELEME.csv", "OUTPUT_ELEME.tec", "OUTPUT.out"],
+)
 def test_output_eleme(filename):
     this_dir = os.path.dirname(os.path.abspath(__file__))
     filename = os.path.join(this_dir, "support_files", "outputs", "tough3", filename)
@@ -57,13 +60,14 @@ def test_output_eleme(filename):
         assert time_ref == output.time
         assert (
             save.labels.tolist() == output.labels.tolist()
-            if output.format == "csv"
+            if output.format in {"csv", "tough"}
             else output.labels == None
         )
-        assert keys_ref == sorted(list(output.data.keys()))
+        if output.format != "tough":
+            assert keys_ref == sorted(list(output.data.keys()))
 
     assert numpy.allclose(save.data["X1"], outputs[-1].data["PRES"])
-    assert numpy.allclose(save.data["X2"], outputs[-1].data["TEMP"])
+    assert numpy.allclose(save.data["X2"], outputs[-1].data["TEMP"], atol=0.1)
 
 
 @pytest.mark.parametrize(
