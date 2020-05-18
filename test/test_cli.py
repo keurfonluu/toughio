@@ -113,13 +113,19 @@ def test_export(filename, mesh, ext):
         assert numpy.allclose(time_steps, time_steps_ref)
 
 
-@pytest.mark.parametrize("split", [True, False])
-def test_extract(split):
+@pytest.mark.parametrize(
+    "version, split",
+    [
+        ("tough2", True),
+        ("tough2", False),
+    ],
+)
+def test_extract(version, split):
     this_dir = os.path.dirname(os.path.abspath(__file__))
     filename = os.path.join(
-        this_dir, "support_files", "outputs", "tough2", "OUTPUT.out"
+        this_dir, "support_files", "outputs", version, "OUTPUT.out"
     )
-    mesh_file = os.path.join(this_dir, "support_files", "outputs", "MESH.out")
+    mesh_file = os.path.join(this_dir, "support_files", "outputs", version, "MESH.out")
 
     tempdir = helpers.tempdir()
     output_filename = os.path.join(tempdir, "OUTPUT_ELEME.csv")

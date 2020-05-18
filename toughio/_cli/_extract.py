@@ -1,7 +1,6 @@
 import numpy
 
-from .._io.input.tough._helpers import str2float
-from .._io.output import Output
+from .._io.output import Output, read
 from ..mesh import read as read_mesh
 
 __all__ = [
@@ -29,12 +28,9 @@ def extract(argv=None):
         nodes = {k: v["center"] for k, v in parameters["elements"].items()}
 
     # Read TOUGH output file
-    out = []
-    with open(args.infile, "r") as f:
-        for line in f:
-            line = line.upper().strip()
-            if line.startswith("OUTPUT DATA AFTER"):
-                out.append(_read_table(f, nodes))
+    out = read(args.infile)
+    if sorted(nodes.keys()) != sorted(out[0].labels):
+        raise ValueError("Elements in '{}' and '{}' are not consistent.".format(args.infile, args.mesh))
 
     # Write TOUGH3 element output file
     headers = ["X", "Y", "Z"]
@@ -91,52 +87,6 @@ def _get_parser():
     )
 
     return parser
-
-
-def _read_table(f, points):
-    # Look for "TOTAL TIME"
-    while True:
-        line = next(f).strip()
-        if line.startswith("TOTAL TIME"):
-            break
-
-    # Read time step in following line
-    line = next(f).strip()
-    time = float(line.split()[0])
-
-    # Look for "ELEM."
-    while True:
-        line = next(f).strip()
-        if line.startswith("ELEM."):
-            break
-
-    # Read headers once (ignore "ELEM." and "INDEX")
-    headers = line.split()[2:]
-
-    # Look for next non-empty line
-    while True:
-        line = next(f).strip()
-        if line:
-            break
-
-    # Loop until end of output block
-    count = 0
-    variables, labels = [], []
-    while True:
-        if line[:5] in points.keys():
-            count += 1
-            labels.append(line[:5])
-            variables.append([str2float(x) for x in line[5:].split()[1:]])
-
-        line = next(f).strip()
-        if line[1:].startswith("@@@@@"):
-            break
-    if count != len(points):
-        raise ValueError("Inconsistent number of elements.")
-
-    return Output(
-        "element", "tough", time, labels, {k: v for k, v in zip(headers, numpy.transpose(variables))}
-    )
 
 
 def _write_table(f, data, nodes):
