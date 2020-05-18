@@ -1,7 +1,7 @@
 import numpy
 
-from .._io._helpers import Output
-from .._io.tough._helpers import str2float
+from .._io.input.tough._helpers import str2float
+from .._io.output import Output
 from ..mesh import read as read_mesh
 
 __all__ = [

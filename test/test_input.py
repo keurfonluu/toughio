@@ -167,7 +167,7 @@ def test_flac(write_read):
 )
 def test_multi(write_read, isothermal):
     import random
-    from toughio._io.tough._common import eos
+    from toughio._io.input.tough._common import eos
 
     parameters_ref = {
         "eos": random.choice(

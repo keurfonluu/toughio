@@ -57,7 +57,7 @@ def test_output_eleme(filename):
         assert time_ref == output.time
         assert (
             save.labels.tolist() == output.labels.tolist()
-            if output.format == "tough"
+            if output.format == "csv"
             else output.labels == None
         )
         assert keys_ref == sorted(list(output.data.keys()))
