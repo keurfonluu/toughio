@@ -104,13 +104,10 @@ parameters = {
 toughio.write_input("INFILE", parameters)
 ```
 
-TOUGH simulation output can also be imported into Python as a list of _namedtuple_ (`time`, `labels`, `data`)
+TOUGH simulation output can also be imported into Python as a list of _namedtuple_ (`type`, `format`, `time`, `labels`, `data`)
 
 ```python
-output = toughio.read_output(
-    filename,
-    file_format="tough",    # Optional, "tough" or "tecplot"
-)
+output = toughio.read_output(filename)
 ```
 
 **`toughio`** is mainly intended to be used as a Python scripting library for TOUGH. Nevertheless, several utility command line scripts are available for users who are not familiar with Python. From a console or terminal, the user can execute the following scripts:
