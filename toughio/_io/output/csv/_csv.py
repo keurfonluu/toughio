@@ -6,6 +6,7 @@ from .._common import to_output
 
 __all__ = [
     "read",
+    "write",
 ]
 
 
@@ -42,7 +43,7 @@ def read_conne(f):
 
 
 def _read_csv(f, file_type):
-    """Read OUTPUT_{ELEME, CONNE}.csv."""    
+    """Read CSV table."""    
     # Read header
     line = f.readline().replace('"', "")
     headers = [l.strip() for l in line.split(",")]
@@ -80,3 +81,23 @@ def _read_csv(f, file_type):
         line = f.readline().strip().replace('"', "")
 
     return headers, times, variables
+
+
+def write(filename, output):
+    """Write OUTPUT_{ELEME, CONNE}.csv."""
+    pass
+
+
+def write_eleme(f):
+    """Write OUTPUT_ELEME.csv."""
+    pass
+
+
+def write_conne(f):
+    """Write OUTTPUT_CONNE.csv."""
+    pass
+
+
+def _write_csv(f):
+    """Write CSV table."""
+    pass
