@@ -9,11 +9,14 @@ __all__ = [
 
 
 _reader_map = {}
+_writer_map = {}
 
 
-def register(file_format, reader):
+def register(file_format, reader, writer=None):
     """Register a new format."""
     _reader_map[file_format] = reader
+    if writer is not None:
+        _writer_map[file_format] = writer
 
 
 def get_output_type(filename):
