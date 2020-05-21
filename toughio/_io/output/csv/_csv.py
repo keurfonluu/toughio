@@ -94,7 +94,7 @@ def write_eleme(f):
 
 
 def write_conne(f):
-    """Write OUTTPUT_CONNE.csv."""
+    """Write OUTPUT_CONNE.csv."""
     pass
 
 
