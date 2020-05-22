@@ -6,4 +6,4 @@ __all__ = [
 ]
 
 
-register("tecplot", read)
+register("tecplot", [".tec"], read)

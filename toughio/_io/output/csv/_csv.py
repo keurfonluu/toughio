@@ -9,6 +9,24 @@ __all__ = [
     "write",
 ]
 
+header_to_unit = {
+    "ELEM": "",
+    "X": "(M)",
+    "Y": "(M)",
+    "Z": "(M)",
+    "PRES": "(PA)",
+    "TEMP": "(DEC-C)",
+    "PCAP_GL": "(PA)",
+    "DEN_G": "(KG/M**3)",
+    "DEN_L": "(KG/M**3)",
+    "ELEM1": "",
+    "ELEM2": "",
+    "HEAT": "(W)",
+    "FLOW": "(KG/S)",
+    "FLOW_G": "(KG/S)",
+    "FLOW_L": "(KG/S)",
+}
+
 
 def read(filename, file_type, file_format, labels_order):
     """Read OUTPUT_{ELEME, CONNE}.csv."""
@@ -85,19 +103,38 @@ def _read_csv(f, file_type):
 
 def write(filename, output):
     """Write OUTPUT_{ELEME, CONNE}.csv."""
-    pass
+    out = output[-1]
+    headers = ["ELEM"] if out.type == "element" else ["ELEM1", "ELEM2"]
+    headers += ["X"] if "X" in out.data.keys() else []
+    headers += ["Y"] if "Y" in out.data.keys() else []
+    headers += ["Z"] if "Z" in out.data.keys() else []
+    headers += [k for k in out.data.keys() if k not in {"X", "Y", "Z"}]
+
+    with open(filename, "w") as f:
+        _write_csv(f, output, headers)
 
 
-def write_eleme(f):
-    """Write OUTPUT_ELEME.csv."""
-    pass
-
-
-def write_conne(f):
-    """Write OUTPUT_CONNE.csv."""
-    pass
-
-
-def _write_csv(f):
+def _write_csv(f, output, headers):
     """Write CSV table."""
-    pass
+    # Headers
+    units = [header_to_unit[header] if header in header_to_unit.keys() else " (-)" for header in headers]
+    f.write(",".join('"{:>18}"'.format(header) for header in headers) + "\n")
+    f.write(",".join('"{:>18}"'.format(unit) for unit in units) + "\n")
+
+    # Data
+    formats = [
+        '"{:>18}"'
+        if header.startswith("ELEM")
+        else "{:20.12e}"
+        for header in headers
+    ]
+    for out in output:
+        # Time step
+        f.write('"TIME [sec]  {:.8e}"\n'.format(out.time))
+
+        # Table
+        for i, label in enumerate(out.labels):
+            record = [label] if isinstance(label, str) else [l for l in label]
+            record += [out.data[k][i] for k in headers if not k.startswith("ELEM")]
+            record = ",".join(fmt.format(rec) for fmt, rec in zip(formats, record)) + "\n"
+            f.write(record)
