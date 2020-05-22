@@ -2,6 +2,7 @@ from __future__ import with_statement
 
 import numpy
 
+from ._common import Output
 from ..._common import filetype_from_filename
 
 __all__ = [
@@ -105,6 +106,11 @@ def write(filename, output, file_format=None, **kwargs):
     """
     if not isinstance(filename, str):
         raise TypeError()
+
+    output = [output] if isinstance(output, Output) else output
+    if not (isinstance(output, (list, tuple)) and all(isinstance(out, Output) for out in output)):
+        raise TypeError()
+    
     fmt = file_format if file_format else _filetype_from_filename(filename)
 
     return _writer_map[fmt](filename, output, **kwargs)
