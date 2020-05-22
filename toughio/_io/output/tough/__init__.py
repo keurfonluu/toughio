@@ -6,4 +6,4 @@ __all__ = [
 ]
 
 
-register("tough", read)
+register("tough", [], read)

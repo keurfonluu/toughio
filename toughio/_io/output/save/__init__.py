@@ -6,4 +6,4 @@ __all__ = [
 ]
 
 
-register("save", read)
+register("save", [], read)

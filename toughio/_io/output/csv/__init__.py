@@ -7,4 +7,4 @@ __all__ = [
 ]
 
 
-register("csv", read, write)
+register("csv", [".csv"], read, write)
