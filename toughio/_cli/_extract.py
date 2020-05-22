@@ -1,6 +1,8 @@
 import numpy
 
-from .._io.output import Output, read
+from .._io.output import Output
+from .._io.output import read as read_output
+from .._io.output import write as write_output
 from ..mesh import read as read_mesh
 
 __all__ = [
@@ -24,27 +26,24 @@ def extract(argv=None):
     parameters = read_mesh(args.mesh, file_format="tough")
     if "elements" not in parameters.keys():
         raise ValueError("Invalid MESH file '{}'.".format(args.mesh))
-    else:
-        nodes = {k: v["center"] for k, v in parameters["elements"].items()}
 
     # Read TOUGH output file
-    out = read(args.infile)
-    if sorted(nodes.keys()) != sorted(out[0].labels):
+    output = read_output(args.infile)
+    try:
+        points = numpy.vstack([parameters["elements"][label]["center"] for label in output[-1].labels])
+        points = {k: v for k, v in zip(["X", "Y", "Z"], points.T)}
+        for out in output:
+            out.data.update(points)
+    except KeyError:
         raise ValueError("Elements in '{}' and '{}' are not consistent.".format(args.infile, args.mesh))
 
     # Write TOUGH3 element output file
-    headers = ["X", "Y", "Z"]
-    if not args.split or len(out) == 1:
-        with open(args.output_file, "w") as f:
-            _write_header(f, headers, out[0])
-            for data in out:
-                _write_table(f, data, nodes)
+    if not args.split or len(output) == 1:
+        write_output(args.output_file, output, file_format="csv")
     else:
         head, ext = os.path.splitext(args.output_file)
-        for i, data in enumerate(out):
-            with open("{}_{}{}".format(head, i + 1, ext), "w") as f:
-                _write_header(f, headers, data)
-                _write_table(f, data, nodes)
+        for i, out in enumerate(output):
+            write_output("{}_{}{}".format(head, i + 1, ext), out, file_format="csv")
 
 
 def _get_parser():
