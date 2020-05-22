@@ -70,6 +70,40 @@ hybrid_mesh = toughio.Mesh(
     cell_data={"c": numpy.random.rand(6), "d": numpy.random.rand(6)},
 )
 
+output_eleme = [
+    toughio.Output(
+        "element",
+        None,
+        numpy.random.rand(),
+        numpy.array(["AAA0{}".format(i) for i in range(10)]),
+        {
+            "X": numpy.random.rand(10),
+            "Y": numpy.random.rand(10),
+            "Z": numpy.random.rand(10),
+            "PRES": numpy.random.rand(10),
+            "TEMP": numpy.random.rand(10),
+        },
+    )
+    for _ in range(3)
+]
+
+output_conne = [
+    toughio.Output(
+        "connection",
+        None,
+        numpy.random.rand(),
+        numpy.array([["AAA0{}".format(i), "AAA0{}".format(i)] for i in range(10)]),
+        {
+            "X": numpy.random.rand(10),
+            "Y": numpy.random.rand(10),
+            "Z": numpy.random.rand(10),
+            "HEAT": numpy.random.rand(10),
+            "FLOW": numpy.random.rand(10),
+        },
+    )
+    for _ in range(3)
+]
+
 
 def tempdir(filename=None):
     temp_dir = tempfile.mkdtemp()
@@ -118,3 +152,10 @@ def allclose_mesh(mesh_ref, mesh):
     if mesh.cell_data:
         for k, v in mesh_ref.cell_data.items():
             assert numpy.allclose(v, mesh.cell_data[k])
+
+
+def allclose_output(output_ref, output):
+    assert output_ref.type == output.type
+    assert numpy.allclose(output_ref.time, output.time)
+    assert output_ref.labels.tolist() == output_ref.labels.tolist()
+    allclose_dict(output_ref.data, output.data)

@@ -3,7 +3,17 @@ import os
 import numpy
 import pytest
 
+import helpers
 import toughio
+
+write_read = lambda output, writer_kws, reader_kws: helpers.write_read(
+    "output",
+    output,
+    toughio.write_output,
+    toughio.read_output,
+    writer_kws=writer_kws,
+    reader_kws=reader_kws,
+)
 
 
 @pytest.mark.parametrize(
@@ -94,6 +104,27 @@ def test_output_conne(filename, data_ref):
     for output, time_ref, data in zip(outputs, times_ref, data_ref):
         assert time_ref == output.time
         assert numpy.allclose(data, output.data["HEAT"].mean())
+
+
+@pytest.mark.parametrize(
+    "output_ref, file_format",
+    [
+        (helpers.output_eleme, "csv"),
+        (helpers.output_eleme[0], "csv"),
+        (helpers.output_conne, "csv"),
+        (helpers.output_conne[0], "csv"),
+    ],
+)
+def test_output(output_ref, file_format):
+    output = write_read(
+        output=output_ref,
+        writer_kws={"file_format": file_format},
+        reader_kws={},
+    )
+
+    output_ref = output_ref if isinstance(output_ref, list) else [output_ref]
+    for out_ref, out in zip(output_ref, output):
+        helpers.allclose_output(out_ref, out)
 
 
 def test_save():
