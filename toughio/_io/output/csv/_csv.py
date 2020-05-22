@@ -31,33 +31,15 @@ header_to_unit = {
 def read(filename, file_type, file_format, labels_order):
     """Read OUTPUT_{ELEME, CONNE}.csv."""
     with open(filename, "r") as f:
-        headers, times, labels, variables = (
-            read_eleme(f)
-            if file_type == "element"
-            else read_conne(f)
-        )
+        headers, times, variables = _read_csv(f, file_type)
+
+        ilab = 1 if file_type == "element" else 2
+        headers = headers[ilab:]
+        labels = [[v[:ilab] for v in variable] for variable in variables]
+        labels = [[l[0] for l in label] for label in labels] if file_type == "element" else labels
+        variables = numpy.array([[v[ilab:] for v in variable] for variable in variables])
 
     return to_output(file_type, file_format, labels_order, headers, times, labels, variables)
-
-
-def read_eleme(f):
-    """Read OUTPUT_ELEME.csv."""
-    headers, times, variables = _read_csv(f, "element")
-
-    headers = headers[1:]
-    labels = [[v[0] for v in variable] for variable in variables]
-    variables = numpy.array([[v[1:] for v in variable] for variable in variables])
-    return headers, times, labels, variables
-
-
-def read_conne(f):
-    """Read OUTPUT_CONNE.csv."""
-    headers, times, variables = _read_csv(f, "connection")
-
-    headers = headers[2:]
-    labels = [[v[:2] for v in variable] for variable in variables]
-    variables = numpy.array([[v[2:] for v in variable] for variable in variables])
-    return headers, times, labels, variables
 
 
 def _read_csv(f, file_type):
