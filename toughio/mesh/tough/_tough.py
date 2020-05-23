@@ -5,7 +5,6 @@ import os
 
 import numpy
 
-from .._helpers import register
 from ._helpers import block
 
 __all__ = [
@@ -393,6 +392,3 @@ def _isot(lines):
 def _dot(A, B):
     """Calculate dot product when arrays A and B have the same shape."""
     return (A * B).sum(axis=1)
-
-
-register("tough", [], read, {"tough": write})
