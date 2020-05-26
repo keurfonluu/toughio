@@ -1,4 +1,4 @@
-from ._tecplot import read
+from ._tecplot import read, write
 from .._helpers import register
 
 __all__ = [
@@ -6,4 +6,4 @@ __all__ = [
 ]
 
 
-register("tecplot", [".tec"], read)
+register("tecplot", [".tec"], read, write)
