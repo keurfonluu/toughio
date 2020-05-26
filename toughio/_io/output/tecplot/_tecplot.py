@@ -7,6 +7,7 @@ from ....mesh.tecplot._tecplot import _read_variables, _read_zone
 
 __all__ = [
     "read",
+    "write",
 ]
 
 
@@ -52,3 +53,8 @@ def read(filename, file_type, file_format, labels_order):
                 break
 
     return to_output(file_type, file_format, labels_order, headers, times, labels, variables)
+
+
+def write(filename):
+    """Write OUTPUT_ELEME.tec."""
+    pass
