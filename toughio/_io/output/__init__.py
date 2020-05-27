@@ -1,4 +1,4 @@
-from . import csv, save, tecplot, tough
+from . import csv, save, petrasim, tecplot, tough
 from ._common import Output
 from ._helpers import read, write, read_history
 
