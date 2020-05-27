@@ -72,15 +72,17 @@ def write(filename, output):
 
     with open(filename, "w") as f:
         # Headers
-        record = "VARIABLES = {}".format(" ".join(header for header in headers))
-        f.write("{}\n".format(record))
+        record = "".join("{:>18}".format(header) for header in headers)
+        f.write("{}{}\n".format("{:>18}".format("VARIABLES       ="), record))
 
         # Data
         for out in output:
             # Zone
-            record = 'ZONE T="{} SEC" I = {}'.format(out.time, len(out.data["X"]))
+            record = ' ZONE T="{:14.7e} SEC"  I = {:8d}'.format(out.time, len(out.data["X"]))
             f.write("{}\n".format(record))
 
             # Table
             data = numpy.transpose([out.data[k] for k in headers])
-            numpy.savetxt(f, data, "%20.12e")
+            for d in data:
+                record = "".join("{:20.12e}".format(x) for x in d)
+                f.write("{}{}\n".format("{:18}".format(""), record))
