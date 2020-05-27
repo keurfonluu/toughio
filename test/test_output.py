@@ -111,6 +111,8 @@ def test_output_conne(filename, data_ref):
     [
         (helpers.output_eleme, "csv"),
         (helpers.output_eleme[0], "csv"),
+        (helpers.output_eleme, "petrasim"),
+        (helpers.output_eleme[0], "petrasim"),
         (helpers.output_eleme, "tecplot"),
         (helpers.output_eleme[0], "tecplot"),
         (helpers.output_conne, "csv"),
