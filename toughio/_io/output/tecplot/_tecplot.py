@@ -55,6 +55,32 @@ def read(filename, file_type, file_format, labels_order):
     return to_output(file_type, file_format, labels_order, headers, times, labels, variables)
 
 
-def write(filename):
+def write(filename, output):
     """Write OUTPUT_ELEME.tec."""
-    pass
+    out = output[-1]
+    headers = []
+    if "X" in out.data.keys():
+        headers += ["X"]
+    else:
+        raise ValueError()
+    if "Y" in out.data.keys():
+        headers += ["Y"]
+    else:
+        raise ValueError()
+    headers += ["Z"] if "Z" in out.data.keys() else []
+    headers += [k for k in out.data.keys() if k not in {"X", "Y", "Z"}]
+
+    with open(filename, "w") as f:
+        # Headers
+        record = "VARIABLES = {}".format(" ".join(header for header in headers))
+        f.write("{}\n".format(record))
+
+        # Data
+        for out in output:
+            # Zone
+            record = 'ZONE T="{} SEC" I = {}'.format(out.time, len(out.data["X"]))
+            f.write("{}\n".format(record))
+
+            # Table
+            data = numpy.transpose([out.data[k] for k in headers])
+            numpy.savetxt(f, data, "%20.12e")
