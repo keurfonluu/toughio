@@ -35,7 +35,7 @@ def read(filename, file_type, file_format, labels_order):
     data = numpy.array(data)
 
     labels, unique_times, variables = [], [], []
-    for time in numpy.sort(numpy.unique(times)):
+    for time in numpy.unique(times):
         idx = times == time
         labels.append(elements[idx])
         unique_times.append(time)
