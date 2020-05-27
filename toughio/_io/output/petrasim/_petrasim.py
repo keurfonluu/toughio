@@ -46,4 +46,28 @@ def read(filename, file_type, file_format, labels_order):
 
 def write(filename, output):
     """Write Petrasim OUTPUT_ELEME.csv."""
-    pass
+    out = output[-1]
+    headers = []
+    headers += ["X"] if "X" in out.data.keys() else []
+    headers += ["Y"] if "Y" in out.data.keys() else []
+    headers += ["Z"] if "Z" in out.data.keys() else []
+    headers += [k for k in out.data.keys() if k not in {"X", "Y", "Z"}]
+
+    with open(filename, "w") as f:
+        # Headers
+        record = ",".join("{:>18}".format(header) for header in ["TIME [sec]", "ELEM", "INDEX"] + headers)
+        f.write("{}\n".format(record))
+
+        # Data
+        for out in output:
+            data = numpy.transpose([out.data[k] for k in headers])
+            formats = ["{:20.12e}", "{:>18}", "{:20d}"]
+            formats += ["{:20.12e}"] * len(out.data)
+
+            i = 0
+            for d in data:
+                tmp = [out.time, out.labels[i], i + 1]
+                tmp += [x for x in d]
+                record = ",".join(fmt.format(x) for fmt, x in zip(formats, tmp))
+                f.write("{}\n".format(record))
+                i += 1
