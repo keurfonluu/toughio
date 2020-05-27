@@ -46,7 +46,7 @@ def test_history(filename, data_ref):
 
 @pytest.mark.parametrize(
     "filename", 
-    ["OUTPUT_ELEME.csv", "OUTPUT_ELEME.tec", "OUTPUT.out"],
+    ["OUTPUT_ELEME.csv", "OUTPUT_ELEME.tec", "OUTPUT_ELEME_PETRASIM.csv", "OUTPUT.out"],
 )
 def test_output_eleme(filename):
     this_dir = os.path.dirname(os.path.abspath(__file__))
@@ -70,7 +70,7 @@ def test_output_eleme(filename):
         assert time_ref == output.time
         assert (
             save.labels.tolist() == output.labels.tolist()
-            if output.format in {"csv", "tough"}
+            if output.format in {"csv", "petrasim", "tough"}
             else output.labels == None
         )
         if output.format != "tough":
