@@ -74,7 +74,7 @@ output_eleme = [
     toughio.Output(
         "element",
         None,
-        numpy.random.rand(),
+        float(time),
         numpy.array(["AAA0{}".format(i) for i in range(10)]),
         {
             "X": numpy.random.rand(10),
@@ -84,14 +84,14 @@ output_eleme = [
             "TEMP": numpy.random.rand(10),
         },
     )
-    for _ in range(3)
+    for time in range(3)
 ]
 
 output_conne = [
     toughio.Output(
         "connection",
         None,
-        numpy.random.rand(),
+        float(time),
         numpy.array([["AAA0{}".format(i), "AAA0{}".format(i)] for i in range(10)]),
         {
             "X": numpy.random.rand(10),
@@ -101,7 +101,7 @@ output_conne = [
             "FLOW": numpy.random.rand(10),
         },
     )
-    for _ in range(3)
+    for time in range(3)
 ]
 
 
