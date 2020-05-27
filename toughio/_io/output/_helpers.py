@@ -50,6 +50,8 @@ def get_output_type(filename):
             return "element", "save"
         elif "=" in line:
             return "element", "tecplot"
+        elif line.startswith("TIME"):
+            return "element", "petrasim"
         else:
             header = line.split(",")[0].replace('"', "").strip()
             
