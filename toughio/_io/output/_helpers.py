@@ -63,7 +63,7 @@ def get_output_type(filename):
                 raise ValueError()
 
 
-def read(filename, labels_order=None):
+def read(filename, labels_order=None, connection=False, **kwargs):
     """
     Read TOUGH SAVE or output file for each time step.
 
@@ -73,6 +73,8 @@ def read(filename, labels_order=None):
         Input file name.
     labels_order : list of array_like or None, optional, default None
         List of labels.
+    connection : bool, optional, default False
+        Only for standard TOUGH output file. If `True`, return data related to connections.
 
     Returns
     -------
@@ -88,8 +90,9 @@ def read(filename, labels_order=None):
         raise TypeError()
 
     file_type, file_format = get_output_type(filename)
+    file_type = "connection" if (file_format == "tough" and connection) else file_type
 
-    return _reader_map[file_format](filename, file_type, file_format, labels_order)
+    return _reader_map[file_format](filename, file_type, file_format, labels_order, **kwargs)
 
 
 def write(filename, output, file_format=None, **kwargs):
