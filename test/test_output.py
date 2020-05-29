@@ -81,18 +81,13 @@ def test_output_eleme(filename):
 
 
 @pytest.mark.parametrize(
-    "filename, data_ref",
-    [
-        (
-            "OUTPUT_CONNE.csv",
-            [2.55892117e-07, -3.14508436e-05, -2.91600309e-09, 1.69222382e-08, 8.60831090e-08],
-        ),
-    ],
+    "filename",
+    ["OUTPUT_CONNE.csv", "OUTPUT.out"],
 )
-def test_output_conne(filename, data_ref):
+def test_output_conne(filename):
     this_dir = os.path.dirname(os.path.abspath(__file__))
     filename = os.path.join(this_dir, "support_files", "outputs", "tough3", "OUTPUT_CONNE.csv")
-    outputs = toughio.read_output(filename)
+    outputs = toughio.read_output(filename, connection=True)
 
     times_ref = [
         0.2592000e08,
@@ -101,9 +96,16 @@ def test_output_conne(filename, data_ref):
         0.3155800e09,
         0.7889400e09,
     ]
+    data_ref = [
+        52542.0,
+        52475.0,
+        51146.0,
+        49600.0,
+        45623.0,
+    ]
     for output, time_ref, data in zip(outputs, times_ref, data_ref):
         assert time_ref == output.time
-        assert numpy.allclose(data, output.data["HEAT"].mean())
+        assert numpy.allclose(data, numpy.abs(output.data["HEAT"]).mean(), atol=1.0)
 
 
 @pytest.mark.parametrize(
