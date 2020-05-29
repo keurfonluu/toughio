@@ -2,7 +2,7 @@ from __future__ import with_statement
 
 import numpy
 
-from .._common import Output
+from .._common import to_output
 from ...input.tough._helpers import str2float
 
 __all__ = [
@@ -12,57 +12,57 @@ __all__ = [
 
 def read(filename, file_type, file_format, labels_order):
     """Read standard TOUGH OUTPUT."""
-    out = []
     with open(filename, "r") as f:
-        for line in f:
-            line = line.upper().strip()
-            if line.startswith("OUTPUT DATA AFTER"):
-                out.append(_read_table(f))
+        headers, times, variables = _read_table(f)
 
-    return out
+        headers = headers[2:]
+        labels = [[v[0] for v in variable] for variable in variables]
+        variables = numpy.array([[v[2:] for v in variable] for variable in variables])
+
+    return to_output(file_type, file_format, labels_order, headers, times, labels, variables)
 
 
 def _read_table(f):
     """Read data table for current time step."""
-    # Look for "TOTAL TIME"
+    times, variables = [], []
     while True:
-        line = next(f).strip()
+        line = f.readline().strip()
+
+        # Look for "TOTAL TIME"
         if line.startswith("TOTAL TIME"):
+            # Read time step in following line
+            line = f.readline().strip()
+            times.append(float(line.split()[0]))
+            variables.append([])
+
+            # Look for "ELEM."
+            while True:
+                line = f.readline().strip()
+                if line.startswith("ELEM."):
+                    break
+
+            # Read headers
+            headers = line.split()
+
+            # Look for next non-empty line
+            while True:
+                line = f.readline()
+                if line.strip():
+                    break
+
+            # Loop until end of output block
+            while True:
+                if line[:10].strip() and not line.strip().startswith("ELEM"):
+                    line = line.strip()
+                    tmp = [line[:5]]
+                    tmp += [str2float(x) for x in line[5:].split()]
+                    variables[-1].append(tmp)
+
+                line = f.readline()
+                if line[1:].startswith("@@@@@"):
+                    break
+
+        elif line.startswith("END OF TOUGH"):
             break
 
-    # Read time step in following line
-    line = next(f).strip()
-    time = float(line.split()[0])
-
-    # Look for "ELEM."
-    while True:
-        line = next(f).strip()
-        if line.startswith("ELEM."):
-            break
-
-    # Read headers once (ignore "ELEM." and "INDEX")
-    headers = line.split()[2:]
-
-    # Look for next non-empty line
-    while True:
-        line = next(f)
-        if line.strip():
-            break
-
-    # Loop until end of output block
-    variables, labels = [], []
-    while True:
-        if line[:10].strip() and not line.strip().startswith("ELEM"):
-            line = line.strip()
-            labels.append(line[:5])
-            variables.append([str2float(x) for x in line[5:].split()[1:]])
-
-        line = next(f)
-        if line[1:].startswith("@@@@@"):
-            break
-
-    return Output(
-        "element", "tough", time, numpy.array(labels), {k: v for k, v in zip(headers, numpy.transpose(variables))}
-    )
-        
-
+    return headers, times, variables
