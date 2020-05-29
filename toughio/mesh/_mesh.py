@@ -397,7 +397,7 @@ class Mesh(object):
                 filename, self.labels, primary_variables, porosities, permeabilities,
             )
 
-    def read_output(self, file_or_output, time_step=-1):
+    def read_output(self, file_or_output, time_step=-1, connection=False):
         """
         Import TOUGH results to the mesh.
 
@@ -407,6 +407,8 @@ class Mesh(object):
             Input file name or output data.
         time_step : int, optional, default -1
             Data for given time step to import. Default is last time step.
+        connection : bool, optional, default False
+            Only for standard TOUGH output file. If `True`, read data related to connections.
 
         """
         from .. import read_output
@@ -418,7 +420,7 @@ class Mesh(object):
             raise TypeError()
 
         if isinstance(file_or_output, str):
-            out = read_output(file_or_output)
+            out = read_output(file_or_output, connection=connection)
         else:
             out = file_or_output
 
