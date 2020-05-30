@@ -68,7 +68,12 @@ class BaseRelativePermeability(ABC):
             Additional keywords passed to :func:`matplotlib.pyplot.plot`.
 
         """
-        import matplotlib.pyplot as plt
+        try:
+            import matplotlib.pyplot as plt
+        except ImportError:
+            raise ImportError(
+                "Plotting relative permeability curve requires matplotlib to be installed."
+            )
 
         if not (isinstance(n, int) and n > 1):
             raise TypeError()
