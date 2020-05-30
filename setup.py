@@ -52,7 +52,7 @@ else:
 REQUIREMENTS += ["numpy >= 1.13.0"]
 EXTRA_REQUIREMENTS["full"] += ["matplotlib", "netcdf4", "h5py", "scipy>=0.9"]
 EXTRA_REQUIREMENTS["dev"] = list(EXTRA_REQUIREMENTS["full"])
-EXTRA_REQUIREMENTS["dev"] += ["black", "isort", "docformatter"]
+EXTRA_REQUIREMENTS["dev"] += ["black", "docformatter", "invoke", "isort"]
 
 
 PACKAGE_DATA = {
