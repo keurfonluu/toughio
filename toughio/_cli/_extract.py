@@ -1,7 +1,7 @@
 import numpy
 
-from .._io._helpers import Output
-from .._io.tough._helpers import str2float
+from .._io.output import read as read_output
+from .._io.output import write as write_output
 from ..mesh import read as read_mesh
 
 __all__ = [
@@ -9,11 +9,22 @@ __all__ = [
 ]
 
 
+format_to_ext = {
+    "csv": ".csv",
+    "tecplot": ".tec",
+    "petrasim": ".csv",
+}
+
+
 def extract(argv=None):
     import os
 
     parser = _get_parser()
     args = parser.parse_args(argv)
+
+    # Check output file format
+    if args.connection and args.file_format != "csv":
+        raise ValueError("Connection data can only be exported to CSV.")
 
     # Check that TOUGH output and MESH file exist
     if not os.path.isfile(args.infile):
@@ -25,30 +36,52 @@ def extract(argv=None):
     parameters = read_mesh(args.mesh, file_format="tough")
     if "elements" not in parameters.keys():
         raise ValueError("Invalid MESH file '{}'.".format(args.mesh))
-    else:
-        nodes = {k: v["center"] for k, v in parameters["elements"].items()}
 
     # Read TOUGH output file
-    out = []
-    with open(args.infile, "r") as f:
-        for line in f:
-            line = line.upper().strip()
-            if line.startswith("OUTPUT DATA AFTER"):
-                out.append(_read_table(f, nodes))
+    output = read_output(args.infile, connection=args.connection)
+    if output[-1].format != "tough":
+        raise ValueError("Invalid TOUGH output file '{}'.".format(args.infile))
+
+    try:
+        if not args.connection:
+            points = numpy.vstack(
+                [parameters["elements"][label]["center"] for label in output[-1].labels]
+            )
+        else:
+            points = numpy.array(
+                [
+                    numpy.mean(
+                        [parameters["elements"][l]["center"] for l in label], axis=0
+                    )
+                    for label in output[-1].labels
+                ]
+            )
+        points = {k: v for k, v in zip(["X", "Y", "Z"], points.T)}
+        for out in output:
+            out.data.update(points)
+
+    except KeyError:
+        raise ValueError(
+            "Elements in '{}' and '{}' are not consistent.".format(
+                args.infile, args.mesh
+            )
+        )
 
     # Write TOUGH3 element output file
-    headers = ["X", "Y", "Z"]
-    if not args.split or len(out) == 1:
-        with open(args.output_file, "w") as f:
-            _write_header(f, headers, out[0])
-            for data in out:
-                _write_table(f, data, nodes)
+    ext = format_to_ext[args.file_format]
+    filename = (
+        args.output_file
+        if args.output_file is not None
+        else "OUTPUT_ELEME{}".format(ext)
+        if not args.connection
+        else "OUTPUT_CONNE{}".format(ext)
+    )
+    if not args.split or len(output) == 1:
+        write_output(filename, output, file_format=args.file_format)
     else:
-        head, ext = os.path.splitext(args.output_file)
-        for i, data in enumerate(out):
-            with open("{}_{}{}".format(head, i + 1, ext), "w") as f:
-                _write_header(f, headers, data)
-                _write_table(f, data, nodes)
+        head, ext = os.path.splitext(filename)
+        for i, out in enumerate(output):
+            write_output("{}_{}{}".format(head, i + 1, ext), out, file_format="csv")
 
 
 def _get_parser():
@@ -57,7 +90,7 @@ def _get_parser():
     # Initialize parser
     parser = argparse.ArgumentParser(
         description=(
-            "Extract results from TOUGH main output file and reformat as a TOUGH3 element output file."
+            "Extract results from TOUGH main output file and reformat as a TOUGH3 CSV output file."
         ),
         formatter_class=argparse.RawTextHelpFormatter,
     )
@@ -77,8 +110,18 @@ def _get_parser():
         "--output-file",
         "-o",
         type=str,
-        default="OUTPUT_ELEME.csv",
+        default=None,
         help="TOUGH3 element output file",
+    )
+
+    # File format
+    parser.add_argument(
+        "--file-format",
+        "-f",
+        type=str,
+        choices=("csv", "tecplot", "petrasim"),
+        default="csv",
+        help="exported file format",
     )
 
     # Split or not
@@ -90,69 +133,13 @@ def _get_parser():
         help="write one file per time step",
     )
 
-    return parser
-
-
-def _read_table(f, points):
-    # Look for "TOTAL TIME"
-    while True:
-        line = next(f).strip()
-        if line.startswith("TOTAL TIME"):
-            break
-
-    # Read time step in following line
-    line = next(f).strip()
-    time = float(line.split()[0])
-
-    # Look for "ELEM."
-    while True:
-        line = next(f).strip()
-        if line.startswith("ELEM."):
-            break
-
-    # Read headers once (ignore "ELEM." and "INDEX")
-    headers = line.split()[2:]
-
-    # Look for next non-empty line
-    while True:
-        line = next(f).strip()
-        if line:
-            break
-
-    # Loop until end of output block
-    count = 0
-    variables, labels = [], []
-    while True:
-        if line[:5] in points.keys():
-            count += 1
-            labels.append(line[:5])
-            variables.append([str2float(x) for x in line[5:].split()[1:]])
-
-        line = next(f).strip()
-        if line[1:].startswith("@@@@@"):
-            break
-    if count != len(points):
-        raise ValueError("Inconsistent number of elements.")
-
-    return Output(
-        time, labels, {k: v for k, v in zip(headers, numpy.transpose(variables))}
+    # Read connection data
+    parser.add_argument(
+        "--connection",
+        "-c",
+        default=False,
+        action="store_true",
+        help="extract data related to connections",
     )
 
-
-def _write_table(f, data, nodes):
-    # Write time step
-    f.write('"TIME [sec]  {:.8e}"\n'.format(data.time))
-
-    # Loop over elements
-    formats = ['"{:>18}"'] + (len(data.data.keys()) + 3) * ["  {:>.12e}"]
-    for i, label in enumerate(data.labels):
-        record = [label] + nodes[label] + [v[i] for v in data.data.values()]
-        record = ",".join(fmt.format(rec) for fmt, rec in zip(formats, record)) + "\n"
-        f.write(record)
-
-
-def _write_header(f, headers, data):
-    headers = ["ELEM"] + headers + list(data.data.keys())
-    units = [""] + 3 * ["(M)"] + len(data.data.keys()) * ["(-)"]
-    f.write(",".join('"{:>18}"'.format(header) for header in headers) + "\n")
-    f.write(",".join('"{:>18}"'.format(unit) for unit in units) + "\n")
+    return parser

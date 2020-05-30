@@ -1,3 +1,4 @@
+import os
 from copy import deepcopy
 
 import numpy
@@ -5,6 +6,17 @@ import pytest
 
 import helpers
 import toughio
+
+output_ref = {
+    "element": {
+        0: {"PRES": 9641264.130638, "TEMP": 149.62999493,},
+        -1: {"PRES": 635804.12294844, "TEMP": 142.89449866,},
+    },
+    "connection": {
+        0: {"HEAT": -1.64908253e-07, "FLOW": -2.85760551e-13,},
+        -1: {"HEAT": -5.54750914e-08, "FLOW": -4.68234504e-14,},
+    },
+}
 
 
 def test_extrude_to_3d():
@@ -102,6 +114,26 @@ def test_from_to(mesh_ref, from_, to_):
 def test_to_tough():
     with pytest.deprecated_call():
         helpers.hybrid_mesh.to_tough(helpers.tempdir("MESH"))
+
+
+@pytest.mark.parametrize(
+    "filename, file_type, time_step",
+    [
+        ("OUTPUT_ELEME.csv", "element", 0),
+        ("OUTPUT_ELEME.csv", "element", -1),
+        ("OUTPUT_CONNE.csv", "connection", 0),
+        ("OUTPUT_CONNE.csv", "connection", -1),
+    ],
+)
+def test_read_output(filename, file_type, time_step):
+    this_dir = os.path.dirname(os.path.abspath(__file__))
+    mesh_filename = os.path.join(this_dir, "support_files", "outputs", "mesh.pickle")
+    mesh = toughio.read_mesh(mesh_filename)
+    filename = os.path.join(this_dir, "support_files", "outputs", filename)
+    mesh.read_output(filename, time_step=time_step)
+
+    for k, v in output_ref[file_type][time_step].items():
+        assert numpy.allclose(v, mesh.cell_data[k].mean())
 
 
 def test_add_point_data():
