@@ -33,7 +33,7 @@ def test_co2tab(dirname):
 )
 def test_export(filename, mesh, ext):
     this_dir = os.path.dirname(os.path.abspath(__file__))
-    filename = os.path.join(this_dir, "support_files", "outputs", "tough3", filename)
+    filename = os.path.join(this_dir, "support_files", "outputs", filename)
 
     outputs = toughio.read_output(filename)
 
@@ -127,7 +127,7 @@ def test_export(filename, mesh, ext):
 def test_extract(file_format, split, connection):
     this_dir = os.path.dirname(os.path.abspath(__file__))
     filename = os.path.join(
-        this_dir, "support_files", "outputs", "tough3", "OUTPUT.out"
+        this_dir, "support_files", "outputs", "OUTPUT.out"
     )
     mesh_file = os.path.join(this_dir, "support_files", "outputs", "MESH.out")
 
@@ -153,7 +153,7 @@ def test_extract(file_format, split, connection):
     toughio._cli.extract(argv)
 
     filename_ref = os.path.join(
-        this_dir, "support_files", "outputs", "tough3", "{}.csv".format(base_filename)
+        this_dir, "support_files", "outputs", "{}.csv".format(base_filename)
     )
     outputs_ref = toughio.read_output(filename_ref)
 

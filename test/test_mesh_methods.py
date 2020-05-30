@@ -143,7 +143,7 @@ def test_read_output(filename, file_type, time_step):
     this_dir = os.path.dirname(os.path.abspath(__file__))
     mesh_filename = os.path.join(this_dir, "support_files", "outputs", "mesh.pickle")
     mesh = toughio.read_mesh(mesh_filename)
-    filename = os.path.join(this_dir, "support_files", "outputs", "tough3", filename)
+    filename = os.path.join(this_dir, "support_files", "outputs", filename)
     mesh.read_output(filename, time_step=time_step)
 
     for k, v in output_ref[file_type][time_step].items():
