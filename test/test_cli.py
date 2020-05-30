@@ -113,35 +113,50 @@ def test_export(filename, mesh, ext):
         assert numpy.allclose(time_steps, time_steps_ref)
 
 
-@pytest.mark.parametrize("split", [True, False])
-def test_extract(split):
+@pytest.mark.parametrize(
+    "split, connection",
+    [
+        (True, False),
+        (True, True),
+        (False, False),
+        (False, True),
+    ],
+)
+def test_extract(split, connection):
     this_dir = os.path.dirname(os.path.abspath(__file__))
     filename = os.path.join(
         this_dir, "support_files", "outputs", "tough3", "OUTPUT.out"
     )
     mesh_file = os.path.join(this_dir, "support_files", "outputs", "MESH.out")
 
+    base_filename = (
+        "OUTPUT_ELEME"
+        if not connection
+        else "OUTPUT_CONNE"
+    )
+
     tempdir = helpers.tempdir()
-    output_filename = os.path.join(tempdir, "OUTPUT_ELEME.csv")
+    output_filename = os.path.join(tempdir, "{}.csv".format(base_filename))
 
     argv = [filename, mesh_file, "-o", output_filename]
     argv += ["--split"] if split else []
+    argv += ["--connection"] if connection else []
     toughio._cli.extract(argv)
 
     filename_ref = os.path.join(
-        this_dir, "support_files", "outputs", "tough3", "OUTPUT_ELEME.csv"
+        this_dir, "support_files", "outputs", "tough3", "{}.csv".format(base_filename)
     )
     outputs_ref = toughio.read_output(filename_ref)
 
     if not split:
-        outputs = toughio.read_output(output_filename)
+        outputs = toughio.read_output(output_filename, connection=connection)
 
         for output_ref, output in zip(outputs_ref, outputs):
             assert output_ref.time == output.time
             for k, v in output_ref.data.items():
                 assert numpy.allclose(v.mean(), output.data[k].mean(), atol=1.0e-2)
     else:
-        filenames = glob.glob(os.path.join(tempdir, "OUTPUT_ELEME_*.csv"))
+        filenames = glob.glob(os.path.join(tempdir, "{}_*.csv".format(base_filename)))
         for i, output_filename in enumerate(sorted(filenames)):
             outputs = toughio.read_output(output_filename)
 
