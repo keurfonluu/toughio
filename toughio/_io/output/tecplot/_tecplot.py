@@ -2,8 +2,8 @@ from __future__ import with_statement
 
 import numpy
 
-from .._common import to_output
 from ....mesh.tecplot._tecplot import _read_variables, _read_zone
+from .._common import to_output
 
 __all__ = [
     "read",
@@ -30,9 +30,7 @@ def read(filename, file_type, file_format, labels_order):
             # Read zone
             if line.startswith("ZONE"):
                 zone = _read_zone(line)
-                zone["T"] = (
-                    float(zone["T"].split()[0]) if "T" in zone.keys() else None
-                )
+                zone["T"] = float(zone["T"].split()[0]) if "T" in zone.keys() else None
                 if "I" not in zone.keys():
                     raise ValueError()
 
@@ -52,7 +50,9 @@ def read(filename, file_type, file_format, labels_order):
             if not line:
                 break
 
-    return to_output(file_type, file_format, labels_order, headers, times, labels, variables)
+    return to_output(
+        file_type, file_format, labels_order, headers, times, labels, variables
+    )
 
 
 def write(filename, output):
@@ -78,7 +78,9 @@ def write(filename, output):
         # Data
         for out in output:
             # Zone
-            record = ' ZONE T="{:14.7e} SEC"  I = {:8d}'.format(out.time, len(out.data["X"]))
+            record = ' ZONE T="{:14.7e} SEC"  I = {:8d}'.format(
+                out.time, len(out.data["X"])
+            )
             f.write("{}\n".format(record))
 
             # Table

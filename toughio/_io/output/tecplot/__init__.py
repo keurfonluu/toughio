@@ -1,5 +1,5 @@
-from ._tecplot import read, write
 from .._helpers import register
+from ._tecplot import read, write
 
 __all__ = [
     "read",

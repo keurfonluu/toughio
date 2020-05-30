@@ -6,7 +6,14 @@ from .__about__ import (
     __version__,
     __website__,
 )
-from ._io import Output, read_history, read_input, read_output, write_input, write_output
+from ._io import (
+    Output,
+    read_history,
+    read_input,
+    read_output,
+    write_input,
+    write_output,
+)
 from ._utils import capillarity, relative_permeability
 from .mesh import Mesh, from_meshio, from_pyvista
 from .mesh import read as read_mesh

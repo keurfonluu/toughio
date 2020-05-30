@@ -432,14 +432,17 @@ class Mesh(object):
         if out.type == "element":
             if len(out.labels) != self.n_cells:
                 raise ValueError()
-            
+
             out = reorder_labels(out, self.labels)
             self.cell_data.update(out.data)
         elif out.type == "connection":
             centers = self.centers
             labels_map = {k: v for v, k in enumerate(self.labels)}
 
-            data = {k: [[[0.0, 0.0, 0.0]] for _ in range(self.n_cells)] for k in out.data.keys()}
+            data = {
+                k: [[[0.0, 0.0, 0.0]] for _ in range(self.n_cells)]
+                for k in out.data.keys()
+            }
             for i, (label1, label2) in enumerate(out.labels):
                 i1, i2 = labels_map[label1], labels_map[label2]
                 line = centers[i1] - centers[i2]
@@ -449,7 +452,10 @@ class Mesh(object):
                     iv = i1 if v[i] > 0.0 else i2
                     data[k][iv].append(v[i] * line)
 
-            data = {k: numpy.array([numpy.sum(vv, axis=0) for vv in v]) for k, v in data.items()}
+            data = {
+                k: numpy.array([numpy.sum(vv, axis=0) for vv in v])
+                for k, v in data.items()
+            }
             self.cell_data.update(data)
 
     def write(self, filename, file_format=None, **kwargs):
