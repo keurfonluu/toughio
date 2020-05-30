@@ -86,22 +86,3 @@ def _get_parser():
     )
 
     return parser
-
-
-def _write_table(f, data, nodes):
-    # Write time step
-    f.write('"TIME [sec]  {:.8e}"\n'.format(data.time))
-
-    # Loop over elements
-    formats = ['"{:>18}"'] + (len(data.data.keys()) + 3) * ["  {:>.12e}"]
-    for i, label in enumerate(data.labels):
-        record = [label] + nodes[label] + [v[i] for v in data.data.values()]
-        record = ",".join(fmt.format(rec) for fmt, rec in zip(formats, record)) + "\n"
-        f.write(record)
-
-
-def _write_header(f, headers, data):
-    headers = ["ELEM"] + headers + list(data.data.keys())
-    units = [""] + 3 * ["(M)"] + len(data.data.keys()) * ["(-)"]
-    f.write(",".join('"{:>18}"'.format(header) for header in headers) + "\n")
-    f.write(",".join('"{:>18}"'.format(unit) for unit in units) + "\n")
