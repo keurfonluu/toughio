@@ -1,6 +1,5 @@
 import numpy
 
-from .._io.output import Output
 from .._io.output import read as read_output
 from .._io.output import write as write_output
 from ..mesh import read as read_mesh
