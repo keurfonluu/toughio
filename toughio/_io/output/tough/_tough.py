@@ -2,8 +2,8 @@ from __future__ import with_statement
 
 import numpy
 
-from .._common import to_output
 from ...input.tough._helpers import str2float
+from .._common import to_output
 
 __all__ = [
     "read",
@@ -16,12 +16,20 @@ def read(filename, file_type, file_format, labels_order):
         headers, times, variables = _read_table(f, file_type)
 
         ilab = 1 if file_type == "element" else 2
-        headers = headers[ilab + 1:]
+        headers = headers[ilab + 1 :]
         labels = [[v[:ilab] for v in variable] for variable in variables]
-        labels = [[l[0] for l in label] for label in labels] if file_type == "element" else labels
-        variables = numpy.array([[v[ilab + 1:] for v in variable] for variable in variables])
+        labels = (
+            [[l[0] for l in label] for label in labels]
+            if file_type == "element"
+            else labels
+        )
+        variables = numpy.array(
+            [[v[ilab + 1 :] for v in variable] for variable in variables]
+        )
 
-    return to_output(file_type, file_format, labels_order, headers, times, labels, variables)
+    return to_output(
+        file_type, file_format, labels_order, headers, times, labels, variables
+    )
 
 
 def _read_table(f, file_type):
@@ -62,11 +70,9 @@ def _read_table(f, file_type):
                 if line[:10].strip() and not line.strip().startswith("ELEM"):
                     line = line.strip()
                     tmp = (
-                        [line[:5]]
-                        if file_type == "element"
-                        else [line[:5], line[7:12]]
+                        [line[:5]] if file_type == "element" else [line[:5], line[7:12]]
                     )
-                    tmp += [str2float(l) for l in line[6 * ilab:].split()]
+                    tmp += [str2float(l) for l in line[6 * ilab :].split()]
                     variables[-1].append(tmp)
 
                 line = f.readline()
@@ -81,4 +87,6 @@ def _read_table(f, file_type):
 
 def _end_of_file(line):
     """Return True if last line."""
-    return line.startswith("END OF TOUGH2 SIMULATION") or line.startswith("END OF TOUGH3 SIMULATION")
+    return line.startswith("END OF TOUGH2 SIMULATION") or line.startswith(
+        "END OF TOUGH3 SIMULATION"
+    )

@@ -1,5 +1,5 @@
-from ._pickle import read, write
 from .._helpers import register
+from ._pickle import read, write
 
 __all__ = [
     "read",

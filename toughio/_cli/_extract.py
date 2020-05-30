@@ -45,18 +45,28 @@ def extract(argv=None):
 
     try:
         if not args.connection:
-            points = numpy.vstack([parameters["elements"][label]["center"] for label in output[-1].labels])
+            points = numpy.vstack(
+                [parameters["elements"][label]["center"] for label in output[-1].labels]
+            )
         else:
-            points = numpy.array([
-                numpy.mean([parameters["elements"][l]["center"] for l in label], axis=0)
-                for label in output[-1].labels
-            ])
+            points = numpy.array(
+                [
+                    numpy.mean(
+                        [parameters["elements"][l]["center"] for l in label], axis=0
+                    )
+                    for label in output[-1].labels
+                ]
+            )
         points = {k: v for k, v in zip(["X", "Y", "Z"], points.T)}
         for out in output:
             out.data.update(points)
 
     except KeyError:
-        raise ValueError("Elements in '{}' and '{}' are not consistent.".format(args.infile, args.mesh))
+        raise ValueError(
+            "Elements in '{}' and '{}' are not consistent.".format(
+                args.infile, args.mesh
+            )
+        )
 
     # Write TOUGH3 element output file
     ext = format_to_ext[args.file_format]

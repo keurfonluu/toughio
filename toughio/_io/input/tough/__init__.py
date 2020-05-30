@@ -1,6 +1,6 @@
+from .._helpers import register
 from ._read import read
 from ._write import write
-from .._helpers import register
 
 __all__ = [
     "read",

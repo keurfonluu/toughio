@@ -1,9 +1,9 @@
 from __future__ import with_statement
 
-from .._common import Output, reorder_labels
-from ...input import tough
-
 import numpy
+
+from ...input import tough
+from .._common import Output, reorder_labels
 
 __all__ = [
     "read",

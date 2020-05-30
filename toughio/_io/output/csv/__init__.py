@@ -1,5 +1,5 @@
-from ._csv import read, write
 from .._helpers import register
+from ._csv import read, write
 
 __all__ = [
     "read",

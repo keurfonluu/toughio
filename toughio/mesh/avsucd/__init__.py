@@ -1,5 +1,5 @@
-from ._avsucd import read, write
 from .._helpers import register
+from ._avsucd import read, write
 
 __all__ = [
     "read",

@@ -1,5 +1,5 @@
-from ._flac3d import read, write
 from .._helpers import register
+from ._flac3d import read, write
 
 __all__ = [
     "read",

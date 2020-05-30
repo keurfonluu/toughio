@@ -126,16 +126,10 @@ def test_export(filename, mesh, ext):
 )
 def test_extract(file_format, split, connection):
     this_dir = os.path.dirname(os.path.abspath(__file__))
-    filename = os.path.join(
-        this_dir, "support_files", "outputs", "OUTPUT.out"
-    )
+    filename = os.path.join(this_dir, "support_files", "outputs", "OUTPUT.out")
     mesh_file = os.path.join(this_dir, "support_files", "outputs", "MESH.out")
 
-    base_filename = (
-        "OUTPUT_ELEME"
-        if not connection
-        else "OUTPUT_CONNE"
-    )
+    base_filename = "OUTPUT_ELEME" if not connection else "OUTPUT_CONNE"
 
     tempdir = helpers.tempdir()
     output_filename = os.path.join(tempdir, "{}.csv".format(base_filename))

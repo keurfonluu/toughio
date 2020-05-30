@@ -41,14 +41,22 @@ def read(filename, file_type, file_format, labels_order):
         ilab = 1 if file_type == "element" else 2
         headers = headers[ilab:]
         labels = [[v[:ilab] for v in variable] for variable in variables]
-        labels = [[l[0] for l in label] for label in labels] if file_type == "element" else labels
-        variables = numpy.array([[v[ilab:] for v in variable] for variable in variables])
+        labels = (
+            [[l[0] for l in label] for label in labels]
+            if file_type == "element"
+            else labels
+        )
+        variables = numpy.array(
+            [[v[ilab:] for v in variable] for variable in variables]
+        )
 
-    return to_output(file_type, file_format, labels_order, headers, times, labels, variables)
+    return to_output(
+        file_type, file_format, labels_order, headers, times, labels, variables
+    )
 
 
 def _read_csv(f, file_type):
-    """Read CSV table."""    
+    """Read CSV table."""
     # Read header
     line = f.readline().replace('"', "")
     headers = [l.strip() for l in line.split(",")]
@@ -104,16 +112,16 @@ def write(filename, output):
 def _write_csv(f, output, headers):
     """Write CSV table."""
     # Headers
-    units = [header_to_unit[header] if header in header_to_unit.keys() else " (-)" for header in headers]
+    units = [
+        header_to_unit[header] if header in header_to_unit.keys() else " (-)"
+        for header in headers
+    ]
     f.write(",".join('"{:>18}"'.format(header) for header in headers) + "\n")
     f.write(",".join('"{:>18}"'.format(unit) for unit in units) + "\n")
 
     # Data
     formats = [
-        '"{:>18}"'
-        if header.startswith("ELEM")
-        else "{:20.12e}"
-        for header in headers
+        '"{:>18}"' if header.startswith("ELEM") else "{:20.12e}" for header in headers
     ]
     for out in output:
         # Time step
@@ -123,5 +131,7 @@ def _write_csv(f, output, headers):
         for i, label in enumerate(out.labels):
             record = [label] if isinstance(label, str) else [l for l in label]
             record += [out.data[k][i] for k in headers if not k.startswith("ELEM")]
-            record = ",".join(fmt.format(rec) for fmt, rec in zip(formats, record)) + "\n"
+            record = (
+                ",".join(fmt.format(rec) for fmt, rec in zip(formats, record)) + "\n"
+            )
             f.write(record)

@@ -41,7 +41,9 @@ def read(filename, file_type, file_format, labels_order):
         unique_times.append(time)
         variables.append(data[idx])
 
-    return to_output(file_type, file_format, labels_order, headers, unique_times, labels, variables)
+    return to_output(
+        file_type, file_format, labels_order, headers, unique_times, labels, variables
+    )
 
 
 def write(filename, output):
@@ -55,7 +57,10 @@ def write(filename, output):
 
     with open(filename, "w") as f:
         # Headers
-        record = ",".join("{:>18}".format(header) for header in ["TIME [sec]", "ELEM", "INDEX"] + headers)
+        record = ",".join(
+            "{:>18}".format(header)
+            for header in ["TIME [sec]", "ELEM", "INDEX"] + headers
+        )
         f.write("{}\n".format(record))
 
         # Data

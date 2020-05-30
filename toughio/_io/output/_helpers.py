@@ -2,8 +2,8 @@ from __future__ import with_statement
 
 import numpy
 
-from ._common import Output
 from ..._common import filetype_from_filename
+from ._common import Output
 
 __all__ = [
     "read",
@@ -54,7 +54,7 @@ def get_output_type(filename):
             return "element", "petrasim"
         else:
             header = line.split(",")[0].replace('"', "").strip()
-            
+
             if header == "ELEM":
                 return "element", "csv"
             elif header == "ELEM1":
@@ -92,7 +92,9 @@ def read(filename, labels_order=None, connection=False, **kwargs):
     file_type, file_format = get_output_type(filename)
     file_type = "connection" if (file_format == "tough" and connection) else file_type
 
-    return _reader_map[file_format](filename, file_type, file_format, labels_order, **kwargs)
+    return _reader_map[file_format](
+        filename, file_type, file_format, labels_order, **kwargs
+    )
 
 
 def write(filename, output, file_format=None, **kwargs):
@@ -113,9 +115,12 @@ def write(filename, output, file_format=None, **kwargs):
         raise TypeError()
 
     output = [output] if isinstance(output, Output) else output
-    if not (isinstance(output, (list, tuple)) and all(isinstance(out, Output) for out in output)):
+    if not (
+        isinstance(output, (list, tuple))
+        and all(isinstance(out, Output) for out in output)
+    ):
         raise TypeError()
-    
+
     fmt = file_format if file_format else _filetype_from_filename(filename)
 
     return _writer_map[fmt](filename, output, **kwargs)
