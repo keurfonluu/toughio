@@ -28,20 +28,37 @@ def extract(argv=None):
         raise ValueError("Invalid MESH file '{}'.".format(args.mesh))
 
     # Read TOUGH output file
-    output = read_output(args.infile)
+    output = read_output(args.infile, connection=args.connection)
+    if output[-1].format != "tough":
+        raise ValueError("Invalid TOUGH output file '{}'.".format(args.infile))
+
     try:
-        points = numpy.vstack([parameters["elements"][label]["center"] for label in output[-1].labels])
+        if not args.connection:
+            points = numpy.vstack([parameters["elements"][label]["center"] for label in output[-1].labels])
+        else:
+            points = numpy.array([
+                numpy.mean([parameters["elements"][l]["center"] for l in label], axis=0)
+                for label in output[-1].labels
+            ])
         points = {k: v for k, v in zip(["X", "Y", "Z"], points.T)}
         for out in output:
             out.data.update(points)
+
     except KeyError:
         raise ValueError("Elements in '{}' and '{}' are not consistent.".format(args.infile, args.mesh))
 
     # Write TOUGH3 element output file
+    filename = (
+        args.output_file
+        if args.output_file is not None
+        else "OUTPUT_ELEME.csv"
+        if not args.connection
+        else "OUTPUT_CONNE.csv"
+    )
     if not args.split or len(output) == 1:
-        write_output(args.output_file, output, file_format="csv")
+        write_output(filename, output, file_format="csv")
     else:
-        head, ext = os.path.splitext(args.output_file)
+        head, ext = os.path.splitext(filename)
         for i, out in enumerate(output):
             write_output("{}_{}{}".format(head, i + 1, ext), out, file_format="csv")
 
@@ -52,7 +69,7 @@ def _get_parser():
     # Initialize parser
     parser = argparse.ArgumentParser(
         description=(
-            "Extract results from TOUGH main output file and reformat as a TOUGH3 element output file."
+            "Extract results from TOUGH main output file and reformat as a TOUGH3 CSV output file."
         ),
         formatter_class=argparse.RawTextHelpFormatter,
     )
@@ -72,7 +89,7 @@ def _get_parser():
         "--output-file",
         "-o",
         type=str,
-        default="OUTPUT_ELEME.csv",
+        default=None,
         help="TOUGH3 element output file",
     )
 
@@ -83,6 +100,15 @@ def _get_parser():
         default=False,
         action="store_true",
         help="write one file per time step",
+    )
+
+    # Read connection data
+    parser.add_argument(
+        "--connection",
+        "-c",
+        default=False,
+        action="store_true",
+        help="extract data related to connections",
     )
 
     return parser
