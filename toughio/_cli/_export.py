@@ -17,16 +17,40 @@ def export(argv=None):
     import os
     import sys
     from .. import read_mesh, read_output, write_time_series
-    from .._io._helpers import _reorder_labels
+    from .._io.output._common import reorder_labels
     from ..meshmaker import voxelize, triangulate
 
     parser = _get_parser()
     args = parser.parse_args(argv)
 
+    # Check that TOUGH output and mesh file exist
+    if not os.path.isfile(args.infile):
+        raise ValueError("TOUGH output file '{}' not found.".format(args.infile))
+
+    with_mesh = bool(args.mesh)
+    if with_mesh:
+        if not os.path.isfile(args.mesh):
+            raise ValueError("Mesh file '{}' not found.".format(args.mesh))
+
+    # Read output file
+    print("Reading file '{}' ...".format(args.infile), end="")
+    sys.stdout.flush()
+    output = read_output(args.infile)
+    if args.file_format != "xdmf":
+        if args.time_step is not None:
+            if not (-len(output) <= args.time_step < len(output)):
+                raise ValueError("Inconsistent time step value.")
+            output = output[args.time_step]
+        else:
+            output = output[-1]
+        input_format = output.format
+    else:
+        input_format = output[-1].format
+    print(" Done!")
+
     # Display warning if mesh is provided but input file format is 'tecplot'
     # Continue as if mesh was not provided
-    with_mesh = bool(args.mesh)
-    if args.input_format == "tecplot":
+    if input_format == "tecplot":
         with_mesh = False
         msg = (
             "Cannot use mesh file with Tecplot TOUGH output, inferring dimensionality"
@@ -36,26 +60,6 @@ def export(argv=None):
     else:
         with_mesh = bool(args.mesh)
         msg = "Mesh file not specified, inferring dimensionality"
-
-    # Check that TOUGH output and mesh file exist
-    if not os.path.isfile(args.infile):
-        raise ValueError("TOUGH output file '{}' not found.".format(args.infile))
-    if with_mesh:
-        if not os.path.isfile(args.mesh):
-            raise ValueError("Mesh file '{}' not found.".format(args.mesh))
-
-    # Read output file
-    print("Reading file '{}' ...".format(args.infile), end="")
-    sys.stdout.flush()
-    output = read_output(args.infile, args.input_format)
-    if args.file_format != "xdmf":
-        if args.time_step is not None:
-            if not (-len(output) <= args.time_step < len(output)):
-                raise ValueError("Inconsistent time step value.")
-            output = output[args.time_step]
-        else:
-            output = output[-1]
-    print(" Done!")
 
     # Triangulate or voxelize if no mesh
     if not with_mesh:
@@ -108,7 +112,7 @@ def export(argv=None):
             mesh.cell_sets = {}
             mesh.read_output(output)
         else:
-            output = [_reorder_labels(data, mesh.labels) for data in output]
+            output = [reorder_labels(data, mesh.labels) for data in output]
     print(" Done!")
 
     # Output file name
@@ -164,16 +168,6 @@ def _get_parser():
     # Input file
     parser.add_argument(
         "infile", type=str, help="TOUGH output file",
-    )
-
-    # Input file format
-    parser.add_argument(
-        "--input-format",
-        "-i",
-        type=str,
-        choices=("tough", "tecplot"),
-        default="tough",
-        help="TOUGH output file format",
     )
 
     # Mesh file

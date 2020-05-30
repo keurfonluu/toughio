@@ -397,7 +397,7 @@ class Mesh(object):
                 filename, self.labels, primary_variables, porosities, permeabilities,
             )
 
-    def read_output(self, file_or_output, time_step=-1):
+    def read_output(self, file_or_output, time_step=-1, connection=False):
         """
         Import TOUGH results to the mesh.
 
@@ -407,30 +407,56 @@ class Mesh(object):
             Input file name or output data.
         time_step : int, optional, default -1
             Data for given time step to import. Default is last time step.
+        connection : bool, optional, default False
+            Only for standard TOUGH output file. If `True`, read data related to connections.
 
         """
         from .. import read_output
-        from .._io._helpers import Output, Save, _reorder_labels
+        from .._io.output._common import Output, reorder_labels
 
-        if not isinstance(file_or_output, (str, list, tuple, Output, Save)):
+        if not isinstance(file_or_output, (str, list, tuple, Output)):
             raise TypeError()
         if not isinstance(time_step, int):
             raise TypeError()
 
         if isinstance(file_or_output, str):
-            out = read_output(file_or_output)
+            out = read_output(file_or_output, connection=connection)
         else:
             out = file_or_output
 
-        if not isinstance(out, (Output, Save)):
+        if not isinstance(out, Output):
             if not (-len(out) <= time_step < len(out)):
                 raise ValueError()
             out = out[time_step]
 
-        if len(out.labels) != self.n_cells:
-            raise ValueError()
-        out = _reorder_labels(out, self.labels)
-        self.cell_data.update(out.data)
+        if out.type == "element":
+            if len(out.labels) != self.n_cells:
+                raise ValueError()
+
+            out = reorder_labels(out, self.labels)
+            self.cell_data.update(out.data)
+        elif out.type == "connection":
+            centers = self.centers
+            labels_map = {k: v for v, k in enumerate(self.labels)}
+
+            data = {
+                k: [[[0.0, 0.0, 0.0]] for _ in range(self.n_cells)]
+                for k in out.data.keys()
+            }
+            for i, (label1, label2) in enumerate(out.labels):
+                i1, i2 = labels_map[label1], labels_map[label2]
+                line = centers[i1] - centers[i2]
+                line /= numpy.linalg.norm(line)
+
+                for k, v in out.data.items():
+                    iv = i1 if v[i] > 0.0 else i2
+                    data[k][iv].append(v[i] * line)
+
+            data = {
+                k: numpy.array([numpy.sum(vv, axis=0) for vv in v])
+                for k, v in data.items()
+            }
+            self.cell_data.update(data)
 
     def write(self, filename, file_format=None, **kwargs):
         """

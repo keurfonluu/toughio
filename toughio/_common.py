@@ -1,7 +1,11 @@
+import os
 import warnings
 from functools import wraps
 
-__all__ = ["deprecated"]
+__all__ = [
+    "deprecated",
+    "filetype_from_filename",
+]
 
 
 def deprecated(version=None, extra_msg=None):
@@ -22,3 +26,10 @@ def deprecated(version=None, extra_msg=None):
         return wrapper
 
     return decorator
+
+
+def filetype_from_filename(filename, extension_to_filetype):
+    """Determine file type from its extension."""
+    ext = os.path.splitext(filename)[1].lower()
+
+    return extension_to_filetype[ext] if ext in extension_to_filetype.keys() else ""

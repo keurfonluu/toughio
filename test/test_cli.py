@@ -21,27 +21,25 @@ def test_co2tab(dirname):
 
 
 @pytest.mark.parametrize(
-    "filename, file_format, mesh, ext",
+    "filename, mesh, ext",
     [
-        ("OUTPUT_ELEME.csv", "tough", True, "vtu"),
-        ("OUTPUT_ELEME.csv", "tough", False, "vtu"),
-        ("OUTPUT_ELEME.tec", "tecplot", False, "vtu"),
-        ("OUTPUT_ELEME.csv", "tough", True, "xdmf"),
-        ("OUTPUT_ELEME.csv", "tough", False, "xdmf"),
-        ("OUTPUT_ELEME.tec", "tecplot", False, "xdmf"),
+        ("OUTPUT_ELEME.csv", True, "vtu"),
+        ("OUTPUT_ELEME.csv", False, "vtu"),
+        ("OUTPUT_ELEME.tec", False, "vtu"),
+        ("OUTPUT_ELEME.csv", True, "xdmf"),
+        ("OUTPUT_ELEME.csv", False, "xdmf"),
+        ("OUTPUT_ELEME.tec", False, "xdmf"),
     ],
 )
-def test_export(filename, file_format, mesh, ext):
+def test_export(filename, mesh, ext):
     this_dir = os.path.dirname(os.path.abspath(__file__))
-    filename = os.path.join(this_dir, "support_files", "outputs", "tough3", filename)
+    filename = os.path.join(this_dir, "support_files", "outputs", filename)
 
-    outputs = toughio.read_output(filename, file_format=file_format)
+    outputs = toughio.read_output(filename)
 
     output_filename = "{}.{}".format(helpers.tempdir(helpers.random_string(10)), ext)
     argv = [
         filename,
-        "-i",
-        file_format,
         "-o",
         output_filename,
         "-f",
@@ -115,46 +113,53 @@ def test_export(filename, file_format, mesh, ext):
         assert numpy.allclose(time_steps, time_steps_ref)
 
 
-@pytest.mark.parametrize("split", [True, False])
-def test_extract(split):
+@pytest.mark.parametrize(
+    "file_format, split, connection",
+    [
+        ("csv", True, False),
+        ("csv", True, True),
+        ("csv", False, False),
+        ("csv", False, True),
+        ("tecplot", True, False),
+        ("tecplot", False, False),
+    ],
+)
+def test_extract(file_format, split, connection):
     this_dir = os.path.dirname(os.path.abspath(__file__))
-    filename = os.path.join(
-        this_dir, "support_files", "outputs", "tough2", "OUTPUT.out"
-    )
+    filename = os.path.join(this_dir, "support_files", "outputs", "OUTPUT.out")
     mesh_file = os.path.join(this_dir, "support_files", "outputs", "MESH.out")
 
-    tempdir = helpers.tempdir()
-    output_filename = os.path.join(tempdir, "OUTPUT_ELEME.csv")
+    base_filename = "OUTPUT_ELEME" if not connection else "OUTPUT_CONNE"
 
-    argv = [filename, mesh_file, "-o", output_filename]
+    tempdir = helpers.tempdir()
+    output_filename = os.path.join(tempdir, "{}.csv".format(base_filename))
+
+    argv = [
+        filename,
+        mesh_file,
+        "-o",
+        output_filename,
+        "-f",
+        file_format,
+    ]
     argv += ["--split"] if split else []
+    argv += ["--connection"] if connection else []
     toughio._cli.extract(argv)
 
     filename_ref = os.path.join(
-        this_dir, "support_files", "outputs", "tough3", "OUTPUT_ELEME.csv"
+        this_dir, "support_files", "outputs", "{}.csv".format(base_filename)
     )
     outputs_ref = toughio.read_output(filename_ref)
 
-    atols = [1.0, 1.0, 10000.0, 10000.0, 100000.0]
     if not split:
-        outputs = toughio.read_output(output_filename)
+        outputs = toughio.read_output(output_filename, connection=connection)
 
-        for output_ref, output, atol in zip(outputs_ref, outputs, atols):
+        for output_ref, output in zip(outputs_ref, outputs):
             assert output_ref.time == output.time
-            assert numpy.allclose(output_ref.data["X"].mean(), output.data["X"].mean())
-            assert numpy.allclose(output_ref.data["Y"].mean(), output.data["Y"].mean())
-            assert numpy.allclose(output_ref.data["Z"].mean(), output.data["Z"].mean())
-            assert numpy.allclose(
-                output_ref.data["PRES"].mean(), output.data["P"].mean(), atol=atol
-            )
-            assert numpy.allclose(
-                output_ref.data["TEMP"].mean(), output.data["T"].mean(), atol=1.0e-2
-            )
-            assert numpy.allclose(
-                output_ref.data["SAT_G"].mean(), output.data["SG"].mean()
-            )
+            for k, v in output_ref.data.items():
+                assert numpy.allclose(v.mean(), output.data[k].mean(), atol=1.0e-2)
     else:
-        filenames = glob.glob(os.path.join(tempdir, "OUTPUT_ELEME_*.csv"))
+        filenames = glob.glob(os.path.join(tempdir, "{}_*.csv".format(base_filename)))
         for i, output_filename in enumerate(sorted(filenames)):
             outputs = toughio.read_output(output_filename)
 
@@ -164,18 +169,8 @@ def test_extract(split):
             output_ref = outputs_ref[i]
 
             assert output_ref.time == output.time
-            assert numpy.allclose(output_ref.data["X"].mean(), output.data["X"].mean())
-            assert numpy.allclose(output_ref.data["Y"].mean(), output.data["Y"].mean())
-            assert numpy.allclose(output_ref.data["Z"].mean(), output.data["Z"].mean())
-            assert numpy.allclose(
-                output_ref.data["PRES"].mean(), output.data["P"].mean(), atol=atols[i]
-            )
-            assert numpy.allclose(
-                output_ref.data["TEMP"].mean(), output.data["T"].mean(), atol=1.0e-2
-            )
-            assert numpy.allclose(
-                output_ref.data["SAT_G"].mean(), output.data["SG"].mean()
-            )
+            for k, v in output_ref.data.items():
+                assert numpy.allclose(v.mean(), output.data[k].mean(), atol=1.0e-2)
 
 
 @pytest.mark.parametrize("incon", [True, False])
@@ -249,7 +244,7 @@ def test_merge(incon):
 def test_save2incon(reset):
     this_dir = os.path.dirname(os.path.abspath(__file__))
     filename = os.path.join(this_dir, "support_files", "outputs", "SAVE.out")
-    save = toughio.read_save(filename)
+    save = toughio.read_output(filename)
 
     output_filename = helpers.tempdir(helpers.random_string(10))
     argv = [
@@ -262,7 +257,7 @@ def test_save2incon(reset):
 
     toughio._cli.save2incon(argv)
 
-    incon = toughio.read_save(output_filename)
+    incon = toughio.read_output(output_filename)
 
     assert save.labels.tolist() == incon.labels.tolist()
     helpers.allclose_dict(save.data, incon.data)
