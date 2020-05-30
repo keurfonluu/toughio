@@ -117,7 +117,7 @@ def test_export(filename, mesh, ext):
 def test_extract(split):
     this_dir = os.path.dirname(os.path.abspath(__file__))
     filename = os.path.join(
-        this_dir, "support_files", "outputs", "tough2", "OUTPUT.out"
+        this_dir, "support_files", "outputs", "tough3", "OUTPUT.out"
     )
     mesh_file = os.path.join(this_dir, "support_files", "outputs", "MESH.out")
 
@@ -133,24 +133,13 @@ def test_extract(split):
     )
     outputs_ref = toughio.read_output(filename_ref)
 
-    atols = [1.0, 1.0, 10000.0, 10000.0, 100000.0]
     if not split:
         outputs = toughio.read_output(output_filename)
 
-        for output_ref, output, atol in zip(outputs_ref, outputs, atols):
+        for output_ref, output in zip(outputs_ref, outputs):
             assert output_ref.time == output.time
-            assert numpy.allclose(output_ref.data["X"].mean(), output.data["X"].mean())
-            assert numpy.allclose(output_ref.data["Y"].mean(), output.data["Y"].mean())
-            assert numpy.allclose(output_ref.data["Z"].mean(), output.data["Z"].mean())
-            assert numpy.allclose(
-                output_ref.data["PRES"].mean(), output.data["P"].mean(), atol=atol
-            )
-            assert numpy.allclose(
-                output_ref.data["TEMP"].mean(), output.data["T"].mean(), atol=1.0e-2
-            )
-            assert numpy.allclose(
-                output_ref.data["SAT_G"].mean(), output.data["SG"].mean()
-            )
+            for k, v in output_ref.data.items():
+                assert numpy.allclose(v.mean(), output.data[k].mean(), atol=1.0e-2)
     else:
         filenames = glob.glob(os.path.join(tempdir, "OUTPUT_ELEME_*.csv"))
         for i, output_filename in enumerate(sorted(filenames)):
@@ -162,18 +151,8 @@ def test_extract(split):
             output_ref = outputs_ref[i]
 
             assert output_ref.time == output.time
-            assert numpy.allclose(output_ref.data["X"].mean(), output.data["X"].mean())
-            assert numpy.allclose(output_ref.data["Y"].mean(), output.data["Y"].mean())
-            assert numpy.allclose(output_ref.data["Z"].mean(), output.data["Z"].mean())
-            assert numpy.allclose(
-                output_ref.data["PRES"].mean(), output.data["P"].mean(), atol=atols[i]
-            )
-            assert numpy.allclose(
-                output_ref.data["TEMP"].mean(), output.data["T"].mean(), atol=1.0e-2
-            )
-            assert numpy.allclose(
-                output_ref.data["SAT_G"].mean(), output.data["SG"].mean()
-            )
+            for k, v in output_ref.data.items():
+                assert numpy.allclose(v.mean(), output.data[k].mean(), atol=1.0e-2)
 
 
 @pytest.mark.parametrize("incon", [True, False])
