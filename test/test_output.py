@@ -50,7 +50,7 @@ def test_history(filename, data_ref):
 )
 def test_output_eleme(filename):
     this_dir = os.path.dirname(os.path.abspath(__file__))
-    filename = os.path.join(this_dir, "support_files", "outputs", "tough3", filename)
+    filename = os.path.join(this_dir, "support_files", "outputs", filename)
     outputs = toughio.read_output(filename)
 
     filename = os.path.join(this_dir, "support_files", "outputs", "SAVE.out")
@@ -86,7 +86,7 @@ def test_output_eleme(filename):
 )
 def test_output_conne(filename):
     this_dir = os.path.dirname(os.path.abspath(__file__))
-    filename = os.path.join(this_dir, "support_files", "outputs", "tough3", "OUTPUT_CONNE.csv")
+    filename = os.path.join(this_dir, "support_files", "outputs", "OUTPUT_CONNE.csv")
     outputs = toughio.read_output(filename, connection=True)
 
     times_ref = [
