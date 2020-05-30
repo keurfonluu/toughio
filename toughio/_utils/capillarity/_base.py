@@ -66,7 +66,12 @@ class BaseCapillarity(ABC):
             Additional keywords passed to :func:`matplotlib.pyplot.semilogy`.
 
         """
-        import matplotlib.pyplot as plt
+        try:
+            import matplotlib.pyplot as plt
+        except ImportError:
+            raise ImportError(
+                "Plotting capillary pressure curve requires matplotlib to be installed."
+            )
 
         if not (isinstance(n, int) and n > 1):
             raise ValueError()
