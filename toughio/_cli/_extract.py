@@ -10,11 +10,22 @@ __all__ = [
 ]
 
 
+format_to_ext = {
+    "csv": ".csv",
+    "tecplot": ".tec",
+    "petrasim": ".csv",
+}
+
+
 def extract(argv=None):
     import os
 
     parser = _get_parser()
     args = parser.parse_args(argv)
+
+    # Check output file format
+    if args.connection and args.file_format != "csv":
+        raise ValueError("Connection data can only be exported to CSV.")
 
     # Check that TOUGH output and MESH file exist
     if not os.path.isfile(args.infile):
@@ -48,15 +59,16 @@ def extract(argv=None):
         raise ValueError("Elements in '{}' and '{}' are not consistent.".format(args.infile, args.mesh))
 
     # Write TOUGH3 element output file
+    ext = format_to_ext[args.file_format]
     filename = (
         args.output_file
         if args.output_file is not None
-        else "OUTPUT_ELEME.csv"
+        else "OUTPUT_ELEME{}".format(ext)
         if not args.connection
-        else "OUTPUT_CONNE.csv"
+        else "OUTPUT_CONNE{}".format(ext)
     )
     if not args.split or len(output) == 1:
-        write_output(filename, output, file_format="csv")
+        write_output(filename, output, file_format=args.file_format)
     else:
         head, ext = os.path.splitext(filename)
         for i, out in enumerate(output):
@@ -91,6 +103,16 @@ def _get_parser():
         type=str,
         default=None,
         help="TOUGH3 element output file",
+    )
+
+    # File format
+    parser.add_argument(
+        "--file-format",
+        "-f",
+        type=str,
+        choices=("csv", "tecplot", "petrasim"),
+        default="csv",
+        help="exported file format",
     )
 
     # Split or not
