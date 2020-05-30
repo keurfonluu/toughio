@@ -117,3 +117,19 @@ output = toughio.read_output(filename)
 -   `toughio-extract`: extract results from TOUGH main output file and reformat as a TOUGH3 element output file (mostly useful for TOUGH2 output _before_ calling `toughio-export`),
 -   `toughio-merge`: merge input file, MESH and/or INCON into a single file (for storage or sharing),
 -   `toughio-save2incon`: convert a _SAVE_ file to an _INCON_ file (mostly useful to automatically restart a simulation and reset the counters).
+
+## Copyright Notice
+
+toughio Copyright (c) 2020, The Regents of the University of California,
+through Lawrence Berkeley National Laboratory (subject to receipt of
+any required approvals from the U.S. Dept. of Energy). All rights reserved.
+If you have questions about your rights to use or distribute this software,
+please contact Berkeley Lab's Intellectual Property Office at
+IPO@lbl.gov.
+
+This Software was developed under funding from the U.S. Department
+of Energy and the U.S. Government consequently retains certain rights.  As
+such, the U.S. Government has been granted for itself and others acting on
+its behalf a paid-up, nonexclusive, irrevocable, worldwide license in the
+Software to reproduce, distribute copies to the public, prepare derivative 
+works, and perform publicly and display publicly, and to permit others to do so.
