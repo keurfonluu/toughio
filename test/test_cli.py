@@ -114,15 +114,17 @@ def test_export(filename, mesh, ext):
 
 
 @pytest.mark.parametrize(
-    "split, connection",
+    "file_format, split, connection",
     [
-        (True, False),
-        (True, True),
-        (False, False),
-        (False, True),
+        ("csv", True, False),
+        ("csv", True, True),
+        ("csv", False, False),
+        ("csv", False, True),
+        ("tecplot", True, False),
+        ("tecplot", False, False),
     ],
 )
-def test_extract(split, connection):
+def test_extract(file_format, split, connection):
     this_dir = os.path.dirname(os.path.abspath(__file__))
     filename = os.path.join(
         this_dir, "support_files", "outputs", "tough3", "OUTPUT.out"
@@ -138,7 +140,14 @@ def test_extract(split, connection):
     tempdir = helpers.tempdir()
     output_filename = os.path.join(tempdir, "{}.csv".format(base_filename))
 
-    argv = [filename, mesh_file, "-o", output_filename]
+    argv = [
+        filename,
+        mesh_file,
+        "-o",
+        output_filename,
+        "-f",
+        file_format,
+    ]
     argv += ["--split"] if split else []
     argv += ["--connection"] if connection else []
     toughio._cli.extract(argv)
