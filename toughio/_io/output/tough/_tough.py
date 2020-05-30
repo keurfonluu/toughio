@@ -45,6 +45,8 @@ def _read_table(f, file_type):
                 line = f.readline().strip()
                 if line.startswith(labels_key):
                     break
+                elif _end_of_file(line):
+                    raise ValueError("No data related to {}s found.".format(file_type))
 
             # Read headers
             headers = line.split()
@@ -58,16 +60,25 @@ def _read_table(f, file_type):
             # Loop until end of output block
             while True:
                 if line[:10].strip() and not line.strip().startswith("ELEM"):
-                    line = line.strip().split()
-                    tmp = [l.strip() for l in line[:ilab]]
-                    tmp += [str2float(l) for l in line[ilab:]]
+                    line = line.strip()
+                    tmp = (
+                        [line[:5]]
+                        if file_type == "element"
+                        else [line[:5], line[7:12]]
+                    )
+                    tmp += [str2float(l) for l in line[6 * ilab:].split()]
                     variables[-1].append(tmp)
 
                 line = f.readline()
                 if line[1:].startswith("@@@@@"):
                     break
 
-        elif line.startswith("END OF TOUGH"):
+        elif _end_of_file(line):
             break
 
     return headers, times, variables
+
+
+def _end_of_file(line):
+    """Return True if last line."""
+    return line.startswith("END OF TOUGH2 SIMULATION") or line.startswith("END OF TOUGH3 SIMULATION")
