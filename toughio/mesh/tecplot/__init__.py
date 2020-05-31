@@ -4,4 +4,4 @@ from ._tecplot import read, write
 __all__ = ["read", "write"]
 
 
-register("tecplot", [".dat", ".tec"], read, {"tecplot": write})
+register("tecplot", [".dat", ".tec"], read, write)

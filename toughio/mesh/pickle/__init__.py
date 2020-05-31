@@ -7,4 +7,4 @@ __all__ = [
 ]
 
 
-register("pickle", [".pickle", ".pkl"], read, {"pickle": write})
+register("pickle", [".pickle", ".pkl"], read, write)
