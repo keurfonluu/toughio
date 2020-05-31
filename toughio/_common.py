@@ -8,14 +8,16 @@ __all__ = [
 ]
 
 
-def register_format(fmt, ext_to_fmt, reader_map, writer_map, extensions, reader, writer):
+def register_format(
+    fmt, ext_to_fmt, reader_map, writer_map, extensions, reader, writer
+):
     """Register a new format."""
     for ext in extensions:
         ext_to_fmt[ext] = fmt
 
     if reader is not None:
         reader_map[fmt] = reader
-    
+
     if writer is not None:
         writer_map[fmt] = writer
 

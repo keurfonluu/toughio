@@ -4,11 +4,7 @@ from copy import deepcopy
 import meshio
 import numpy
 
-from ._common import (
-    get_meshio_version,
-    get_new_meshio_cells,
-    get_old_meshio_cells,
-)
+from ._common import get_meshio_version, get_new_meshio_cells, get_old_meshio_cells
 from ._properties import (
     _connections,
     _face_areas,

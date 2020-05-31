@@ -3,8 +3,8 @@ from copy import deepcopy
 import meshio
 import numpy
 
+from .._common import filetype_from_filename, register_format
 from ._mesh import Mesh, from_meshio
-from .._common import register_format, filetype_from_filename
 
 __all__ = [
     "read",
@@ -63,7 +63,11 @@ def read(filename, file_format=None, **kwargs):
     # Check file format
     if not isinstance(filename, str):
         raise TypeError()
-    fmt = file_format if file_format else filetype_from_filename(filename, _extension_to_filetype)
+    fmt = (
+        file_format
+        if file_format
+        else filetype_from_filename(filename, _extension_to_filetype)
+    )
 
     # Call custom readers
     if fmt in _reader_map.keys():
@@ -113,7 +117,11 @@ def write(filename, mesh, file_format=None, **kwargs):
     # Check file format
     if not isinstance(filename, str):
         raise TypeError()
-    fmt = file_format if file_format else filetype_from_filename(filename, _extension_to_filetype)
+    fmt = (
+        file_format
+        if file_format
+        else filetype_from_filename(filename, _extension_to_filetype)
+    )
 
     # Call custom writer
     if fmt in _writer_map.keys():
