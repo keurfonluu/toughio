@@ -1,4 +1,4 @@
-from . import _cli, mesh, meshmaker
+from . import _cli, capillarity, mesh, meshmaker, relative_permeability
 from .__about__ import (
     __author__,
     __author_email__,
@@ -14,7 +14,6 @@ from ._io import (
     write_input,
     write_output,
 )
-from ._utils import capillarity, relative_permeability
 from .mesh import Mesh, from_meshio, from_pyvista
 from .mesh import read as read_mesh
 from .mesh import read_time_series

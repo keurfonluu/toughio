@@ -44,3 +44,5 @@ def test_capillarity(model, parameters, sl, monkeypatch):
 
     monkeypatch.setattr(plt, "show", lambda: None)
     cap.plot()
+
+    print(cap)

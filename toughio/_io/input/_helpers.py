@@ -1,5 +1,7 @@
 import os
 
+from ..._common import filetype_from_filename, register_format
+
 __all__ = [
     "read",
     "write",
@@ -11,21 +13,16 @@ _reader_map = {}
 _writer_map = {}
 
 
-def register(name, extensions, reader, writer_map):
+def register(file_format, extensions, reader, writer=None):
     """Register a new format."""
-    for ext in extensions:
-        _extension_to_filetype[ext] = name
-
-    if reader is not None:
-        _reader_map[name] = reader
-    _writer_map.update(writer_map)
-
-
-def _filetype_from_filename(filename):
-    """Determine file type from its extension."""
-    ext = os.path.splitext(filename)[1].lower()
-    return (
-        _extension_to_filetype[ext] if ext in _extension_to_filetype.keys() else "tough"
+    register_format(
+        fmt=file_format,
+        ext_to_fmt=_extension_to_filetype,
+        reader_map=_reader_map,
+        writer_map=_writer_map,
+        extensions=extensions,
+        reader=reader,
+        writer=writer,
     )
 
 
@@ -55,7 +52,12 @@ def read(filename, file_format=None, **kwargs):
     if not (file_format is None or file_format in {"tough", "json"}):
         raise ValueError()
 
-    fmt = file_format if file_format else _filetype_from_filename(filename)
+    fmt = (
+        file_format
+        if file_format
+        else filetype_from_filename(filename, _extension_to_filetype)
+    )
+    fmt = fmt if fmt else "tough"
 
     return _reader_map[fmt](filename, **kwargs)
 
@@ -81,6 +83,11 @@ def write(filename, parameters, file_format=None, **kwargs):
     if not (file_format is None or file_format in {"tough", "json"}):
         raise ValueError()
 
-    fmt = file_format if file_format else _filetype_from_filename(filename)
+    fmt = (
+        file_format
+        if file_format
+        else filetype_from_filename(filename, _extension_to_filetype)
+    )
+    fmt = fmt if fmt else "tough"
 
     _writer_map[fmt](filename, parameters, **kwargs)

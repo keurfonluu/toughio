@@ -3,7 +3,7 @@ from abc import ABCMeta, abstractmethod, abstractproperty
 import numpy
 
 __all__ = [
-    "BaseRelativePermeability",
+    "BaseCapillarity",
 ]
 
 
@@ -11,14 +11,14 @@ __all__ = [
 ABC = ABCMeta("ABC", (object,), {"__slots__": ()})
 
 
-class BaseRelativePermeability(ABC):
+class BaseCapillarity(ABC):
 
     _id = None
     _name = ""
 
     def __init__(self, *args):
         """
-        Base class for relative permeability models.
+        Base class for capillarity models.
 
         Do not use.
 
@@ -26,18 +26,16 @@ class BaseRelativePermeability(ABC):
         pass
 
     def __repr__(self):
-        """Display relative permeability model informations."""
-        out = [
-            "{} relative permeability model (IRP = {}):".format(self._name, self._id)
-        ]
+        """Display capillarity model informations."""
+        out = ["{} capillarity model (ICP = {}):".format(self._name, self._id)]
         out += [
-            "    RP({}) = {}".format(i + 1, parameter)
+            "    CP({}) = {}".format(i + 1, parameter)
             for i, parameter in enumerate(self.parameters)
         ]
         return "\n".join(out)
 
     def __call__(self, sl):
-        """Calculate relative permeability given liquid saturation."""
+        """Calculate capillary pressure given liquid saturation."""
         if numpy.ndim(sl) == 0:
             if not (0.0 <= sl <= 1.0):
                 raise ValueError()
@@ -46,7 +44,7 @@ class BaseRelativePermeability(ABC):
             sl = numpy.asarray(sl)
             if not numpy.logical_and((sl >= 0.0).all(), (sl <= 1.0).all()):
                 raise ValueError()
-            return numpy.transpose([self._eval(sat, *self.parameters) for sat in sl])
+            return numpy.array([self._eval(sat, *self.parameters) for sat in sl])
 
     @abstractmethod
     def _eval(self, sl, *args):
@@ -54,7 +52,7 @@ class BaseRelativePermeability(ABC):
 
     def plot(self, n=100, ax=None, figsize=(10, 8), plt_kws=None):
         """
-        Plot relative permeability curve.
+        Plot capillary pressure curve.
 
         Parameters
         ----------
@@ -65,13 +63,18 @@ class BaseRelativePermeability(ABC):
         figsize : array_like or None, optional, default None
             New figure size if `ax` is `None`.
         plt_kws : dict or None, optional, default None
-            Additional keywords passed to :func:`matplotlib.pyplot.plot`.
+            Additional keywords passed to :func:`matplotlib.pyplot.semilogy`.
 
         """
-        import matplotlib.pyplot as plt
+        try:
+            import matplotlib.pyplot as plt
+        except ImportError:
+            raise ImportError(
+                "Plotting capillary pressure curve requires matplotlib to be installed."
+            )
 
         if not (isinstance(n, int) and n > 1):
-            raise TypeError()
+            raise ValueError()
         if not (ax is None or isinstance(ax, plt.Axes)):
             raise TypeError()
         if not (figsize is None or isinstance(figsize, (tuple, list, numpy.ndarray))):
@@ -94,17 +97,15 @@ class BaseRelativePermeability(ABC):
             fig = plt.figure(figsize=figsize, facecolor="white")
             ax1 = fig.add_subplot(1, 1, 1)
 
-        # Calculate liquid and gas relative permeability
+        # Calculate capillary pressure
         sl = numpy.linspace(0.0, 1.0, n)
-        kl, kg = self(sl)
+        pcap = self(sl)
 
         # Plot
-        ax1.plot(sl, kl, label="Liquid", **_kwargs)
-        ax1.plot(sl, kg, label="Gas", **_kwargs)
+        ax1.semilogy(sl, numpy.abs(pcap), **_kwargs)
         ax1.set_xlim(0.0, 1.0)
-        ax1.set_ylim(0.0, 1.0)
         ax1.set_xlabel("Saturation (liquid)")
-        ax1.set_ylabel("Relative permeability")
+        ax1.set_ylabel("Capillary pressure (Pa)")
         ax1.grid(True, linestyle=":")
 
         plt.draw()
@@ -113,12 +114,12 @@ class BaseRelativePermeability(ABC):
 
     @property
     def id(self):
-        """Return relative permeability model ID in TOUGH."""
+        """Return capillarity model ID in TOUGH."""
         return self._id
 
     @property
     def name(self):
-        """Return relative permeability model name."""
+        """Return capillarity model name."""
         return self._name
 
     @abstractproperty

@@ -3,12 +3,12 @@ from copy import deepcopy
 import meshio
 import numpy
 
+from .._common import filetype_from_filename, register_format
 from ._mesh import Mesh, from_meshio
 
 __all__ = [
     "read",
     "write",
-    "write_points_cells",
     "read_time_series",
     "write_time_series",
 ]
@@ -17,24 +17,30 @@ __all__ = [
 _extension_to_filetype = {}
 _reader_map = {}
 _writer_map = {}
+_materials = ["material", "gmsh:physical", "medit:ref"]
 
 
-def register(name, extensions, reader, writer_map):
+def register(file_format, extensions, reader, writer=None, material=None):
     """Register a new format."""
-    for ext in extensions:
-        _extension_to_filetype[ext] = name
+    register_format(
+        fmt=file_format,
+        ext_to_fmt=_extension_to_filetype,
+        reader_map=_reader_map,
+        writer_map=_writer_map,
+        extensions=extensions,
+        reader=reader,
+        writer=writer,
+    )
+    if material:
+        _materials.append(material)
 
-    if reader is not None:
-        _reader_map[name] = reader
-    _writer_map.update(writer_map)
 
-
-def _filetype_from_filename(filename):
-    """Determine file type from its extension."""
-    import os
-
-    ext = os.path.splitext(filename)[1].lower()
-    return _extension_to_filetype[ext] if ext in _extension_to_filetype.keys() else ""
+def get_material_key(cell_data):
+    """Get key of material data in cell_data."""
+    for k in cell_data.keys():
+        if k in _materials:
+            return k
+    return None
 
 
 def read(filename, file_format=None, **kwargs):
@@ -57,7 +63,11 @@ def read(filename, file_format=None, **kwargs):
     # Check file format
     if not isinstance(filename, str):
         raise TypeError()
-    fmt = file_format if file_format else _filetype_from_filename(filename)
+    fmt = (
+        file_format
+        if file_format
+        else filetype_from_filename(filename, _extension_to_filetype)
+    )
 
     # Call custom readers
     if fmt in _reader_map.keys():
@@ -66,6 +76,9 @@ def read(filename, file_format=None, **kwargs):
             mesh.cell_data = {
                 k: numpy.concatenate(v) for k, v in mesh.cell_data.items()
             }
+            key = get_material_key(mesh.cell_data)
+            if key:
+                mesh.cell_data["material"] = mesh.cell_data.pop(key)
     else:
         mesh = meshio.read(filename, file_format)
         mesh = from_meshio(mesh)
@@ -104,7 +117,11 @@ def write(filename, mesh, file_format=None, **kwargs):
     # Check file format
     if not isinstance(filename, str):
         raise TypeError()
-    fmt = file_format if file_format else _filetype_from_filename(filename)
+    fmt = (
+        file_format
+        if file_format
+        else filetype_from_filename(filename, _extension_to_filetype)
+    )
 
     # Call custom writer
     if fmt in _writer_map.keys():
@@ -115,52 +132,6 @@ def write(filename, mesh, file_format=None, **kwargs):
     else:
         mesh = mesh.to_meshio()
         meshio.write(filename, mesh, file_format=file_format, **kwargs)
-
-
-def write_points_cells(
-    filename,
-    points,
-    cells,
-    point_data=None,
-    cell_data=None,
-    field_data=None,
-    file_format=None,
-    **kwargs
-):
-    """
-    Write unstructured mesh to file given points and cells data.
-
-    Parameters
-    ----------
-    filename : str
-        Output file name.
-    points : ndarray
-        Grid points array.
-    cells : dict
-        Grid cell data.
-    point_data : dict or None, optional, default None
-        Data associated to grid points.
-    cell_data : dict or None, optional, default None
-        Data associated to grid cells.
-    field_data : dict or None, optional, default None
-        Data names.
-    file_format : str or None, optional, default None
-        Output file format.
-
-    Other Parameters
-    ----------------
-    kwargs : dict
-        Refer to function ``write`` for additional information.
-
-    """
-    mesh = Mesh(
-        points=points,
-        cells=cells,
-        point_data=point_data,
-        cell_data=cell_data,
-        field_data=field_data,
-    )
-    write(filename, mesh, file_format=file_format, **kwargs)
 
 
 def read_time_series(filename):

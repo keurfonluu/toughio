@@ -8,10 +8,8 @@ __all__ = [
     "meshio_to_vtk_type",
     "vtk_type_to_numnodes",
     "meshio_type_to_ndim",
-    "meshio_data",
     "get_meshio_version",
     "get_old_meshio_cells",
-    "get_local_index",
     "labeler",
 ]
 
@@ -96,15 +94,6 @@ meshio_type_to_ndim = {k: 3 for k in meshio_to_vtk_type.keys()}
 meshio_type_to_ndim.update(
     {"empty": 0, "vertex": 1, "line": 2, "triangle": 2, "polygon": 2, "quad": 2}
 )
-
-
-meshio_data = {
-    "material",
-    "avsucd:material",
-    "flac3d:zone",
-    "gmsh:physical",
-    "medit:ref",
-}
 
 
 alpha = list(ascii_uppercase)
@@ -203,24 +192,6 @@ def get_new_meshio_cells(cells, cell_data=None):
         return new_cells, new_cell_data
     else:
         return new_cells
-
-
-def get_local_index(mesh, i):
-    """
-    Convert global cell index to local tuple index.
-
-    Parameters
-    ----------
-    mesh : toughio.Mesh
-        Input mesh.
-    i : int
-        Global cell index.
-
-    """
-    n_cells = numpy.cumsum([len(c.data) for c in mesh.cells])
-    idx = numpy.nonzero(n_cells > i)[0][0]
-
-    return (0, i) if not idx else (idx, i - n_cells[idx - 1])
 
 
 def labeler(i):

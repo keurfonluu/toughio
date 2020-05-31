@@ -5,8 +5,7 @@ import logging
 import numpy
 
 from ...__about__ import __version__ as version
-from .._common import meshio_data
-from .._helpers import register
+from .._helpers import _materials, get_material_key
 from .._mesh import CellBlock, Mesh
 
 __all__ = [
@@ -180,7 +179,7 @@ def write(filename, mesh):
         num_cell_data = [
             1 if numpy.concatenate(v).ndim == 1 else numpy.concatenate(v).shape[1]
             for k, v in mesh.cell_data.items()
-            if k not in meshio_data
+            if k not in _materials
         ]
         num_node_data_sum = sum(num_node_data)
         num_cell_data_sum = sum(num_cell_data)
@@ -206,12 +205,12 @@ def write(filename, mesh):
 
         # Write cell data
         if num_cell_data_sum:
-            labels = [k for k in mesh.cell_data.keys() if k not in meshio_data]
+            labels = [k for k in mesh.cell_data.keys() if k not in _materials]
             data_array = numpy.column_stack(
                 [
                     numpy.concatenate(v)
                     for k, v in mesh.cell_data.items()
-                    if k not in meshio_data
+                    if k not in _materials
                 ]
             )
             _write_data(
@@ -226,11 +225,7 @@ def _write_nodes(f, points):
 
 def _write_cells(f, cells, cell_data, num_cells):
     # Interoperability with other formats
-    mat_data = None
-    for k in cell_data.keys():
-        if k in meshio_data:
-            mat_data = k
-            break
+    mat_data = get_material_key(cell_data)
 
     # Material array
     if mat_data:
