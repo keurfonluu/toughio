@@ -41,3 +41,5 @@ def test_relative_permeability(model, parameters, monkeypatch):
 
     monkeypatch.setattr(plt, "show", lambda: None)
     perm.plot()
+
+    print(perm)
