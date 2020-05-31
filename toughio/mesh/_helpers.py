@@ -9,7 +9,6 @@ from .._common import register_format, filetype_from_filename
 __all__ = [
     "read",
     "write",
-    "write_points_cells",
     "read_time_series",
     "write_time_series",
 ]
@@ -111,52 +110,6 @@ def write(filename, mesh, file_format=None, **kwargs):
     else:
         mesh = mesh.to_meshio()
         meshio.write(filename, mesh, file_format=file_format, **kwargs)
-
-
-def write_points_cells(
-    filename,
-    points,
-    cells,
-    point_data=None,
-    cell_data=None,
-    field_data=None,
-    file_format=None,
-    **kwargs
-):
-    """
-    Write unstructured mesh to file given points and cells data.
-
-    Parameters
-    ----------
-    filename : str
-        Output file name.
-    points : ndarray
-        Grid points array.
-    cells : dict
-        Grid cell data.
-    point_data : dict or None, optional, default None
-        Data associated to grid points.
-    cell_data : dict or None, optional, default None
-        Data associated to grid cells.
-    field_data : dict or None, optional, default None
-        Data names.
-    file_format : str or None, optional, default None
-        Output file format.
-
-    Other Parameters
-    ----------------
-    kwargs : dict
-        Refer to function ``write`` for additional information.
-
-    """
-    mesh = Mesh(
-        points=points,
-        cells=cells,
-        point_data=point_data,
-        cell_data=cell_data,
-        field_data=field_data,
-    )
-    write(filename, mesh, file_format=file_format, **kwargs)
 
 
 def read_time_series(filename):
