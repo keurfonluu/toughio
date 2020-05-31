@@ -8,7 +8,6 @@ __all__ = [
     "meshio_to_vtk_type",
     "vtk_type_to_numnodes",
     "meshio_type_to_ndim",
-    "meshio_data",
     "get_meshio_version",
     "get_old_meshio_cells",
     "get_local_index",
@@ -96,15 +95,6 @@ meshio_type_to_ndim = {k: 3 for k in meshio_to_vtk_type.keys()}
 meshio_type_to_ndim.update(
     {"empty": 0, "vertex": 1, "line": 2, "triangle": 2, "polygon": 2, "quad": 2}
 )
-
-
-meshio_data = {
-    "material",
-    "avsucd:material",
-    "flac3d:zone",
-    "gmsh:physical",
-    "medit:ref",
-}
 
 
 alpha = list(ascii_uppercase)

@@ -17,9 +17,10 @@ __all__ = [
 _extension_to_filetype = {}
 _reader_map = {}
 _writer_map = {}
+_materials = ["material", "gmsh:physical", "medit:ref"]
 
 
-def register(file_format, extensions, reader, writer=None):
+def register(file_format, extensions, reader, writer=None, material=None):
     """Register a new format."""
     register_format(
         fmt=file_format,
@@ -30,6 +31,16 @@ def register(file_format, extensions, reader, writer=None):
         reader=reader,
         writer=writer,
     )
+    if material:
+        _materials.append(material)
+
+
+def get_material_key(cell_data):
+    """Get key of material data in cell_data."""
+    for k in cell_data.keys():
+        if k in _materials:
+            return k
+    return None
 
 
 def read(filename, file_format=None, **kwargs):
@@ -61,6 +72,9 @@ def read(filename, file_format=None, **kwargs):
             mesh.cell_data = {
                 k: numpy.concatenate(v) for k, v in mesh.cell_data.items()
             }
+            key = get_material_key(mesh.cell_data)
+            if key:
+                mesh.cell_data["material"] = mesh.cell_data.pop(key)
     else:
         mesh = meshio.read(filename, file_format)
         mesh = from_meshio(mesh)
