@@ -8,7 +8,6 @@ from ._common import (
     get_meshio_version,
     get_new_meshio_cells,
     get_old_meshio_cells,
-    meshio_data,
 )
 from ._properties import (
     _connections,
@@ -790,6 +789,8 @@ def from_meshio(mesh):
         Output mesh.
 
     """
+    from ._helpers import get_material_key
+
     if not isinstance(mesh, meshio.Mesh):
         raise TypeError()
 
@@ -802,11 +803,9 @@ def from_meshio(mesh):
         else:
             cells, cell_data = get_new_meshio_cells(mesh.cells, mesh.cell_data)
 
-        for k in cell_data.keys():
-            if k in meshio_data:
-                cell_data["material"] = cell_data.pop(k)
-                break
-
+        key = get_material_key(cell_data)
+        if key:
+            cell_data["material"] = cell_data.pop(key)
         cell_data = {k: numpy.concatenate(v) for k, v in cell_data.items()}
     else:
         cells = mesh.cells if version[0] >= 4 else get_new_meshio_cells(mesh.cells)

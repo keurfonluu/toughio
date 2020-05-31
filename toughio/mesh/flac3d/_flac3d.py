@@ -6,7 +6,7 @@ import time
 import numpy
 
 from ...__about__ import __version__ as version
-from .._common import meshio_data
+from .._helpers import _materials, get_material_key
 from .._mesh import Mesh
 
 __all__ = [
@@ -334,11 +334,7 @@ def _write_zgroups(f, cell_data, field_data, binary):
     zgroups = None
     if cell_data:
         # Pick out material
-        key = None
-        for k in cell_data.keys():
-            if k in meshio_data:
-                key = k
-                break
+        key = get_material_key(cell_data)
         if key:
             material = numpy.concatenate(cell_data[key])
             zgroups, labels = _translate_zgroups(material, field_data)

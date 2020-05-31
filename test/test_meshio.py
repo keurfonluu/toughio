@@ -1,3 +1,5 @@
+import copy
+
 import pytest
 
 import helpers
@@ -33,12 +35,15 @@ write_read = lambda mesh, writer_kws, reader_kws: helpers.write_read(
     ],
 )
 def test_meshio(mesh_ref, file_format, binary):
+    mesh_ref = copy.deepcopy(mesh_ref)
     writer_kws = {"file_format": file_format}
     if binary is not None:
-        writer_kws.update({"binary": binary})
+        writer_kws["binary"] = binary
 
     mesh = write_read(
         mesh=mesh_ref, writer_kws=writer_kws, reader_kws={"file_format": file_format},
     )
+    if file_format == "flac3d":
+        mesh_ref.cell_data.pop("c", None)
 
     helpers.allclose_mesh(mesh_ref, mesh)

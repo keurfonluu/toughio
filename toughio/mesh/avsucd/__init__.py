@@ -7,4 +7,4 @@ __all__ = [
 ]
 
 
-register("avsucd", [], read, write)
+register("avsucd", [], read, write, "avsucd:material")
