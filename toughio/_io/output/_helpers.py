@@ -2,7 +2,7 @@ from __future__ import with_statement
 
 import numpy
 
-from ..._common import register_format, filetype_from_filename
+from ..._common import filetype_from_filename, register_format
 from ._common import Output
 
 __all__ = [
@@ -116,7 +116,11 @@ def write(filename, output, file_format=None, **kwargs):
     ):
         raise TypeError()
 
-    fmt = file_format if file_format else filetype_from_filename(filename, _extension_to_filetype)
+    fmt = (
+        file_format
+        if file_format
+        else filetype_from_filename(filename, _extension_to_filetype)
+    )
 
     return _writer_map[fmt](filename, output, **kwargs)
 

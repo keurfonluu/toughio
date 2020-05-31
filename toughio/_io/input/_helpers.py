@@ -1,6 +1,6 @@
 import os
 
-from ..._common import register_format, filetype_from_filename
+from ..._common import filetype_from_filename, register_format
 
 __all__ = [
     "read",
@@ -52,7 +52,11 @@ def read(filename, file_format=None, **kwargs):
     if not (file_format is None or file_format in {"tough", "json"}):
         raise ValueError()
 
-    fmt = file_format if file_format else filetype_from_filename(filename, _extension_to_filetype)
+    fmt = (
+        file_format
+        if file_format
+        else filetype_from_filename(filename, _extension_to_filetype)
+    )
     fmt = fmt if fmt else "tough"
 
     return _reader_map[fmt](filename, **kwargs)
@@ -79,7 +83,11 @@ def write(filename, parameters, file_format=None, **kwargs):
     if not (file_format is None or file_format in {"tough", "json"}):
         raise ValueError()
 
-    fmt = file_format if file_format else filetype_from_filename(filename, _extension_to_filetype)
+    fmt = (
+        file_format
+        if file_format
+        else filetype_from_filename(filename, _extension_to_filetype)
+    )
     fmt = fmt if fmt else "tough"
 
     _writer_map[fmt](filename, parameters, **kwargs)
