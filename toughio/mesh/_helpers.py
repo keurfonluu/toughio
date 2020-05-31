@@ -4,6 +4,7 @@ import meshio
 import numpy
 
 from ._mesh import Mesh, from_meshio
+from .._common import register_format, filetype_from_filename
 
 __all__ = [
     "read",
@@ -19,22 +20,17 @@ _reader_map = {}
 _writer_map = {}
 
 
-def register(name, extensions, reader, writer_map):
+def register(file_format, extensions, reader, writer=None):
     """Register a new format."""
-    for ext in extensions:
-        _extension_to_filetype[ext] = name
-
-    if reader is not None:
-        _reader_map[name] = reader
-    _writer_map.update(writer_map)
-
-
-def _filetype_from_filename(filename):
-    """Determine file type from its extension."""
-    import os
-
-    ext = os.path.splitext(filename)[1].lower()
-    return _extension_to_filetype[ext] if ext in _extension_to_filetype.keys() else ""
+    register_format(
+        fmt=file_format,
+        ext_to_fmt=_extension_to_filetype,
+        reader_map=_reader_map,
+        writer_map=_writer_map,
+        extensions=extensions,
+        reader=reader,
+        writer=writer,
+    )
 
 
 def read(filename, file_format=None, **kwargs):
@@ -57,7 +53,7 @@ def read(filename, file_format=None, **kwargs):
     # Check file format
     if not isinstance(filename, str):
         raise TypeError()
-    fmt = file_format if file_format else _filetype_from_filename(filename)
+    fmt = file_format if file_format else filetype_from_filename(filename, _extension_to_filetype)
 
     # Call custom readers
     if fmt in _reader_map.keys():
@@ -104,7 +100,7 @@ def write(filename, mesh, file_format=None, **kwargs):
     # Check file format
     if not isinstance(filename, str):
         raise TypeError()
-    fmt = file_format if file_format else _filetype_from_filename(filename)
+    fmt = file_format if file_format else filetype_from_filename(filename, _extension_to_filetype)
 
     # Call custom writer
     if fmt in _writer_map.keys():

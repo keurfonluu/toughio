@@ -7,4 +7,4 @@ __all__ = [
 ]
 
 
-register("tough", [], read, {"tough": write})
+register("tough", [], read, write)

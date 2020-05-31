@@ -2,7 +2,7 @@ from __future__ import with_statement
 
 import numpy
 
-from ..._common import filetype_from_filename
+from ..._common import register_format, filetype_from_filename
 from ._common import Output
 
 __all__ = [
@@ -19,20 +19,15 @@ _writer_map = {}
 
 def register(file_format, extensions, reader, writer=None):
     """Register a new format."""
-    for ext in extensions:
-        _extension_to_filetype[ext] = file_format
-
-    _reader_map[file_format] = reader
-    if writer is not None:
-        _writer_map[file_format] = writer
-
-
-def _filetype_from_filename(filename):
-    """Determine file type from its extension."""
-    import os
-
-    ext = os.path.splitext(filename)[1].lower()
-    return _extension_to_filetype[ext] if ext in _extension_to_filetype.keys() else ""
+    register_format(
+        fmt=file_format,
+        ext_to_fmt=_extension_to_filetype,
+        reader_map=_reader_map,
+        writer_map=_writer_map,
+        extensions=extensions,
+        reader=reader,
+        writer=writer,
+    )
 
 
 def get_output_type(filename):
@@ -121,7 +116,7 @@ def write(filename, output, file_format=None, **kwargs):
     ):
         raise TypeError()
 
-    fmt = file_format if file_format else _filetype_from_filename(filename)
+    fmt = file_format if file_format else filetype_from_filename(filename, _extension_to_filetype)
 
     return _writer_map[fmt](filename, output, **kwargs)
 
