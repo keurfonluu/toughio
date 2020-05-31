@@ -19,6 +19,10 @@ output_ref = {
 }
 
 
+def test_print():
+    print(helpers.hex_mesh)
+
+
 def test_extrude_to_3d():
     # Create 2D mesh
     dx = numpy.random.rand(10)
