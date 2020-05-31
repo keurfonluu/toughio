@@ -768,11 +768,11 @@ class Mesh(object):
         """
         Return qualities of cells in mesh.
 
-        The quality of a cell is measured as the average cosine angle between the
+        The quality of a cell is measured as the minimum cosine angle between the
         connection line and the interface normal vectors.
 
         """
-        return numpy.array([numpy.mean(out) for out in _qualities(self)])
+        return numpy.array([numpy.min(out) for out in _qualities(self)])
 
 
 def from_meshio(mesh):

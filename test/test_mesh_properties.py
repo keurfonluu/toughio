@@ -22,3 +22,12 @@ def test_mesh():
 
     connections = mesh.connections.sum()
     assert numpy.allclose(connections, 25353)
+
+
+def test_quality():
+    dx = numpy.ones(3)
+    dy = numpy.ones(3)
+    dz = numpy.ones(3)
+    mesh = toughio.meshmaker.structured_grid(dx, dy, dz, origin=numpy.zeros(3))
+
+    assert numpy.allclose(mesh.qualities, numpy.ones(mesh.n_cells))
