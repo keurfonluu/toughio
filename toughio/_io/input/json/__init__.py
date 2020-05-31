@@ -7,4 +7,4 @@ __all__ = [
 ]
 
 
-register("json", [".json"], read, {"json": write})
+register("json", [".json"], read, write)

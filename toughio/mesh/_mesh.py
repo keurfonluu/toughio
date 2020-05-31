@@ -4,13 +4,7 @@ from copy import deepcopy
 import meshio
 import numpy
 
-from .._common import deprecated
-from ._common import (
-    get_meshio_version,
-    get_new_meshio_cells,
-    get_old_meshio_cells,
-    meshio_data,
-)
+from ._common import get_meshio_version, get_new_meshio_cells, get_old_meshio_cells
 from ._properties import (
     _connections,
     _face_areas,
@@ -325,23 +319,6 @@ class Mesh(object):
         mesh.cell_arrays.update(self.cell_data)
 
         return mesh
-
-    @deprecated("1.3.0", "Use function 'write_tough' instead.")
-    def to_tough(self, filename="MESH", **kwargs):
-        """
-        Write TOUGH `MESH` file.
-
-        Parameters
-        ----------
-        filename : str, optional, default 'MESH'
-            Output file name.
-
-        Note
-        ----
-        Deprecated in version `1.3.0` in favor of :method:`toughio.write_tough`.
-
-        """
-        self.write_tough(filename, **kwargs)
 
     def write_tough(self, filename="MESH", **kwargs):
         """
@@ -786,11 +763,11 @@ class Mesh(object):
         """
         Return qualities of cells in mesh.
 
-        The quality of a cell is measured as the average cosine angle between the
+        The quality of a cell is measured as the minimum cosine angle between the
         connection line and the interface normal vectors.
 
         """
-        return numpy.array([numpy.mean(out) for out in _qualities(self)])
+        return numpy.array([numpy.min(out) for out in _qualities(self)])
 
 
 def from_meshio(mesh):
@@ -808,6 +785,8 @@ def from_meshio(mesh):
         Output mesh.
 
     """
+    from ._helpers import get_material_key
+
     if not isinstance(mesh, meshio.Mesh):
         raise TypeError()
 
@@ -820,11 +799,9 @@ def from_meshio(mesh):
         else:
             cells, cell_data = get_new_meshio_cells(mesh.cells, mesh.cell_data)
 
-        for k in cell_data.keys():
-            if k in meshio_data:
-                cell_data["material"] = cell_data.pop(k)
-                break
-
+        key = get_material_key(cell_data)
+        if key:
+            cell_data["material"] = cell_data.pop(key)
         cell_data = {k: numpy.concatenate(v) for k, v in cell_data.items()}
     else:
         cells = mesh.cells if version[0] >= 4 else get_new_meshio_cells(mesh.cells)

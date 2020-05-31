@@ -23,7 +23,7 @@ CLASSIFIERS = [
     "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
     "Development Status :: 5 - Production/Stable",
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: BSD License",
     "Natural Language :: English",
     "Operating System :: Microsoft :: Windows",
     "Operating System :: POSIX",
@@ -50,7 +50,10 @@ else:
     REQUIREMENTS = ["meshio >= 4.0.11, < 5.0"]
     EXTRA_REQUIREMENTS = {"full": ["pyvista >= 0.23.1"]}
 REQUIREMENTS += ["numpy >= 1.13.0"]
-EXTRA_REQUIREMENTS["full"] += ["netcdf4", "h5py", "scipy>=0.9"]
+EXTRA_REQUIREMENTS["full"] += ["matplotlib", "netcdf4", "h5py", "scipy>=0.9"]
+EXTRA_REQUIREMENTS["dev"] = list(EXTRA_REQUIREMENTS["full"])
+EXTRA_REQUIREMENTS["dev"] += ["black", "docformatter", "invoke", "isort", "pytest", "pytest-cov"]
+
 
 PACKAGE_DATA = {
     "toughio.data": ["CO2TAB"],

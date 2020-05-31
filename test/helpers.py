@@ -19,7 +19,7 @@ tet_mesh = toughio.Mesh(
     ),
     cells=[("tetra", numpy.array([[0, 1, 2, 4], [0, 2, 3, 4]]))],
     point_data={"a": numpy.random.rand(5), "b": numpy.random.rand(5)},
-    cell_data={"c": numpy.random.rand(2), "d": numpy.random.rand(2)},
+    cell_data={"c": numpy.random.rand(2), "material": numpy.ones(2)},
 )
 
 hex_mesh = toughio.Mesh(
@@ -37,7 +37,7 @@ hex_mesh = toughio.Mesh(
     ),
     cells=[("hexahedron", numpy.array([[0, 1, 2, 3, 4, 5, 6, 7]]))],
     point_data={"a": numpy.random.rand(8), "b": numpy.random.rand(8)},
-    cell_data={"c": numpy.random.rand(1), "d": numpy.random.rand(1)},
+    cell_data={"c": numpy.random.rand(1), "material": numpy.ones(1)},
 )
 
 hybrid_mesh = toughio.Mesh(
@@ -67,7 +67,7 @@ hybrid_mesh = toughio.Mesh(
         ("wedge", numpy.array([[1, 11, 5, 2, 12, 6], [13, 0, 4, 14, 3, 7]])),
     ],
     point_data={"a": numpy.random.rand(15), "b": numpy.random.rand(15)},
-    cell_data={"c": numpy.random.rand(6), "d": numpy.random.rand(6)},
+    cell_data={"c": numpy.random.rand(6), "material": numpy.ones(6)},
 )
 
 output_eleme = [

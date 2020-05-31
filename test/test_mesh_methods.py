@@ -19,6 +19,10 @@ output_ref = {
 }
 
 
+def test_print():
+    print(helpers.hex_mesh)
+
+
 def test_extrude_to_3d():
     # Create 2D mesh
     dx = numpy.random.rand(10)
@@ -109,11 +113,6 @@ def test_from_to(mesh_ref, from_, to_):
     mesh = from_(getattr(mesh_ref, to_)())
 
     helpers.allclose_mesh(mesh_ref, mesh)
-
-
-def test_to_tough():
-    with pytest.deprecated_call():
-        helpers.hybrid_mesh.to_tough(helpers.tempdir("MESH"))
 
 
 @pytest.mark.parametrize(
