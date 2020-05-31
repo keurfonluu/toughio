@@ -111,11 +111,6 @@ def test_from_to(mesh_ref, from_, to_):
     helpers.allclose_mesh(mesh_ref, mesh)
 
 
-def test_to_tough():
-    with pytest.deprecated_call():
-        helpers.hybrid_mesh.to_tough(helpers.tempdir("MESH"))
-
-
 @pytest.mark.parametrize(
     "filename, file_type, time_step",
     [
