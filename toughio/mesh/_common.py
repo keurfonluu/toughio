@@ -1,5 +1,3 @@
-from string import ascii_uppercase
-
 import meshio
 import numpy
 
@@ -96,11 +94,6 @@ meshio_type_to_ndim.update(
 )
 
 
-alpha = list(ascii_uppercase)
-numer = ["{:0>2}".format(i) for i in range(100)]
-nomen = ["{:1}".format(i + 1) for i in range(9)] + alpha
-
-
 def get_meshio_version():
     """
     Return :mod:`meshio` version as a tuple.
@@ -194,9 +187,9 @@ def get_new_meshio_cells(cells, cell_data=None):
         return new_cells
 
 
-def labeler(i):
+def labeler(n_cells):
     """
-    Return five-character long cell labels.
+    Return array of five-character long cell labels.
 
     - 1st: from A to Z
     - 2nd and 3rd: from 1 to 9 then A to Z
@@ -205,22 +198,29 @@ def labeler(i):
 
     Parameters
     ----------
-    i : int
-        Cell general index in mesh.
+    n_cells : int
+        Number of cells.
 
     Returns
     -------
-    str
-        Label for cell `i`.
+    array_like
+        Array of labels of size `n_cells`.
 
     Note
     ----
     Currently support up to 3,185,000 different cells.
 
     """
-    q1, r1 = divmod(i, len(numer))
-    q2, r2 = divmod(q1, len(nomen))
-    q3, r3 = divmod(q2, len(nomen))
-    _, r4 = divmod(q3, len(nomen))
+    from string import ascii_uppercase
+    
+    alpha = numpy.array(list(ascii_uppercase))
+    numer = numpy.array(["{:0>2}".format(i) for i in range(100)])
+    nomen = numpy.concatenate((["{:1}".format(i + 1) for i in range(9)], alpha))
 
-    return "".join([alpha[r4], nomen[r3], nomen[r2], numer[r1]])
+    q1, r1 = numpy.divmod(numpy.arange(n_cells), numer.size)
+    q2, r2 = numpy.divmod(q1, nomen.size)
+    q3, r3 = numpy.divmod(q2, nomen.size)
+    _, r4 = numpy.divmod(q3, nomen.size)
+
+    iterables = [alpha[r4], nomen[r3], nomen[r2], numer[r1]]
+    return numpy.array(["".join(name) for name in zip(*iterables)])
