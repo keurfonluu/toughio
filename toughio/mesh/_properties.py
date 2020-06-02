@@ -102,7 +102,7 @@ def _face_areas(mesh):
         [_get_triangle_normals(mesh, v) for k, v in faces_dict.items()]
     )
     areas = numpy.linalg.norm(areas, axis=-1)
-    if len(faces_dict["quad"]):
+    if "quad" in faces_dict.keys() and len(faces_dict["quad"]):
         tmp = numpy.concatenate(
             [
                 _get_triangle_normals(mesh, v, [0, 2, 3])
