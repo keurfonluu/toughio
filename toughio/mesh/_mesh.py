@@ -706,7 +706,7 @@ class Mesh(object):
         """Return labels of cell in mesh."""
         from ._common import labeler
 
-        return numpy.array([labeler(i) for i in range(self.n_cells)])
+        return labeler(self.n_cells)
 
     @property
     def centers(self):
