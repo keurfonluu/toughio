@@ -1,6 +1,4 @@
 import os
-import warnings
-from functools import wraps
 
 __all__ = [
     "register_format",
