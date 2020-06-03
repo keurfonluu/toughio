@@ -187,19 +187,16 @@ def get_new_meshio_cells(cells, cell_data=None):
         return new_cells
 
 
-def labeler(n_cells):
+def labeler(n_cells, label_length=5):
     """
-    Return array of five-character long cell labels.
-
-    - 1st: from A to Z
-    - 2nd and 3rd: from 1 to 9 then A to Z
-    - 4th and 5th: from 00 to 99
-    Incrementation is performed from right to left.
+    Return an array of `label_length`-character long cell labels.
 
     Parameters
     ----------
     n_cells : int
         Number of cells.
+    label_length : int, optional, default 5
+        Number of characters in label.
 
     Returns
     -------
@@ -208,13 +205,15 @@ def labeler(n_cells):
 
     Note
     ----
-    Currently support up to 3,185,000 different cells.
+    `label_length` corresponds to option MOP2(2).
 
     """
     from string import ascii_uppercase
     
+    n = label_length - 3
+    fmt = "{{:0>{}}}".format(n)
     alpha = numpy.array(list(ascii_uppercase))
-    numer = numpy.array(["{:0>2}".format(i) for i in range(100)])
+    numer = numpy.array([fmt.format(i) for i in range(10**n)])
     nomen = numpy.concatenate((["{:1}".format(i + 1) for i in range(9)], alpha))
 
     q1, r1 = numpy.divmod(numpy.arange(n_cells), numer.size)
