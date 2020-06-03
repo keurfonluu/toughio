@@ -221,5 +221,5 @@ def labeler(n_cells, label_length=5):
     q3, r3 = numpy.divmod(q2, nomen.size)
     _, r4 = numpy.divmod(q3, nomen.size)
 
-    iterables = [alpha[r4], nomen[r3], nomen[r2], numer[r1]]
+    iterables = (alpha[r4], nomen[r3], nomen[r2], numer[r1])
     return numpy.array(["".join(name) for name in zip(*iterables)])
