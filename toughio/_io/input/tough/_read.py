@@ -1,6 +1,7 @@
 from __future__ import division, with_statement
 
 from ._helpers import prune_nones_dict, prune_nones_list, read_record
+from ...._common import block_to_format_dict
 
 __all__ = [
     "read",
@@ -105,6 +106,7 @@ def read_buffer(f):
 
 def _read_rocks(f):
     """Read ROCKS block data."""
+    fmt = block_to_format_dict["ROCKS"]
     rocks = {"rocks": {}, "rocks_order": []}
 
     while True:
@@ -112,7 +114,7 @@ def _read_rocks(f):
 
         if line.strip():
             # Record 1
-            data = read_record(line, "5s,5d,10e,10e,10e,10e,10e,10e,10e")
+            data = read_record(line, fmt[1])
             rock = data[0]
             rocks["rocks"][rock] = {
                 "density": data[2],
@@ -126,7 +128,7 @@ def _read_rocks(f):
             if nad is not None:
                 # Record 2
                 line = next(f)
-                data = read_record(line, "10e,10e,10e,10e,10e,10e,10e")
+                data = read_record(line, fmt[2])
                 rocks["rocks"][rock].update(
                     {
                         "compressibility": data[0],
@@ -153,11 +155,12 @@ def _read_rocks(f):
 
 def _read_rpcap(f):
     """Read RPCAP block data."""
+    fmt = block_to_format_dict["RPCAP"]
     rpcap = {}
 
     for key in ["relative_permeability", "capillarity"]:
         line = next(f)
-        data = read_record(line, "5d,5s,10e,10e,10e,10e,10e,10e,10e")
+        data = read_record(line, fmt)
         if data[0] is not None:
             rpcap[key] = {
                 "id": data[0],
@@ -169,11 +172,12 @@ def _read_rpcap(f):
 
 def _read_flac(f, rocks_order):
     """Read FLAC block data."""
+    fmt = block_to_format_dict["FLAC"]
     flac = {"rocks": {}, "flac": {}}
 
     # Record 1
     line = next(f)
-    data = read_record(line, ",".join(16 * ["5d"]))
+    data = read_record(line, fmt[1])
     flac["flac"]["creep"] = data[0]
     flac["flac"]["porosity_model"] = data[1]
     flac["flac"]["version"] = data[2]
@@ -183,14 +187,14 @@ def _read_flac(f, rocks_order):
         flac["rocks"][rock] = {}
 
         line = next(f)
-        data = read_record(line, "10d,10e,10e,10e,10e,10e,10e,10e")
+        data = read_record(line, fmt[2])
         flac["rocks"][rock]["permeability_model"] = {
             "id": data[0],
             "parameters": prune_nones_list(data[1:]),
         }
 
         line = next(f)
-        data = read_record(line, "5d,5s,10e,10e,10e,10e,10e,10e,10e")
+        data = read_record(line, fmt[3])
         flac["rocks"][rock]["equivalent_pore_pressure"] = {
             "id": data[0],
             "parameters": prune_nones_list(data[2:]),
@@ -215,17 +219,18 @@ def _read_multi(f):
 
 def _read_selec(f):
     """Read SELEC block data."""
+    fmt = block_to_format_dict["SELEC"]
     selec = {"selections": {}}
 
     line = next(f)
-    data = read_record(line, ",".join(16 * ["5d"]))
+    data = read_record(line, fmt[1])
     selec["selections"]["integers"] = {k + 1: v for k, v in enumerate(data)}
 
     if selec["selections"]["integers"][1]:
         selec["selections"]["floats"] = []
         for _ in range(selec["selections"]["integers"][1]):
             line = next(f)
-            data = read_record(line, ",".join(8 * ["10e"]))
+            data = read_record(line, fmt[2])
             selec["selections"]["floats"] += data
 
     selec["selections"]["integers"] = prune_nones_dict(selec["selections"]["integers"])
@@ -237,10 +242,11 @@ def _read_selec(f):
 
 def _read_solvr(f):
     """Read SOLVR block data."""
+    fmt = block_to_format_dict["SOLVR"]
     solvr = {}
 
     line = next(f)
-    data = read_record(line, "1d,2s,2s,3s,2s,10e,10e")
+    data = read_record(line, fmt)
     solvr["solver"] = {
         "method": data[0],
         "z_precond": data[2],
@@ -254,11 +260,12 @@ def _read_solvr(f):
 
 def _read_param(f):
     """Read PARAM block data."""
+    fmt = block_to_format_dict["PARAM"]
     param = {}
 
     # Record 1
     line = next(f)
-    data = read_record(line, "2d,2d,4d,4d,4d,24S,10s,10e,10e")
+    data = read_record(line, fmt[1])
     param["options"] = {
         "n_iteration": data[0],
         "verbosity": data[1],
@@ -274,7 +281,7 @@ def _read_param(f):
 
     # Record 2
     line = next(f)
-    data = read_record(line, "10e,10e,10f,10e,10s,10e,10e,10e")
+    data = read_record(line, fmt[2])
     param["options"].update(
         {
             "t_ini": data[0],
@@ -294,14 +301,14 @@ def _read_param(f):
         param["options"]["t_steps"] = []
         for _ in range(-t_steps):
             line = next(f)
-            data = read_record(line, "10e,10e,10e,10e,10e,10e,10e,10e")
+            data = read_record(line, fmt[3])
             param["options"]["t_steps"] += prune_nones_list(data)
         if len(param["options"]["t_steps"]) == 1:
             param["options"]["t_steps"] = param["options"]["t_steps"][0]
 
     # Record 3
     line = next(f)
-    data = read_record(line, "10e,10e,10s,10e,10e,10e")
+    data = read_record(line, fmt[4])
     param["options"].update(
         {
             "eps1": data[0],
@@ -314,7 +321,7 @@ def _read_param(f):
 
     # Record 4
     line = next(f)
-    data = read_record(line, "20e,20e,20e,20e")
+    data = read_record(line, fmt[5])
     if any(x is not None for x in data):
         data = prune_nones_list(data)
         param["default"] = {"initial_condition": data}
@@ -330,6 +337,7 @@ def _read_param(f):
 
 def _read_indom(f):
     """Read INDOM block data."""
+    fmt = block_to_format_dict["INDOM"]
     indom = {"rocks": {}}
 
     while True:
@@ -338,7 +346,7 @@ def _read_indom(f):
         if line.strip():
             rock = line[:5]
             line = next(f)
-            data = read_record(line, "20e,20e,20e,20e")
+            data = read_record(line, fmt)
             data = prune_nones_list(data)
             indom["rocks"][rock] = {"initial_condition": data}
         else:
@@ -349,8 +357,10 @@ def _read_indom(f):
 
 def _read_momop(f):
     """Read MOMOP block data."""
+    fmt = block_to_format_dict["MOMOP"]
+
     line = next(f)
-    data = read_record(line, "40S")
+    data = read_record(line, fmt)
     momop = {
         "more_options": {i + 1: int(x) for i, x in enumerate(data[0]) if x.isdigit()}
     }
@@ -360,17 +370,18 @@ def _read_momop(f):
 
 def _read_times(f):
     """Read TIMES block data."""
+    fmt = block_to_format_dict["TIMES"]
     times = {"times": []}
 
     # Record 1
     line = next(f)
-    data = read_record(line, "5d,5d,10e,10e")
+    data = read_record(line, fmt[1])
     n_times = data[0]
 
     # Record 2
     while len(times["times"]) < n_times:
         line = next(f)
-        data = read_record(line, "10e,10e,10e,10e,10e,10e,10e,10e")
+        data = read_record(line, fmt[2])
         times["times"] += prune_nones_list(data)
 
     if n_times == 1:
@@ -396,13 +407,14 @@ def _read_oft(f, oft):
 
 def _read_gener(f):
     """Read GENER block data."""
+    fmt = block_to_format_dict["GENER"]
     gener = {"generators": {}}
 
     while True:
         line = next(f)
 
         if line.strip():
-            data = read_record(line, "5s,5s,5d,5d,5d,5d,5s,4s,1s,10e,10e,10e")
+            data = read_record(line, fmt[5])
             label = data[0]
             tmp = {
                 "name": [data[1]],
@@ -417,7 +429,7 @@ def _read_gener(f):
 
                     while len(table) < ltab:
                         line = next(f)
-                        data = read_record(line, "14e,14e,14e,14e")
+                        data = read_record(line, fmt[0])
                         table += prune_nones_list(data)
 
                     tmp[key] = [table]
@@ -454,11 +466,12 @@ def _read_gener(f):
 
 def _read_diffu(f):
     """Read DIFFU block data."""
+    fmt = block_to_format_dict["DIFFU"]
     diffu = {"diffusion": []}
 
     for _ in range(2):
         line = next(f)
-        data = read_record(line, "10e,10e,10e,10e,10e,10e,10e,10e")
+        data = read_record(line, fmt)
         diffu["diffusion"].append(prune_nones_list(data))
 
     return diffu
@@ -466,6 +479,7 @@ def _read_diffu(f):
 
 def _read_outpu(f):
     """Read OUTPU block data."""
+    fmt = block_to_format_dict["OUTPU"]
     outpu = {"output": {}}
 
     # Format
@@ -481,7 +495,7 @@ def _read_outpu(f):
 
         for _ in range(n_var):
             line = next(f)
-            data = read_record(line, "20s,5d,5d")
+            data = read_record(line, fmt)
             name = data[0].lower()
             outpu["output"]["variables"][name] = prune_nones_list(data[1:])
             outpu["output"]["variables"][name] = (
@@ -497,13 +511,14 @@ def _read_outpu(f):
 
 def _read_eleme(f):
     """Read ELEME block data."""
+    fmt = block_to_format_dict["ELEME"]
     eleme = {"elements": {}, "elements_order": []}
 
     while True:
         line = next(f)
 
         if line.strip():
-            data = read_record(line, "5s,5d,5d,5s,10e,10e,10e,10e,10e,10e")
+            data = read_record(line, fmt[5])
             label = data[0]
             rock = data[3].strip()
             eleme["elements"][label] = {
@@ -525,13 +540,14 @@ def _read_eleme(f):
 
 def _read_conne(f):
     """Read CONNE block data."""
+    fmt = block_to_format_dict["CONNE"]
     conne = {"connections": {}, "connections_order": []}
 
     while True:
         line = next(f)
 
         if line.strip():
-            data = read_record(line, "10s,5d,5d,5d,5d,10e,10e,10e,10e,10e")
+            data = read_record(line, fmt[5])
             label = data[0]
             conne["connections"][label] = {
                 "permeability_direction": data[4],
@@ -554,6 +570,7 @@ def _read_conne(f):
 
 def _read_incon(f):
     """Read INCON block data."""
+    fmt = block_to_format_dict["INCON"]
     incon = {"initial_conditions": {}, "initial_conditions_order": []}
 
     while True:
@@ -561,7 +578,7 @@ def _read_incon(f):
 
         if line.strip() and not line.startswith("+++"):
             # Record 1
-            data = read_record(line, "5s,5d,5d,15e,10e,10e,10e,10e,10e")
+            data = read_record(line, fmt[5])
             label = data[0]
             userx = prune_nones_list(data[4:9])
             incon["initial_conditions"][label] = {
@@ -571,7 +588,7 @@ def _read_incon(f):
 
             # Record 2
             line = next(f)
-            data = read_record(line, "20e,20e,20e,20e")
+            data = read_record(line, fmt[0])
             incon["initial_conditions"][label]["values"] = prune_nones_list(data)
 
             incon["initial_conditions_order"].append(label)

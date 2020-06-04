@@ -286,7 +286,7 @@ def read_record(data, fmt):
     i = 0
     out = []
     for token in fmt.split(","):
-        n = int(token[:-1])
+        n = int(token[:-1].split(".")[0])
         tmp = data[i : i + n]
         tmp = tmp if token[-1] == "S" else tmp.strip()
         out.append(token_to_type[token[-1]](tmp) if tmp else None)
