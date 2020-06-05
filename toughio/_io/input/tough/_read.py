@@ -1,7 +1,7 @@
 from __future__ import division, with_statement
 
 from ._helpers import prune_nones_dict, prune_nones_list, read_record
-from ...._common import block_to_format_dict
+from ...._common import block_to_format
 
 __all__ = [
     "read",
@@ -106,7 +106,7 @@ def read_buffer(f):
 
 def _read_rocks(f):
     """Read ROCKS block data."""
-    fmt = block_to_format_dict["ROCKS"]
+    fmt = block_to_format["ROCKS"]
     rocks = {"rocks": {}, "rocks_order": []}
 
     while True:
@@ -155,7 +155,7 @@ def _read_rocks(f):
 
 def _read_rpcap(f):
     """Read RPCAP block data."""
-    fmt = block_to_format_dict["RPCAP"]
+    fmt = block_to_format["RPCAP"]
     rpcap = {}
 
     for key in ["relative_permeability", "capillarity"]:
@@ -172,7 +172,7 @@ def _read_rpcap(f):
 
 def _read_flac(f, rocks_order):
     """Read FLAC block data."""
-    fmt = block_to_format_dict["FLAC"]
+    fmt = block_to_format["FLAC"]
     flac = {"rocks": {}, "flac": {}}
 
     # Record 1
@@ -207,7 +207,7 @@ def _read_flac(f, rocks_order):
 
 def _read_multi(f):
     """Read MULTI block data."""
-    fmt = block_to_format_dict["MULTI"]
+    fmt = block_to_format["MULTI"]
     multi = {}
 
     line = next(f)
@@ -221,7 +221,7 @@ def _read_multi(f):
 
 def _read_selec(f):
     """Read SELEC block data."""
-    fmt = block_to_format_dict["SELEC"]
+    fmt = block_to_format["SELEC"]
     selec = {"selections": {}}
 
     line = next(f)
@@ -244,7 +244,7 @@ def _read_selec(f):
 
 def _read_solvr(f):
     """Read SOLVR block data."""
-    fmt = block_to_format_dict["SOLVR"]
+    fmt = block_to_format["SOLVR"]
     solvr = {}
 
     line = next(f)
@@ -262,7 +262,7 @@ def _read_solvr(f):
 
 def _read_param(f):
     """Read PARAM block data."""
-    fmt = block_to_format_dict["PARAM"]
+    fmt = block_to_format["PARAM"]
     param = {}
 
     # Record 1
@@ -339,7 +339,7 @@ def _read_param(f):
 
 def _read_indom(f):
     """Read INDOM block data."""
-    fmt = block_to_format_dict["INDOM"]
+    fmt = block_to_format["INDOM"]
     indom = {"rocks": {}}
 
     while True:
@@ -359,7 +359,7 @@ def _read_indom(f):
 
 def _read_momop(f):
     """Read MOMOP block data."""
-    fmt = block_to_format_dict["MOMOP"]
+    fmt = block_to_format["MOMOP"]
 
     line = next(f)
     data = read_record(line, fmt)
@@ -372,7 +372,7 @@ def _read_momop(f):
 
 def _read_times(f):
     """Read TIMES block data."""
-    fmt = block_to_format_dict["TIMES"]
+    fmt = block_to_format["TIMES"]
     times = {"times": []}
 
     # Record 1
@@ -409,7 +409,7 @@ def _read_oft(f, oft):
 
 def _read_gener(f):
     """Read GENER block data."""
-    fmt = block_to_format_dict["GENER"]
+    fmt = block_to_format["GENER"]
     gener = {"generators": {}}
 
     while True:
@@ -468,7 +468,7 @@ def _read_gener(f):
 
 def _read_diffu(f):
     """Read DIFFU block data."""
-    fmt = block_to_format_dict["DIFFU"]
+    fmt = block_to_format["DIFFU"]
     diffu = {"diffusion": []}
 
     for _ in range(2):
@@ -481,7 +481,7 @@ def _read_diffu(f):
 
 def _read_outpu(f):
     """Read OUTPU block data."""
-    fmt = block_to_format_dict["OUTPU"]
+    fmt = block_to_format["OUTPU"]
     outpu = {"output": {}}
 
     # Format
@@ -513,7 +513,7 @@ def _read_outpu(f):
 
 def _read_eleme(f):
     """Read ELEME block data."""
-    fmt = block_to_format_dict["ELEME"]
+    fmt = block_to_format["ELEME"]
     eleme = {"elements": {}, "elements_order": []}
 
     while True:
@@ -542,7 +542,7 @@ def _read_eleme(f):
 
 def _read_conne(f):
     """Read CONNE block data."""
-    fmt = block_to_format_dict["CONNE"]
+    fmt = block_to_format["CONNE"]
     conne = {"connections": {}, "connections_order": []}
 
     while True:
@@ -572,7 +572,7 @@ def _read_conne(f):
 
 def _read_incon(f):
     """Read INCON block data."""
-    fmt = block_to_format_dict["INCON"]
+    fmt = block_to_format["INCON"]
     incon = {"initial_conditions": {}, "initial_conditions_order": []}
 
     while True:
