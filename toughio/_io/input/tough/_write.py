@@ -12,7 +12,7 @@ from ._helpers import (
     dtypes,
     write_record,
 )
-from ...._common import block_to_format_dict, str2format
+from ...._common import block_to_format, str2format
 
 __all__ = [
     "write",
@@ -143,11 +143,11 @@ def _write_rocks(parameters):
         order = parameters["rocks"].keys()
 
     # Formats
-    fmt = block_to_format_dict["ROCKS"]
+    fmt = block_to_format["ROCKS"]
     fmt1 = str2format(fmt[1])
     fmt2 = str2format(fmt[2])
 
-    fmt = block_to_format_dict["RPCAP"]
+    fmt = block_to_format["RPCAP"]
     fmt3 = str2format(fmt)
 
     out = []
@@ -231,7 +231,7 @@ def _write_rpcap(parameters):
     data.update(parameters["default"])
 
     # Formats
-    fmt = block_to_format_dict["RPCAP"]
+    fmt = block_to_format["RPCAP"]
     fmt = str2format(fmt)
 
     out = []
@@ -272,7 +272,7 @@ def _write_flac(parameters):
         order = parameters["rocks"].keys()
 
     # Formats
-    fmt = block_to_format_dict["FLAC"]
+    fmt = block_to_format["FLAC"]
     fmt1 = str2format(fmt[1])
     fmt2 = str2format(fmt[2])
     fmt3 = str2format(fmt[3])
@@ -311,7 +311,7 @@ def _write_multi(parameters):
     from ._common import eos
 
     # Formats
-    fmt = block_to_format_dict["MULTI"]
+    fmt = block_to_format["MULTI"]
     fmt = str2format(fmt)
 
     values = list(eos[parameters["eos"]]) if parameters["eos"] else [0, 0, 0, 6]
@@ -347,7 +347,7 @@ def _write_selec(parameters):
         data["floats"] = parameters["selections"]["floats"]
 
     # Formats
-    fmt = block_to_format_dict["SELEC"]
+    fmt = block_to_format["SELEC"]
     fmt1 = str2format(fmt[1])
     fmt2 = str2format(fmt[2])
 
@@ -372,7 +372,7 @@ def _write_solvr(parameters):
     data.update(parameters["solver"])
 
     # Formats
-    fmt = block_to_format_dict["SOLVR"]
+    fmt = block_to_format["SOLVR"]
     fmt = str2format(fmt)
 
     values = [
@@ -414,7 +414,7 @@ def _write_param(parameters):
         data["t_steps"] = [data["t_steps"]]
 
     # Formats
-    fmt = block_to_format_dict["PARAM"]
+    fmt = block_to_format["PARAM"]
     fmt1 = str2format(fmt[1])
     fmt2 = str2format(fmt[2])
     fmt3 = str2format(fmt[3])
@@ -486,7 +486,7 @@ def _write_indom(parameters):
         order = parameters["rocks"].keys()
 
     # Formats
-    fmt = block_to_format_dict["INDOM"]
+    fmt = block_to_format["INDOM"]
     fmt = str2format(fmt[5]) + str2format(fmt[0])
     fmt[0] = "{}\n".format(fmt[0])
 
@@ -509,7 +509,7 @@ def _write_momop(parameters):
     from ._common import more_options
 
     # Formats
-    fmt = block_to_format_dict["MOMOP"]
+    fmt = block_to_format["MOMOP"]
     fmt = str2format(fmt)
 
     _momop = deepcopy(more_options)
@@ -528,7 +528,7 @@ def _write_times(parameters):
     data = data if numpy.ndim(data) else [data]
 
     # Formats
-    fmt = block_to_format_dict["TIMES"]
+    fmt = block_to_format["TIMES"]
     fmt1 = str2format(fmt[1])
     fmt2 = str2format(fmt[2])
 
@@ -545,7 +545,7 @@ def _write_times(parameters):
 def _write_foft(parameters):
     """Write FOFT block data."""
     # Formats
-    fmt = block_to_format_dict["FOFT"]
+    fmt = block_to_format["FOFT"]
     fmt = str2format(fmt[5])
 
     values = [x for x in parameters["element_history"]]
@@ -558,7 +558,7 @@ def _write_foft(parameters):
 def _write_coft(parameters):
     """Write COFT block data."""
     # Format
-    fmt = block_to_format_dict["COFT"]
+    fmt = block_to_format["COFT"]
     fmt = str2format(fmt[5])
 
     values = [x for x in parameters["connection_history"]]
@@ -571,7 +571,7 @@ def _write_coft(parameters):
 def _write_goft(parameters):
     """Write GOFT block data."""
     # Format
-    fmt = block_to_format_dict["GOFT"]
+    fmt = block_to_format["GOFT"]
     fmt = str2format(fmt[5])
 
     values = [x for x in parameters["generator_history"]]
@@ -627,7 +627,7 @@ def _write_gener(parameters):
             generator_data.append((k, data))
 
     # Format
-    fmt = block_to_format_dict["GENER"]
+    fmt = block_to_format["GENER"]
     fmt1 = str2format(fmt[5])
     fmt2 = str2format(fmt[0])
 
@@ -694,7 +694,7 @@ def _write_diffu(parameters):
     mass1, mass2 = parameters["diffusion"]
 
     # Format
-    fmt = block_to_format_dict["DIFFU"]
+    fmt = block_to_format["DIFFU"]
     fmt = str2format(fmt)
 
     # Record 1
@@ -717,7 +717,7 @@ def _write_outpu(parameters):
     data.update(parameters["output"])
 
     # Format
-    fmt = block_to_format_dict["OUTPU"]
+    fmt = block_to_format["OUTPU"]
     fmt1 = str2format(fmt[1])
     fmt2 = str2format(fmt[2])
     fmt3 = str2format(fmt[3])
@@ -759,7 +759,7 @@ def _write_eleme(parameters):
         order = parameters["elements"].keys()
 
     # Format
-    fmt = block_to_format_dict["ELEME"]
+    fmt = block_to_format["ELEME"]
     fmt = str2format(fmt[5])
 
     out = []
@@ -797,7 +797,7 @@ def _write_conne(parameters):
         order = parameters["connections"].keys()
 
     # Format
-    fmt = block_to_format_dict["CONNE"]
+    fmt = block_to_format["CONNE"]
     fmt = str2format(fmt[5])
 
     out = []
@@ -835,7 +835,7 @@ def _write_incon(parameters):
         order = parameters["initial_conditions"].keys()
 
     # Format
-    fmt = block_to_format_dict["INCON"]
+    fmt = block_to_format["INCON"]
     fmt1 = str2format(fmt[5])
     fmt2 = str2format(fmt[0])
 

@@ -6,7 +6,7 @@ __all__ = [
 ]
 
 
-block_to_format_dict = {
+block_to_format = {
     "ROCKS": {
         1: "5s,5d,10.4e,10.4e,10.4e,10.4e,10.4e,10.4e,10.4e",
         2: ",".join(7 * ["10.4e"]),
