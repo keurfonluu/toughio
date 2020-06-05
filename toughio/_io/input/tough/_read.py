@@ -207,12 +207,14 @@ def _read_flac(f, rocks_order):
 
 def _read_multi(f):
     """Read MULTI block data."""
+    fmt = block_to_format_dict["MULTI"]
     multi = {}
 
-    line = next(f).split()
-    multi["n_component"] = int(line[0])
-    multi["isothermal"] = int(line[1]) == int(line[0])
-    multi["n_phase"] = int(line[2])
+    line = next(f)
+    data = read_record(line, fmt)
+    multi["n_component"] = data[0]
+    multi["isothermal"] = data[1] == data[0]
+    multi["n_phase"] = data[2]
 
     return multi
 
@@ -344,9 +346,9 @@ def _read_indom(f):
         line = next(f)
 
         if line.strip():
-            rock = line[:5]
+            rock = read_record(line, fmt[5])[0]
             line = next(f)
-            data = read_record(line, fmt)
+            data = read_record(line, fmt[0])
             data = prune_nones_list(data)
             indom["rocks"][rock] = {"initial_condition": data}
         else:
@@ -495,7 +497,7 @@ def _read_outpu(f):
 
         for _ in range(n_var):
             line = next(f)
-            data = read_record(line, fmt)
+            data = read_record(line, fmt[3])
             name = data[0].lower()
             outpu["output"]["variables"][name] = prune_nones_list(data[1:])
             outpu["output"]["variables"][name] = (
