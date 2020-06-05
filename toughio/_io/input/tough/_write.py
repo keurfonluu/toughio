@@ -310,21 +310,27 @@ def _write_multi(parameters):
     """Write MULTI block data."""
     from ._common import eos
 
-    out = list(eos[parameters["eos"]]) if parameters["eos"] else [0, 0, 0, 6]
-    out[0] = parameters["n_component"] if parameters["n_component"] else out[0]
-    out[1] = out[0] if parameters["isothermal"] else out[0] + 1
-    out[2] = parameters["n_phase"] if parameters["n_phase"] else out[2]
+    # Formats
+    fmt = block_to_format_dict["MULTI"]
+    fmt = str2format(fmt)
+
+    values = list(eos[parameters["eos"]]) if parameters["eos"] else [0, 0, 0, 6]
+    values[0] = parameters["n_component"] if parameters["n_component"] else values[0]
+    values[1] = values[0] if parameters["isothermal"] else values[0] + 1
+    values[2] = parameters["n_phase"] if parameters["n_phase"] else values[2]
 
     # Handle diffusion
     if parameters["diffusion"]:
-        out[3] = 8
-        parameters["n_phase"] = out[2]  # Save for later check
+        values[3] = 8
+        parameters["n_phase"] = values[2]  # Save for later check
 
     # Number of mass components
     if parameters["n_component_mass"]:
-        out.append(parameters["n_component_mass"])
+        values.append(parameters["n_component_mass"])
 
-    return [("{:>5d}" * len(out) + "\n").format(*out)]
+    out = write_record(values, fmt)
+
+    return out
 
 
 @check_parameters(dtypes["SELEC"], keys="selections")
