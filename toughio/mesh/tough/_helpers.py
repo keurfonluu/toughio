@@ -57,14 +57,14 @@ def _write_eleme(labels, materials, volumes, nodes, material_name=None):
 
 def _write_conne(clabels, isot, d1, d2, areas, angles):
     """Return a generator that iterates over the records of block CONNE."""
-    label_length = len(clabels[0]) // 2
+    label_length = len(clabels[0][0])
     fmt = block_to_format["CONNE"][label_length]
     fmt = "{}\n".format("".join(str2format(fmt, ignore_types=[1, 2, 3, 9])))
 
     iterables = zip(clabels, isot, d1, d2, areas, angles)
     for label, isot, d1, d2, area, angle in iterables:
         record = fmt.format(
-            label,  # ID1-ID2
+            "".join(label),  # ID1-ID2
             "",  # NSEQ
             "",  # NAD1
             "",  # NAD2
