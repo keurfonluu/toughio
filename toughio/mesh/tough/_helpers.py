@@ -4,6 +4,7 @@ __all__ = [
     "block",
     "_write_eleme",
     "_write_conne",
+    "_write_incon",
 ]
 
 
@@ -28,7 +29,8 @@ def block(keyword):
 
 def _write_eleme(labels, materials, volumes, nodes, material_name=None):
     """Return a generator that iterates over the records of block ELEME."""
-    fmt = block_to_format["ELEME"][5]
+    label_length = len(labels[0])
+    fmt = block_to_format["ELEME"][label_length]
     fmt = "{}\n".format("".join(str2format(fmt, ignore_types=[1, 2, 5, 6])))
 
     iterables = zip(labels, materials, volumes, nodes)
@@ -55,7 +57,8 @@ def _write_eleme(labels, materials, volumes, nodes, material_name=None):
 
 def _write_conne(clabels, isot, d1, d2, areas, angles):
     """Return a generator that iterates over the records of block CONNE."""
-    fmt = block_to_format["CONNE"][5]
+    label_length = len(clabels[0]) // 2
+    fmt = block_to_format["CONNE"][label_length]
     fmt = "{}\n".format("".join(str2format(fmt, ignore_types=[1, 2, 3, 9])))
 
     iterables = zip(clabels, isot, d1, d2, areas, angles)
@@ -79,6 +82,7 @@ def _write_incon(labels, values, porosity=None, userx=None):
     """Return a generator that iterates over the records of block INCON."""
     porosity = porosity if porosity is not None else [None] * len(labels)
     userx = userx if userx is not None else [None] * len(labels)
+    label_length = len(labels[0])
     fmt = block_to_format["INCON"]
 
     iterables = zip(labels, values, porosity, userx)
@@ -103,7 +107,7 @@ def _write_incon(labels, values, porosity=None, userx=None):
                 values += 3 * [""]
                 ignore_types += [4, 5, 6]
 
-            fmt1 = str2format(fmt[5], ignore_types=ignore_types)
+            fmt1 = str2format(fmt[label_length], ignore_types=ignore_types)
             fmt1 = "{}\n".format("".join(fmt1[:len(values)]))
             record = fmt1.format(*values)
 

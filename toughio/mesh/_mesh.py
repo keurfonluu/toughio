@@ -68,6 +68,7 @@ class Mesh(object):
         self.field_data = field_data if field_data else {}
         self.point_sets = point_sets if point_sets else {}
         self.cell_sets = cell_sets if cell_sets else {}
+        self.label_length = None
 
     def __repr__(self):
         """Represent a :class:`toughio.Mesh`."""
@@ -702,11 +703,20 @@ class Mesh(object):
         return sum(len(c.data) for c in self.cells)
 
     @property
+    def label_length(self):
+        """Return length of labels."""
+        return self._label_length
+
+    @label_length.setter
+    def label_length(self, value):
+        self._label_length = value
+
+    @property
     def labels(self):
         """Return labels of cell in mesh."""
         from ._common import labeler
 
-        return labeler(self.n_cells)
+        return labeler(self.n_cells, self.label_length)
 
     @property
     def centers(self):
