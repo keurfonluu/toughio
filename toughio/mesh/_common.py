@@ -1,3 +1,5 @@
+import logging
+
 import meshio
 import numpy
 
@@ -187,7 +189,7 @@ def get_new_meshio_cells(cells, cell_data=None):
         return new_cells
 
 
-def labeler(n_cells, label_length=5):
+def labeler(n_cells, label_length=None):
     """
     Return an array of `label_length`-character long cell labels.
 
@@ -195,8 +197,8 @@ def labeler(n_cells, label_length=5):
     ----------
     n_cells : int
         Number of cells.
-    label_length : int, optional, default 5
-        Number of characters in label.
+    label_length : int or None, optional, default None
+        Number of characters in cell labels.
 
     Returns
     -------
@@ -209,6 +211,12 @@ def labeler(n_cells, label_length=5):
 
     """
     from string import ascii_uppercase
+
+    if not label_length:
+        bins = 3185000 * 10**numpy.arange(5, dtype=numpy.int64) + 1
+        label_length = numpy.digitize(n_cells, bins) + 5
+        if label_length > 5:
+            logging.warning("Cell labels are {}-character long.".format(label_length))
     
     n = label_length - 3
     fmt = "{{:0>{}}}".format(n)
