@@ -1,3 +1,5 @@
+from ..._common import block_to_format, str2format
+
 __all__ = [
     "block",
     "_write_eleme",
@@ -26,7 +28,8 @@ def block(keyword):
 
 def _write_eleme(labels, materials, volumes, nodes, material_name=None):
     """Return a generator that iterates over the records of block ELEME."""
-    fmt = "{:>5.5}{:>5}{:>5}{:>5}{:10.4e}{:>10}{:>10}{:10.3e}{:10.3e}{:10.3e}\n"
+    fmt = block_to_format["ELEME"][5]
+    fmt = "{}\n".format("".join(str2format(fmt, ignore_types=[1, 2, 5, 6])))
 
     iterables = zip(labels, materials, volumes, nodes)
     for label, material, volume, node in iterables:
@@ -52,7 +55,8 @@ def _write_eleme(labels, materials, volumes, nodes, material_name=None):
 
 def _write_conne(clabels, isot, d1, d2, areas, angles):
     """Return a generator that iterates over the records of block CONNE."""
-    fmt = "{:>10.10}{:>5}{:>5}{:>5}{:>5g}{:10.4e}{:10.4e}{:10.4e}{:10.3e}\n"
+    fmt = block_to_format["CONNE"][5]
+    fmt = "{}\n".format("".join(str2format(fmt, ignore_types=[1, 2, 3, 9])))
 
     iterables = zip(clabels, isot, d1, d2, areas, angles)
     for label, isot, d1, d2, area, angle in iterables:
@@ -66,6 +70,7 @@ def _write_conne(clabels, isot, d1, d2, areas, angles):
             d2,  # D2
             area,  # AREAX
             angle,  # BETAX
+            "",  # SIGX
         )
         yield record
 
@@ -74,6 +79,7 @@ def _write_incon(labels, values, porosity=None, userx=None):
     """Return a generator that iterates over the records of block INCON."""
     porosity = porosity if porosity is not None else [None] * len(labels)
     userx = userx if userx is not None else [None] * len(labels)
+    fmt = block_to_format["INCON"]
 
     iterables = zip(labels, values, porosity, userx)
     for label, value, phi, usrx in iterables:
@@ -81,18 +87,39 @@ def _write_incon(labels, values, porosity=None, userx=None):
         cond2 = phi is not None
         cond3 = usrx is not None
         if cond1 or cond2 or cond3:
-            record = "{:>5.5}{:10}".format(label, "")
+            # Record 1
+            values = [label, "", ""]
+            ignore_types = [1, 2]
 
-            record += "{:15.9e}".format(phi) if phi is not None else "{:15}".format("")
+            if phi is not None:
+                values.append(phi)
+            else:
+                values.append("")
+                ignore_types.append(3)
 
             if usrx is not None:
-                fmt = "{:10.3e}" * len(usrx)
-                record += fmt.format(*usrx)
-            record += "\n"
+                values += list(usrx)
+            else:
+                values += 3 * [""]
+                ignore_types += [4, 5, 6]
 
-            for v in value:
-                record += "{:20.13e}".format(v) if v > -1.0e9 else "{:20}".format("")
-            record += "\n"
+            fmt1 = str2format(fmt[5], ignore_types=ignore_types)
+            fmt1 = "{}\n".format("".join(fmt1[:len(values)]))
+            record = fmt1.format(*values)
+
+            # Record 2
+            values = []
+            ignore_types = []
+            for i, v in enumerate(value):
+                if v > -1.0e9:
+                    values.append(v)
+                else:
+                    values.append("")
+                    ignore_types.append(i)
+
+            fmt2 = str2format(fmt[0], ignore_types=ignore_types)
+            fmt2 = "{}\n".format("".join(fmt2[:len(values)]))
+            record += fmt2.format(*values)
 
             yield record
         else:
