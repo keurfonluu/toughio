@@ -8,7 +8,7 @@ __all__ = [
 ]
 
 
-def read(filename):
+def read(filename, label_length=None):
     """
     Read TOUGH input file.
 
@@ -16,6 +16,8 @@ def read(filename):
     ----------
     filename : str
         Input file name.
+    label_length : int or None, optional, default None
+        Number of characters in cell labels.
 
     Returns
     -------
@@ -23,12 +25,15 @@ def read(filename):
         TOUGH input parameters.
 
     """
+    label_length = label_length if label_length else 5
+
     with open(filename, "r") as f:
-        out = read_buffer(f)
+        out = read_buffer(f, label_length)
+
     return out
 
 
-def read_buffer(f):
+def read_buffer(f, label_length):
     """Read TOUGH input file."""
     parameters = {}
 
@@ -85,17 +90,17 @@ def read_buffer(f):
         elif line.startswith("GOFT"):
             parameters.update(_read_oft(f, "generator_history"))
         elif line.startswith("GENER"):
-            parameters.update(_read_gener(f))
+            parameters.update(_read_gener(f, label_length))
         elif line.startswith("DIFFU"):
             parameters.update(_read_diffu(f))
         elif line.startswith("OUTPU"):
             parameters.update(_read_outpu(f))
         elif line.startswith("ELEME"):
-            parameters.update(_read_eleme(f))
+            parameters.update(_read_eleme(f, label_length))
         elif line.startswith("CONNE"):
-            parameters.update(_read_conne(f))
+            parameters.update(_read_conne(f, label_length))
         elif line.startswith("INCON"):
-            parameters.update(_read_incon(f))
+            parameters.update(_read_incon(f, label_length))
         elif line.startswith("NOVER"):
             parameters["nover"] = True
         elif line.startswith("ENDCY"):
@@ -407,7 +412,7 @@ def _read_oft(f, oft):
     return history
 
 
-def _read_gener(f):
+def _read_gener(f, label_length):
     """Read GENER block data."""
     fmt = block_to_format["GENER"]
     gener = {"generators": {}}
@@ -416,7 +421,7 @@ def _read_gener(f):
         line = next(f)
 
         if line.strip():
-            data = read_record(line, fmt[5])
+            data = read_record(line, fmt[label_length])
             label = data[0]
             tmp = {
                 "name": [data[1]],
@@ -511,7 +516,7 @@ def _read_outpu(f):
     return outpu
 
 
-def _read_eleme(f):
+def _read_eleme(f, label_length):
     """Read ELEME block data."""
     fmt = block_to_format["ELEME"]
     eleme = {"elements": {}, "elements_order": []}
@@ -520,7 +525,7 @@ def _read_eleme(f):
         line = next(f)
 
         if line.strip():
-            data = read_record(line, fmt[5])
+            data = read_record(line, fmt[label_length])
             label = data[0]
             rock = data[3].strip()
             eleme["elements"][label] = {
@@ -540,7 +545,7 @@ def _read_eleme(f):
     return eleme
 
 
-def _read_conne(f):
+def _read_conne(f, label_length):
     """Read CONNE block data."""
     fmt = block_to_format["CONNE"]
     conne = {"connections": {}, "connections_order": []}
@@ -549,7 +554,7 @@ def _read_conne(f):
         line = next(f)
 
         if line.strip():
-            data = read_record(line, fmt[5])
+            data = read_record(line, fmt[label_length])
             label = data[0]
             conne["connections"][label] = {
                 "permeability_direction": data[4],
@@ -570,7 +575,7 @@ def _read_conne(f):
     return conne
 
 
-def _read_incon(f):
+def _read_incon(f, label_length):
     """Read INCON block data."""
     fmt = block_to_format["INCON"]
     incon = {"initial_conditions": {}, "initial_conditions_order": []}
@@ -580,7 +585,7 @@ def _read_incon(f):
 
         if line.strip() and not line.startswith("+++"):
             # Record 1
-            data = read_record(line, fmt[5])
+            data = read_record(line, fmt[label_length])
             label = data[0]
             userx = prune_nones_list(data[4:9])
             incon["initial_conditions"][label] = {
