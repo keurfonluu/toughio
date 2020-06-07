@@ -627,8 +627,9 @@ def _write_gener(parameters):
             generator_data.append((k, data))
 
     # Format
+    label_length = len(max(parameters["generators"], key=len))
     fmt = block_to_format["GENER"]
-    fmt1 = str2format(fmt[5])
+    fmt1 = str2format(fmt[label_length])
     fmt2 = str2format(fmt[0])
 
     out = []
@@ -759,8 +760,9 @@ def _write_eleme(parameters):
         order = parameters["elements"].keys()
 
     # Format
+    label_length = len(max(parameters["elements"], key=len))
     fmt = block_to_format["ELEME"]
-    fmt = str2format(fmt[5])
+    fmt = str2format(fmt[label_length])
 
     out = []
     for k in order:
@@ -797,8 +799,9 @@ def _write_conne(parameters):
         order = parameters["connections"].keys()
 
     # Format
+    label_length = len(max(parameters["connections"], key=len)) // 2
     fmt = block_to_format["CONNE"]
-    fmt = str2format(fmt[5])
+    fmt = str2format(fmt[label_length])
 
     out = []
     for k in order:
@@ -835,8 +838,9 @@ def _write_incon(parameters):
         order = parameters["initial_conditions"].keys()
 
     # Format
+    label_length = len(max(parameters["initial_conditions"], key=len))
     fmt = block_to_format["INCON"]
-    fmt1 = str2format(fmt[5])
+    fmt1 = str2format(fmt[label_length])
     fmt2 = str2format(fmt[0])
 
     out = []
