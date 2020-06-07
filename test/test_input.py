@@ -4,20 +4,22 @@ import pytest
 import helpers
 import toughio
 
-write_read_tough = lambda x: helpers.write_read(
+write_read = lambda x, **kwargs: helpers.write_read(
     "INFILE",
     x,
     toughio.write_input,
     toughio.read_input,
+    **kwargs,
+)
+
+write_read_tough = lambda x: write_read(
+    x,
     writer_kws={"file_format": "tough"},
     reader_kws={"file_format": "tough"},
 )
 
-write_read_json = lambda x: helpers.write_read(
-    "INFILE",
+write_read_json = lambda x: write_read(
     x,
-    toughio.write_input,
-    toughio.read_input,
     writer_kws={"file_format": "json"},
     reader_kws={"file_format": "json"},
 )
@@ -361,12 +363,26 @@ def test_oft(write_read, oft, n):
     assert parameters_ref[oft] == parameters[oft]
 
 
-@pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
-def test_gener(write_read):
+@pytest.mark.parametrize(
+    "file_format, label_length",
+    [
+        ("tough", 5),
+        ("json", 5),
+        ("tough", 6),
+        ("json", 6),
+    ],
+)
+def test_gener(file_format, label_length):
+    reader_kws = {"file_format": file_format}
+    writer_kws = {"file_format": file_format}
+
+    if file_format == "tough":
+        reader_kws["label_length"] = label_length
+    
     n_rnd = numpy.random.randint(100) + 1
     parameters_ref = {
         "generators": {
-            helpers.random_string(5): {
+            helpers.random_string(label_length): {
                 "name": [
                     helpers.random_string(5),
                     helpers.random_string(5),
@@ -402,7 +418,7 @@ def test_gener(write_read):
             },
         },
     }
-    parameters = write_read(parameters_ref)
+    parameters = write_read(parameters_ref, reader_kws=reader_kws, writer_kws=writer_kws)
 
     assert sorted(parameters_ref["generators"].keys()) == sorted(
         parameters["generators"].keys()
@@ -470,8 +486,22 @@ def test_outpu(write_read, fmt):
     )
 
 
-@pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
-def test_eleme(write_read):
+@pytest.mark.parametrize(
+    "file_format, label_length",
+    [
+        ("tough", 5),
+        ("json", 5),
+        ("tough", 6),
+        ("json", 6),
+    ],
+)
+def test_eleme(file_format, label_length):
+    reader_kws = {"file_format": file_format}
+    writer_kws = {"file_format": file_format}
+
+    if file_format == "tough":
+        reader_kws["label_length"] = label_length
+
     keys = [
         "material",
         "volume",
@@ -481,7 +511,7 @@ def test_eleme(write_read):
     ]
     parameters_ref = {
         "elements": {
-            helpers.random_string(5): {
+            helpers.random_string(label_length): {
                 key: (
                     helpers.random_string(5)
                     if key == "material"
@@ -494,7 +524,7 @@ def test_eleme(write_read):
             for _ in range(numpy.random.randint(10) + 1)
         }
     }
-    parameters = write_read(parameters_ref)
+    parameters = write_read(parameters_ref, reader_kws=reader_kws, writer_kws=writer_kws)
 
     assert sorted(parameters_ref["elements"].keys()) == sorted(
         parameters["elements"].keys()
@@ -508,8 +538,22 @@ def test_eleme(write_read):
                 assert vv == parameters["elements"][k][kk]
 
 
-@pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
-def test_conne(write_read):
+@pytest.mark.parametrize(
+    "file_format, label_length",
+    [
+        ("tough", 5),
+        ("json", 5),
+        ("tough", 6),
+        ("json", 6),
+    ],
+)
+def test_conne(file_format, label_length):
+    reader_kws = {"file_format": file_format}
+    writer_kws = {"file_format": file_format}
+
+    if file_format == "tough":
+        reader_kws["label_length"] = label_length
+    
     keys = [
         "permeability_direction",
         "nodal_distances",
@@ -519,7 +563,7 @@ def test_conne(write_read):
     ]
     parameters_ref = {
         "connections": {
-            helpers.random_string(10): {
+            helpers.random_string(label_length * 2): {
                 key: (
                     numpy.random.randint(1, 4)
                     if key == "permeability_direction"
@@ -532,7 +576,7 @@ def test_conne(write_read):
             for _ in range(numpy.random.randint(10) + 1)
         }
     }
-    parameters = write_read(parameters_ref)
+    parameters = write_read(parameters_ref, reader_kws=reader_kws, writer_kws=writer_kws)
 
     assert sorted(parameters_ref["connections"].keys()) == sorted(
         parameters["connections"].keys()
@@ -543,8 +587,22 @@ def test_conne(write_read):
             assert numpy.allclose(vv, parameters["connections"][k][kk], atol=1.0e-4)
 
 
-@pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
-def test_incon(write_read):
+@pytest.mark.parametrize(
+    "file_format, label_length",
+    [
+        ("tough", 5),
+        ("json", 5),
+        ("tough", 6),
+        ("json", 6),
+    ],
+)
+def test_incon(file_format, label_length):
+    reader_kws = {"file_format": file_format}
+    writer_kws = {"file_format": file_format}
+
+    if file_format == "tough":
+        reader_kws["label_length"] = label_length
+    
     keys = [
         "porosity",
         "userx",
@@ -552,7 +610,7 @@ def test_incon(write_read):
     ]
     parameters_ref = {
         "initial_conditions": {
-            helpers.random_string(5): {
+            helpers.random_string(label_length): {
                 key: (
                     numpy.random.rand()
                     if key == "porosity"
@@ -565,7 +623,7 @@ def test_incon(write_read):
             for _ in range(numpy.random.randint(10) + 1)
         }
     }
-    parameters = write_read(parameters_ref)
+    parameters = write_read(parameters_ref, reader_kws=reader_kws, writer_kws=writer_kws)
 
     assert sorted(parameters_ref["initial_conditions"].keys()) == sorted(
         parameters["initial_conditions"].keys()
