@@ -25,6 +25,11 @@ def read(filename, label_length=None):
         TOUGH input parameters.
 
     """
+    if not (label_length is None or isinstance(label_length, int)):
+        raise TypeError()
+    if isinstance(label_length, int) and not 5 <= label_length < 10:
+        raise ValueError()
+
     with open(filename, "r") as f:
         out = read_buffer(f, label_length)
 
