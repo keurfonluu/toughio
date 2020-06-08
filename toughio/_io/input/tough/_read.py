@@ -1,7 +1,7 @@
 from __future__ import division, with_statement
 
 from ._helpers import prune_nones_dict, prune_nones_list, read_record
-from ...._common import block_to_format
+from ...._common import block_to_format, get_label_length
 
 __all__ = [
     "read",
@@ -25,8 +25,6 @@ def read(filename, label_length=None):
         TOUGH input parameters.
 
     """
-    label_length = label_length if label_length else 5
-
     with open(filename, "r") as f:
         out = read_buffer(f, label_length)
 
@@ -417,9 +415,11 @@ def _read_gener(f, label_length):
     fmt = block_to_format["GENER"]
     gener = {"generators": {}}
 
-    while True:
-        line = next(f)
+    line = next(f)
+    if not label_length:
+        label_length = get_label_length(line[:9])
 
+    while True:
         if line.strip():
             data = read_record(line, fmt[label_length])
             label = data[0]
@@ -456,6 +456,8 @@ def _read_gener(f, label_length):
                 gener["generators"][label] = tmp
         else:
             break
+
+        line = next(f)
 
     # Tidy up
     for generator in gener["generators"].values():
@@ -521,8 +523,11 @@ def _read_eleme(f, label_length):
     fmt = block_to_format["ELEME"]
     eleme = {"elements": {}, "elements_order": []}
 
+    line = next(f)
+    if not label_length:
+        label_length = get_label_length(line[:9])
+
     while True:
-        line = next(f)
 
         if line.strip():
             data = read_record(line, fmt[label_length])
@@ -540,6 +545,8 @@ def _read_eleme(f, label_length):
         else:
             break
 
+        line = next(f)
+
     eleme["elements"] = {k: prune_nones_dict(v) for k, v in eleme["elements"].items()}
 
     return eleme
@@ -550,9 +557,11 @@ def _read_conne(f, label_length):
     fmt = block_to_format["CONNE"]
     conne = {"connections": {}, "connections_order": []}
 
-    while True:
-        line = next(f)
+    line = next(f)
+    if not label_length:
+        label_length = get_label_length(line[:9])
 
+    while True:
         if line.strip():
             data = read_record(line, fmt[label_length])
             label = data[0]
@@ -568,6 +577,8 @@ def _read_conne(f, label_length):
         else:
             break
 
+        line = next(f)
+
     conne["connections"] = {
         k: prune_nones_dict(v) for k, v in conne["connections"].items()
     }
@@ -580,9 +591,11 @@ def _read_incon(f, label_length):
     fmt = block_to_format["INCON"]
     incon = {"initial_conditions": {}, "initial_conditions_order": []}
 
-    while True:
-        line = next(f)
+    line = next(f)
+    if not label_length:
+        label_length = get_label_length(line[:9])
 
+    while True:
         if line.strip() and not line.startswith("+++"):
             # Record 1
             data = read_record(line, fmt[label_length])
@@ -601,6 +614,8 @@ def _read_incon(f, label_length):
             incon["initial_conditions_order"].append(label)
         else:
             break
+
+        line = next(f)
 
     incon["initial_conditions"] = {
         k: prune_nones_dict(v) for k, v in incon["initial_conditions"].items()

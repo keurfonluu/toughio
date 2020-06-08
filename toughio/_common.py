@@ -1,10 +1,5 @@
 import os
 
-__all__ = [
-    "register_format",
-    "filetype_from_filename",
-]
-
 
 block_to_format = {
     "ROCKS": {
@@ -111,6 +106,15 @@ def str2format(fmt, ignore_types=None):
             out.append(base_fmt.format(">{}{}".format(n, token_to_format[token[-1]])))
     
     return out
+
+
+def get_label_length(label):
+    """Get length of cell label."""
+    label_length = 5
+    while label_length < len(label) and label[label_length].isdigit():
+        label_length += 1
+
+    return label_length
 
 
 def register_format(
