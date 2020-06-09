@@ -77,7 +77,7 @@ def _read_table(f, file_type, label_length):
                     tmp = (
                         [line[:label_length]] if file_type == "element" else [line[:label_length], line[label_length+2:2 * label_length + 2]]
                     )
-                    tmp += [str2float(l) for l in line[6 * ilab :].split()]
+                    tmp += [str2float(l) for l in line[(label_length + 1) * ilab :].split()]
                     variables[-1].append(tmp)
 
                 line = f.readline()
