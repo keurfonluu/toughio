@@ -58,7 +58,7 @@ def get_output_type(filename):
                 raise ValueError()
 
 
-def read(filename, labels_order=None, connection=False, **kwargs):
+def read(filename, labels_order=None, connection=False, label_length=None, **kwargs):
     """
     Read TOUGH SAVE or output file for each time step.
 
@@ -68,8 +68,13 @@ def read(filename, labels_order=None, connection=False, **kwargs):
         Input file name.
     labels_order : list of array_like or None, optional, default None
         List of labels.
+
+    Other Parameters
+    ----------------
     connection : bool, optional, default False
         Only for standard TOUGH output file. If `True`, return data related to connections.
+    label_length : int or None, optional, default None
+        Only for standard TOUGH output file. Number of characters in cell labels.
 
     Returns
     -------
@@ -87,8 +92,10 @@ def read(filename, labels_order=None, connection=False, **kwargs):
     file_type, file_format = get_output_type(filename)
     file_type = "connection" if (file_format == "tough" and connection) else file_type
 
+    _kwargs = {"label_length": label_length} if file_format == "tough" else {}
+    _kwargs.update(kwargs)
     return _reader_map[file_format](
-        filename, file_type, file_format, labels_order, **kwargs
+        filename, file_type, file_format, labels_order, **_kwargs
     )
 
 

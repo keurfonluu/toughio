@@ -13,11 +13,11 @@ __all__ = [
 ]
 
 
-def read(filename):
+def read(filename, label_length=None):
     """Read TOUGH MESH file."""
     from ... import read_input
 
-    mesh = read_input(filename, file_format="tough")
+    mesh = read_input(filename, file_format="tough", label_length=label_length)
     return {
         k: v
         for k, v in mesh.items()
