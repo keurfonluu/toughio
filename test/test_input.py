@@ -5,23 +5,15 @@ import helpers
 import toughio
 
 write_read = lambda x, **kwargs: helpers.write_read(
-    "INFILE",
-    x,
-    toughio.write_input,
-    toughio.read_input,
-    **kwargs,
+    "INFILE", x, toughio.write_input, toughio.read_input, **kwargs,
 )
 
 write_read_tough = lambda x: write_read(
-    x,
-    writer_kws={"file_format": "tough"},
-    reader_kws={"file_format": "tough"},
+    x, writer_kws={"file_format": "tough"}, reader_kws={"file_format": "tough"},
 )
 
 write_read_json = lambda x: write_read(
-    x,
-    writer_kws={"file_format": "json"},
-    reader_kws={"file_format": "json"},
+    x, writer_kws={"file_format": "json"}, reader_kws={"file_format": "json"},
 )
 
 
@@ -491,8 +483,7 @@ def test_outpu(write_read, fmt):
 )
 def test_eleme(write_read, label_length):
     labels = [
-        helpers.random_label(label_length) 
-        for _ in range(numpy.random.randint(10) + 1)
+        helpers.random_label(label_length) for _ in range(numpy.random.randint(10) + 1)
     ]
     keys = [
         "material",
@@ -588,8 +579,7 @@ def test_conne(write_read, label_length):
 )
 def test_incon(write_read, label_length):
     labels = [
-        helpers.random_label(label_length) 
-        for _ in range(numpy.random.randint(10) + 1)
+        helpers.random_label(label_length) for _ in range(numpy.random.randint(10) + 1)
     ]
     keys = [
         "porosity",

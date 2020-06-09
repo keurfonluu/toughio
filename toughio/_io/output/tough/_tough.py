@@ -2,9 +2,9 @@ from __future__ import with_statement
 
 import numpy
 
-from .._common import to_output
-from ...input.tough._helpers import str2float
 from ...._common import get_label_length
+from ...input.tough._helpers import str2float
+from .._common import to_output
 
 __all__ = [
     "read",
@@ -75,9 +75,16 @@ def _read_table(f, file_type, label_length):
                         label_length = get_label_length(line[:9])
 
                     tmp = (
-                        [line[:label_length]] if file_type == "element" else [line[:label_length], line[label_length+2:2 * label_length + 2]]
+                        [line[:label_length]]
+                        if file_type == "element"
+                        else [
+                            line[:label_length],
+                            line[label_length + 2 : 2 * label_length + 2],
+                        ]
                     )
-                    tmp += [str2float(l) for l in line[(label_length + 1) * ilab :].split()]
+                    tmp += [
+                        str2float(l) for l in line[(label_length + 1) * ilab :].split()
+                    ]
                     variables[-1].append(tmp)
 
                 line = f.readline()

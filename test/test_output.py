@@ -110,7 +110,10 @@ def test_output_conne(filename):
     ]
     for output, time_ref, data in zip(outputs, times_ref, data_ref):
         assert time_ref == output.time
-        assert len(set("".join(labels) for labels in output.labels)) == output.data["HEAT"].size
+        assert (
+            len(set("".join(labels) for labels in output.labels))
+            == output.data["HEAT"].size
+        )
         assert numpy.allclose(data, numpy.abs(output.data["HEAT"]).mean(), atol=1.0)
 
 

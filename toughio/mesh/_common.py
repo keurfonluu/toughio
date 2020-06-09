@@ -213,15 +213,15 @@ def labeler(n_cells, label_length=None):
     from string import ascii_uppercase
 
     if not label_length:
-        bins = 3185000 * 10**numpy.arange(5, dtype=numpy.int64) + 1
+        bins = 3185000 * 10 ** numpy.arange(5, dtype=numpy.int64) + 1
         label_length = numpy.digitize(n_cells, bins) + 5
         if label_length > 5:
             logging.warning("Cell labels are {}-character long.".format(label_length))
-    
+
     n = label_length - 3
     fmt = "{{:0>{}}}".format(n)
     alpha = numpy.array(list(ascii_uppercase))
-    numer = numpy.array([fmt.format(i) for i in range(10**n)])
+    numer = numpy.array([fmt.format(i) for i in range(10 ** n)])
     nomen = numpy.concatenate((["{:1}".format(i + 1) for i in range(9)], alpha))
 
     q1, r1 = numpy.divmod(numpy.arange(n_cells), numer.size)

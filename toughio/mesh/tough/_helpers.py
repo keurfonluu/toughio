@@ -108,7 +108,7 @@ def _write_incon(labels, values, porosity=None, userx=None):
                 ignore_types += [4, 5, 6]
 
             fmt1 = str2format(fmt[label_length], ignore_types=ignore_types)
-            fmt1 = "{}\n".format("".join(fmt1[:len(values)]))
+            fmt1 = "{}\n".format("".join(fmt1[: len(values)]))
             record = fmt1.format(*values)
 
             # Record 2
@@ -122,7 +122,7 @@ def _write_incon(labels, values, porosity=None, userx=None):
                     ignore_types.append(i)
 
             fmt2 = str2format(fmt[0], ignore_types=ignore_types)
-            fmt2 = "{}\n".format("".join(fmt2[:len(values)]))
+            fmt2 = "{}\n".format("".join(fmt2[: len(values)]))
             record += fmt2.format(*values)
 
             yield record
