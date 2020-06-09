@@ -2,18 +2,19 @@ from __future__ import with_statement
 
 import numpy
 
-from ...input.tough._helpers import str2float
 from .._common import to_output
+from ...input.tough._helpers import str2float
+from ...._common import get_label_length
 
 __all__ = [
     "read",
 ]
 
 
-def read(filename, file_type, file_format, labels_order):
+def read(filename, file_type, file_format, labels_order, label_length=None):
     """Read standard TOUGH OUTPUT."""
     with open(filename, "r") as f:
-        headers, times, variables = _read_table(f, file_type)
+        headers, times, variables = _read_table(f, file_type, label_length)
 
         ilab = 1 if file_type == "element" else 2
         headers = headers[ilab + 1 :]
@@ -32,7 +33,7 @@ def read(filename, file_type, file_format, labels_order):
     )
 
 
-def _read_table(f, file_type):
+def _read_table(f, file_type, label_length):
     """Read data table for current time step."""
     labels_key = "ELEM." if file_type == "element" else "ELEM1"
     ilab = 1 if file_type == "element" else 2
@@ -68,9 +69,13 @@ def _read_table(f, file_type):
             # Loop until end of output block
             while True:
                 if line[:10].strip() and not line.strip().startswith("ELEM"):
-                    line = line.strip()
+                    line = line.lstrip()
+
+                    if not label_length:
+                        label_length = get_label_length(line[:9])
+
                     tmp = (
-                        [line[:5]] if file_type == "element" else [line[:5], line[7:12]]
+                        [line[:label_length]] if file_type == "element" else [line[:label_length], line[label_length+2:2 * label_length + 2]]
                     )
                     tmp += [str2float(l) for l in line[6 * ilab :].split()]
                     variables[-1].append(tmp)
