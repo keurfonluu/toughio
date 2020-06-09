@@ -728,7 +728,7 @@ def _write_outpu(parameters):
         out += write_record([str(len(data["variables"]))], fmt2)
 
         for k, v in data["variables"].items():
-            values = [k]
+            values = [k.upper()]
 
             if v is not None:
                 v = list(v) if isinstance(v, (list, tuple, numpy.ndarray)) else [v]
