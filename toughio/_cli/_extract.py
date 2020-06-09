@@ -33,12 +33,16 @@ def extract(argv=None):
         raise ValueError("MESH file '{}' not found.".format(args.mesh))
 
     # Read MESH and extract X, Y and Z
-    parameters = read_mesh(args.mesh, file_format="tough", label_length=args.label_length)
+    parameters = read_mesh(
+        args.mesh, file_format="tough", label_length=args.label_length
+    )
     if "elements" not in parameters.keys():
         raise ValueError("Invalid MESH file '{}'.".format(args.mesh))
 
     # Read TOUGH output file
-    output = read_output(args.infile, connection=args.connection, label_length=args.label_length)
+    output = read_output(
+        args.infile, connection=args.connection, label_length=args.label_length
+    )
     if output[-1].format != "tough":
         raise ValueError("Invalid TOUGH output file '{}'.".format(args.infile))
 

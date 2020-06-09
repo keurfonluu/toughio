@@ -1,7 +1,7 @@
 from __future__ import division, with_statement
 
-from ._helpers import prune_nones_dict, prune_nones_list, read_record
 from ...._common import block_to_format, get_label_length
+from ._helpers import prune_nones_dict, prune_nones_list, read_record
 
 __all__ = [
     "read",

@@ -5,14 +5,9 @@ from copy import deepcopy
 
 import numpy
 
-from ._common import default
-from ._helpers import (
-    block,
-    check_parameters,
-    dtypes,
-    write_record,
-)
 from ...._common import block_to_format, str2format
+from ._common import default
+from ._helpers import block, check_parameters, dtypes, write_record
 
 __all__ = [
     "write",
@@ -242,7 +237,7 @@ def _write_rpcap(parameters):
             out += write_record(values, fmt)
         else:
             out += write_record([], [])
-    
+
     return out
 
 
@@ -301,7 +296,7 @@ def _write_flac(parameters):
         values = [data["equivalent_pore_pressure"]["id"], None]
         values += list(data["equivalent_pore_pressure"]["parameters"])
         out += write_record(values, fmt3)
-    
+
     return out
 
 
@@ -498,7 +493,7 @@ def _write_indom(parameters):
                 values = [k]
                 values += list(data)
                 out += write_record(values, fmt)
-                
+
     return out
 
 
@@ -683,7 +678,7 @@ def _write_gener(parameters):
                 specific_enthalpy = numpy.full(ltab, v["specific_enthalpy"])
 
             out += write_record(specific_enthalpy, fmt2, multi=True)
-            
+
     return out
 
 
@@ -860,7 +855,7 @@ def _write_incon(parameters):
 
         # Record 2
         out += write_record(data["values"], fmt2)
-    
+
     return out
 
 
