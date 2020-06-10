@@ -5,7 +5,7 @@ import helpers
 import toughio
 
 write_read = lambda x, **kwargs: helpers.write_read(
-    "INFILE", x, toughio.write_input, toughio.read_input, **kwargs,
+    "INFILE", x, toughio.write_input, toughio.read_input, **kwargs
 )
 
 write_read_tough = lambda x: write_read(
