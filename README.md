@@ -125,7 +125,7 @@ through Lawrence Berkeley National Laboratory (subject to receipt of
 any required approvals from the U.S. Dept. of Energy). All rights reserved.
 If you have questions about your rights to use or distribute this software,
 please contact Berkeley Lab's Intellectual Property Office at
-IPO@lbl.gov.
+[IPO@lbl.gov](mailto:IPO@lbl.gov).
 
 This Software was developed under funding from the U.S. Department
 of Energy and the U.S. Government consequently retains certain rights.  As

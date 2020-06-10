@@ -6,7 +6,7 @@ import time
 import numpy
 
 from ...__about__ import __version__ as version
-from .._helpers import _materials, get_material_key
+from .._helpers import get_material_key
 from .._mesh import Mesh
 
 __all__ = [
