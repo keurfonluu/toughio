@@ -474,7 +474,7 @@ class Mesh(object):
         write(filename, self, file_format, **kwargs)
 
     def plot(self, *args, **kwargs):
-        """Display mesh using :method:`pyvista.UnstructuredGrid.plot``."""
+        """Display mesh using :meth:`pyvista.UnstructuredGrid.plot`."""
         mesh = self.to_pyvista()
         mesh.plot(*args, **kwargs)
 
