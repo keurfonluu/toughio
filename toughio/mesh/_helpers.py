@@ -4,7 +4,7 @@ import meshio
 import numpy
 
 from .._common import filetype_from_filename, register_format
-from ._mesh import Mesh, from_meshio
+from ._mesh import from_meshio
 
 __all__ = [
     "read",

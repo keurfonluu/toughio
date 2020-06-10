@@ -1,5 +1,3 @@
-import os
-
 from ..._common import filetype_from_filename, register_format
 
 __all__ = [
