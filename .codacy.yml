@@ -5,4 +5,4 @@ exclude_paths:
   - 'CODE_OF_CONDUCT.md'
   - 'paper/**'
   - '**/*.sh'
-  - 'doc/conf.py'
+  - 'doc/source/conf.py'
