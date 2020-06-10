@@ -9,5 +9,5 @@ python:
     - requirements: doc/requirements.txt
     - method: pip
       path: .
-      extra-requirements:
+      extra_requirements:
         - full
