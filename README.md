@@ -1,6 +1,6 @@
 # toughio
 
-[![License](https://img.shields.io/badge/license-BSD-green)](https://github.com/keurfonluu/toughio/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-BSD--3--Clause-green)](https://github.com/keurfonluu/toughio/blob/master/LICENSE)
 [![Stars](https://img.shields.io/github/stars/keurfonluu/toughio?logo=github)](https://github.com/keurfonluu/toughio)
 [![Pyversions](https://img.shields.io/pypi/pyversions/toughio.svg?style=flat)](https://pypi.org/pypi/toughio/)
 [![Version](https://img.shields.io/pypi/v/toughio.svg?style=flat)](https://pypi.org/project/toughio)
