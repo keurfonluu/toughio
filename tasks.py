@@ -1,4 +1,7 @@
+import glob
+import os
 import shutil
+
 from invoke import task
 
 import toughio
@@ -22,14 +25,22 @@ def upload(c):
 
 
 @task
-def clean(c):
+def clean(c, bytecode=False):
     patterns = [
         "build",
         "dist",
         "toughio.egg-info",
     ]
+
+    if bytecode:
+        patterns += glob.glob("**/*.pyc", recursive=True)
+        patterns += glob.glob("**/__pycache__", recursive=True)
+
     for pattern in patterns:
-        shutil.rmtree(pattern, ignore_errors=True)
+        if os.path.isfile(pattern):
+            os.remove(pattern)
+        else:
+            shutil.rmtree(pattern, ignore_errors=True)
 
 
 @task
