@@ -14,13 +14,11 @@ sys.path.insert(0, os.path.abspath(".../"))
 
 # -- Project information -----------------------------------------------------
 
-import toughio
-
 project = "toughio"
 copyright = "2020, Keurfon Luu"
 author = "Keurfon Luu"
 
-version = toughio.__version__
+version = "1.3.0"
 release = version
 
 
