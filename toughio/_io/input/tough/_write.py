@@ -5,16 +5,9 @@ from copy import deepcopy
 
 import numpy
 
+from ...._common import block_to_format, str2format
 from ._common import default
-from ._helpers import (
-    add_record,
-    block,
-    check_parameters,
-    dtypes,
-    format_data,
-    write_multi_record,
-    write_record,
-)
+from ._helpers import block, check_parameters, dtypes, write_record
 
 __all__ = [
     "write",
@@ -122,6 +115,7 @@ def write_buffer(parameters):
     out += _write_incon(parameters) if parameters["initial_conditions"] else []
     out += _write_nover() if parameters["nover"] else []
     out += _write_endcy()
+
     return out
 
 
@@ -142,6 +136,14 @@ def _write_rocks(parameters):
                 order.append(rock)
     else:
         order = parameters["rocks"].keys()
+
+    # Formats
+    fmt = block_to_format["ROCKS"]
+    fmt1 = str2format(fmt[1])
+    fmt2 = str2format(fmt[2])
+
+    fmt = block_to_format["RPCAP"]
+    fmt3 = str2format(fmt)
 
     out = []
     for k in order:
@@ -174,52 +176,43 @@ def _write_rocks(parameters):
             raise TypeError()
 
         # Record 1
-        out += write_record(
-            format_data(
-                [
-                    (k, "{:5.5}"),
-                    (nad if nad else None, "{:>5g}"),
-                    (data["density"], "{:>10.4e}"),
-                    (data["porosity"], "{:>10.4e}"),
-                    (per[0], "{:>10.4e}"),
-                    (per[1], "{:>10.4e}"),
-                    (per[2], "{:>10.4e}"),
-                    (data["conductivity"], "{:>10.4e}"),
-                    (data["specific_heat"], "{:>10.4e}"),
-                ]
-            )
-        )
+        values = [
+            k,
+            nad if nad else "",
+            data["density"],
+            data["porosity"],
+            per[0],
+            per[1],
+            per[2],
+            data["conductivity"],
+            data["specific_heat"],
+        ]
+        out += write_record(values, fmt1)
 
         # Record 2
         if cond:
-            out += write_record(
-                format_data(
-                    [
-                        (data["compressibility"], "{:>10.4e}"),
-                        (data["expansivity"], "{:>10.4e}"),
-                        (data["conductivity_dry"], "{:>10.4e}"),
-                        (data["tortuosity"], "{:>10.4e}"),
-                        (data["klinkenberg_parameter"], "{:>10.4e}"),
-                        (data["distribution_coefficient_3"], "{:>10.4e}"),
-                        (data["distribution_coefficient_4"], "{:>10.4e}"),
-                    ]
-                )
-            )
+            values = [
+                data["compressibility"],
+                data["expansivity"],
+                data["conductivity_dry"],
+                data["tortuosity"],
+                data["klinkenberg_parameter"],
+                data["distribution_coefficient_3"],
+                data["distribution_coefficient_4"],
+            ]
+            out += write_record(values, fmt2)
         else:
-            out += write_record([]) if nad == 2 else []
+            out += write_record([], []) if nad == 2 else []
 
         # Relative permeability / Capillary pressure
         if nad == 2:
-            out += (
-                add_record(data["relative_permeability"])
-                if "relative_permeability" in data.keys()
-                else write_record([])
-            )
-            out += (
-                add_record(data["capillarity"])
-                if "capillarity" in data.keys()
-                else write_record([])
-            )
+            for key in ["relative_permeability", "capillarity"]:
+                if key in data.keys():
+                    values = [data[key]["id"], None]
+                    values += list(data[key]["parameters"])
+                    out += write_record(values, fmt3)
+                else:
+                    out += write_record([], [])
 
     return out
 
@@ -232,17 +225,19 @@ def _write_rpcap(parameters):
     data = deepcopy(default)
     data.update(parameters["default"])
 
+    # Formats
+    fmt = block_to_format["RPCAP"]
+    fmt = str2format(fmt)
+
     out = []
-    out += (
-        add_record(data["relative_permeability"])
-        if "relative_permeability" in data.keys()
-        else write_record([])
-    )
-    out += (
-        add_record(data["capillarity"])
-        if "capillarity" in data.keys()
-        else write_record([])
-    )
+    for key in ["relative_permeability", "capillarity"]:
+        if key in data.keys():
+            values = [data[key]["id"], None]
+            values += list(data[key]["parameters"])
+            out += write_record(values, fmt)
+        else:
+            out += write_record([], [])
+
     return out
 
 
@@ -271,16 +266,19 @@ def _write_flac(parameters):
     else:
         order = parameters["rocks"].keys()
 
+    # Formats
+    fmt = block_to_format["FLAC"]
+    fmt1 = str2format(fmt[1])
+    fmt2 = str2format(fmt[2])
+    fmt3 = str2format(fmt[3])
+
     # Record 1
-    out = write_record(
-        format_data(
-            [
-                (bool(data["creep"]), "{:5g}"),
-                (data["porosity_model"], "{:5g}"),
-                (data["version"], "{:5g}"),
-            ]
-        )
-    )
+    values = [
+        bool(data["creep"]),
+        data["porosity_model"],
+        data["version"],
+    ]
+    out = write_record(values, fmt1)
 
     # Additional records
     for k in order:
@@ -290,10 +288,15 @@ def _write_flac(parameters):
         data.update(parameters["rocks"][k])
 
         # Permeability model
-        out += add_record(data["permeability_model"], "{:>10g}")
+        values = [data["permeability_model"]["id"]]
+        values += list(data["permeability_model"]["parameters"])
+        out += write_record(values, fmt2)
 
         # Equivalent pore pressure
-        out += add_record(data["equivalent_pore_pressure"])
+        values = [data["equivalent_pore_pressure"]["id"], None]
+        values += list(data["equivalent_pore_pressure"]["parameters"])
+        out += write_record(values, fmt3)
+
     return out
 
 
@@ -302,21 +305,27 @@ def _write_multi(parameters):
     """Write MULTI block data."""
     from ._common import eos
 
-    out = list(eos[parameters["eos"]]) if parameters["eos"] else [0, 0, 0, 6]
-    out[0] = parameters["n_component"] if parameters["n_component"] else out[0]
-    out[1] = out[0] if parameters["isothermal"] else out[0] + 1
-    out[2] = parameters["n_phase"] if parameters["n_phase"] else out[2]
+    # Formats
+    fmt = block_to_format["MULTI"]
+    fmt = str2format(fmt)
+
+    values = list(eos[parameters["eos"]]) if parameters["eos"] else [0, 0, 0, 6]
+    values[0] = parameters["n_component"] if parameters["n_component"] else values[0]
+    values[1] = values[0] if parameters["isothermal"] else values[0] + 1
+    values[2] = parameters["n_phase"] if parameters["n_phase"] else values[2]
 
     # Handle diffusion
     if parameters["diffusion"]:
-        out[3] = 8
-        parameters["n_phase"] = out[2]  # Save for later check
+        values[3] = 8
+        parameters["n_phase"] = values[2]  # Save for later check
 
     # Number of mass components
     if parameters["n_component_mass"]:
-        out.append(parameters["n_component_mass"])
+        values.append(parameters["n_component_mass"])
 
-    return [("{:>5d}" * len(out) + "\n").format(*out)]
+    out = write_record(values, fmt)
+
+    return out
 
 
 @check_parameters(dtypes["SELEC"], keys="selections")
@@ -332,18 +341,19 @@ def _write_selec(parameters):
     if len(parameters["selections"]["floats"]):
         data["floats"] = parameters["selections"]["floats"]
 
+    # Formats
+    fmt = block_to_format["SELEC"]
+    fmt1 = str2format(fmt[1])
+    fmt2 = str2format(fmt[2])
+
     # Record 1
-    out = write_record(
-        format_data(
-            [(data["integers"][k], "{:>5}") for k in sorted(data["integers"].keys())]
-        )
-    )
+    values = [data["integers"][k] for k in sorted(data["integers"].keys())]
+    out = write_record(values, fmt1)
 
     # Record 2
     if data["floats"] is not None and len(data["floats"]):
-        out += write_multi_record(
-            format_data([(i, "{:>10.3e}") for i in data["floats"]])
-        )
+        out += write_record(data["floats"], fmt2, multi=True)
+
     return out
 
 
@@ -355,17 +365,23 @@ def _write_solvr(parameters):
 
     data = deepcopy(solver)
     data.update(parameters["solver"])
-    return write_record(
-        format_data(
-            [
-                (data["method"], "{:1g}  "),
-                (data["z_precond"], "{:>2g}   "),
-                (data["o_precond"], "{:>2g}"),
-                (data["rel_iter_max"], "{:>10.4e}"),
-                (data["eps"], "{:>10.4e}"),
-            ]
-        )
-    )
+
+    # Formats
+    fmt = block_to_format["SOLVR"]
+    fmt = str2format(fmt)
+
+    values = [
+        data["method"],
+        None,
+        data["z_precond"],
+        None,
+        data["o_precond"],
+        data["rel_iter_max"],
+        data["eps"],
+    ]
+    out = write_record(values, fmt)
+
+    return out
 
 
 @block("START")
@@ -383,7 +399,7 @@ def _write_start():
 def _write_param(parameters):
     """Write PARAM block data."""
     # Load data
-    from ._common import options
+    from ._common import options, extra_options
 
     data = deepcopy(options)
     data.update(parameters["options"])
@@ -392,65 +408,64 @@ def _write_param(parameters):
     if not isinstance(data["t_steps"], (list, tuple, numpy.ndarray)):
         data["t_steps"] = [data["t_steps"]]
 
-    # Record 1
-    from ._common import extra_options
+    # Formats
+    fmt = block_to_format["PARAM"]
+    fmt1 = str2format(fmt[1])
+    fmt2 = str2format(fmt[2])
+    fmt3 = str2format(fmt[3])
+    fmt4 = str2format(fmt[4])
+    fmt5 = str2format(fmt[5])
 
+    # Record 1
     _mop = deepcopy(extra_options)
     _mop.update(parameters["extra_options"])
-    mop = format_data([(_mop[k], "{:>1g}") for k in sorted(_mop.keys())])
-    out = write_record(
-        format_data(
-            [
-                (data["n_iteration"], "{:>2g}"),
-                (data["verbosity"], "{:>2g}"),
-                (data["n_cycle"], "{:>4g}"),
-                (data["n_second"], "{:>4g}"),
-                (data["n_cycle_print"], "{:>4g}"),
-                ("{}".format("".join(mop)), "{:>24}"),
-                (None, "{:>10}"),
-                (data["temperature_dependence_gas"], "{:>10.4e}"),
-                (data["effective_strength_vapor"], "{:>10.4e}"),
-            ]
-        )
-    )
+    mop = [" " if _mop[k] is None else str(_mop[k]) for k in sorted(_mop.keys())]
+
+    values = [
+        data["n_iteration"],
+        data["verbosity"],
+        data["n_cycle"],
+        data["n_second"],
+        data["n_cycle_print"],
+        "{}".format("".join(mop)),
+        None,
+        data["temperature_dependence_gas"],
+        data["effective_strength_vapor"],
+    ]
+    out = write_record(values, fmt1)
 
     # Record 2
-    out += write_record(
-        format_data(
-            [
-                (data["t_ini"], "{:>10.4e}"),
-                (data["t_max"], "{:>10.4e}"),
-                (-((len(data["t_steps"]) - 1) // 8 + 1), "{:>9g}."),
-                (data["t_step_max"], "{:>10.4e}"),
-                (None, "{:>10g}"),
-                (data["gravity"], "{:>10.4e}"),
-                (data["t_reduce_factor"], "{:>10.4e}"),
-                (data["mesh_scale_factor"], "{:>10.4e}"),
-            ]
-        )
-    )
+    values = [
+        data["t_ini"],
+        data["t_max"],
+        -((len(data["t_steps"]) - 1) // 8 + 1),
+        data["t_step_max"],
+        None,
+        data["gravity"],
+        data["t_reduce_factor"],
+        data["mesh_scale_factor"],
+    ]
+    out += write_record(values, fmt2)
 
     # Record 2.1
-    out += write_multi_record(format_data([(i, "{:>10.4e}") for i in data["t_steps"]]))
+    values = [x for x in data["t_steps"]]
+    out += write_record(values, fmt3, multi=True)
 
     # Record 3
-    out += write_record(
-        format_data(
-            [
-                (data["eps1"], "{:>10.4e}"),
-                (data["eps2"], "{:>10.4e}"),
-                (None, "{:>10.4e}"),
-                (data["w_upstream"], "{:>10.4e}"),
-                (data["w_newton"], "{:>10.4e}"),
-                (data["derivative_factor"], "{:>10.4e}"),
-            ]
-        )
-    )
+    values = [
+        data["eps1"],
+        data["eps2"],
+        None,
+        data["w_upstream"],
+        data["w_newton"],
+        data["derivative_factor"],
+    ]
+    out += write_record(values, fmt4)
 
     # Record 4
-    data = parameters["default"]["initial_condition"]
-    n = len(data)
-    out += write_record(format_data([(i, "{:>20.13e}") for i in data[: min(n, 4)]]))
+    values = parameters["default"]["initial_condition"]
+    out += write_record(values, fmt5)
+
     return out
 
 
@@ -465,14 +480,20 @@ def _write_indom(parameters):
     else:
         order = parameters["rocks"].keys()
 
+    # Formats
+    fmt = block_to_format["INDOM"]
+    fmt = str2format(fmt[5]) + str2format(fmt[0])
+    fmt[0] = "{}\n".format(fmt[0])
+
     out = []
     for k in order:
         if "initial_condition" in parameters["rocks"][k]:
             data = parameters["rocks"][k]["initial_condition"]
-            data = data[: min(len(data), 4)]
             if any(x is not None for x in data):
-                out += ["{:5.5}\n".format(k)]
-                out += write_record(format_data([(i, "{:>20.13e}") for i in data]))
+                values = [k]
+                values += list(data)
+                out += write_record(values, fmt)
+
     return out
 
 
@@ -482,11 +503,16 @@ def _write_momop(parameters):
     """Write MOMOP block data."""
     from ._common import more_options
 
+    # Formats
+    fmt = block_to_format["MOMOP"]
+    fmt = str2format(fmt)
+
     _momop = deepcopy(more_options)
     _momop.update(parameters["more_options"])
-    out = write_record(
-        format_data([(_momop[k], "{:>1g}") for k in sorted(_momop.keys())])
-    )
+
+    tmp = [" " if _momop[k] is None else str(_momop[k]) for k in sorted(_momop.keys())]
+    out = write_record(["".join(tmp)], fmt)
+
     return out
 
 
@@ -495,34 +521,58 @@ def _write_times(parameters):
     """Write TIMES block data."""
     data = parameters["times"]
     data = data if numpy.ndim(data) else [data]
-    n = len(data)
-    out = write_record(format_data([(n, "{:>5g}")]))
-    out += write_multi_record(format_data([(i, "{:>10.4e}") for i in data]))
+
+    # Formats
+    fmt = block_to_format["TIMES"]
+    fmt1 = str2format(fmt[1])
+    fmt2 = str2format(fmt[2])
+
+    # Record 1
+    out = write_record([len(data)], fmt1)
+
+    # Record 2
+    out += write_record(data, fmt2, multi=True)
+
     return out
 
 
 @block("FOFT", multi=True)
 def _write_foft(parameters):
     """Write FOFT block data."""
-    return write_multi_record(
-        format_data([(i, "{:>5g}") for i in parameters["element_history"]]), ncol=1
-    )
+    # Formats
+    fmt = block_to_format["FOFT"]
+    fmt = str2format(fmt[5])
+
+    values = [x for x in parameters["element_history"]]
+    out = write_record(values, fmt, multi=True)
+
+    return out
 
 
 @block("COFT", multi=True)
 def _write_coft(parameters):
     """Write COFT block data."""
-    return write_multi_record(
-        format_data([(i, "{:>10g}") for i in parameters["connection_history"]]), ncol=1
-    )
+    # Format
+    fmt = block_to_format["COFT"]
+    fmt = str2format(fmt[5])
+
+    values = [x for x in parameters["connection_history"]]
+    out = write_record(values, fmt, multi=True)
+
+    return out
 
 
 @block("GOFT", multi=True)
 def _write_goft(parameters):
     """Write GOFT block data."""
-    return write_multi_record(
-        format_data([(i, "{:>5g}") for i in parameters["generator_history"]]), ncol=1
-    )
+    # Format
+    fmt = block_to_format["GOFT"]
+    fmt = str2format(fmt[5])
+
+    values = [x for x in parameters["generator_history"]]
+    out = write_record(values, fmt, multi=True)
+
+    return out
 
 
 @check_parameters(dtypes["GENER"], keys="generators", is_list=True)
@@ -571,6 +621,12 @@ def _write_gener(parameters):
                     raise ValueError()
             generator_data.append((k, data))
 
+    # Format
+    label_length = len(max(parameters["generators"], key=len))
+    fmt = block_to_format["GENER"]
+    fmt1 = str2format(fmt[label_length])
+    fmt2 = str2format(fmt[0])
+
     out = []
     for k, v in generator_data:
         # Table
@@ -592,36 +648,27 @@ def _write_gener(parameters):
                         raise ValueError()
 
         # Record 1
-        out += write_record(
-            format_data(
-                [
-                    (k, "{:>5.5}"),
-                    (v["name"], "{:>5g}"),
-                    (None, "{:>5g}"),
-                    (None, "{:>5g}"),
-                    (None, "{:>5g}"),
-                    (ltab, "{:>5g}"),
-                    (None, "{:>5g}"),
-                    (v["type"], "{:4g}"),
-                    (itab, "{:>1g}"),
-                    (None if ltab else v["rates"], "{:>10.3e}"),
-                    (None if ltab else v["specific_enthalpy"], "{:>10.3e}"),
-                    (v["layer_thickness"], "{:>10.3e}"),
-                ]
-            )
-        )
+        values = [
+            k,
+            v["name"],
+            None,
+            None,
+            None,
+            ltab,
+            None,
+            v["type"],
+            itab,
+            None if ltab else v["rates"],
+            None if ltab else v["specific_enthalpy"],
+            v["layer_thickness"],
+        ]
+        out += write_record(values, fmt1)
 
         # Record 2
-        if ltab:
-            out += write_multi_record(
-                format_data([(i, "{:>14.7e}") for i in v["times"]]), ncol=4
-            )
+        out += write_record(v["times"], fmt2, multi=True) if ltab else []
 
         # Record 3
-        if ltab:
-            out += write_multi_record(
-                format_data([(i, "{:>14.7e}") for i in v["rates"]]), ncol=4
-            )
+        out += write_record(v["rates"], fmt2, multi=True) if ltab else []
 
         # Record 4
         if ltab and v["specific_enthalpy"] is not None:
@@ -629,9 +676,9 @@ def _write_gener(parameters):
                 specific_enthalpy = v["specific_enthalpy"]
             else:
                 specific_enthalpy = numpy.full(ltab, v["specific_enthalpy"])
-            out += write_multi_record(
-                format_data([(i, "{:>14.7e}") for i in specific_enthalpy]), ncol=4
-            )
+
+            out += write_record(specific_enthalpy, fmt2, multi=True)
+
     return out
 
 
@@ -642,9 +689,16 @@ def _write_diffu(parameters):
         raise ValueError()
     mass1, mass2 = parameters["diffusion"]
 
-    out = []
-    out += write_multi_record(format_data([(i, "{:>10.3e}") for i in mass1]), ncol=8)
-    out += write_multi_record(format_data([(i, "{:>10.3e}") for i in mass2]), ncol=8)
+    # Format
+    fmt = block_to_format["DIFFU"]
+    fmt = str2format(fmt)
+
+    # Record 1
+    out = write_record(mass1, fmt, multi=True)
+
+    # Record 2
+    out += write_record(mass2, fmt, multi=True)
+
     return out
 
 
@@ -652,30 +706,38 @@ def _write_diffu(parameters):
 @block("OUTPU")
 def _write_outpu(parameters):
     """Write OUTPU block data."""
+    # Load data
     from ._common import output
 
     data = deepcopy(output)
     data.update(parameters["output"])
 
+    # Format
+    fmt = block_to_format["OUTPU"]
+    fmt1 = str2format(fmt[1])
+    fmt2 = str2format(fmt[2])
+    fmt3 = str2format(fmt[3])
+
     out = []
 
-    # Format
-    if data["format"]:
-        out += write_record(format_data([(data["format"].upper(), "{:20}")]))
+    # Output format
+    out += write_record([data["format"].upper()], fmt1) if data["format"] else []
 
     # Variables
     if data["variables"]:
-        out += write_record(format_data([(str(len(data["variables"])), "{:15}")]))
+        out += write_record([str(len(data["variables"]))], fmt2)
 
         for k, v in data["variables"].items():
-            tmp = [(k.upper(), "{:20}")]
-            if v:
-                v = v if isinstance(v, (list, tuple, numpy.ndarray)) else [v]
+            values = [k.upper()]
+
+            if v is not None:
+                v = list(v) if isinstance(v, (list, tuple, numpy.ndarray)) else [v]
                 if not (0 < len(v) < 3):
                     raise ValueError()
                 else:
-                    tmp += [(vv, "{:5}") for vv in v]
-            out += write_record(format_data(tmp))
+                    values += v
+
+            out += write_record(values, fmt3)
 
     return out
 
@@ -692,27 +754,29 @@ def _write_eleme(parameters):
     else:
         order = parameters["elements"].keys()
 
+    # Format
+    label_length = len(max(parameters["elements"], key=len))
+    fmt = block_to_format["ELEME"]
+    fmt = str2format(fmt[label_length])
+
     out = []
     for k in order:
         data = deepcopy(elements)
         data.update(parameters["elements"][k])
 
-        out += write_record(
-            format_data(
-                [
-                    (k, "{:>5.5}"),
-                    (None, "{:>5}"),
-                    (None, "{:>5}"),
-                    (data["material"], "{:>5}"),
-                    (data["volume"], "{:10.4e}"),
-                    (data["heat_exchange_area"], "{:10.3e}"),
-                    (data["permeability_modifier"], "{:10.3e}"),
-                    (data["center"][0], "{:10.3e}"),
-                    (data["center"][1], "{:10.3e}"),
-                    (data["center"][2], "{:10.3e}"),
-                ]
-            )
-        )
+        values = [
+            k,
+            None,
+            None,
+            data["material"],
+            data["volume"],
+            data["heat_exchange_area"],
+            data["permeability_modifier"],
+            data["center"][0],
+            data["center"][1],
+            data["center"][2],
+        ]
+        out += write_record(values, fmt)
 
     return out
 
@@ -729,27 +793,29 @@ def _write_conne(parameters):
     else:
         order = parameters["connections"].keys()
 
+    # Format
+    label_length = len(max(parameters["connections"], key=len)) // 2
+    fmt = block_to_format["CONNE"]
+    fmt = str2format(fmt[label_length])
+
     out = []
     for k in order:
         data = deepcopy(connections)
         data.update(parameters["connections"][k])
 
-        out += write_record(
-            format_data(
-                [
-                    (k, "{:>10.10}"),
-                    (None, "{:>5}"),
-                    (None, "{:>5}"),
-                    (None, "{:>5}"),
-                    (data["permeability_direction"], "{:>5g}"),
-                    (data["nodal_distances"][0], "{:10.4e}"),
-                    (data["nodal_distances"][1], "{:10.4e}"),
-                    (data["interface_area"], "{:10.4e}"),
-                    (data["gravity_cosine_angle"], "{:10.3e}"),
-                    (data["radiant_emittance_factor"], "{:10.3e}"),
-                ]
-            )
-        )
+        values = [
+            k,
+            None,
+            None,
+            None,
+            data["permeability_direction"],
+            data["nodal_distances"][0],
+            data["nodal_distances"][1],
+            data["interface_area"],
+            data["gravity_cosine_angle"],
+            data["radiant_emittance_factor"],
+        ]
+        out += write_record(values, fmt)
 
     return out
 
@@ -766,23 +832,29 @@ def _write_incon(parameters):
     else:
         order = parameters["initial_conditions"].keys()
 
+    # Format
+    label_length = len(max(parameters["initial_conditions"], key=len))
+    fmt = block_to_format["INCON"]
+    fmt1 = str2format(fmt[label_length])
+    fmt2 = str2format(fmt[0])
+
     out = []
     for k in order:
         data = deepcopy(initial_conditions)
         data.update(parameters["initial_conditions"][k])
 
         # Record 1
-        tmp = [
-            (k, "{:>5.5}"),
-            (None, "{:>5}"),
-            (None, "{:>5}"),
-            (data["porosity"], "{:>15.9e}"),
+        values = [
+            k,
+            None,
+            None,
+            data["porosity"],
         ]
-        tmp += [(x, "{:>10.3e}") for x in data["userx"]]
-        out += write_record(format_data(tmp))
+        values += list(data["userx"])
+        out += write_record(values, fmt1)
 
         # Record 2
-        out += write_record(format_data([(x, "{:20.13e}") for x in data["values"]]))
+        out += write_record(data["values"], fmt2)
 
     return out
 

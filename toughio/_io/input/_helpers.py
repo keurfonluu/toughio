@@ -37,6 +37,11 @@ def read(filename, file_format=None, **kwargs):
     file_format : str ('tough', 'json') or None, optional, default None
         Input file format.
 
+    Other Parameters
+    ----------------
+    label_length : int or None, optional, default None
+        Only if ``file_format = "tough"``. Number of characters in cell labels.
+
     Returns
     -------
     dict

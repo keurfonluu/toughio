@@ -130,6 +130,13 @@ def random_string(n):
     return "".join(random.choice(ascii_lowercase) for _ in range(n))
 
 
+def random_label(label_length):
+    n = label_length - 3
+    fmt = "{{:0{}d}}".format(n)
+
+    return random_string(3) + fmt.format(numpy.random.randint(10 ** n))
+
+
 def allclose_dict(a, b, atol=1.0e-8):
     for k, v in a.items():
         if v is not None:
