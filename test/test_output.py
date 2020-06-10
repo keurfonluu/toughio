@@ -45,15 +45,21 @@ def test_history(filename, data_ref):
 
 
 @pytest.mark.parametrize(
-    "filename",
-    ["OUTPUT_ELEME.csv", "OUTPUT_ELEME.tec", "OUTPUT_ELEME_PETRASIM.csv", "OUTPUT.out"],
+    "filename, filename_ref",
+    [
+        ("OUTPUT_ELEME.csv", "SAVE.out"),
+        ("OUTPUT_ELEME.tec", "SAVE.out"),
+        ("OUTPUT_ELEME_PETRASIM.csv", "SAVE.out"),
+        ("OUTPUT.out", "SAVE.out"),
+        ("OUTPUT_6.out", "SAVE_6.out"),
+    ],
 )
-def test_output_eleme(filename):
+def test_output_eleme(filename, filename_ref):
     this_dir = os.path.dirname(os.path.abspath(__file__))
     filename = os.path.join(this_dir, "support_files", "outputs", filename)
     outputs = toughio.read_output(filename)
 
-    filename = os.path.join(this_dir, "support_files", "outputs", "SAVE.out")
+    filename = os.path.join(this_dir, "support_files", "outputs", filename_ref)
     save = toughio.read_output(filename)
 
     assert len(outputs) == 5
@@ -81,11 +87,11 @@ def test_output_eleme(filename):
 
 
 @pytest.mark.parametrize(
-    "filename", ["OUTPUT_CONNE.csv", "OUTPUT.out"],
+    "filename", ["OUTPUT_CONNE.csv", "OUTPUT.out", "OUTPUT_6.out"],
 )
 def test_output_conne(filename):
     this_dir = os.path.dirname(os.path.abspath(__file__))
-    filename = os.path.join(this_dir, "support_files", "outputs", "OUTPUT_CONNE.csv")
+    filename = os.path.join(this_dir, "support_files", "outputs", filename)
     outputs = toughio.read_output(filename, connection=True)
 
     times_ref = [
@@ -104,6 +110,10 @@ def test_output_conne(filename):
     ]
     for output, time_ref, data in zip(outputs, times_ref, data_ref):
         assert time_ref == output.time
+        assert (
+            len(set("".join(labels) for labels in output.labels))
+            == output.data["HEAT"].size
+        )
         assert numpy.allclose(data, numpy.abs(output.data["HEAT"]).mean(), atol=1.0)
 
 
