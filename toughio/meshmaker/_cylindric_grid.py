@@ -1,6 +1,6 @@
 import numpy
 
-from ..mesh import Mesh
+from .._mesh import Mesh
 from ._structured_grid import structured_grid
 
 __all__ = [

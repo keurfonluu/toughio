@@ -68,9 +68,6 @@ def read(filename, labels_order=None, connection=False, label_length=None, **kwa
         Input file name.
     labels_order : list of array_like or None, optional, default None
         List of labels.
-
-    Other Parameters
-    ----------------
     connection : bool, optional, default False
         Only for standard TOUGH output file. If `True`, return data related to connections.
     label_length : int or None, optional, default None

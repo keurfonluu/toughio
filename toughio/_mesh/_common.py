@@ -3,17 +3,6 @@ import logging
 import meshio
 import numpy
 
-__all__ = [
-    "vtk_to_meshio_type",
-    "meshio_to_vtk_type",
-    "vtk_type_to_numnodes",
-    "meshio_type_to_ndim",
-    "get_meshio_version",
-    "get_old_meshio_cells",
-    "labeler",
-]
-
-
 vtk_to_meshio_type = {
     0: "empty",
     1: "vertex",

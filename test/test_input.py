@@ -392,12 +392,12 @@ def test_gener(write_read, label_length):
                 ],
                 "layer_thickness": numpy.random.rand(3),
             },
-            helpers.random_label(5): {
+            helpers.random_label(label_length): {
                 "name": [helpers.random_string(5), helpers.random_string(5)],
                 "type": [helpers.random_string(4), helpers.random_string(4)],
                 "rates": numpy.random.rand(2),
             },
-            helpers.random_label(5): {
+            helpers.random_label(label_length): {
                 "type": helpers.random_string(4),
                 "rates": numpy.random.rand(),
                 "layer_thickness": numpy.random.rand(),
