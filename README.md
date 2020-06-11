@@ -1,6 +1,6 @@
 # toughio
 
-[![License](https://img.shields.io/badge/license-BSD-green)](https://github.com/keurfonluu/toughio/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-BSD--3--Clause-green)](https://github.com/keurfonluu/toughio/blob/master/LICENSE)
 [![Stars](https://img.shields.io/github/stars/keurfonluu/toughio?logo=github)](https://github.com/keurfonluu/toughio)
 [![Pyversions](https://img.shields.io/pypi/pyversions/toughio.svg?style=flat)](https://pypi.org/pypi/toughio/)
 [![Version](https://img.shields.io/pypi/v/toughio.svg?style=flat)](https://pypi.org/project/toughio)
@@ -125,7 +125,7 @@ through Lawrence Berkeley National Laboratory (subject to receipt of
 any required approvals from the U.S. Dept. of Energy). All rights reserved.
 If you have questions about your rights to use or distribute this software,
 please contact Berkeley Lab's Intellectual Property Office at
-IPO@lbl.gov.
+[IPO@lbl.gov](mailto:IPO@lbl.gov).
 
 This Software was developed under funding from the U.S. Department
 of Energy and the U.S. Government consequently retains certain rights.  As

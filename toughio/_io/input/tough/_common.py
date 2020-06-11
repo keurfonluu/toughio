@@ -1,22 +1,3 @@
-__all__ = [
-    "Parameters",
-    "flac",
-    "selections",
-    "options",
-    "extra_options",
-    "more_options",
-    "solver",
-    "generators",
-    "output",
-    "elements",
-    "connections",
-    "initial_conditions",
-    "default",
-    "eos",
-    "header",
-]
-
-
 _Parameters = {
     "title": "",
     "eos": "",

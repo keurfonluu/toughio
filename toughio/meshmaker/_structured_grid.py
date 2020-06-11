@@ -1,6 +1,6 @@
 import numpy
 
-from ..mesh._mesh import CellBlock, Mesh
+from .._mesh._mesh import CellBlock, Mesh
 
 __all__ = [
     "structured_grid",
