@@ -8,6 +8,7 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg?style=flat)](https://github.com/psf/black)
 [![Codacy Badge](https://img.shields.io/codacy/grade/037f16f4e7544afbb1b99bf0d66df4a6.svg?style=flat)](https://www.codacy.com/manual/keurfonluu/toughio?utm_source=github.com&utm_medium=referral&utm_content=keurfonluu/toughio&utm_campaign=Badge_Grade)
 [![Codecov](https://img.shields.io/codecov/c/github/keurfonluu/toughio.svg?style=flat)](https://codecov.io/gh/keurfonluu/toughio)
+[![Documentation Status](https://readthedocs.org/projects/toughio/badge/?version=latest)](https://toughio.readthedocs.io/en/latest/?badge=latest)
 
 [TOUGH](https://tough.lbl.gov/) (Transport Of Unsaturated Groundwater and Heat) is a general purpose numerical simulation software designed for fluid and heat flows of multiphase, multicomponent fluid mixtures in porous and fractured media developed at Lawrence Berkeley National Laboratory. It solves mass and energy balance equations that describe fluid and heat flow in multiphase and multicomponent systems. TOUGH handles all types of multiphase and multicomponent flow systems since the governing equations for fluid and heat flow have the same mathematical form. The nature and properties of fluid mixtures are described by thermophysical variables (e.g. density, viscosity, enthalpy) which are provided by an equation-of-state (EOS) module.
 
@@ -56,6 +57,17 @@ Otherwise, clone and extract the package, then run from the package location:
 
 ```bash
 pip install .[full]
+```
+
+## Documentation
+
+Refer to the online [documentation](https://toughio.readthedocs.io/en/latest/) for detailed description of the API and examples.
+
+Alternatively, the documentation can be built using [Sphinx](https://www.sphinx-doc.org/en/master/)
+
+```bash
+pip install -r doc/requirements.txt
+sphinx-build -b html doc/source doc/build
 ```
 
 ## Usage
@@ -114,11 +126,11 @@ output = toughio.read_output(filename)
 
 -   `toughio-co2tab`: copy file _CO2TAB_ to the target directory,
 -   `toughio-export`: export TOUGH simulation results to a file for visualization (VTK, VTU, Tecplot or XDMF),
--   `toughio-extract`: extract results from TOUGH main output file and reformat as a TOUGH3 element output file (mostly useful for TOUGH2 output _before_ calling `toughio-export`),
+-   `toughio-extract`: extract results from TOUGH main output file and reformat as a TOUGH3 element or connection output file (mostly useful for TOUGH2 output _before_ calling `toughio-export`),
 -   `toughio-merge`: merge input file, MESH and/or INCON into a single file (for storage or sharing),
 -   `toughio-save2incon`: convert a _SAVE_ file to an _INCON_ file (mostly useful to automatically restart a simulation and reset the counters).
 
-## Copyright Notice
+## Notice
 
 toughio Copyright (c) 2020, The Regents of the University of California,
 through Lawrence Berkeley National Laboratory (subject to receipt of
