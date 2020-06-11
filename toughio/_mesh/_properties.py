@@ -3,16 +3,6 @@ from itertools import chain
 
 import numpy
 
-__all__ = [
-    "_materials",
-    "_faces",
-    "_face_normals",
-    "_face_areas",
-    "_volumes",
-    "_connections",
-    "_qualities",
-]
-
 
 def _materials(mesh):
     """Return materials of cell in mesh."""
