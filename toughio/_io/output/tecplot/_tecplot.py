@@ -2,7 +2,7 @@ from __future__ import with_statement
 
 import numpy
 
-from ....mesh.tecplot._tecplot import _read_variables, _read_zone
+from ...._mesh.tecplot._tecplot import _read_variables, _read_zone
 from .._common import to_output
 
 __all__ = [
