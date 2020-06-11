@@ -6,7 +6,6 @@ from functools import wraps
 
 import numpy
 
-
 dtypes = {
     "PARAMETERS": {
         "title": "str",

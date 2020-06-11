@@ -3,7 +3,6 @@ import logging
 import meshio
 import numpy
 
-
 vtk_to_meshio_type = {
     0: "empty",
     1: "vertex",
