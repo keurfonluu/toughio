@@ -14,7 +14,7 @@ from ._io import (
     write_input,
     write_output,
 )
-from ._mesh import Mesh, CellBlock, from_meshio, from_pyvista
+from ._mesh import CellBlock, Mesh, from_meshio, from_pyvista
 from ._mesh import read as read_mesh
 from ._mesh import read_time_series
 from ._mesh import write as write_mesh
