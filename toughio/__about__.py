@@ -1,5 +1,5 @@
-__version__ = "1.2.7"
+__version__ = "1.3.0"
 __author__ = "Keurfon Luu"
 __author_email__ = "keurfonluu@lbl.gov"
 __website__ = "https://github.com/keurfonluu/toughio"
-__license__ = "BSD License"
+__license__ = "3-Clause BSD License"
