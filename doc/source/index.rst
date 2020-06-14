@@ -10,6 +10,7 @@ toughio's documentation
    mesh
    rpcap
    cli
+   example
 
 
 Indices and tables
