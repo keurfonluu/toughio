@@ -56,7 +56,7 @@ pip install toughio[full] --user
 Otherwise, clone and extract the package, then run from the package location:
 
 ```bash
-pip install .[full]
+pip install .[full] --user
 ```
 
 ## Documentation
