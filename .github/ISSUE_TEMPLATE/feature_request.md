@@ -12,8 +12,6 @@ example of how you would like to use this feature (even better if it's a code
 example).
 -->
 
-
-
 **Are you willing to help implement and maintain this feature?** Yes/No
 
 <!--
