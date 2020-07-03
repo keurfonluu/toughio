@@ -7,3 +7,4 @@ exclude_paths:
   - '**/*.sh'
   - 'doc/source/conf.py'
   - 'tasks.py'
+  - '.github/**'
