@@ -130,6 +130,10 @@ output = toughio.read_output(filename)
 -   `toughio-merge`: merge input file, MESH and/or INCON into a single file (for storage or sharing),
 -   `toughio-save2incon`: convert a _SAVE_ file to an _INCON_ file (mostly useful to automatically restart a simulation and reset the counters).
 
+## Contributing
+
+Please refer to the [Contributing Guidelines](https://github.com/keurfonluu/toughio/blob/master/CONTRIBUTING.md) to see how you can help. This project is released with a [Code of Conduct](https://github.com/keurfonluu/toughio/blob/master/CODE_OF_CONDUCT.md) which you agree to abide by when contributing.
+
 ## Notice
 
 toughio Copyright (c) 2020, The Regents of the University of California,
