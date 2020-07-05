@@ -11,7 +11,7 @@ with open(os.path.join(base_dir, "toughio", "__about__.py"), "rb") as f:
 
 DISTNAME = "toughio"
 DESCRIPTION = "Pre- and post-processing Python library for TOUGH"
-LONG_DESCRIPTION = open("README.md").read()
+LONG_DESCRIPTION = open("README.rst").read()
 VERSION = about["__version__"]
 AUTHOR = about["__author__"]
 AUTHOR_EMAIL = about["__author_email__"]
@@ -73,7 +73,7 @@ if __name__ == "__main__":
         name=DISTNAME,
         description=DESCRIPTION,
         long_description=LONG_DESCRIPTION,
-        long_description_content_type="text/markdown",
+        long_description_content_type="text/x-rst",
         author=AUTHOR,
         author_email=AUTHOR_EMAIL,
         url=URL,
