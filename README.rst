@@ -20,12 +20,12 @@ user-friendly by relying on existing well-established Python packages:
 
 Note that the results of a TOUGH simulation are sensitive to the quality of the mesh (ideally, it should satisfy the orthogonality condition). A mesh that contains too many ill-shaped cells can potentially lead to unexpected results although the simulation converged successfully. **toughio** does not verify the quality of the mesh which is left to the discretion of the user.
 
-.. figure:: https://raw.githubusercontent.com/keurfonluu/toughio/master/.github/sample.gif
-   :alt: sample_co2
-   :figwidth: 50%
-   :align: center
+.. raw:: html
 
-   Simulation of CO\ :sub:`2` leakage along a fault. Mesh generated with Gmsh and animation exported by PyVista.
+   <p align="center">
+      <img alt="sample_co2" src="https://raw.githubusercontent.com/keurfonluu/toughio/master/.github/sample.gif" width="50%"><br>
+      <em>Simulation of CO<sub>2</sub> leakage along a fault.<br>Mesh generated with Gmsh and animation exported by PyVista.</em>
+   </p>
 
 Features
 --------
