@@ -275,10 +275,13 @@ class Mesh(object):
         """
         try:
             import pyvista
+            import vtk
             from ._common import (
                 meshio_to_vtk_type,
                 vtk_type_to_numnodes,
             )
+
+            VTK9 = vtk.vtkVersion().GetVTKMajorVersion() >= 9
         except ImportError:
             raise ImportError(
                 "Converting to pyvista.UnstructuredGrid requires pyvista to be installed."
@@ -292,24 +295,32 @@ class Mesh(object):
         for c in self.cells:
             vtk_type = meshio_to_vtk_type[c.type]
             numnodes = vtk_type_to_numnodes[vtk_type]
-            offset += [next_offset + i * (numnodes + 1) for i in range(len(c.data))]
             cells.append(
                 numpy.hstack((numpy.full((len(c.data), 1), numnodes), c.data)).ravel()
             )
             cell_type += [vtk_type] * len(c.data)
-            next_offset = offset[-1] + numnodes + 1
+            if not VTK9:
+                offset += [next_offset + i * (numnodes + 1) for i in range(len(c.data))]
+                next_offset = offset[-1] + numnodes + 1
 
         # Create pyvista.UnstructuredGrid object
         points = self.points
         if points.shape[1] == 2:
             points = numpy.hstack((points, numpy.zeros((len(points), 1))))
 
-        mesh = pyvista.UnstructuredGrid(
-            numpy.array(offset),
-            numpy.concatenate(cells),
-            numpy.array(cell_type),
-            numpy.array(points, numpy.float64),
-        )
+        if VTK9:
+            mesh = pyvista.UnstructuredGrid(
+                numpy.concatenate(cells),
+                numpy.array(cell_type),
+                numpy.array(points, numpy.float64),
+            )
+        else:
+            mesh = pyvista.UnstructuredGrid(
+                numpy.array(offset),
+                numpy.concatenate(cells),
+                numpy.array(cell_type),
+                numpy.array(points, numpy.float64),
+            )
 
         # Set point data
         mesh.point_arrays.update(
@@ -862,7 +873,10 @@ def from_pyvista(mesh):
     """
     try:
         import pyvista
+        import vtk
         from ._common import vtk_to_meshio_type
+
+        VTK9 = vtk.vtkVersion().GetVTKMajorVersion() >= 9
     except ImportError:
         raise ImportError(
             "Converting pyvista.UnstructuredGrid requires pyvista to be installed."
@@ -884,9 +898,14 @@ def from_pyvista(mesh):
 
     # Get cells
     cells = []
+    c = 0
     for offset, cell_type in zip(vtk_offset, vtk_cell_type):
         numnodes = vtk_cells[offset]
-        cell = vtk_cells[offset + 1 : offset + 1 + numnodes]
+        if VTK9:
+            cell = vtk_cells[offset + 1 + c : offset + 1 + c + numnodes]
+            c += 1
+        else:
+            cell = vtk_cells[offset + 1 : offset + 1 + numnodes]
         cell = (
             cell
             if cell_type not in pixel_voxel
