@@ -273,43 +273,46 @@ geo.add_physical(
 ########################################################################################
 
 ########################################################################################
-# Finally, we can generate the Gmsh mesh file directly in Python by specifying the path to Gmsh executable (if Gmsh has not been added to the system PATH).
-# Alternatively, we can write the geometry file and import it in Gmsh to generate the final mesh:
-# 
+# Finally, we can generate the geometry file and import it into Gmsh to generate the final mesh.
+
+with open("mesh.geo", "w") as f:
+    f.write(geo.get_code())
+
+########################################################################################
+
+########################################################################################
+# Alternatively, the Gmsh mesh file can also be directly generated in Python by specifying the path to Gmsh executable (if Gmsh has not been added to the system PATH).
+#
 # .. code-block:: python
 #
-#   with open("mesh.geo", "w") as f:
-#       f.write(geo.get_code())
-#
-
-geo.add_raw_code("Coherence;")
-mesh = pygmsh.generate_mesh(
-    geo,
-    dim=2,
-    prune_vertices=True,
-    remove_lower_dim_cells=True,
-    gmsh_path="gmsh",  # Change the path here
-    geo_filename="mesh.geo",
-    msh_filename="mesh.msh",
-    mesh_file_type="msh4",
-    extra_gmsh_arguments=[
-        "-smooth", "2",
-        "-optimize_netgen",
-    ],
-    verbose=False,
-)
+#       geo.add_raw_code("Coherence;")
+#       mesh = pygmsh.generate_mesh(
+#           geo,
+#           dim=2,
+#           prune_vertices=True,
+#           remove_lower_dim_cells=True,
+#           gmsh_path="gmsh",  # Change the path here
+#           geo_filename="mesh.geo",
+#           msh_filename="mesh.msh",
+#           mesh_file_type="msh4",
+#           extra_gmsh_arguments=[
+#               "-smooth", "2",
+#               "-optimize_netgen",
+#           ],
+#           verbose=False,
+#       )
 
 ########################################################################################
 
 ########################################################################################
-# The function :func:`pygmsh.generate_mesh` returns a :class:`meshio.Mesh` object that can be visualized with :mod:`pyvista`.
+# The generated mesh can be visualized in Python with :mod:`pyvista`.
 
 import pyvista
 pyvista.set_plot_theme("document")
 
 p = pyvista.Plotter(window_size=(800, 800), notebook=True)
 p.add_mesh(
-    mesh=pyvista.from_meshio(mesh),
+    mesh=pyvista.read("mesh.msh"),
     stitle="Materials",
     show_scalar_bar=True,
     show_edges=True,
