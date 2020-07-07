@@ -27,16 +27,12 @@ release = version
 # -- Hack for lacking git-lfs support ReadTheDocs ----------------------------
 # See <https://github.com/readthedocs/readthedocs.org/issues/1846>
 
-on_rtd = os.environ.get("READTHEDOCS", None) == "True"
-if on_rtd:
-    from git_lfs import fetch
-
-    DOC_SOURCES_DIR = os.path.dirname(os.path.abspath(__file__))
-    PROJECT_ROOT_DIR = os.path.dirname(os.path.dirname(DOC_SOURCES_DIR))
-    sys.path.insert(0, DOC_SOURCES_DIR)
-
-    print("Fetching files with git_lfs...")
-    fetch(PROJECT_ROOT_DIR)
+if not os.path.exists("./git-lfs"):
+    os.system("wget https://github.com/git-lfs/git-lfs/releases/download/v2.7.1/git-lfs-linux-amd64-v2.7.1.tar.gz")
+    os.system("tar xvfz git-lfs-linux-amd64-v2.7.1.tar.gz")
+    os.system("./git-lfs install")  # Make lfs available in current repository
+    os.system("./git-lfs fetch")  # Download content from remote
+    os.system("./git-lfs checkout")  # Make local files to have the real content on them
 
 
 # -- General configuration ---------------------------------------------------
