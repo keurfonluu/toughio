@@ -1,21 +1,20 @@
 toughio's documentation
 =======================
 
+.. include:: ../../README.rst
+
+
 .. toctree::
-   :numbered:
    :maxdepth: 2
-   :caption: Contents
+   :hidden:
+   :caption: Getting started
 
-   io
-   mesh
-   rpcap
-   cli
-   example
+   gallery/index
 
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: Reference documentation
+   
+   api/index
