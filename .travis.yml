@@ -1,0 +1,25 @@
+dist: xenial
+
+language: python
+python:
+  - 3.7
+
+env:
+  global:
+    # Doctr deploy key for keurfonluu/toughio
+    - secure: "DZ8xSB3I4c9RD7p6k0X2au/w3h7dhmNaGAwZm5ufi9tyecwQ9tQub7GpNk5Uqs45BgmXbPhWuedkYc9jdIBzWCFOI58vJC3KXbD/OYnmUo3sYbjItBAijOH20K1Var781oNkQ3Lb5WKibIkyCnjhs/5Uc3PI1pFegzzLGCAUbLKbWRUdAFfLYEKHvuCHR74EysuWDyKgmy4igRdDKlV6rsbFO5dIscJnbVoncL6V0hEmsgKu+278foD9KYui6fAIEIVg+zsdEd1YkbPbkz1w9lm4IxXgDJeRtb5ck1kUKh0b4Hfu/UpZZC44jqHElPeqigikyYeavvniyU7M5UaeL3Xz71Mk/8Ndm/SDKU9oUJojYCstZCPNb43ucpE+dWMG2AiyUVFxeCBLEWQEaQ5to1E37crmzr3L1U6geugTKaLAu9F61PRVMqughVxjA0FXnHtOgSIq+zCBnxqD/VGAyJbp59E4SMMQ8bmSIjazGFyVRvHpYSfsypEi4Ow/itGCNvLq+uYZ8tFOnURdtd3Kej3vQ1TlT0TucxQwQhFQeOMl9hK2C6pS9yQPdMKdz70wftGh7pJUtGmWIOqVae8+FzkO5zMwsFDAZ0+Y7A1GvSr1t2bieC2Dt/CmN8+KVbCxpDmU+1GzX0O48PMxc+y39ueUtsBlmPfrSQUreJxBdDM="
+
+before_install:
+  # configure a headless display
+  - git clone --depth 1 git://github.com/pyvista/gl-ci-helpers.git
+  - source ./gl-ci-helpers/travis/setup_headless_display.sh
+
+install:
+  - pip install -e .[full]
+  - pip install -r doc/requirements.txt
+
+script:
+  - set -e
+  - sphinx-build -b html doc/source doc/build
+  - pip install doctr
+  - doctr deploy --built-docs ./doc/build/
