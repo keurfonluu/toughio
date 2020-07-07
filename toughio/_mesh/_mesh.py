@@ -873,7 +873,10 @@ def from_pyvista(mesh):
     """
     try:
         import pyvista
+        import vtk
         from ._common import vtk_to_meshio_type
+
+        VTK9 = vtk.vtkVersion().GetVTKMajorVersion() >= 9
     except ImportError:
         raise ImportError(
             "Converting pyvista.UnstructuredGrid requires pyvista to be installed."
@@ -895,9 +898,14 @@ def from_pyvista(mesh):
 
     # Get cells
     cells = []
+    c = 0
     for offset, cell_type in zip(vtk_offset, vtk_cell_type):
         numnodes = vtk_cells[offset]
-        cell = vtk_cells[offset + 1 : offset + 1 + numnodes]
+        if VTK9:
+            cell = vtk_cells[offset + 1 + c : offset + 1 + c + numnodes]
+            c += 1
+        else:
+            cell = vtk_cells[offset + 1 : offset + 1 + numnodes]
         cell = (
             cell
             if cell_type not in pixel_voxel
