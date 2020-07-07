@@ -1,3 +1,4 @@
+git-lfs
 pygmsh
 seaborn
 sphinx-argparse

@@ -24,6 +24,21 @@ version = toughio.__version__
 release = version
 
 
+# -- Hack for lacking git-lfs support ReadTheDocs ----------------------------
+# See <https://github.com/readthedocs/readthedocs.org/issues/1846>
+
+on_rtd = os.environ.get("READTHEDOCS", None) == "True"
+if on_rtd:
+    from git_lfs import fetch
+
+    DOC_SOURCES_DIR = os.path.dirname(os.path.abspath(__file__))
+    PROJECT_ROOT_DIR = os.path.dirname(os.path.dirname(DOC_SOURCES_DIR))
+    sys.path.insert(0, DOC_SOURCES_DIR)
+
+    print("Fetching files with git_lfs...")
+    fetch(PROJECT_ROOT_DIR)
+
+
 # -- General configuration ---------------------------------------------------
 
 master_doc = "index"
