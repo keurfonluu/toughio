@@ -22,4 +22,4 @@ script:
   - set -e
   - sphinx-build -b html doc/source doc/build
   - pip install doctr
-  - doctr deploy doc --built-docs ./doc/build/
+  - doctr deploy . --built-docs ./doc/build/
