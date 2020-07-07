@@ -4,7 +4,9 @@ Import and visualize simulation outputs in PyVista
 
 Once the TOUGH simulation has ended, there is not much things left to do with :mod:`toughio`. We can either:
 
--   Export the output file *OUTPUT_ELEME.csv* to a file that can be opened by common visualization softwares (e.g. ParaView) using the command line script `toughio-export`,
+-   Run the command :code:`toughio-export OUTPUT_ELEME.csv -m mesh.pickle` and drag-and-drop the generated VTK file in a compatible visualization software (e.g. ParaView),
+
+.. image:: ../../figures/co2_leakage_along_a_fault_paraview.png
 
 -   Import the output file *OUTPUT_ELEME.csv* in Python using :mod:`toughio` (two-liners) and do whatever post-processing we want and need.
 
@@ -13,12 +15,7 @@ This example briefly shows how to import TOUGH output file using :mod:`toughio` 
 """
 
 ########################################################################################
-# First, we unpickle the mesh file and import the last time step of the output file (`OUTPUT_ELEME.csv` in TOUGH3). For TOUGH2 output, we need to run the command line script `toughio-extract` to convert TOUGH2 main output file to a TOUGH3 output file:
-# 
-# .. code-block:: bash
-#     
-#       toughio-extract OUTPUT MESH
-# 
+# First, we unpickle the mesh file and import the last time step of the output file (`OUTPUT_ELEME.csv` in TOUGH3, `OUTPUT` in TOUGH2).
 
 import toughio
 
