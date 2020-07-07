@@ -54,7 +54,7 @@ sphinx_gallery_conf = {
         "../../examples/co2_leakage_along_a_fault/",
     ],
     "gallery_dirs": [
-        "examples",
+        "examples/co2_leakage_along_a_fault/",
     ],
     "filename_pattern": r"\.py",
     "download_all_examples": False,
@@ -69,6 +69,11 @@ sphinx_gallery_conf = {
         "%matplotlib inline\n"
     ),
 }
+
+# PyVista settings
+import pyvista
+
+pyvista.BUILDING_GALLERY = True
 
 # Napoleon settings
 napoleon_google_docstring = False
