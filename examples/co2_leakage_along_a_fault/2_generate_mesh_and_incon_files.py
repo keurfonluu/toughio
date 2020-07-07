@@ -37,7 +37,7 @@ mesh.extrude_to_3d(height=1.0, axis=1)
 import pyvista
 pyvista.set_plot_theme("document")
 
-p = pyvista.Plotter(window_size=(800, 800), notebook=True)
+p = pyvista.Plotter(window_size=(800, 800))
 p.add_mesh(
     mesh=mesh.to_pyvista(),
     scalars=mesh.qualities,

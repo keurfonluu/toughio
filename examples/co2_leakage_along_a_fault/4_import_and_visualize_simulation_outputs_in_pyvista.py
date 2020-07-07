@@ -30,7 +30,7 @@ mesh.read_output("OUTPUT_ELEME.csv", time_step=-1)
 import pyvista
 pyvista.set_plot_theme("document")
 
-p = pyvista.Plotter(window_size=(1000, 1000), notebook=True)
+p = pyvista.Plotter(window_size=(1000, 1000))
 p.add_mesh(
     mesh.to_pyvista(),
     scalars="SAT_G",

@@ -1,7 +1,7 @@
 toughio
 =======
 
-|License| |Stars| |Pyversions| |Version| |Downloads| |Code style: black| |Codacy Badge| |Codecov| |Documentation Status|
+|License| |Stars| |Pyversions| |Version| |Downloads| |Code style: black| |Codacy Badge| |Codecov|
 
 `TOUGH <https://tough.lbl.gov/>`__ (Transport Of Unsaturated Groundwater and Heat) is a general purpose numerical simulation software designed for fluid and heat flows of multiphase, multicomponent fluid mixtures in porous and fractured media developed at Lawrence Berkeley National Laboratory. It solves mass and energy balance equations that describe fluid and heat flow in multiphase and multicomponent systems. TOUGH handles all types of multiphase and multicomponent flow systems since the governing equations for fluid and heat flow have the same mathematical form. The nature and properties of fluid mixtures are described by thermophysical variables (e.g. density, viscosity, enthalpy) which are provided by an equation-of-state (EOS) module.
 
@@ -194,6 +194,3 @@ This Software was developed under funding from the U.S. Department of Energy and
 
 .. |Codecov| image:: https://img.shields.io/codecov/c/github/keurfonluu/toughio.svg?style=flat
    :target: https://codecov.io/gh/keurfonluu/toughio
-
-.. |Documentation Status| image:: https://readthedocs.org/projects/toughio/badge/?version=latest
-   :target: https://toughio.readthedocs.io/en/latest/?badge=latest
