@@ -150,12 +150,13 @@ parameters["generators"] = {
 
 ########################################################################################
 # Let's customize the outputs.
-# For this example, we want TOUGH to save the output every three months (i.e. 4 outputs per year). To reduce the size of the output file, we also want TOUGH to only save the saturation of phase 1 (gas) (only available in TOUGH3).
+# For this example, we want TOUGH to save the output every three months (i.e. 4 outputs per year). To reduce the size of the output file, we also want TOUGH to only save the saturation of phase 1 (gas) in addition to the cell coordinates. Note that this option is only available in TOUGH3.
 
 parameters["times"] = numpy.arange(1, 13) * 90.0 * 24.0 * 3600.0
 parameters["output"] = {
     "variables": {
         "saturation": 1,
+        "coordinate": None,
     },
 }
 
@@ -165,5 +166,10 @@ parameters["output"] = {
 # Finally, we can export the model parameters input file by using the function :func:`toughio.write_input`.
 
 toughio.write_input("INFILE", parameters)
+
+########################################################################################
+
+########################################################################################
+# At this stage, all the input files required to run the simulation have been generated. We can now simply call TOUGH using EOS ECO2n (e.g. :code:`tough3-eco2n` for TOUGH3).
 
 ########################################################################################
