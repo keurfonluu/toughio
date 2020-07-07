@@ -310,7 +310,7 @@ with open("mesh.geo", "w") as f:
 import pyvista
 pyvista.set_plot_theme("document")
 
-p = pyvista.Plotter(window_size=(800, 800), notebook=True)
+p = pyvista.Plotter(window_size=(800, 800))
 p.add_mesh(
     mesh=pyvista.read("mesh.msh"),
     stitle="Materials",
