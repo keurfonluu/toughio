@@ -56,7 +56,7 @@ Otherwise, clone and extract the package, then run from the package location:
 
    pip install .[full] --user
 
-To test the integrity of the package, check out this repository and run:
+To test the integrity of the installed package, check out this repository and run:
 
 .. code:: bash
 
