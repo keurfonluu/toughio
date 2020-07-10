@@ -791,7 +791,7 @@ class Mesh(object):
         return numpy.array([numpy.min(out) for out in _qualities(self)])
 
 
-def from_meshio(mesh):
+def from_meshio(mesh, material="dfalt"):
     """
     Convert a :class:`meshio.Mesh` to :class:`toughio.Mesh`.
 
@@ -799,6 +799,8 @@ def from_meshio(mesh):
     ----------
     mesh : meshio.Mesh
         Input mesh.
+    material : str, optional, default 'dfalt'
+        Default material name.
 
     Returns
     -------
@@ -809,6 +811,8 @@ def from_meshio(mesh):
     from ._helpers import get_material_key
 
     if not isinstance(mesh, meshio.Mesh):
+        raise TypeError()
+    if not isinstance(material, str):
         raise TypeError()
 
     version = get_meshio_version()
@@ -851,12 +855,12 @@ def from_meshio(mesh):
             else 1
         )
         out.cell_data["material"] = numpy.full(out.n_cells, imat, dtype=int)
-        out.field_data["dfalt"] = numpy.array([imat, 3])
+        out.field_data[material] = numpy.array([imat, 3])
 
     return out
 
 
-def from_pyvista(mesh):
+def from_pyvista(mesh, material="dfalt"):
     """
     Convert a :class:`pyvista.UnstructuredGrid` to :class:`toughio.Mesh`.
 
@@ -864,6 +868,8 @@ def from_pyvista(mesh):
     ----------
     mesh : pyvista.UnstructuredGrid
         Input mesh.
+    material : str, optional, default 'dfalt'
+        Default material name.
 
     Returns
     -------
@@ -883,6 +889,8 @@ def from_pyvista(mesh):
         )
 
     if not isinstance(mesh, pyvista.UnstructuredGrid):
+        raise TypeError()
+    if not isinstance(material, str):
         raise TypeError()
 
     # Copy useful arrays to avoid repeated calls to properties
@@ -945,6 +953,6 @@ def from_pyvista(mesh):
     if "material" not in out.cell_data.keys():
         imat = 1
         out.cell_data["material"] = numpy.full(out.n_cells, imat, dtype=int)
-        out.field_data["dfalt"] = numpy.array([imat, 3])
+        out.field_data[material] = numpy.array([imat, 3])
 
     return out
