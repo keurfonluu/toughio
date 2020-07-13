@@ -2,7 +2,8 @@
 exclude_paths:
   - '**/__init__.py'
   - 'samples/**'
-  - 'CODE_OF_CONDUCT.md'
+  - 'CODE_OF_CONDUCT.rst'
+  - 'CONTRIBUTING.rst'
   - 'paper/**'
   - '**/*.sh'
   - 'doc/source/conf.py'
