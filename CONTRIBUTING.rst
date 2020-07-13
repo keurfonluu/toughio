@@ -18,13 +18,13 @@ The first step to contributing is to fork and/or clone the repository. Additiona
 
     pip install -r requirements-dev.txt
 
-The code is formatted with `**``black``** <https://github.com/psf/black>`__ so you don't have to worry about code formatting. Docstrings follow `NumPy's style guide <https://github.com/numpy/numpy/blob/master/doc/HOWTO_DOCUMENT.rst.txt>`__ and all public functions, classes and methods must come with a full description of input parameters and return outputs. To format both code and docstrings, simply run the command:
+The code is formatted with `black <https://github.com/psf/black>`__ so you don't have to worry about code formatting. Docstrings follow `NumPy's style guide <https://github.com/numpy/numpy/blob/master/doc/HOWTO_DOCUMENT.rst.txt>`__ and all public functions, classes and methods must come with a full description of input parameters and return outputs. To format both code and docstrings, simply run the command:
 
 .. code:: bash
 
     invoke format
 
-Every new features must be unit tested in the directory ``test`` using the `**``pytest``** <https://docs.pytest.org/en/stable/>`__ framework. To run the test suite, run the command:
+Every new features must be unit tested in the directory ``test`` using the `pytest <https://docs.pytest.org/en/stable/>`__ framework. To run the test suite, run the command:
 
 .. code:: bash
 
