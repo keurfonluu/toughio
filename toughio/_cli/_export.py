@@ -94,6 +94,8 @@ def export(argv=None):
                 for label, data in output.data.items():
                     if label not in {"X", "Y", "Z"}:
                         mesh.add_cell_data(label, data)
+            else:
+                with_mesh = True
 
     else:
         print("Reading mesh file '{}' ...".format(args.mesh), end="")
