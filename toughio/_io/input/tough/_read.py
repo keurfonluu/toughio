@@ -567,7 +567,7 @@ def _read_conne(f, label_length):
         label_length = get_label_length(line[:9])
 
     while True:
-        if line.strip():
+        if line.strip() and not line.startswith("+++"):
             data = read_record(line, fmt[label_length])
             label = data[0]
             conne["connections"][label] = {
