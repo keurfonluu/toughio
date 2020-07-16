@@ -132,6 +132,11 @@ def _write_csv(f, output, headers):
             record = [label] if isinstance(label, str) else [l for l in label]
             record += [out.data[k][i] for k in headers if not k.startswith("ELEM")]
             record = (
-                ",".join(fmt.format(rec) for fmt, rec in zip(formats, record)) + "\n"
+                ",".join(
+                    fmt.format(rec)
+                    if rec is not None
+                    else fmt.format(0.0)
+                    for fmt, rec in zip(formats, record)
+                ) + "\n"
             )
             f.write(record)
