@@ -14,7 +14,7 @@ affiliations:
     - name: Energy Geosciences Division, Lawrence Berkeley National Laboratory, Berkeley, CA, USA
       index: 1
 
-date: 16 June 2020
+date: 26 July 2020
 bibliography: paper.bib
 ---
 
