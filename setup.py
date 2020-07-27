@@ -50,7 +50,7 @@ else:
     REQUIREMENTS = ["meshio >= 4.0.11, < 5.0"]
     EXTRA_REQUIREMENTS = {"full": ["pyvista >= 0.23.1"]}
 REQUIREMENTS += ["numpy >= 1.13.0"]
-EXTRA_REQUIREMENTS["full"] += ["matplotlib", "netcdf4", "h5py", "scipy>=0.9"]
+EXTRA_REQUIREMENTS["full"] += ["matplotlib", "h5py", "netcdf4", "scipy>=0.9"]
 
 
 PACKAGE_DATA = {
