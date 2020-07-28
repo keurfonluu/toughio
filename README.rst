@@ -148,6 +148,32 @@ Contributing
 Please refer to the `Contributing
 Guidelines <https://github.com/keurfonluu/toughio/blob/master/CONTRIBUTING.rst>`__ to see how you can help. This project is released with a `Code of Conduct <https://github.com/keurfonluu/toughio/blob/master/CODE_OF_CONDUCT.rst>`__ which you agree to abide by when contributing.
 
+Citing toughio
+--------------
+
+If you are using **toughio** in your scientific research, please consider citing our work!
+
+..
+
+   Luu, K., (2020). toughio: Pre- and post-processing Python library for TOUGH. Journal of Open Source Software, 5(51), 2412, https://doi.org/10.21105/joss.02412
+
+BibTex:
+
+.. code-block::
+
+   @article{Luu2020,
+      doi = {10.21105/joss.02412},
+      url = {https://doi.org/10.21105/joss.02412},
+      year = {2020},
+      publisher = {The Open Journal},
+      volume = {5},
+      number = {51},
+      pages = {2412},
+      author = {Keurfon Luu},
+      title = {toughio: Pre- and post-processing Python library for TOUGH},
+      journal = {Journal of Open Source Software}
+   }
+
 Notice
 ------
 
