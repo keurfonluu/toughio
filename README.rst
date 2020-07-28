@@ -1,7 +1,7 @@
 toughio
 =======
 
-|License| |Stars| |Pyversions| |Version| |Downloads| |Code style: black| |Codacy Badge| |Codecov| |Build| |Travis|
+|License| |Stars| |Pyversions| |Version| |Downloads| |Code style: black| |Codacy Badge| |Codecov| |Build| |Travis| |JOSS|
 
 `TOUGH <https://tough.lbl.gov/>`__ (Transport Of Unsaturated Groundwater and Heat) is a general purpose numerical simulation software designed for fluid and heat flows of multiphase, multicomponent fluid mixtures in porous and fractured media developed at Lawrence Berkeley National Laboratory. It solves mass and energy balance equations that describe fluid and heat flow in multiphase and multicomponent systems. TOUGH handles all types of multiphase and multicomponent flow systems since the governing equations for fluid and heat flow have the same mathematical form. The nature and properties of fluid mixtures are described by thermophysical variables (e.g. density, viscosity, enthalpy) which are provided by an equation-of-state (EOS) module.
 
@@ -148,6 +148,32 @@ Contributing
 Please refer to the `Contributing
 Guidelines <https://github.com/keurfonluu/toughio/blob/master/CONTRIBUTING.rst>`__ to see how you can help. This project is released with a `Code of Conduct <https://github.com/keurfonluu/toughio/blob/master/CODE_OF_CONDUCT.rst>`__ which you agree to abide by when contributing.
 
+Citing toughio
+--------------
+
+If you are using **toughio** in your scientific research, please consider citing our work!
+
+..
+
+   Luu, K., (2020). toughio: Pre- and post-processing Python library for TOUGH. Journal of Open Source Software, 5(51), 2412, https://doi.org/10.21105/joss.02412
+
+BibTex:
+
+.. code-block::
+
+   @article{Luu2020,
+      doi = {10.21105/joss.02412},
+      url = {https://doi.org/10.21105/joss.02412},
+      year = {2020},
+      publisher = {The Open Journal},
+      volume = {5},
+      number = {51},
+      pages = {2412},
+      author = {Keurfon Luu},
+      title = {toughio: Pre- and post-processing Python library for TOUGH},
+      journal = {Journal of Open Source Software}
+   }
+
 Notice
 ------
 
@@ -185,3 +211,6 @@ This Software was developed under funding from the U.S. Department of Energy and
 
 .. |Travis| image:: https://img.shields.io/travis/com/keurfonluu/toughio/master?label=docs
    :target: https://keurfonluu.github.io/toughio/
+
+.. |JOSS| image:: https://joss.theoj.org/papers/10.21105/joss.02412/status.svg
+   :target: https://doi.org/10.21105/joss.02412
