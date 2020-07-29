@@ -6,10 +6,19 @@ import toughio
 
 
 @pytest.mark.parametrize(
-    "nodal_distance, bound",
-    [("line", True), ("line", False), ("orthogonal", True), ("orthogonal", False)],
+    "nodal_distance, bound, coord",
+    [
+        ("line", True, False),
+        ("line", False, False),
+        ("orthogonal", True, False),
+        ("orthogonal", False, False),
+        ("line", True, True),
+        ("line", False, True),
+        ("orthogonal", True, True),
+        ("orthogonal", False, True),
+    ],
 )
-def test_mesh(nodal_distance, bound):
+def test_mesh(nodal_distance, bound, coord):
     # Create 3D mesh
     dx = numpy.arange(3) + 1
     dy = numpy.arange(4) + 1
@@ -35,7 +44,7 @@ def test_mesh(nodal_distance, bound):
         obj=None,
         writer=mesh.write_tough,
         reader=toughio.read_mesh,
-        writer_kws={"nodal_distance": nodal_distance},
+        writer_kws={"nodal_distance": nodal_distance, "coord": coord},
         reader_kws={"file_format": "tough"},
     )
 
@@ -61,6 +70,9 @@ def test_mesh(nodal_distance, bound):
 
     centers = [parameters["elements"][label]["center"] for label in mesh.labels]
     assert numpy.allclose(mesh.centers, centers)
+
+    # Check block COORD
+    assert parameters["coordinates"] == coord
 
     # Check block CONNE
     nx, ny, nz = len(dx), len(dy), len(dz)
