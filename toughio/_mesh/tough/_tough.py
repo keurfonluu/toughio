@@ -25,6 +25,7 @@ def read(filename, label_length=None):
         in {
             "elements",
             "elements_order",
+            "coordinates",
             "connections",
             "connections_order",
             "initial_conditions",
