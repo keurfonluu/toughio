@@ -111,6 +111,7 @@ def write_buffer(parameters):
     out += _write_diffu(parameters) if parameters["diffusion"] is not None else []
     out += _write_outpu(parameters) if parameters["output"] else []
     out += _write_eleme(parameters) if parameters["elements"] else []
+    out += _write_coord(parameters) if parameters["coordinates"] else []
     out += _write_conne(parameters) if parameters["connections"] else []
     out += _write_incon(parameters) if parameters["initial_conditions"] else []
     out += _write_nover() if parameters["nover"] else []
@@ -776,6 +777,27 @@ def _write_eleme(parameters):
             data["center"][1],
             data["center"][2],
         ]
+        out += write_record(values, fmt)
+
+    return out
+
+
+@block("COORD", multi=True)
+def _write_coord(parameters):
+    """Write COORD block data."""
+    # Reorder elements
+    if parameters["elements_order"] is not None:
+        order = parameters["elements_order"]
+    else:
+        order = parameters["elements"].keys()
+
+    # Format
+    fmt = block_to_format["COORD"]
+    fmt = str2format(fmt)
+
+    out = []
+    for k in order:
+        values = parameters["elements"][k]["center"]
         out += write_record(values, fmt)
 
     return out

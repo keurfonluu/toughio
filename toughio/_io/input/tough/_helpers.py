@@ -33,6 +33,7 @@ dtypes = {
         "output": "dict",
         "elements": "dict",
         "elements_order": "array_like",
+        "coordinates": "bool",
         "connections": "dict",
         "connections_order": "array_like",
         "initial_conditions": "dict",
