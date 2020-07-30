@@ -193,12 +193,9 @@ def write_mesh(
 
         if coord:
             _write_coord(
-                f,
-                nodes,
-                materials,
-                material_end,
+                f, nodes, materials, material_end,
             )
-        
+
         _write_conne(
             f,
             labels,
@@ -258,10 +255,7 @@ def _write_eleme(
 
 @block("COORD")
 def _write_coord(
-    f,
-    nodes,
-    materials,
-    material_end,
+    f, nodes, materials, material_end,
 ):
     """Write COORD block."""
     from ._helpers import _write_coord as writer

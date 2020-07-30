@@ -539,7 +539,6 @@ def _read_eleme(f, label_length):
         label_length = get_label_length(line[:9])
 
     while True:
-
         if line.strip():
             data = read_record(line, fmt[label_length])
             label = data[0]
