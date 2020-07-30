@@ -51,13 +51,9 @@ def _write_eleme(labels, materials, volumes, nodes, material_name=None):
 def _write_coord(nodes):
     """Return a generator that iterates over the records of block COORD."""
     fmt = "{:20.13e}{:20.13e}{:20.13e}\n"
-    
+
     for node in nodes:
-        record = fmt.format(
-            node[0],  # X
-            node[1],  # Y
-            node[2],  # Z
-        )
+        record = fmt.format(*node)
         yield record
 
 

@@ -104,12 +104,18 @@ def write_buffer(parameters, mesh):
         out += _write_indom(parameters) if indom else []
         out += _write_momop(parameters) if parameters["more_options"] else []
         out += _write_times(parameters) if parameters["times"] is not None else []
-        out += _write_foft(parameters) if parameters["element_history"] is not None else []
         out += (
-            _write_coft(parameters) if parameters["connection_history"] is not None else []
+            _write_foft(parameters) if parameters["element_history"] is not None else []
         )
         out += (
-            _write_goft(parameters) if parameters["generator_history"] is not None else []
+            _write_coft(parameters)
+            if parameters["connection_history"] is not None
+            else []
+        )
+        out += (
+            _write_goft(parameters)
+            if parameters["generator_history"] is not None
+            else []
         )
         out += _write_gener(parameters) if parameters["generators"] else []
         out += _write_diffu(parameters) if parameters["diffusion"] is not None else []
