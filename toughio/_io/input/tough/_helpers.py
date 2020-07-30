@@ -189,9 +189,9 @@ def check_parameters(input_types, keys=None, is_list=False):
 
     keys = [keys] if isinstance(keys, str) else keys
 
-    def decorator(func):
+    def decorator(func, *args, **kwargs):
         @wraps(func)
-        def wrapper(parameters):
+        def wrapper(parameters, *args, **kwargs):
             if not keys:
                 _check_parameters(parameters)
             else:
@@ -214,7 +214,7 @@ def check_parameters(input_types, keys=None, is_list=False):
                         keys_str += "['{}']".format(key)
                     _check_parameters(params, keys_str)
 
-            out = func(parameters)
+            out = func(parameters, *args, **kwargs)
 
             return out
 

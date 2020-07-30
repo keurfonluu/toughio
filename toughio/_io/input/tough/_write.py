@@ -14,7 +14,7 @@ __all__ = [
 ]
 
 
-def write(filename, parameters):
+def write(filename, parameters, mesh=False):
     """
     Write TOUGH input file.
 
@@ -24,6 +24,8 @@ def write(filename, parameters):
         Output file name.
     parameters : dict
         Parameters to export.
+    mesh : bool, optional, default False
+        If `True`, only write blocks ELEME, COORD, CONNE and INCON.
 
     """
     from ._common import Parameters, default
@@ -46,14 +48,14 @@ def write(filename, parameters):
             if cond1 and cond2:
                 params["rocks"][rock][k] = v
 
-    buffer = write_buffer(params)
+    buffer = write_buffer(params, mesh)
     with open(filename, "w") as f:
         for record in buffer:
             f.write(record)
 
 
 @check_parameters(dtypes["PARAMETERS"])
-def write_buffer(parameters):
+def write_buffer(parameters, mesh):
     """Write TOUGH input file as a list of 80-character long record strings."""
     from ._common import eos
 
@@ -88,34 +90,39 @@ def write_buffer(parameters):
         logging.warning("Option 'START' is needed to use 'INDOM' conditions.")
 
     # Define input file contents
-    out = ["{:80}\n".format(parameters["title"])]
-    out += _write_rocks(parameters)
-    out += _write_rpcap(parameters) if rpcap else []
-    out += _write_flac(parameters) if parameters["flac"] is not None else []
-    out += _write_multi(parameters) if multi else []
-    out += _write_selec(parameters) if parameters["selections"] else []
-    out += _write_solvr(parameters) if parameters["solver"] else []
-    out += _write_start() if parameters["start"] else []
-    out += _write_param(parameters)
-    out += _write_indom(parameters) if indom else []
-    out += _write_momop(parameters) if parameters["more_options"] else []
-    out += _write_times(parameters) if parameters["times"] is not None else []
-    out += _write_foft(parameters) if parameters["element_history"] is not None else []
-    out += (
-        _write_coft(parameters) if parameters["connection_history"] is not None else []
-    )
-    out += (
-        _write_goft(parameters) if parameters["generator_history"] is not None else []
-    )
-    out += _write_gener(parameters) if parameters["generators"] else []
-    out += _write_diffu(parameters) if parameters["diffusion"] is not None else []
-    out += _write_outpu(parameters) if parameters["output"] else []
+    out = []
+    if not mesh:
+        out += ["{:80}\n".format(parameters["title"])]
+        out += _write_rocks(parameters)
+        out += _write_rpcap(parameters) if rpcap else []
+        out += _write_flac(parameters) if parameters["flac"] is not None else []
+        out += _write_multi(parameters) if multi else []
+        out += _write_selec(parameters) if parameters["selections"] else []
+        out += _write_solvr(parameters) if parameters["solver"] else []
+        out += _write_start() if parameters["start"] else []
+        out += _write_param(parameters)
+        out += _write_indom(parameters) if indom else []
+        out += _write_momop(parameters) if parameters["more_options"] else []
+        out += _write_times(parameters) if parameters["times"] is not None else []
+        out += _write_foft(parameters) if parameters["element_history"] is not None else []
+        out += (
+            _write_coft(parameters) if parameters["connection_history"] is not None else []
+        )
+        out += (
+            _write_goft(parameters) if parameters["generator_history"] is not None else []
+        )
+        out += _write_gener(parameters) if parameters["generators"] else []
+        out += _write_diffu(parameters) if parameters["diffusion"] is not None else []
+        out += _write_outpu(parameters) if parameters["output"] else []
+
     out += _write_eleme(parameters) if parameters["elements"] else []
     out += _write_coord(parameters) if parameters["coordinates"] else []
     out += _write_conne(parameters) if parameters["connections"] else []
     out += _write_incon(parameters) if parameters["initial_conditions"] else []
-    out += _write_nover() if parameters["nover"] else []
-    out += _write_endcy()
+
+    if not mesh:
+        out += _write_nover() if parameters["nover"] else []
+        out += _write_endcy()
 
     return out
 
