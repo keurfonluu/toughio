@@ -473,15 +473,19 @@ def test_outpu(write_read, fmt):
 
 
 @pytest.mark.parametrize(
-    "write_read, label_length",
+    "write_read, label_length, coord",
     [
-        (write_read_tough, 5),
-        (write_read_json, 5),
-        (write_read_tough, 6),
-        (write_read_json, 6),
+        (write_read_tough, 5, False),
+        (write_read_json, 5, False),
+        (write_read_tough, 6, False),
+        (write_read_json, 6, False),
+        (write_read_tough, 5, True),
+        (write_read_json, 5, True),
+        (write_read_tough, 6, True),
+        (write_read_json, 6, True),
     ],
 )
-def test_eleme(write_read, label_length):
+def test_eleme(write_read, label_length, coord):
     labels = [
         helpers.random_label(label_length) for _ in range(numpy.random.randint(10) + 1)
     ]
@@ -505,7 +509,8 @@ def test_eleme(write_read, label_length):
                 for key in keys
             }
             for label in labels
-        }
+        },
+        "coordinates": coord,
     }
     parameters = write_read(parameters_ref)
 
@@ -519,6 +524,8 @@ def test_eleme(write_read, label_length):
                 assert numpy.allclose(vv, parameters["elements"][k][kk], atol=1.0e-4)
             else:
                 assert vv == parameters["elements"][k][kk]
+
+    assert parameters_ref["coordinates"] == parameters["coordinates"]
 
 
 @pytest.mark.parametrize(

@@ -25,6 +25,7 @@ def read(filename, label_length=None):
         in {
             "elements",
             "elements_order",
+            "coordinates",
             "connections",
             "connections_order",
             "initial_conditions",
@@ -40,6 +41,7 @@ def write(
     material_name=None,
     material_end=None,
     incon=False,
+    coord=False,
 ):
     """Write TOUGH MESH file (and INCON file)."""
     if nodal_distance not in {"line", "orthogonal"}:
@@ -93,6 +95,7 @@ def write(
         nodal_distance,
         material_name,
         material_end,
+        coord,
     )
 
     # Write INCON file
@@ -164,8 +167,18 @@ def write_mesh(
     nodal_distance,
     material_name,
     material_end,
+    coord,
 ):
     """Write MESH file."""
+    # Check materials
+    materials = [
+        "{:5}".format(material.strip()) if isinstance(material, str) else material
+        for material in materials
+    ]
+    material_name = material_name if material_name else {}
+    material_end = material_end if material_end else []
+    material_end = [material_end] if isinstance(material_end, str) else material_end
+
     with open(filename, "w") as f:
         _write_eleme(
             f,
@@ -177,6 +190,12 @@ def write_mesh(
             material_name,
             material_end,
         )
+
+        if coord:
+            _write_coord(
+                f, nodes, materials, material_end,
+            )
+
         _write_conne(
             f,
             labels,
@@ -216,15 +235,6 @@ def _write_eleme(
     """Write ELEME block."""
     from ._helpers import _write_eleme as writer
 
-    # Check materials
-    materials = [
-        "{:5}".format(material.strip()) if isinstance(material, str) else material
-        for material in materials
-    ]
-    material_name = material_name if material_name else {}
-    material_end = material_end if material_end else []
-    material_end = [material_end] if isinstance(material_end, str) else material_end
-
     # Apply time-independent Dirichlet boundary conditions
     volumes[boundary_conditions.astype(bool)] *= 1.0e50
 
@@ -232,6 +242,27 @@ def _write_eleme(
     ending = []
     iterables = zip(materials, writer(labels, materials, volumes, nodes, material_name))
     for material, record in iterables:
+        if material not in material_end:
+            f.write(record)
+        else:
+            ending.append(record)
+
+    # Append ending cells at the end of the block
+    if material_end:
+        for record in ending:
+            f.write(record)
+
+
+@block("COORD")
+def _write_coord(
+    f, nodes, materials, material_end,
+):
+    """Write COORD block."""
+    from ._helpers import _write_coord as writer
+
+    # Write COORD block
+    ending = []
+    for material, record in zip(materials, writer(nodes)):
         if material not in material_end:
             f.write(record)
         else:

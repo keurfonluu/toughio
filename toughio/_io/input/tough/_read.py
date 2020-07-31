@@ -100,6 +100,12 @@ def read_buffer(f, label_length):
             parameters.update(_read_outpu(f))
         elif line.startswith("ELEME"):
             parameters.update(_read_eleme(f, label_length))
+            parameters["coordinates"] = False
+        elif line.startswith("COORD"):
+            coord = _read_coord(f)
+            for k, v in zip(parameters["elements_order"], coord):
+                parameters["elements"][k]["center"] = v
+            parameters["coordinates"] = True
         elif line.startswith("CONNE"):
             parameters.update(_read_conne(f, label_length))
         elif line.startswith("INCON"):
@@ -533,7 +539,6 @@ def _read_eleme(f, label_length):
         label_length = get_label_length(line[:9])
 
     while True:
-
         if line.strip():
             data = read_record(line, fmt[label_length])
             label = data[0]
@@ -555,6 +560,24 @@ def _read_eleme(f, label_length):
     eleme["elements"] = {k: prune_nones_dict(v) for k, v in eleme["elements"].items()}
 
     return eleme
+
+
+def _read_coord(f):
+    """Read COORD block data."""
+    fmt = block_to_format["COORD"]
+    coord = []
+
+    line = next(f)
+    while True:
+        if line.strip():
+            data = read_record(line, fmt)
+            coord.append(data)
+        else:
+            break
+
+        line = next(f)
+
+    return coord
 
 
 def _read_conne(f, label_length):

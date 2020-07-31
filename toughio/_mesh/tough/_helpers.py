@@ -48,6 +48,15 @@ def _write_eleme(labels, materials, volumes, nodes, material_name=None):
         yield record
 
 
+def _write_coord(nodes):
+    """Return a generator that iterates over the records of block COORD."""
+    fmt = "{:20.13e}{:20.13e}{:20.13e}\n"
+
+    for node in nodes:
+        record = fmt.format(*node)
+        yield record
+
+
 def _write_conne(clabels, isot, d1, d2, areas, angles):
     """Return a generator that iterates over the records of block CONNE."""
     label_length = len(clabels[0][0])
