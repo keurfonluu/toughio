@@ -78,6 +78,11 @@ def write(filename, parameters, file_format=None, **kwargs):
     file_format : str ('tough', 'json') or None, optional, default None
         Output file format.
 
+    Other Parameters
+    ----------------
+    mesh : bool, optional, default False
+        Only if ``file_format = "tough"``. If `True`, only write blocks ELEME, COORD, CONNE and INCON.
+
     """
     if not isinstance(filename, str):
         raise TypeError()

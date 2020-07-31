@@ -24,6 +24,7 @@ _Parameters = {
     "output": None,
     "elements": {},
     "elements_order": None,
+    "coordinates": False,
     "connections": {},
     "connections_order": None,
     "initial_conditions": {},
