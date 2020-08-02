@@ -43,9 +43,16 @@ def read_buffer(f, label_length):
     # Title
     line = f.readline().strip()
     if line[:5] not in {"ROCKS", "ELEME", "INCON", "GENER"}:
-        parameters["title"] = line
-    else:
-        f.seek(0)
+        title = [line]
+        while True:
+            line = f.readline().strip()
+            if not line.startswith("ROCKS"):
+                title.append(line)
+            else:
+                break
+
+        parameters["title"] = title[0] if len(title) == 1 else title
+    f.seek(0)
 
     # Loop over blocks
     for line in f:
@@ -436,13 +443,19 @@ def _read_gener(f, label_length):
             label = data[0]
             tmp = {
                 "name": [data[1]],
+                "nseq": [data[2]],
+                "nadd": [data[3]],
+                "nads": [data[4]],
                 "type": [data[7]],
                 "layer_thickness": [data[11]],
             }
 
             ltab = data[5]
             if ltab and ltab > 1:
-                for key in ["times", "rates", "specific_enthalpy"]:
+                itab = data[8]
+                keys = ["times", "rates"]
+                keys += ["specific_enthalpy"] if itab else []
+                for key in keys:
                     table = []
 
                     while len(table) < ltab:
@@ -544,6 +557,8 @@ def _read_eleme(f, label_length):
             label = data[0]
             rock = data[3].strip()
             eleme["elements"][label] = {
+                "nseq": data[1],
+                "nadd": data[2],
                 "material": int(rock) if all(r.isdigit() for r in rock) else rock,
                 "volume": data[4],
                 "heat_exchange_area": data[5],
@@ -594,6 +609,8 @@ def _read_conne(f, label_length):
             data = read_record(line, fmt[label_length])
             label = data[0]
             conne["connections"][label] = {
+                "nseq": data[1],
+                "nadd": data[2:4],
                 "permeability_direction": data[4],
                 "nodal_distances": data[5:7],
                 "interface_area": data[7],
