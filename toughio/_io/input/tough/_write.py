@@ -33,6 +33,12 @@ def write(filename, parameters, mesh=False):
     params = deepcopy(Parameters)
     params.update(deepcopy(parameters))
 
+    params["title"] = (
+        [params["title"]]
+        if isinstance(params["title"], str)
+        else params["title"]
+    )
+
     for k, v in default.items():
         if k not in params["default"].keys():
             params["default"][k] = v
@@ -92,7 +98,7 @@ def write_buffer(parameters, mesh):
     # Define input file contents
     out = []
     if not mesh:
-        out += ["{:80}\n".format(parameters["title"])]
+        out += ["{:80}\n".format(title) for title in parameters["title"]]
         out += _write_rocks(parameters)
         out += _write_rpcap(parameters) if rpcap else []
         out += _write_flac(parameters) if parameters["flac"] is not None else []

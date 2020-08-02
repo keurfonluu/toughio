@@ -17,9 +17,23 @@ write_read_json = lambda x: write_read(
 )
 
 
-@pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
-def test_title(write_read):
-    parameters_ref = {"title": helpers.random_string(80)}
+@pytest.mark.parametrize(
+    "write_read, single",
+    [
+        (write_read_tough, True),
+        (write_read_tough, False),
+        (write_read_json, True),
+        (write_read_json, False),
+    ],
+)
+def test_title(write_read, single):
+    parameters_ref = {
+        "title": (
+            helpers.random_string(80)
+            if single
+            else [helpers.random_string(80) for _ in range(numpy.random.randint(5) + 1)]
+        ),
+    }
     parameters = write_read(parameters_ref)
 
     assert parameters_ref["title"] == parameters["title"]
