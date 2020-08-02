@@ -51,11 +51,7 @@ def read_buffer(f, label_length):
             else:
                 break
 
-        parameters["title"] = (
-            title[0]
-            if len(title) == 1
-            else title
-        )
+        parameters["title"] = title[0] if len(title) == 1 else title
     f.seek(0)
 
     # Loop over blocks

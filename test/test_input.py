@@ -410,7 +410,9 @@ def test_gener(write_read, specific_enthalpy, label_length):
                     numpy.random.rand(10),
                     numpy.random.rand(),
                     numpy.random.rand(n_rnd),
-                ] if specific_enthalpy else None,
+                ]
+                if specific_enthalpy
+                else None,
                 "layer_thickness": numpy.random.rand(3),
             },
             helpers.random_label(label_length): {

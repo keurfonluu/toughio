@@ -34,9 +34,7 @@ def write(filename, parameters, mesh=False):
     params.update(deepcopy(parameters))
 
     params["title"] = (
-        [params["title"]]
-        if isinstance(params["title"], str)
-        else params["title"]
+        [params["title"]] if isinstance(params["title"], str) else params["title"]
     )
 
     for k, v in default.items():
