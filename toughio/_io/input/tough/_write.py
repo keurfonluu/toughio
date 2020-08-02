@@ -783,11 +783,16 @@ def _write_eleme(parameters):
         data = deepcopy(elements)
         data.update(parameters["elements"][k])
 
+        material = (
+            "{:>5}".format(data["material"])
+            if isinstance(data["material"], int)
+            else data["material"]
+        )
         values = [
             k,
             None,
             None,
-            data["material"],
+            material,
             data["volume"],
             data["heat_exchange_area"],
             data["permeability_modifier"],
