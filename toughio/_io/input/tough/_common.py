@@ -81,6 +81,9 @@ solver = {
 
 generators = {
     "name": None,
+    "nseq": None,
+    "nadd": None,
+    "nads": None,
     "type": None,
     "times": None,
     "rates": None,
@@ -94,6 +97,8 @@ output = {
 }
 
 elements = {
+    "nseq": None,
+    "nadd": None,
     "material": "",
     "volume": None,
     "heat_exchange_area": None,
@@ -102,6 +107,8 @@ elements = {
 }
 
 connections = {
+    "nseq": None,
+    "nadd": None,
     "permeability_direction": None,
     "nodal_distances": None,
     "interface_area": None,

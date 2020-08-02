@@ -8,7 +8,7 @@ import numpy
 
 dtypes = {
     "PARAMETERS": {
-        "title": "str",
+        "title": "str_array_like",
         "eos": "str",
         "n_component": "int",
         "n_phase": "int",
@@ -94,6 +94,9 @@ dtypes = {
     },
     "GENER": {
         "name": "str_array_like",
+        "nseq": "scalar_array_like",
+        "nadd": "scalar_array_like",
+        "nads": "scalar_array_like",
         "type": "str_array_like",
         "times": "scalar_array_like",
         "rates": "scalar_array_like",
@@ -102,6 +105,8 @@ dtypes = {
     },
     "OUTPU": {"format": "str", "variables": "dict"},
     "ELEME": {
+        "nseq": "int",
+        "nadd": "int",
         "material": "str_int",
         "volume": "scalar",
         "heat_exchange_area": "scalar",
@@ -109,6 +114,8 @@ dtypes = {
         "center": "array_like",
     },
     "CONNE": {
+        "nseq": "int",
+        "nadd": "array_like",
         "permeability_direction": "int",
         "nodal_distances": "array_like",
         "interface_area": "scalar",

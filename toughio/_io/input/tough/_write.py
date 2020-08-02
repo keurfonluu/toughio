@@ -33,6 +33,10 @@ def write(filename, parameters, mesh=False):
     params = deepcopy(Parameters)
     params.update(deepcopy(parameters))
 
+    params["title"] = (
+        [params["title"]] if isinstance(params["title"], str) else params["title"]
+    )
+
     for k, v in default.items():
         if k not in params["default"].keys():
             params["default"][k] = v
@@ -92,7 +96,7 @@ def write_buffer(parameters, mesh):
     # Define input file contents
     out = []
     if not mesh:
-        out += ["{:80}\n".format(parameters["title"])]
+        out += ["{:80}\n".format(title) for title in parameters["title"]]
         out += _write_rocks(parameters)
         out += _write_rpcap(parameters) if rpcap else []
         out += _write_flac(parameters) if parameters["flac"] is not None else []
@@ -644,11 +648,11 @@ def _write_gener(parameters):
     out = []
     for k, v in generator_data:
         # Table
-        ltab, itab = None, None
+        ltab = None
         if v["times"] is not None and isinstance(
             v["times"], (list, tuple, numpy.ndarray)
         ):
-            ltab, itab = len(v["times"]), 1
+            ltab = len(v["times"])
             if not isinstance(v["rates"], (list, tuple, numpy.ndarray)):
                 raise TypeError()
             if not (ltab > 1 and ltab == len(v["rates"])):
@@ -657,17 +661,22 @@ def _write_gener(parameters):
             # Rates and specific enthalpy tables cannot be written without a
             # time table
             for key in ["rates", "specific_enthalpy"]:
-                if v[key] is not None:
-                    if numpy.ndim(v[key]) != 0:
-                        raise ValueError()
+                if v[key] is not None and numpy.ndim(v[key]) != 0:
+                    raise ValueError()
+
+        itab = (
+            1
+            if isinstance(v["specific_enthalpy"], (list, tuple, numpy.ndarray))
+            else None
+        )
 
         # Record 1
         values = [
             k,
             v["name"],
-            None,
-            None,
-            None,
+            v["nseq"],
+            v["nadd"],
+            v["nads"],
             ltab,
             None,
             v["type"],
@@ -778,11 +787,16 @@ def _write_eleme(parameters):
         data = deepcopy(elements)
         data.update(parameters["elements"][k])
 
+        material = (
+            "{:>5}".format(data["material"])
+            if isinstance(data["material"], int)
+            else data["material"]
+        )
         values = [
             k,
-            None,
-            None,
-            data["material"],
+            data["nseq"],
+            data["nadd"],
+            material,
             data["volume"],
             data["heat_exchange_area"],
             data["permeability_modifier"],
@@ -840,9 +854,9 @@ def _write_conne(parameters):
 
         values = [
             k,
-            None,
-            None,
-            None,
+            data["nseq"],
+            data["nadd"][0] if data["nadd"] is not None else None,
+            data["nadd"][1] if data["nadd"] is not None else None,
             data["permeability_direction"],
             data["nodal_distances"][0],
             data["nodal_distances"][1],

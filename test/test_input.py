@@ -17,9 +17,23 @@ write_read_json = lambda x: write_read(
 )
 
 
-@pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
-def test_title(write_read):
-    parameters_ref = {"title": helpers.random_string(80)}
+@pytest.mark.parametrize(
+    "write_read, single",
+    [
+        (write_read_tough, True),
+        (write_read_tough, False),
+        (write_read_json, True),
+        (write_read_json, False),
+    ],
+)
+def test_title(write_read, single):
+    parameters_ref = {
+        "title": (
+            helpers.random_string(80)
+            if single
+            else [helpers.random_string(80) for _ in range(numpy.random.randint(5) + 1)]
+        ),
+    }
     parameters = write_read(parameters_ref)
 
     assert parameters_ref["title"] == parameters["title"]
@@ -356,15 +370,19 @@ def test_oft(write_read, oft, n):
 
 
 @pytest.mark.parametrize(
-    "write_read, label_length",
+    "write_read, specific_enthalpy, label_length",
     [
-        (write_read_tough, 5),
-        (write_read_json, 5),
-        (write_read_tough, 6),
-        (write_read_json, 6),
+        (write_read_tough, True, 5),
+        (write_read_json, True, 5),
+        (write_read_tough, True, 6),
+        (write_read_json, True, 6),
+        (write_read_tough, False, 5),
+        (write_read_json, False, 5),
+        (write_read_tough, False, 6),
+        (write_read_json, False, 6),
     ],
 )
-def test_gener(write_read, label_length):
+def test_gener(write_read, specific_enthalpy, label_length):
     n_rnd = numpy.random.randint(100) + 1
     parameters_ref = {
         "generators": {
@@ -374,6 +392,9 @@ def test_gener(write_read, label_length):
                     helpers.random_string(5),
                     helpers.random_string(5),
                 ],
+                "nseq": numpy.random.randint(10, size=3),
+                "nadd": numpy.random.randint(10, size=3),
+                "nads": numpy.random.randint(10, size=3),
                 "type": [
                     helpers.random_string(4),
                     helpers.random_string(4),
@@ -389,15 +410,23 @@ def test_gener(write_read, label_length):
                     numpy.random.rand(10),
                     numpy.random.rand(),
                     numpy.random.rand(n_rnd),
-                ],
+                ]
+                if specific_enthalpy
+                else None,
                 "layer_thickness": numpy.random.rand(3),
             },
             helpers.random_label(label_length): {
                 "name": [helpers.random_string(5), helpers.random_string(5)],
+                "nseq": numpy.random.randint(10, size=2),
+                "nadd": numpy.random.randint(10, size=2),
+                "nads": numpy.random.randint(10, size=2),
                 "type": [helpers.random_string(4), helpers.random_string(4)],
                 "rates": numpy.random.rand(2),
             },
             helpers.random_label(label_length): {
+                "nseq": numpy.random.randint(10),
+                "nadd": numpy.random.randint(10),
+                "nads": numpy.random.randint(10),
                 "type": helpers.random_string(4),
                 "rates": numpy.random.rand(),
                 "layer_thickness": numpy.random.rand(),
@@ -415,6 +444,8 @@ def test_gener(write_read, label_length):
             if kk in {"name", "type"}:
                 assert vv == parameters["generators"][k][kk]
             else:
+                if kk == "specific_enthalpy" and not specific_enthalpy:
+                    continue
                 if numpy.ndim(vv):
                     for i, arr_ref in enumerate(vv):
                         arr = parameters["generators"][k][kk][i]
@@ -490,6 +521,8 @@ def test_eleme(write_read, label_length, coord):
         helpers.random_label(label_length) for _ in range(numpy.random.randint(10) + 1)
     ]
     keys = [
+        "nseq",
+        "nadd",
         "material",
         "volume",
         "heat_exchange_area",
@@ -500,7 +533,9 @@ def test_eleme(write_read, label_length, coord):
         "elements": {
             label: {
                 key: (
-                    helpers.random_string(5)
+                    numpy.random.randint(10)
+                    if key in {"nseq", "nadd"}
+                    else helpers.random_string(5)
                     if key == "material"
                     else numpy.random.rand(3)
                     if key == "center"
@@ -543,6 +578,8 @@ def test_conne(write_read, label_length):
         for _ in range(numpy.random.randint(10) + 1)
     ]
     keys = [
+        "nseq",
+        "nadd",
         "permeability_direction",
         "nodal_distances",
         "interface_area",
@@ -553,7 +590,11 @@ def test_conne(write_read, label_length):
         "connections": {
             label: {
                 key: (
-                    numpy.random.randint(1, 4)
+                    numpy.random.randint(10)
+                    if key == "nseq"
+                    else numpy.random.randint(10, size=2)
+                    if key == "nadd"
+                    else numpy.random.randint(1, 4)
                     if key == "permeability_direction"
                     else numpy.random.rand(2)
                     if key == "nodal_distances"
