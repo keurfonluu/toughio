@@ -676,9 +676,9 @@ def _write_gener(parameters):
         values = [
             k,
             v["name"],
-            None,
-            None,
-            None,
+            v["nseq"],
+            v["nadd"],
+            v["nads"],
             ltab,
             None,
             v["type"],
@@ -796,8 +796,8 @@ def _write_eleme(parameters):
         )
         values = [
             k,
-            None,
-            None,
+            data["nseq"],
+            data["nadd"],
             material,
             data["volume"],
             data["heat_exchange_area"],
@@ -856,9 +856,9 @@ def _write_conne(parameters):
 
         values = [
             k,
-            None,
-            None,
-            None,
+            data["nseq"],
+            data["nadd"][0] if data["nadd"] is not None else None,
+            data["nadd"][1] if data["nadd"] is not None else None,
             data["permeability_direction"],
             data["nodal_distances"][0],
             data["nodal_distances"][1],
