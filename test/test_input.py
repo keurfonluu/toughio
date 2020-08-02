@@ -356,15 +356,19 @@ def test_oft(write_read, oft, n):
 
 
 @pytest.mark.parametrize(
-    "write_read, label_length",
+    "write_read, specific_enthalpy, label_length",
     [
-        (write_read_tough, 5),
-        (write_read_json, 5),
-        (write_read_tough, 6),
-        (write_read_json, 6),
+        (write_read_tough, True, 5),
+        (write_read_json, True, 5),
+        (write_read_tough, True, 6),
+        (write_read_json, True, 6),
+        (write_read_tough, False, 5),
+        (write_read_json, False, 5),
+        (write_read_tough, False, 6),
+        (write_read_json, False, 6),
     ],
 )
-def test_gener(write_read, label_length):
+def test_gener(write_read, specific_enthalpy, label_length):
     n_rnd = numpy.random.randint(100) + 1
     parameters_ref = {
         "generators": {
@@ -389,7 +393,7 @@ def test_gener(write_read, label_length):
                     numpy.random.rand(10),
                     numpy.random.rand(),
                     numpy.random.rand(n_rnd),
-                ],
+                ] if specific_enthalpy else None,
                 "layer_thickness": numpy.random.rand(3),
             },
             helpers.random_label(label_length): {
@@ -415,6 +419,8 @@ def test_gener(write_read, label_length):
             if kk in {"name", "type"}:
                 assert vv == parameters["generators"][k][kk]
             else:
+                if kk == "specific_enthalpy" and not specific_enthalpy:
+                    continue
                 if numpy.ndim(vv):
                     for i, arr_ref in enumerate(vv):
                         arr = parameters["generators"][k][kk][i]

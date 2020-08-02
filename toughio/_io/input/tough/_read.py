@@ -442,7 +442,10 @@ def _read_gener(f, label_length):
 
             ltab = data[5]
             if ltab and ltab > 1:
-                for key in ["times", "rates", "specific_enthalpy"]:
+                itab = data[8]
+                keys = ["times", "rates"]
+                keys += ["specific_enthalpy"] if itab else []
+                for key in keys:
                     table = []
 
                     while len(table) < ltab:
