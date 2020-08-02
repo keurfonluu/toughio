@@ -392,6 +392,9 @@ def test_gener(write_read, specific_enthalpy, label_length):
                     helpers.random_string(5),
                     helpers.random_string(5),
                 ],
+                "nseq": numpy.random.randint(10, size=3),
+                "nadd": numpy.random.randint(10, size=3),
+                "nads": numpy.random.randint(10, size=3),
                 "type": [
                     helpers.random_string(4),
                     helpers.random_string(4),
@@ -412,10 +415,16 @@ def test_gener(write_read, specific_enthalpy, label_length):
             },
             helpers.random_label(label_length): {
                 "name": [helpers.random_string(5), helpers.random_string(5)],
+                "nseq": numpy.random.randint(10, size=2),
+                "nadd": numpy.random.randint(10, size=2),
+                "nads": numpy.random.randint(10, size=2),
                 "type": [helpers.random_string(4), helpers.random_string(4)],
                 "rates": numpy.random.rand(2),
             },
             helpers.random_label(label_length): {
+                "nseq": numpy.random.randint(10),
+                "nadd": numpy.random.randint(10),
+                "nads": numpy.random.randint(10),
                 "type": helpers.random_string(4),
                 "rates": numpy.random.rand(),
                 "layer_thickness": numpy.random.rand(),
@@ -510,6 +519,8 @@ def test_eleme(write_read, label_length, coord):
         helpers.random_label(label_length) for _ in range(numpy.random.randint(10) + 1)
     ]
     keys = [
+        "nseq",
+        "nadd",
         "material",
         "volume",
         "heat_exchange_area",
@@ -520,7 +531,9 @@ def test_eleme(write_read, label_length, coord):
         "elements": {
             label: {
                 key: (
-                    helpers.random_string(5)
+                    numpy.random.randint(10)
+                    if key in {"nseq", "nadd"}
+                    else helpers.random_string(5)
                     if key == "material"
                     else numpy.random.rand(3)
                     if key == "center"
@@ -563,6 +576,8 @@ def test_conne(write_read, label_length):
         for _ in range(numpy.random.randint(10) + 1)
     ]
     keys = [
+        "nseq",
+        "nadd",
         "permeability_direction",
         "nodal_distances",
         "interface_area",
@@ -573,7 +588,11 @@ def test_conne(write_read, label_length):
         "connections": {
             label: {
                 key: (
-                    numpy.random.randint(1, 4)
+                    numpy.random.randint(10)
+                    if key == "nseq"
+                    else numpy.random.randint(10, size=2)
+                    if key == "nadd"
+                    else numpy.random.randint(1, 4)
                     if key == "permeability_direction"
                     else numpy.random.rand(2)
                     if key == "nodal_distances"

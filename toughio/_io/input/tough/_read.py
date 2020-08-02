@@ -447,6 +447,9 @@ def _read_gener(f, label_length):
             label = data[0]
             tmp = {
                 "name": [data[1]],
+                "nseq": [data[2]],
+                "nadd": [data[3]],
+                "nads": [data[4]],
                 "type": [data[7]],
                 "layer_thickness": [data[11]],
             }
@@ -558,6 +561,8 @@ def _read_eleme(f, label_length):
             label = data[0]
             rock = data[3].strip()
             eleme["elements"][label] = {
+                "nseq": data[1],
+                "nadd": data[2],
                 "material": int(rock) if all(r.isdigit() for r in rock) else rock,
                 "volume": data[4],
                 "heat_exchange_area": data[5],
@@ -608,6 +613,8 @@ def _read_conne(f, label_length):
             data = read_record(line, fmt[label_length])
             label = data[0]
             conne["connections"][label] = {
+                "nseq": data[1],
+                "nadd": data[2:4],
                 "permeability_direction": data[4],
                 "nodal_distances": data[5:7],
                 "interface_area": data[7],
