@@ -8,7 +8,7 @@ import numpy
 
 dtypes = {
     "PARAMETERS": {
-        "title": "str",
+        "title": "str_array_like",
         "eos": "str",
         "n_component": "int",
         "n_phase": "int",

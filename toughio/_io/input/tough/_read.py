@@ -43,9 +43,20 @@ def read_buffer(f, label_length):
     # Title
     line = f.readline().strip()
     if line[:5] not in {"ROCKS", "ELEME", "INCON", "GENER"}:
-        parameters["title"] = line
-    else:
-        f.seek(0)
+        title = [line]
+        while True:
+            line = f.readline().strip()
+            if not line.startswith("ROCKS"):
+                title.append(line)
+            else:
+                break
+
+        parameters["title"] = (
+            title[0]
+            if len(title) == 1
+            else title
+        )
+    f.seek(0)
 
     # Loop over blocks
     for line in f:
