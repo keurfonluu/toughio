@@ -3,7 +3,7 @@ from __future__ import with_statement
 import numpy
 
 from ...._common import get_label_length
-from ...input.tough._helpers import str2float
+from ...input.tough._helpers import read_record
 from .._common import to_output
 
 __all__ = [
@@ -36,8 +36,8 @@ def read(filename, file_type, file_format, labels_order, label_length=None):
 def _read_table(f, file_type, label_length):
     """Read data table for current time step."""
     labels_key = "ELEM." if file_type == "element" else "ELEM1"
-    ilab = 1 if file_type == "element" else 2
 
+    first = True
     times, variables = [], []
     while True:
         line = f.readline().strip()
@@ -74,18 +74,39 @@ def _read_table(f, file_type, label_length):
                     if not label_length:
                         label_length = get_label_length(line[:9])
 
+                    iend = (
+                        label_length if file_type == "element" else 2 * label_length + 2
+                    )
                     tmp = (
                         [line[:label_length]]
                         if file_type == "element"
-                        else [
-                            line[:label_length],
-                            line[label_length + 2 : 2 * label_length + 2],
-                        ]
+                        else [line[:label_length], line[label_length + 2 : iend]]
                     )
-                    tmp += [
-                        str2float(l) for l in line[(label_length + 1) * ilab :].split()
-                    ]
-                    variables[-1].append(tmp)
+
+                    line = line[iend:]
+                    if first:
+                        # Determine number of characters for index
+                        idx = line.replace("-", " ").split()[0]
+                        nidx = line.index(idx) + len(idx)
+                        ifmt = "{}s".format(nidx)
+
+                        # Determine number of characters between two Es
+                        i1 = line.find("E")
+                        i2 = line.find("E", i1 + 1)
+
+                        # Initialize data format
+                        if i2 >= 0:
+                            di = i2 - i1
+                            dfmt = "{}.{}e".format(di, di - 7)
+                            fmt = [ifmt] + 20 * [dfmt]  # Read 20 data columns at most
+                        else:
+                            fmt = [ifmt, "12.5e"]
+                        fmt = ",".join(fmt)
+
+                        first = False
+
+                    tmp += read_record(line, fmt)
+                    variables[-1].append([x for x in tmp if x is not None])
 
                 line = f.readline()
                 if line[1:].startswith("@@@@@"):
