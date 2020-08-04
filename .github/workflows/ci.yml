@@ -32,6 +32,7 @@ jobs:
         pip install coverage
         coverage run -m pytest
     - name: Submit coverage
+      if: ${{ matrix.python-version == '3.7' }}
       run: |
         pip install codecov
         codecov --token=${{ secrets.CODECOV_TOKEN }}
