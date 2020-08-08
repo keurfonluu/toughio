@@ -597,32 +597,40 @@ class Mesh(object):
             self.add_cell_data("material", data)
             self.field_data[material] = numpy.array([imat, 3])
 
-    def near(self, point):
+    def near(self, points):
         """
-        Return index of cell nearest to query point.
+        Return indices of cells nearest to query points.
 
         Parameters
         ----------
-        point : array_like
-            Coordinates of point to query.
+        points : array_like
+            Coordinates of points to query.
 
         Returns
         -------
-        tuple
-            Index of cell.
+        int or array_like
+            Index of cell or indices of cells.
 
         """
-        if not isinstance(point, (list, tuple, numpy.ndarray)):
+
+        def distance(point, points):
+            """Distance between point to list of points."""
+            dp = points - point
+            return numpy.einsum("ij,ij->i", dp, dp)
+
+        ndim = numpy.ndim(points)
+        if ndim == 0:
             raise TypeError()
-        if numpy.ndim(point) != 1:
-            raise ValueError()
-        if len(point) != self.points.shape[1]:
+        elif ndim == 1:
+            points = numpy.array([points])
+        else:
+            points = numpy.asarray(points)
+        if points.shape[1] != self.points.shape[1]:
             raise ValueError()
 
-        idx = numpy.arange(self.n_cells)
-        idx = idx[numpy.argmin(numpy.linalg.norm(self.centers - point, axis=1))]
-
-        return idx
+        centers = self.centers
+        idx = numpy.argmin([distance(point, centers) for point in points], axis=1)
+        return idx[0] if ndim == 1 else idx
 
     @property
     def points(self):
