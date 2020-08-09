@@ -77,24 +77,24 @@ def export(argv=None):
     if not with_mesh:
         print("{} ...".format(msg), end="")
         sys.stdout.flush()
-        points = _get_points(output if args.file_format != "xdmf" else output[0])
-        ndim = 1 if points.ndim == 1 else points.shape[1]
+        points, axis = _get_points(output if args.file_format != "xdmf" else output[0])
+        ndim = len(axis)
         print(" Done!")
 
         if args.voxelize or ndim == 1:
+            if ndim == 1:
+                if not args.origin:
+                    raise ValueError("Mesh is {}D and requires option --origin.".format(ndim))
+                elif len(args.origin) != 3:
+                    raise ValueError("Option --origin requires 3 parameters, got {}.".format(len(args.origin)))
+
             print("Mesh is {}D, voxelizing mesh ...".format(ndim), end="")
             sys.stdout.flush()
 
-            npts = len(points)
-            zeros = numpy.zeros(npts)
-            n = 2 if ndim == 1 else 3 - points.shape[1]
-            for _ in range(n):
-                points = numpy.c_[points, zeros]
-            
             mesh = voxelize(points, args.origin)
             mesh.cell_dada = {}
 
-            idx = numpy.arange(npts)
+            idx = numpy.arange(len(points))
             idx = numpy.array([x for x, _ in sorted(zip(idx, points), key=lambda x: (x[1][2], x[1][1], x[1][0]))])
 
             if args.file_format != "xdmf":
@@ -110,7 +110,7 @@ def export(argv=None):
             )
             sys.stdout.flush()
 
-            mesh = triangulate(points)
+            mesh = triangulate(points[:, axis])
             mesh.cell_dada = {}
 
             if args.file_format != "xdmf":
@@ -279,20 +279,27 @@ def _get_points(output):
     nz = len(numpy.unique(Z))
 
     # Reconstruct points cloud
-    points = (
-        X
-        if ny == 1 and nz == 1
-        else Y
-        if nx == 1 and nz == 1
-        else Z
-        if nx == 1 and ny == 1
-        else numpy.column_stack((Y, Z))
-        if nx == 1
-        else numpy.column_stack((X, Z))
-        if ny == 1
-        else numpy.column_stack((X, Y))
-        if nz == 1
-        else numpy.column_stack((X, Y, Z))
-    )
+    zeros = numpy.zeros(n_points)
+    if ny == 1 and nz == 1:
+        points = numpy.column_stack((X, zeros, zeros))
+        axis = [0]
+    elif nx == 1 and nz == 1:
+        points = numpy.column_stack((zeros, Y, zeros))
+        axis = [1]
+    elif nx == 1 and ny == 1:
+        points = numpy.column_stack((zeros, zeros, Z))
+        axis = [2]
+    elif nx == 1:
+        points = numpy.column_stack((zeros, Y, Z))
+        axis = [1, 2]
+    elif ny == 1:
+        points = numpy.column_stack((X, zeros, Z))
+        axis = [0, 2]
+    elif nz == 1:
+        points = numpy.column_stack((X, Y, zeros))
+        axis = [0, 1]
+    else:
+        points = numpy.column_stack((X, Y, Z))
+        axis = [0, 1, 2]
 
-    return points
+    return points, axis
