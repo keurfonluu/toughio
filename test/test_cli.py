@@ -23,12 +23,12 @@ def test_co2tab(dirname):
 @pytest.mark.parametrize(
     "filename, mesh, voxelize, ext",
     [
-        # ("OUTPUT_ELEME.csv", True, False, "vtu"),
-        # ("OUTPUT_ELEME.csv", False, False, "vtu"),
-        # ("OUTPUT_ELEME.tec", False, False, "vtu"),
-        # ("OUTPUT_ELEME.csv", True, False, "xdmf"),
-        # ("OUTPUT_ELEME.csv", False, False, "xdmf"),
-        # ("OUTPUT_ELEME.tec", False, False, "xdmf"),
+        ("OUTPUT_ELEME.csv", True, False, "vtu"),
+        ("OUTPUT_ELEME.csv", False, False, "vtu"),
+        ("OUTPUT_ELEME.tec", False, False, "vtu"),
+        ("OUTPUT_ELEME.csv", True, False, "xdmf"),
+        ("OUTPUT_ELEME.csv", False, False, "xdmf"),
+        ("OUTPUT_ELEME.tec", False, False, "xdmf"),
         ("OUTPUT_ELEME.csv", True, True, "vtu"),
         ("OUTPUT_ELEME.csv", False, True, "vtu"),
         ("OUTPUT_ELEME.tec", False, True, "vtu"),
