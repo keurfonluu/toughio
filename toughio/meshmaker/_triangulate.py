@@ -13,7 +13,7 @@ def triangulate(points, material="dfalt"):
 
     Parameters
     ----------
-    points : array_like (n_points, 3)
+    points : array_like
         Cooordinates of points.
     material : str, optional, default 'dfalt'
         Default material name.
