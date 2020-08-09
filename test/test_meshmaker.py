@@ -1,9 +1,8 @@
 import numpy
 import pytest
 
+import helpers
 import toughio
-
-numpy.random.seed(42)
 
 
 def test_cylindric_grid():
@@ -64,7 +63,11 @@ def test_triangulate(ndim):
 
 
 def test_voxelize():
-    points = numpy.random.rand(numpy.random.randint(10) + 2)
-    mesh = toughio.meshmaker.voxelize(points)
-
-    assert numpy.allclose(numpy.argsort(points), numpy.argsort(mesh.centers[:, 0]))
+    dx = numpy.array([1.0, 2.0, 3.0, 4.0])
+    dy = numpy.array([1.0, 2.0, 3.0])
+    dz = numpy.array([1.0, 2.0])
+    origin = numpy.random.rand(3)
+    mesh_ref = toughio.meshmaker.structured_grid(dx, dy, dz, origin=origin)
+    
+    mesh = toughio.meshmaker.voxelize(mesh_ref.centers, origin=origin)
+    helpers.allclose_mesh(mesh_ref, mesh)
