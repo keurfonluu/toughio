@@ -28,15 +28,18 @@ def voxelize(points, origin, material="dfalt"):
         Output non-uniform structured mesh.
 
     """
-    def voronoi1d(x, x0):
+    def voronoi1d(x, x0, xstr):
         """1D Voronoi tessellation."""
-        x = numpy.sort(x)
-        if x0 >= x[0]:
-            raise ValueError()
+        if x.size > 1:
+            x = numpy.sort(x)
+            if x0 >= x[0]:
+                raise ValueError("{}-coordinate of origin must be lower than {:.3f}, got {:.3f}".format(xstr, x[0], x0))
 
-        vor = [x0]
-        for xx in x:
-            vor.append(2 * xx - vor[-1])
+            vor = [x0]
+            for xx in x:
+                vor.append(2 * xx - vor[-1])
+        else:
+            vor = [x0, x0 + 1.0]
 
         return vor
 
@@ -53,9 +56,9 @@ def voxelize(points, origin, material="dfalt"):
         raise ValueError("Input points do not form a structured grid.")
 
     x0, y0, z0 = origin
-    x = voronoi1d(x, x0)
-    y = voronoi1d(y, y0)
-    z = voronoi1d(z, z0)
+    x = voronoi1d(x, x0, "x")
+    y = voronoi1d(y, y0, "y")
+    z = voronoi1d(z, z0, "z")
     dx = numpy.diff(x)
     dy = numpy.diff(y)
     dz = numpy.diff(z)
