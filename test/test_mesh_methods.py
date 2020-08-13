@@ -161,6 +161,14 @@ def test_set_material():
     assert (mesh.materials == "test").sum() == 8
 
 
+def test_cell_data_to_point_data():
+    mesh = deepcopy(helpers.hybrid_mesh)
+    data = numpy.ones(mesh.n_cells)
+    mesh.add_cell_data("a", data)
+    mesh.cell_data_to_point_data()
+    assert numpy.allclose(numpy.ones(mesh.n_points), mesh.point_data["a"])
+
+
 def test_near():
     dx = numpy.ones(3)
     dy = numpy.ones(3)
