@@ -171,6 +171,16 @@ def test_cell_data_to_point_data():
     assert "a" not in mesh.cell_data.keys()
 
 
+def test_point_data_to_cell_data():
+    mesh = deepcopy(helpers.hybrid_mesh)
+    data = numpy.ones(mesh.n_points)
+    mesh.add_point_data("a", data)
+    mesh.point_data_to_cell_data()
+
+    assert numpy.allclose(numpy.ones(mesh.n_cells), mesh.cell_data["a"])
+    assert "a" not in mesh.point_data.keys()
+
+
 def test_near():
     dx = numpy.ones(3)
     dy = numpy.ones(3)
