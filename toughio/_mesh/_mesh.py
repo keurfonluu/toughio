@@ -617,6 +617,16 @@ class Mesh(object):
         self._point_data.update(point_data)
         self._cell_data = {}
 
+    def point_data_to_cell_data(self):
+        """Interpolate point data to cell data."""
+        from ._common import interpolate_data
+
+        cells = [c for cell in self.cells for c in cell.data]
+        
+        cell_data = interpolate_data(self._point_data, cells)
+        self._cell_data.update(cell_data)
+        self._point_data = {}
+
     def near(self, points):
         """
         Return indices of cells nearest to query points.
