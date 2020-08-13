@@ -166,7 +166,9 @@ def test_cell_data_to_point_data():
     data = numpy.ones(mesh.n_cells)
     mesh.add_cell_data("a", data)
     mesh.cell_data_to_point_data()
+
     assert numpy.allclose(numpy.ones(mesh.n_points), mesh.point_data["a"])
+    assert "a" not in mesh.cell_data.keys()
 
 
 def test_near():
