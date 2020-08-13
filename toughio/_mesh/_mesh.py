@@ -597,6 +597,36 @@ class Mesh(object):
             self.add_cell_data("material", data)
             self.field_data[material] = numpy.array([imat, 3])
 
+    def cell_data_to_point_data(self):
+        """Interpolate cell data to point data."""
+        from ._common import interpolate_data
+
+        points = [[] for _ in range(self.n_points)]
+        weights = [[] for _ in range(self.n_points)]
+
+        i = 0
+        volumes = self.volumes
+        for cellblock in self.cells:
+            for cell in cellblock.data:
+                for c in cell:
+                    points[c].append(i)
+                    weights[c].append(volumes[i])
+                i += 1
+
+        point_data = interpolate_data(self._cell_data, points, weights)
+        self._point_data.update(point_data)
+        self._cell_data = {}
+
+    def point_data_to_cell_data(self):
+        """Interpolate point data to cell data."""
+        from ._common import interpolate_data
+
+        cells = [c for cell in self.cells for c in cell.data]
+
+        cell_data = interpolate_data(self._point_data, cells)
+        self._cell_data.update(cell_data)
+        self._point_data = {}
+
     def near(self, points):
         """
         Return indices of cells nearest to query points.

@@ -1,5 +1,7 @@
 from __future__ import print_function
 
+import numpy
+
 __all__ = [
     "export",
 ]
@@ -31,6 +33,18 @@ def export(argv=None):
     if with_mesh:
         if not os.path.isfile(args.mesh):
             raise ValueError("Mesh file '{}' not found.".format(args.mesh))
+        if args.voxelize:
+            print("Mesh file has been provided. Skipping option --voxelize.")
+    else:
+        if args.voxelize:
+            if not args.origin:
+                raise ValueError("Option --voxelize requires option --origin.")
+            elif len(args.origin) != 3:
+                raise ValueError(
+                    "Option --origin requires 3 parameters, got {}.".format(
+                        len(args.origin)
+                    )
+                )
 
     # Read output file
     print("Reading file '{}' ...".format(args.infile), end="")
@@ -62,40 +76,63 @@ def export(argv=None):
         msg = "Mesh file not specified, inferring dimensionality"
 
     # Triangulate or voxelize if no mesh
+    voxelized = False
     if not with_mesh:
         print("{} ...".format(msg), end="")
         sys.stdout.flush()
-        points = _get_points(output if args.file_format != "xdmf" else output[0])
-        ndim = 1 if points.ndim == 1 else points.shape[1]
+        points, axis = _get_points(output if args.file_format != "xdmf" else output[0])
+        ndim = len(axis)
         print(" Done!")
 
-        if ndim > 1:
+        if args.voxelize or ndim == 1:
+            if ndim == 1:
+                if not args.origin:
+                    raise ValueError(
+                        "Mesh is {}D and requires option --origin.".format(ndim)
+                    )
+                elif len(args.origin) != 3:
+                    raise ValueError(
+                        "Option --origin requires 3 parameters, got {}.".format(
+                            len(args.origin)
+                        )
+                    )
+
+            print("Mesh is {}D, voxelizing mesh ...".format(ndim), end="")
+            sys.stdout.flush()
+
+            mesh = voxelize(points, args.origin)
+            mesh.cell_dada = {}
+
+            idx = numpy.arange(len(points))
+            idx = numpy.array(
+                [
+                    x
+                    for x, _ in sorted(
+                        zip(idx, points), key=lambda x: (x[1][2], x[1][1], x[1][0])
+                    )
+                ]
+            )
+
+            if args.file_format != "xdmf":
+                for label, data in output.data.items():
+                    if label not in {"X", "Y", "Z"}:
+                        mesh.add_cell_data(label, data[idx])
+
+            voxelized = True
+
+        else:
             print(
                 "Mesh is {}D, performing point triangulation ...".format(ndim), end=""
             )
             sys.stdout.flush()
 
-            mesh = triangulate(points)
+            mesh = triangulate(points[:, axis])
             mesh.cell_dada = {}
 
             if args.file_format != "xdmf":
                 for label, data in output.data.items():
                     if label not in {"X", "Y", "Z"}:
                         mesh.add_point_data(label, data)
-
-        else:
-            print("Mesh is 1D, voxelizing points ...", end="")
-            sys.stdout.flush()
-
-            mesh = voxelize(points)
-            mesh.cell_dada = {}
-
-            if args.file_format != "xdmf":
-                for label, data in output.data.items():
-                    if label not in {"X", "Y", "Z"}:
-                        mesh.add_cell_data(label, data)
-            else:
-                with_mesh = True
 
     else:
         print("Reading mesh file '{}' ...".format(args.mesh), end="")
@@ -132,18 +169,24 @@ def export(argv=None):
         mesh.write(filename, file_format=args.file_format)
 
     else:
-        data = [
-            {k: v for k, v in out.data.items() if k not in {"X", "Y", "Z"}}
-            for out in output
-        ]
+        if voxelized:
+            data = [
+                {k: v[idx] for k, v in out.data.items() if k not in {"X", "Y", "Z"}}
+                for out in output
+            ]
+        else:
+            data = [
+                {k: v for k, v in out.data.items() if k not in {"X", "Y", "Z"}}
+                for out in output
+            ]
         time_steps = [out.time for out in output]
 
-        if not with_mesh:
+        if with_mesh or voxelized:
             write_time_series(
                 filename,
                 mesh.points,
                 mesh.cells,
-                point_data=data,
+                cell_data=data,
                 time_steps=time_steps,
             )
         else:
@@ -151,7 +194,7 @@ def export(argv=None):
                 filename,
                 mesh.points,
                 mesh.cells,
-                cell_data=data,
+                point_data=data,
                 time_steps=time_steps,
             )
 
@@ -197,12 +240,28 @@ def _get_parser():
         help="exported file format",
     )
 
+    # Voxelize
+    parser.add_argument(
+        "--voxelize",
+        "-v",
+        default=False,
+        action="store_true",
+        help="voxelize mesh (only if mesh is not provided, requires option --origin)",
+    )
+
+    # Origin
+    parser.add_argument(
+        "--origin",
+        nargs="+",
+        type=float,
+        default=None,
+        help="coordinates of origin point (only if option --voxelize is enabled)",
+    )
+
     return parser
 
 
 def _get_points(output):
-    import numpy
-
     # Number of data points
     n_points = len(next(iter(output.data.values())))
 
@@ -236,20 +295,27 @@ def _get_points(output):
     nz = len(numpy.unique(Z))
 
     # Reconstruct points cloud
-    points = (
-        X
-        if ny == 1 and nz == 1
-        else Y
-        if nx == 1 and nz == 1
-        else Z
-        if nx == 1 and ny == 1
-        else numpy.column_stack((Y, Z))
-        if nx == 1
-        else numpy.column_stack((X, Z))
-        if ny == 1
-        else numpy.column_stack((X, Y))
-        if nz == 1
-        else numpy.column_stack((X, Y, Z))
-    )
+    zeros = numpy.zeros(n_points)
+    if ny == 1 and nz == 1:
+        points = numpy.column_stack((X, zeros, zeros))
+        axis = [0]
+    elif nx == 1 and nz == 1:
+        points = numpy.column_stack((zeros, Y, zeros))
+        axis = [1]
+    elif nx == 1 and ny == 1:
+        points = numpy.column_stack((zeros, zeros, Z))
+        axis = [2]
+    elif nx == 1:
+        points = numpy.column_stack((zeros, Y, Z))
+        axis = [1, 2]
+    elif ny == 1:
+        points = numpy.column_stack((X, zeros, Z))
+        axis = [0, 2]
+    elif nz == 1:
+        points = numpy.column_stack((X, Y, zeros))
+        axis = [0, 1]
+    else:
+        points = numpy.column_stack((X, Y, Z))
+        axis = [0, 1, 2]
 
-    return points
+    return points, axis

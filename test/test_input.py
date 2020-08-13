@@ -31,7 +31,7 @@ def test_title(write_read, single):
         "title": (
             helpers.random_string(80)
             if single
-            else [helpers.random_string(80) for _ in range(numpy.random.randint(5) + 1)]
+            else [helpers.random_string(80) for _ in range(numpy.random.randint(5) + 2)]
         ),
     }
     parameters = write_read(parameters_ref)

@@ -21,17 +21,23 @@ def test_co2tab(dirname):
 
 
 @pytest.mark.parametrize(
-    "filename, mesh, ext",
+    "filename, mesh, voxelize, ext",
     [
-        ("OUTPUT_ELEME.csv", True, "vtu"),
-        ("OUTPUT_ELEME.csv", False, "vtu"),
-        ("OUTPUT_ELEME.tec", False, "vtu"),
-        ("OUTPUT_ELEME.csv", True, "xdmf"),
-        ("OUTPUT_ELEME.csv", False, "xdmf"),
-        ("OUTPUT_ELEME.tec", False, "xdmf"),
+        ("OUTPUT_ELEME.csv", True, False, "vtu"),
+        ("OUTPUT_ELEME.csv", False, False, "vtu"),
+        ("OUTPUT_ELEME.tec", False, False, "vtu"),
+        ("OUTPUT_ELEME.csv", True, False, "xdmf"),
+        ("OUTPUT_ELEME.csv", False, False, "xdmf"),
+        ("OUTPUT_ELEME.tec", False, False, "xdmf"),
+        ("OUTPUT_ELEME.csv", True, True, "vtu"),
+        ("OUTPUT_ELEME.csv", False, True, "vtu"),
+        ("OUTPUT_ELEME.tec", False, True, "vtu"),
+        ("OUTPUT_ELEME.csv", True, True, "xdmf"),
+        ("OUTPUT_ELEME.csv", False, True, "xdmf"),
+        ("OUTPUT_ELEME.tec", False, True, "xdmf"),
     ],
 )
-def test_export(filename, mesh, ext):
+def test_export(filename, mesh, voxelize, ext):
     this_dir = os.path.dirname(os.path.abspath(__file__))
     filename = os.path.join(this_dir, "support_files", "outputs", filename)
 
@@ -46,7 +52,15 @@ def test_export(filename, mesh, ext):
         ext,
     ]
 
-    if mesh:
+    if voxelize:
+        argv += [
+            "-v",
+            "--origin",
+            "0.0",
+            "0.0",
+            "-50.5",
+        ]
+    elif mesh:
         argv += [
             "-m",
             os.path.join(this_dir, "support_files", "outputs", "mesh.pickle"),
@@ -65,7 +79,7 @@ def test_export(filename, mesh, ext):
         centers_ref = numpy.column_stack([output.data[dim] for dim in ["X", "Y", "Z"]])
         assert (
             numpy.allclose(centers_ref, mesh_in.centers)
-            if mesh
+            if mesh or voxelize
             else numpy.allclose(centers_ref[:, :2], mesh_in.points[:, :2])
         )
 
@@ -73,7 +87,7 @@ def test_export(filename, mesh, ext):
             if k not in {"X", "Y", "Z"}:
                 assert (
                     numpy.allclose(v, mesh_in.cell_data[k])
-                    if mesh
+                    if mesh or voxelize
                     else numpy.allclose(v, mesh_in.point_data[k])
                 )
     else:
@@ -88,7 +102,7 @@ def test_export(filename, mesh, ext):
                 centers_ref,
                 numpy.concatenate([points[c.data].mean(axis=1) for c in cells]),
             )
-            if mesh
+            if mesh or voxelize
             else numpy.allclose(centers_ref[:, :2], points[:, :2])
         )
 
@@ -97,7 +111,7 @@ def test_export(filename, mesh, ext):
 
         assert (
             all(pdata == {} for pdata in point_data)
-            if mesh
+            if mesh or voxelize
             else all(cdata == {} for cdata in cell_data)
         )
 
