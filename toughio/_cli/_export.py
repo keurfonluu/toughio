@@ -7,7 +7,6 @@ __all__ = [
 ]
 
 
-
 format_to_ext = {
     "tecplot": ".dat",
     "vtk": ".vtk",
@@ -41,7 +40,11 @@ def export(argv=None):
             if not args.origin:
                 raise ValueError("Option --voxelize requires option --origin.")
             elif len(args.origin) != 3:
-                raise ValueError("Option --origin requires 3 parameters, got {}.".format(len(args.origin)))
+                raise ValueError(
+                    "Option --origin requires 3 parameters, got {}.".format(
+                        len(args.origin)
+                    )
+                )
 
     # Read output file
     print("Reading file '{}' ...".format(args.infile), end="")
@@ -84,9 +87,15 @@ def export(argv=None):
         if args.voxelize or ndim == 1:
             if ndim == 1:
                 if not args.origin:
-                    raise ValueError("Mesh is {}D and requires option --origin.".format(ndim))
+                    raise ValueError(
+                        "Mesh is {}D and requires option --origin.".format(ndim)
+                    )
                 elif len(args.origin) != 3:
-                    raise ValueError("Option --origin requires 3 parameters, got {}.".format(len(args.origin)))
+                    raise ValueError(
+                        "Option --origin requires 3 parameters, got {}.".format(
+                            len(args.origin)
+                        )
+                    )
 
             print("Mesh is {}D, voxelizing mesh ...".format(ndim), end="")
             sys.stdout.flush()
@@ -95,7 +104,14 @@ def export(argv=None):
             mesh.cell_dada = {}
 
             idx = numpy.arange(len(points))
-            idx = numpy.array([x for x, _ in sorted(zip(idx, points), key=lambda x: (x[1][2], x[1][1], x[1][0]))])
+            idx = numpy.array(
+                [
+                    x
+                    for x, _ in sorted(
+                        zip(idx, points), key=lambda x: (x[1][2], x[1][1], x[1][0])
+                    )
+                ]
+            )
 
             if args.file_format != "xdmf":
                 for label, data in output.data.items():

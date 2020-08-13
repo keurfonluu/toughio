@@ -228,6 +228,9 @@ def interpolate_data(data, entities, weights=None):
         k: (
             numpy.array([numpy.mean(v[e]) for e in entities])
             if not weights
-            else numpy.array([numpy.average(v[e], weights=w) for e, w in zip(entities, weights)])
-        ) for k, v in data.items()
+            else numpy.array(
+                [numpy.average(v[e], weights=w) for e, w in zip(entities, weights)]
+            )
+        )
+        for k, v in data.items()
     }
