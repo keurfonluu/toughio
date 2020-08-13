@@ -222,13 +222,12 @@ def labeler(n_cells, label_length=None):
     return numpy.array(["".join(name) for name in zip(*iterables)])
 
 
-def cell_data_to_point_data(cell_data, points, weights):
-    """Interpolate cell data to point data."""
-    point_data = {}
-    for k, v in cell_data.items():
-        point_data[k] = numpy.array([numpy.average(v[p], weights=w) for p, w in zip(points, weights)])
-    
-    for k in point_data.keys():
-        cell_data.pop(k, None)
-
-    return point_data
+def interpolate_data(data, entities, weights=None):
+    """Interpolate input data."""
+    return {
+        k: (
+            numpy.array([numpy.mean(v[e]) for e in entities])
+            if not weights
+            else numpy.array([numpy.average(v[e], weights=w) for e, w in zip(entities, weights)])
+        ) for k, v in data.items()
+    }
