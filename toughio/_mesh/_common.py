@@ -220,3 +220,17 @@ def labeler(n_cells, label_length=None):
 
     iterables = (alpha[r4], nomen[r3], nomen[r2], numer[r1])
     return numpy.array(["".join(name) for name in zip(*iterables)])
+
+
+def interpolate_data(data, entities, weights=None):
+    """Interpolate input data."""
+    return {
+        k: (
+            numpy.array([numpy.mean(v[e]) for e in entities])
+            if not weights
+            else numpy.array(
+                [numpy.average(v[e], weights=w) for e, w in zip(entities, weights)]
+            )
+        )
+        for k, v in data.items()
+    }
