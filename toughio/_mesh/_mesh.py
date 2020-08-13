@@ -599,7 +599,7 @@ class Mesh(object):
 
     def cell_data_to_point_data(self):
         """Interpolate cell data to point data."""
-        from ._common import cell_data_to_point_data
+        from ._common import interpolate_data
 
         points = [[] for _ in range(self.n_points)]
         weights = [[] for _ in range(self.n_points)]
@@ -613,8 +613,9 @@ class Mesh(object):
                     weights[c].append(volumes[i])
                 i += 1
 
-        point_data = cell_data_to_point_data(self._cell_data, points, weights)
+        point_data = interpolate_data(self._cell_data, points, weights)
         self._point_data.update(point_data)
+        self._cell_data = {}
 
     def near(self, points):
         """
