@@ -68,6 +68,6 @@ def test_voxelize():
     dz = numpy.array([1.0, 2.0])
     origin = numpy.random.rand(3)
     mesh_ref = toughio.meshmaker.structured_grid(dx, dy, dz, origin=origin)
-    
+
     mesh = toughio.meshmaker.voxelize(mesh_ref.centers, origin=origin)
     helpers.allclose_mesh(mesh_ref, mesh)

@@ -622,7 +622,7 @@ class Mesh(object):
         from ._common import interpolate_data
 
         cells = [c for cell in self.cells for c in cell.data]
-        
+
         cell_data = interpolate_data(self._point_data, cells)
         self._cell_data.update(cell_data)
         self._point_data = {}
