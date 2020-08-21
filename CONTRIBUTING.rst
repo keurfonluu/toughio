@@ -5,7 +5,7 @@ This project is mainly developed and maintained by `@keurfonluu <https://github.
 
 -  Submitting bug reports and/or feature requests via `issue tracker <https://github.com/keurfonluu/toughio/issues>`__,
 -  Fixing bugs and/or adding new features through a `pull request <https://github.com/keurfonluu/toughio/pulls>`__,
--  Improving `documentation <https://toughio.readthedocs.io/>`__ by fixing typos and/or adding tutorials.
+-  Improving `documentation <https://keurfonluu.github.io/toughio/>`__ by fixing typos and/or adding tutorials.
 
 If you wish to participate but are new to GitHub, please read `GitHub's guide <https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests>`__ and do not hesitate to open an issue.
 
