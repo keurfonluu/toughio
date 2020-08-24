@@ -16,31 +16,40 @@ __all__ = [
 
 
 meshio_only = {
-    "tetra": "tetra",
-    "tetra10": "tetra",
-    "pyramid": "pyramid",
-    "pyramid13": "pyramid",
-    "wedge": "wedge",
-    "wedge12": "wedge",
-    "wedge15": "wedge",
-    "wedge18": "wedge",
-    "hexahedron": "hexahedron",
-    "hexahedron20": "hexahedron",
-    "hexahedron24": "hexahedron",
-    "hexahedron27": "hexahedron",
+    "zone": {
+        "tetra": "tetra",
+        "tetra10": "tetra",
+        "pyramid": "pyramid",
+        "pyramid13": "pyramid",
+        "wedge": "wedge",
+        "wedge12": "wedge",
+        "wedge15": "wedge",
+        "wedge18": "wedge",
+        "hexahedron": "hexahedron",
+        "hexahedron20": "hexahedron",
+        "hexahedron24": "hexahedron",
+        "hexahedron27": "hexahedron",
+    },
+    "face": {
+        "triangle": "triangle",
+        "triangle6": "triangle",
+        "triangle7": "triangle",
+        "quad": "quad",
+        "quad8": "quad",
+        "quad9": "quad",
+    },
 }
 
 
 numnodes_to_meshio_type = {
-    4: "tetra",
-    5: "pyramid",
-    6: "wedge",
-    8: "hexahedron",
+    "zone": {4: "tetra", 5: "pyramid", 6: "wedge", 8: "hexahedron"},
+    "face": {3: "triangle", 4: "quad"},
 }
-meshio_type_to_numnodes = {v: k for k, v in numnodes_to_meshio_type.items()}
 
 
 meshio_to_flac3d_type = {
+    "triangle": "T3",
+    "quad": "Q4",
     "tetra": "T4",
     "pyramid": "P5",
     "wedge": "W6",
@@ -49,6 +58,8 @@ meshio_to_flac3d_type = {
 
 
 flac3d_to_meshio_order = {
+    "triangle": [0, 1, 2],
+    "quad": [0, 1, 2, 3],
     "tetra": [0, 1, 2, 3],
     "pyramid": [0, 1, 4, 2, 3],
     "wedge": [0, 1, 3, 2, 4, 5],
@@ -57,6 +68,8 @@ flac3d_to_meshio_order = {
 
 
 meshio_to_flac3d_order = {
+    "triangle": [0, 1, 2],
+    "quad": [0, 1, 2, 3],
     "tetra": [0, 1, 2, 3],
     "pyramid": [0, 1, 3, 4, 2],
     "wedge": [0, 1, 3, 2, 4, 5],
@@ -69,6 +82,12 @@ meshio_to_flac3d_order_2 = {
     "pyramid": [0, 3, 1, 4, 2],
     "wedge": [0, 2, 3, 1, 5, 4],
     "hexahedron": [0, 3, 1, 4, 2, 5, 7, 6],
+}
+
+
+flag_to_numdim = {
+    "zone": 3,
+    "face": 2,
 }
 
 
@@ -89,13 +108,26 @@ def read(filename):
 
 def read_buffer(f, binary):
     """Read binary or ASCII file."""
+    flags = {
+        "Z": "zone",
+        "F": "face",
+        "ZGROUP": "zone",
+        "FGROUP": "face",
+    }
+
     points = []
     point_ids = {}
     cells = []
-    mapper = {}
     field_data = {}
-    slots = set()
 
+    # Zones and faces do not share the same cell ID pool in FLAC3D
+    # i.e. a given cell ID can be assigned to a zone and a face concurrently
+    mapper = {"zone": {}, "face": {}}
+    slots = {"zone": set(), "face": set()}
+
+    pidx = 0
+    cidx = 0
+    gidx = 0
     if binary:
         # Not sure what the first bytes represent, the format might be wrong
         # It does not seem to be useful anyway
@@ -107,24 +139,23 @@ def read_buffer(f, binary):
             points.append(point)
             point_ids[pid] = pidx
 
-        (num_cells,) = struct.unpack("<I", f.read(4))
-        for cidx in range(num_cells):
-            cid, cell = _read_cell(f, point_ids, binary)
-            cells = _update_cells(cells, cell)
-            mapper[cid] = [cidx]
+        for flag in ["zone", "face"]:
+            (num_cells,) = struct.unpack("<I", f.read(4))
+            for _ in range(num_cells):
+                cid, cell = _read_cell(f, point_ids, binary)
+                cells = _update_cells(cells, cell, flag)
+                mapper[flag][cid] = [cidx]
+                cidx += 1
 
-        (num_groups,) = struct.unpack("<I", f.read(4))
-        for zidx in range(num_groups):
-            name, slot, data = _read_zgroup(f, binary)
-            field_data, mapper = _update_field_data(
-                field_data, mapper, data, name, zidx + 1
-            )
-            slots = _update_slots(slots, slot)
+            (num_groups,) = struct.unpack("<I", f.read(4))
+            for _ in range(num_groups):
+                name, slot, data = _read_group(f, binary)
+                field_data, mapper[flag] = _update_field_data(
+                    field_data, mapper[flag], data, name, gidx + 1, flag,
+                )
+                slots[flag] = _update_slots(slots[flag], slot)
+                gidx += 1
     else:
-        pidx = 0
-        zidx = 0
-        count = 0
-
         line = f.readline().rstrip().split()
         while line:
             if line[0] == "G":
@@ -132,27 +163,33 @@ def read_buffer(f, binary):
                 points.append(point)
                 point_ids[pid] = pidx
                 pidx += 1
-            elif line[0] == "Z":
+            elif line[0] in {"Z", "F"}:
+                flag = flags[line[0]]
                 cid, cell = _read_cell(line, point_ids, binary)
-                cells = _update_cells(cells, cell)
-                mapper[cid] = [count]
-                count += 1
-            elif line[0] == "ZGROUP":
-                name, slot, data = _read_zgroup(f, binary, line)
-                field_data, mapper = _update_field_data(
-                    field_data, mapper, data, name, zidx + 1
+                cells = _update_cells(cells, cell, flag)
+                mapper[flag][cid] = [cidx]
+                cidx += 1
+            elif line[0] in {"ZGROUP", "FGROUP"}:
+                flag = flags[line[0]]
+                name, slot, data = _read_group(f, binary, line)
+                field_data, mapper[flag] = _update_field_data(
+                    field_data, mapper[flag], data, name, gidx + 1, flag,
                 )
-                slots = _update_slots(slots, slot)
-                zidx += 1
+                slots[flag] = _update_slots(slots[flag], slot)
+                gidx += 1
 
             line = f.readline().rstrip().split()
 
     if field_data:
         num_cells = numpy.cumsum([len(c[1]) for c in cells])
-        cell_data = numpy.empty(num_cells[-1], dtype=int)
-        for cid, zid in mapper.values():
-            cell_data[cid] = zid
-        cell_data = {"flac3d:zone": numpy.split(cell_data, num_cells[:-1])}
+        cell_data = numpy.zeros(num_cells[-1], dtype=int)
+        for k, v in mapper.items():
+            if not slots[k]:
+                continue
+
+            for cid, zid in v.values():
+                cell_data[cid] = zid
+        cell_data = {"flac3d:group": numpy.split(cell_data, num_cells[:-1])}
     else:
         cell_data = {}
 
@@ -194,7 +231,7 @@ def _read_cell(buf_or_line, point_ids, binary):
     return cid, cell
 
 
-def _read_zgroup(buf_or_line, binary, line=None):
+def _read_group(buf_or_line, binary, line=None):
     """Read cell group."""
     if binary:
         # Group name
@@ -230,9 +267,9 @@ def _read_zgroup(buf_or_line, binary, line=None):
     return name, slot, data
 
 
-def _update_cells(cells, cell):
+def _update_cells(cells, cell, flag):
     """Update cell list."""
-    cell_type = numnodes_to_meshio_type[len(cell)]
+    cell_type = numnodes_to_meshio_type[flag][len(cell)]
     if len(cells) > 0 and cell_type == cells[-1][0]:
         cells[-1][1].append(cell)
     else:
@@ -241,11 +278,11 @@ def _update_cells(cells, cell):
     return cells
 
 
-def _update_field_data(field_data, mapper, data, name, zidx):
+def _update_field_data(field_data, mapper, data, name, gidx, flag):
     """Update field data dict."""
     for cid in data:
-        mapper[cid].append(zidx)
-    field_data[name] = numpy.array([zidx, 3])
+        mapper[cid].append(gidx)
+    field_data[name] = numpy.array([gidx, flag_to_numdim[flag]])
 
     return field_data, mapper
 
@@ -266,8 +303,15 @@ def _update_slots(slots, slot):
 
 def write(filename, mesh, float_fmt=".16e", binary=False):
     """Write FLAC3D f3grid grid file."""
-    if not any(c.type in meshio_only.keys() for c in mesh.cells):
+    if not any(c.type in meshio_only["zone"].keys() for c in mesh.cells):
         raise ValueError("FLAC3D format only supports 3D cells")
+
+    # Pick out material
+    material = None
+    if mesh.cell_data:
+        key = get_material_key(mesh.cell_data)
+        if key:
+            material = numpy.concatenate(mesh.cell_data[key])
 
     mode = "wb" if binary else "w"
     with open(filename, mode) as f:
@@ -280,11 +324,9 @@ def write(filename, mesh, float_fmt=".16e", binary=False):
             f.write("* {}\n".format(time.ctime()))
 
         _write_points(f, mesh.points, binary, float_fmt)
-        _write_cells(f, mesh.points, mesh.cells, binary)
-        _write_zgroups(f, mesh.cell_data, mesh.field_data, binary)
-
-        if binary:
-            f.write(struct.pack("<2I", 0, 0))  # No face and face group
+        for flag in ["zone", "face"]:
+            _write_cells(f, mesh.points, mesh.cells, flag, binary)
+            _write_groups(f, mesh.cells, material, mesh.field_data, flag, binary)
 
 
 def _write_points(f, points, binary, float_fmt=None):
@@ -300,20 +342,28 @@ def _write_points(f, points, binary, float_fmt=None):
             f.write(fmt.format(i + 1, *point))
 
 
-def _write_cells(f, points, cells, binary):
-    """Write zones."""
-    zones = _translate_zones(points, cells)
+def _write_cells(f, points, cells, flag, binary):
+    """Write cells."""
+    if flag == "zone":
+        count = 0
+        cells = _translate_zones(points, cells)
+    else:
+        count = sum(len(c[1]) for c in cells if c.type in meshio_only["zone"])
+        cells = _translate_faces(cells)
 
-    count = 0
     if binary:
-        f.write(struct.pack("<I", sum(len(c.data) for c in cells)))
-        for _, zone in zones:
-            num_cells, num_verts = zone.shape
+        f.write(
+            struct.pack(
+                "<I", sum(len(c[1]) for c in cells if c[0] in meshio_only[flag])
+            )
+        )
+        for _, cdata in cells:
+            num_cells, num_verts = cdata.shape
             tmp = numpy.column_stack(
                 (
                     numpy.arange(1, num_cells + 1) + count,
                     numpy.full(num_cells, num_verts),
-                    zone + 1,
+                    cdata + 1,
                 )
             )
             f.write(
@@ -321,31 +371,34 @@ def _write_cells(f, points, cells, binary):
             )
             count += num_cells
     else:
-        f.write("* ZONES\n")
-        for meshio_type, zone in zones:
-            fmt = "Z {} {} " + " ".join(["{}"] * zone.shape[1]) + "\n"
-            for entry in zone + 1:
+        flag_to_text = {
+            "zone": ("ZONES", "Z"),
+            "face": ("FACES", "F"),
+        }
+
+        f.write("* {}\n".format(flag_to_text[flag][0]))
+        for ctype, cdata in cells:
+            fmt = (
+                "{} {{}} {{}} ".format(flag_to_text[flag][1])
+                + " ".join(["{}"] * cdata.shape[1])
+                + "\n"
+            )
+            for entry in cdata + 1:
                 count += 1
-                f.write(fmt.format(meshio_to_flac3d_type[meshio_type], count, *entry))
+                f.write(fmt.format(meshio_to_flac3d_type[ctype], count, *entry))
 
 
-def _write_zgroups(f, cell_data, field_data, binary):
-    """Write zone groups."""
-    zgroups = None
-    if cell_data:
-        # Pick out material
-        key = get_material_key(cell_data)
-        if key:
-            material = numpy.concatenate(cell_data[key])
-            zgroups, labels = _translate_zgroups(material, field_data)
+def _write_groups(f, cells, cell_data, field_data, flag, binary):
+    """Write groups."""
+    if cell_data is not None:
+        groups, labels = _translate_groups(cells, cell_data, field_data, flag)
 
-    if zgroups:
         if binary:
             slot = "Default".encode("utf-8")
 
-            f.write(struct.pack("<I", len(zgroups)))
-            for k in sorted(zgroups.keys()):
-                num_chars, num_zones = len(labels[k]), len(zgroups[k])
+            f.write(struct.pack("<I", len(groups)))
+            for k in sorted(groups.keys()):
+                num_chars, num_zones = len(labels[k]), len(groups[k])
                 fmt = "<H{}sH7sI{}I".format(num_chars, num_zones)
                 tmp = [
                     num_chars,
@@ -353,14 +406,19 @@ def _write_zgroups(f, cell_data, field_data, binary):
                     7,
                     slot,
                     num_zones,
+                    *groups[k],
                 ]
-                tmp += zgroups[k].tolist()
                 f.write(struct.pack(fmt, *tmp))
         else:
-            f.write("* ZONE GROUPS\n")
-            for k in sorted(zgroups.keys()):
-                f.write('ZGROUP "{}"\n'.format(labels[k]))
-                _write_table(f, zgroups[k])
+            flag_to_text = {
+                "zone": "ZGROUP",
+                "face": "FGROUP",
+            }
+
+            f.write("* {} GROUPS\n".format(flag.upper()))
+            for k in sorted(groups.keys()):
+                f.write('{} "{}"\n'.format(flag_to_text[flag], labels[k]))
+                _write_table(f, groups[k])
     else:
         if binary:
             f.write(struct.pack("<I", 0))
@@ -383,13 +441,14 @@ def _translate_zones(points, cells):
 
     zones = []
     for key, idx in cells:
-        if key not in meshio_only.keys():
+        if key not in meshio_only["zone"].keys():
             continue
 
         # Compute scalar triple products
-        key = meshio_only[key]
+        key = meshio_only["zone"][key]
         tmp = points[idx[:, meshio_to_flac3d_order[key][:4]].T]
         det = slicing_summing(tmp[1] - tmp[0], tmp[2] - tmp[0], tmp[3] - tmp[0])
+
         # Reorder corner points
         data = numpy.where(
             (det > 0)[:, None],
@@ -401,19 +460,46 @@ def _translate_zones(points, cells):
     return zones
 
 
-def _translate_zgroups(zone_data, field_data):
-    """Convert toughio cell_data to FLAC3D zone groups."""
-    zgroups = {k: numpy.nonzero(zone_data == k)[0] + 1 for k in numpy.unique(zone_data)}
+def _translate_faces(cells):
+    """Reorder toughio cells to FLAC3D faces."""
+    faces = []
+    for key, idx in cells:
+        if key not in meshio_only["face"].keys():
+            continue
 
-    labels = {k: str(k) for k in zgroups.keys()}
+        key = meshio_only["face"][key]
+        data = idx[:, meshio_to_flac3d_order[key]]
+        faces.append((key, data))
+
+    return faces
+
+
+def _translate_groups(cells, cell_data, field_data, flag):
+    """Convert toughio cell_data to FLAC3D groups."""
+    num_dims = numpy.concatenate(
+        [numpy.full(len(c[1]), 2 if c[0] in meshio_only["face"] else 3) for c in cells]
+    )
+    groups = {
+        k: numpy.nonzero(
+            numpy.logical_and(cell_data == k, num_dims == flag_to_numdim[flag])
+        )[0]
+        + 1
+        for k in numpy.unique(cell_data)
+    }
+    groups = {k: v for k, v in groups.items() if v.size}
+
+    labels = {k: str(k) for k in groups.keys()}
     labels[0] = "None"
     if field_data:
-        labels.update({v[0]: k for k, v in field_data.items() if v[1] == 3})
-    return zgroups, labels
+        labels.update(
+            {v[0]: k for k, v in field_data.items() if v[1] == flag_to_numdim[flag]}
+        )
+
+    return groups, labels
 
 
 def _write_table(f, data, ncol=20):
-    """Write zone group data table."""
+    """Write group data table."""
     nrow = len(data) // ncol
     lines = numpy.split(data, numpy.full(nrow, ncol).cumsum())
     for line in lines:
