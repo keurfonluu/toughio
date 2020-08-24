@@ -71,12 +71,12 @@ def _read_table(f, file_type, label_length):
                 if line[:10].strip() and not line.strip().startswith("ELEM"):
                     line = line.lstrip()
 
-                    if not label_length:
+                    if first and not label_length:
                         label_length = get_label_length(line[:9])
-
-                    iend = (
-                        label_length if file_type == "element" else 2 * label_length + 2
-                    )
+                        iend = (
+                            label_length if file_type == "element" else 2 * label_length + 2
+                        )
+                        
                     tmp = (
                         [line[:label_length]]
                         if file_type == "element"
