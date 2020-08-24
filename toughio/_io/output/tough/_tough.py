@@ -78,7 +78,9 @@ def _read_table(f, file_type, label_length):
                     if first and not label_length:
                         label_length = get_label_length(line[:9])
                         iend = (
-                            label_length if file_type == "element" else 2 * label_length + 2
+                            label_length
+                            if file_type == "element"
+                            else 2 * label_length + 2
                         )
 
                     tmp = (
@@ -105,12 +107,13 @@ def _read_table(f, file_type, label_length):
                             i2 = line.find("E", i1 + 1)
 
                             # Initialize data format
+                            fmt = [ifmt]
                             if i2 >= 0:
                                 di = i2 - i1
                                 dfmt = "{}.{}e".format(di, di - 7)
-                                fmt = [ifmt] + 20 * [dfmt]  # Read 20 data columns at most
+                                fmt += 20 * [dfmt]  # Read 20 data columns at most
                             else:
-                                fmt = [ifmt, "12.5e"]
+                                fmt += ["12.5e"]
                             fmt = ",".join(fmt)
 
                             # Set line parser
