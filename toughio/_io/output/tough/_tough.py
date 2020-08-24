@@ -1,9 +1,11 @@
 from __future__ import with_statement
 
+from functools import partial
+
 import numpy
 
 from ...._common import get_label_length
-from ...input.tough._helpers import read_record
+from ...input.tough._helpers import read_record, str2float
 from .._common import to_output
 
 __all__ = [
@@ -39,22 +41,24 @@ def _read_table(f, file_type, label_length):
 
     first = True
     times, variables = [], []
-    while True:
-        line = f.readline().strip()
+    for line in f:
+        line = line.strip()
 
         # Look for "TOTAL TIME"
         if line.startswith("TOTAL TIME"):
             # Read time step in following line
-            line = f.readline().strip()
+            line = next(f).strip()
             times.append(float(line.split()[0]))
             variables.append([])
 
             # Look for "ELEM." or "ELEM1"
             while True:
-                line = f.readline().strip()
-                if line.startswith(labels_key):
-                    break
-                elif _end_of_file(line):
+                try:
+                    line = next(f).strip()
+                    if line.startswith(labels_key):
+                        break
+
+                except StopIteration:
                     raise ValueError("No data related to {}s found.".format(file_type))
 
             # Read headers
@@ -62,7 +66,7 @@ def _read_table(f, file_type, label_length):
 
             # Look for next non-empty line
             while True:
-                line = f.readline()
+                line = next(f)
                 if line.strip():
                     break
 
@@ -76,7 +80,7 @@ def _read_table(f, file_type, label_length):
                         iend = (
                             label_length if file_type == "element" else 2 * label_length + 2
                         )
-                        
+
                     tmp = (
                         [line[:label_length]]
                         if file_type == "element"
@@ -85,41 +89,41 @@ def _read_table(f, file_type, label_length):
 
                     line = line[iend:]
                     if first:
-                        # Determine number of characters for index
-                        idx = line.replace("-", " ").split()[0]
-                        nidx = line.index(idx) + len(idx)
-                        ifmt = "{}s".format(nidx)
+                        try:
+                            # Set line parser and try parsing first line
+                            reader = lambda line: [str2float(x) for x in line.split()]
+                            _ = reader(line)
 
-                        # Determine number of characters between two Es
-                        i1 = line.find("E")
-                        i2 = line.find("E", i1 + 1)
+                        except ValueError:
+                            # Determine number of characters for index
+                            idx = line.replace("-", " ").split()[0]
+                            nidx = line.index(idx) + len(idx)
+                            ifmt = "{}s".format(nidx)
 
-                        # Initialize data format
-                        if i2 >= 0:
-                            di = i2 - i1
-                            dfmt = "{}.{}e".format(di, di - 7)
-                            fmt = [ifmt] + 20 * [dfmt]  # Read 20 data columns at most
-                        else:
-                            fmt = [ifmt, "12.5e"]
-                        fmt = ",".join(fmt)
+                            # Determine number of characters between two Es
+                            i1 = line.find("E")
+                            i2 = line.find("E", i1 + 1)
 
-                        first = False
+                            # Initialize data format
+                            if i2 >= 0:
+                                di = i2 - i1
+                                dfmt = "{}.{}e".format(di, di - 7)
+                                fmt = [ifmt] + 20 * [dfmt]  # Read 20 data columns at most
+                            else:
+                                fmt = [ifmt, "12.5e"]
+                            fmt = ",".join(fmt)
 
-                    tmp += read_record(line, fmt)
+                            # Set line parser
+                            reader = partial(read_record, fmt=fmt)
+
+                        finally:
+                            first = False
+
+                    tmp += reader(line)
                     variables[-1].append([x for x in tmp if x is not None])
 
-                line = f.readline()
+                line = next(f)
                 if line[1:].startswith("@@@@@"):
                     break
 
-        elif _end_of_file(line):
-            break
-
     return headers, times, variables
-
-
-def _end_of_file(line):
-    """Return True if last line."""
-    return line.startswith("END OF TOUGH2 SIMULATION") or line.startswith(
-        "END OF TOUGH3 SIMULATION"
-    )

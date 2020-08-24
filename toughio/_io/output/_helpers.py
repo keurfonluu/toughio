@@ -41,6 +41,8 @@ def get_output_type(filename):
                 return "element", "tough"
             else:
                 raise ValueError()
+        elif line.startswith("1      @@@@@"):
+            return "element", "tough"
         elif line.startswith("INCON"):
             return "element", "save"
         elif "=" in line:
