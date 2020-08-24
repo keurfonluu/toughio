@@ -406,8 +406,8 @@ def _write_groups(f, cells, cell_data, field_data, flag, binary):
                     7,
                     slot,
                     num_zones,
-                    *groups[k],
                 ]
+                tmp += groups[k].tolist()
                 f.write(struct.pack(fmt, *tmp))
         else:
             flag_to_text = {
