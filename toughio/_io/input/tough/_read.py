@@ -640,6 +640,8 @@ def _read_incon(f, label_length):
     if not label_length:
         label_length = get_label_length(line[:9])
 
+    first = True
+    two_lines = True
     while True:
         if line.strip() and not line.startswith("+++"):
             # Record 1
@@ -654,13 +656,25 @@ def _read_incon(f, label_length):
             # Record 2
             line = next(f)
             data = read_record(line, fmt[0])
-            incon["initial_conditions"][label]["values"] = prune_nones_list(data)
 
+            # Record 3 (EOS7R)
+            if first or two_lines:
+                try:
+                    line = next(f)
+                    data += read_record(line, fmt[0])
+                except ValueError:
+                    two_lines = False
+
+            incon["initial_conditions"][label]["values"] = prune_nones_list(data)
             incon["initial_conditions_order"].append(label)
         else:
             break
 
-        line = next(f)
+        if not first or two_lines:
+            line = next(f)
+        
+        if first:
+            first = False
 
     incon["initial_conditions"] = {
         k: prune_nones_dict(v) for k, v in incon["initial_conditions"].items()
