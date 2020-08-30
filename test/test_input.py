@@ -617,15 +617,17 @@ def test_conne(write_read, label_length):
 
 
 @pytest.mark.parametrize(
-    "write_read, label_length",
+    "write_read, label_length, num_pvars",
     [
-        (write_read_tough, 5),
-        (write_read_json, 5),
-        (write_read_tough, 6),
-        (write_read_json, 6),
+        (write_read_tough, 5, 4),
+        (write_read_json, 5, 4),
+        (write_read_tough, 5, 6),
+        (write_read_json, 5, 6),
+        (write_read_tough, 6, 4),
+        (write_read_json, 6, 4),
     ],
 )
-def test_incon(write_read, label_length):
+def test_incon(write_read, label_length, num_pvars):
     labels = [
         helpers.random_label(label_length) for _ in range(numpy.random.randint(10) + 1)
     ]
@@ -642,7 +644,7 @@ def test_incon(write_read, label_length):
                     if key == "porosity"
                     else numpy.random.rand(numpy.random.randint(5) + 1)
                     if key == "userx"
-                    else numpy.random.rand(numpy.random.randint(4) + 1)
+                    else numpy.random.rand(num_pvars)
                 )
                 for key in keys
             }
