@@ -903,7 +903,12 @@ def _write_incon(parameters):
         out += write_record(values, fmt1)
 
         # Record 2
-        out += write_record(data["values"], fmt2)
+        n = min(4, len(data["values"]))
+        out += write_record(data["values"][:n], fmt2)
+
+        # Record 3 (EOS7R)
+        if len(data["values"]) > 4:
+            out += write_record(data["values"][4:], fmt2)
 
     return out
 
