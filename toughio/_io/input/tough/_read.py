@@ -363,17 +363,36 @@ def _read_indom(f):
     fmt = block_to_format["INDOM"]
     indom = {"rocks": {}}
 
+    line = next(f)
+    first = True
+    two_lines = True
     while True:
-        line = next(f)
-
         if line.strip():
+            # Record 1
             rock = read_record(line, fmt[5])[0]
+
+            # Record 2
             line = next(f)
             data = read_record(line, fmt[0])
+
+            # Record 3 (EOS7R)
+            if first or two_lines:
+                try:
+                    line = next(f)
+                    data += read_record(line, fmt[0])
+                except ValueError:
+                    two_lines = False
+
             data = prune_nones_list(data)
             indom["rocks"][rock] = {"initial_condition": data}
         else:
             break
+
+        if not first or two_lines:
+            line = next(f)
+        
+        if first:
+            first = False
 
     return indom
 
