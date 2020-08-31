@@ -55,30 +55,33 @@ def read_buffer(f, label_length):
     f.seek(0)
 
     # Loop over blocks
-    for line in f:
+    # Some blocks (INCON, INDOM, PARAM) need to rewind to previous line but tell and seek are disabled by next
+    # See <https://stackoverflow.com/questions/22688505/is-there-a-way-to-go-back-when-reading-a-file-using-seek-and-calls-to-next>
+    fiter = iter(f.readline, "")
+    for line in fiter:
         if line.startswith("ROCKS"):
-            parameters.update(_read_rocks(f))
+            parameters.update(_read_rocks(fiter))
         elif line.startswith("RPCAP"):
-            rpcap = _read_rpcap(f)
+            rpcap = _read_rpcap(fiter)
             if "default" in parameters.keys():
                 parameters["default"].update(rpcap)
             else:
                 parameters["default"] = rpcap
         elif line.startswith("FLAC"):
-            flac = _read_flac(f, parameters["rocks_order"])
+            flac = _read_flac(fiter, parameters["rocks_order"])
             parameters["flac"] = flac["flac"]
             for k, v in flac["rocks"].items():
                 parameters["rocks"][k].update(v)
         elif line.startswith("MULTI"):
-            parameters.update(_read_multi(f))
+            parameters.update(_read_multi(fiter))
         elif line.startswith("SELEC"):
-            parameters.update(_read_selec(f))
+            parameters.update(_read_selec(fiter))
         elif line.startswith("SOLVR"):
-            parameters.update(_read_solvr(f))
+            parameters.update(_read_solvr(fiter))
         elif line.startswith("START"):
             parameters["start"] = True
         elif line.startswith("PARAM"):
-            param = _read_param(f)
+            param = _read_param(fiter)
             parameters["options"] = param["options"]
             parameters["extra_options"] = param["extra_options"]
             if "default" in parameters.keys():
@@ -86,37 +89,37 @@ def read_buffer(f, label_length):
             else:
                 parameters["default"] = param["default"]
         elif line.startswith("INDOM"):
-            indom = _read_indom(f)
+            indom = _read_indom(fiter, f)
             for k, v in indom["rocks"].items():
                 parameters["rocks"][k].update(v)
         elif line.startswith("MOMOP"):
-            parameters.update(_read_momop(f))
+            parameters.update(_read_momop(fiter))
         elif line.startswith("TIMES"):
-            parameters.update(_read_times(f))
+            parameters.update(_read_times(fiter))
         elif line.startswith("FOFT"):
-            parameters.update(_read_oft(f, "element_history"))
+            parameters.update(_read_oft(fiter, "element_history"))
         elif line.startswith("COFT"):
-            parameters.update(_read_oft(f, "connection_history"))
+            parameters.update(_read_oft(fiter, "connection_history"))
         elif line.startswith("GOFT"):
-            parameters.update(_read_oft(f, "generator_history"))
+            parameters.update(_read_oft(fiter, "generator_history"))
         elif line.startswith("GENER"):
-            parameters.update(_read_gener(f, label_length))
+            parameters.update(_read_gener(fiter, label_length))
         elif line.startswith("DIFFU"):
-            parameters.update(_read_diffu(f))
+            parameters.update(_read_diffu(fiter))
         elif line.startswith("OUTPU"):
-            parameters.update(_read_outpu(f))
+            parameters.update(_read_outpu(fiter))
         elif line.startswith("ELEME"):
-            parameters.update(_read_eleme(f, label_length))
+            parameters.update(_read_eleme(fiter, label_length))
             parameters["coordinates"] = False
         elif line.startswith("COORD"):
-            coord = _read_coord(f)
+            coord = _read_coord(fiter)
             for k, v in zip(parameters["elements_order"], coord):
                 parameters["elements"][k]["center"] = v
             parameters["coordinates"] = True
         elif line.startswith("CONNE"):
-            parameters.update(_read_conne(f, label_length))
+            parameters.update(_read_conne(fiter, label_length))
         elif line.startswith("INCON"):
-            parameters.update(_read_incon(f, label_length))
+            parameters.update(_read_incon(fiter, label_length, f))
         elif line.startswith("NOVER"):
             parameters["nover"] = True
         elif line.startswith("ENDCY"):
@@ -358,13 +361,12 @@ def _read_param(f):
     return param
 
 
-def _read_indom(f):
+def _read_indom(f, fh):
     """Read INDOM block data."""
     fmt = block_to_format["INDOM"]
     indom = {"rocks": {}}
 
     line = next(f)
-    first = True
     two_lines = True
     while True:
         if line.strip():
@@ -376,23 +378,21 @@ def _read_indom(f):
             data = read_record(line, fmt[0])
 
             # Record 3 (EOS7R)
-            if first or two_lines:
+            if two_lines:
+                i = fh.tell()
                 try:
                     line = next(f)
                     data += read_record(line, fmt[0])
                 except ValueError:
                     two_lines = False
+                    fh.seek(i)
 
             data = prune_nones_list(data)
             indom["rocks"][rock] = {"initial_condition": data}
         else:
             break
-
-        if not first or two_lines:
-            line = next(f)
         
-        if first:
-            first = False
+        line = next(f)
 
     return indom
 
@@ -650,7 +650,7 @@ def _read_conne(f, label_length):
     return conne
 
 
-def _read_incon(f, label_length):
+def _read_incon(f, label_length, fh):
     """Read INCON block data."""
     fmt = block_to_format["INCON"]
     incon = {"initial_conditions": {}, "initial_conditions_order": []}
@@ -658,8 +658,7 @@ def _read_incon(f, label_length):
     line = next(f)
     if not label_length:
         label_length = get_label_length(line[:9])
-
-    first = True
+    
     two_lines = True
     while True:
         if line.strip() and not line.startswith("+++"):
@@ -677,23 +676,21 @@ def _read_incon(f, label_length):
             data = read_record(line, fmt[0])
 
             # Record 3 (EOS7R)
-            if first or two_lines:
+            if two_lines:
+                i = fh.tell()
                 try:
                     line = next(f)
                     data += read_record(line, fmt[0])
                 except ValueError:
                     two_lines = False
+                    fh.seek(i)
 
             incon["initial_conditions"][label]["values"] = prune_nones_list(data)
             incon["initial_conditions_order"].append(label)
         else:
             break
 
-        if not first or two_lines:
-            line = next(f)
-        
-        if first:
-            first = False
+        line = next(f)
 
     incon["initial_conditions"] = {
         k: prune_nones_dict(v) for k, v in incon["initial_conditions"].items()
