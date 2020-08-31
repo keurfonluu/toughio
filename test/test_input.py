@@ -301,12 +301,20 @@ def test_param(write_read, t_steps):
         assert not len(parameters_ref["default"]["initial_condition"])
 
 
-@pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
-def test_indom(write_read):
+@pytest.mark.parametrize(
+    "write_read, num_pvars",
+    [
+        (write_read_tough, 4),
+        (write_read_json, 4),
+        (write_read_tough, 6),
+        (write_read_json, 6),
+    ],
+)
+def test_indom(write_read, num_pvars):
     parameters_ref = {
         "rocks": {
             helpers.random_string(5): {
-                "initial_condition": numpy.random.rand(numpy.random.randint(4) + 1),
+                "initial_condition": numpy.random.rand(num_pvars),
             }
             for _ in numpy.random.rand(10) + 1
         },
