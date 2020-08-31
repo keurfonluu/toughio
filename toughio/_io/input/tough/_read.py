@@ -81,7 +81,7 @@ def read_buffer(f, label_length):
         elif line.startswith("START"):
             parameters["start"] = True
         elif line.startswith("PARAM"):
-            param = _read_param(fiter)
+            param = _read_param(fiter, f)
             parameters["options"] = param["options"]
             parameters["extra_options"] = param["extra_options"]
             if "default" in parameters.keys():
@@ -284,7 +284,7 @@ def _read_solvr(f):
     return solvr
 
 
-def _read_param(f):
+def _read_param(f, fh):
     """Read PARAM block data."""
     fmt = block_to_format["PARAM"]
     param = {}
@@ -345,9 +345,17 @@ def _read_param(f):
         }
     )
 
-    # Record 4
+    # Record 4 and record 5 (EOS7R)
     line = next(f)
     data = read_record(line, fmt[5])
+
+    i = fh.tell()
+    try:
+        line = next(f)
+        data += read_record(line, fmt[5])
+    except ValueError:
+        fh.seek(i)
+
     if any(x is not None for x in data):
         data = prune_nones_list(data)
         param["default"] = {"initial_condition": data}
