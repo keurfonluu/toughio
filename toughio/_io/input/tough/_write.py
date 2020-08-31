@@ -500,17 +500,27 @@ def _write_indom(parameters):
 
     # Formats
     fmt = block_to_format["INDOM"]
-    fmt = str2format(fmt[5]) + str2format(fmt[0])
-    fmt[0] = "{}\n".format(fmt[0])
+    fmt1 = str2format(fmt[5])
+    fmt2 = str2format(fmt[0])
 
     out = []
     for k in order:
         if "initial_condition" in parameters["rocks"][k]:
             data = parameters["rocks"][k]["initial_condition"]
             if any(x is not None for x in data):
+                # Record 1
                 values = [k]
-                values += list(data)
-                out += write_record(values, fmt)
+                out += write_record(values, fmt1)
+
+                # Record 2
+                n = min(4, len(data))
+                values = list(data[:n])
+                out += write_record(values, fmt2)
+
+                # Record 3
+                if len(data) > 4:
+                    values = list(data[4:])
+                    out += write_record(values, fmt2)
 
     return out
 
