@@ -481,8 +481,14 @@ def _write_param(parameters):
     out += write_record(values, fmt4)
 
     # Record 4
-    values = parameters["default"]["initial_condition"]
+    n = min(4, len(parameters["default"]["initial_condition"]))
+    values = parameters["default"]["initial_condition"][:n]
     out += write_record(values, fmt5)
+
+    # Record 5 (EOS7R)
+    if len(parameters["default"]["initial_condition"]) > 4:
+        values = parameters["default"]["initial_condition"][n:]
+        out += write_record(values, fmt5)
 
     return out
 
