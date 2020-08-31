@@ -251,15 +251,17 @@ def test_solvr(write_read):
 
 
 @pytest.mark.parametrize(
-    "write_read, t_steps",
+    "write_read, t_steps, num_pvars",
     [
-        (write_read_tough, numpy.random.rand()),
-        (write_read_tough, numpy.random.rand(numpy.random.randint(100) + 1)),
-        (write_read_json, numpy.random.rand()),
-        (write_read_json, numpy.random.rand(numpy.random.randint(100) + 1)),
+        (write_read_tough, numpy.random.rand(), 4),
+        (write_read_tough, numpy.random.rand(numpy.random.randint(100) + 1), 4),
+        (write_read_tough, numpy.random.rand(numpy.random.randint(100) + 1), 6),
+        (write_read_json, numpy.random.rand(), 4),
+        (write_read_json, numpy.random.rand(numpy.random.randint(100) + 1), 4),
+        (write_read_json, numpy.random.rand(numpy.random.randint(100) + 1), 6),
     ],
 )
-def test_param(write_read, t_steps):
+def test_param(write_read, t_steps, num_pvars):
     parameters_ref = {
         "options": {
             "n_iteration": numpy.random.randint(10),
@@ -285,7 +287,7 @@ def test_param(write_read, t_steps):
         "extra_options": {
             k + 1: v for k, v in enumerate(numpy.random.randint(10, size=24))
         },
-        "default": {"initial_condition": numpy.random.rand(numpy.random.randint(5))},
+        "default": {"initial_condition": numpy.random.rand(num_pvars)},
     }
     parameters = write_read(parameters_ref)
 
