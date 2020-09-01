@@ -74,8 +74,6 @@ def read_buffer(f, label_length):
                 parameters["rocks"][k].update(v)
         elif line.startswith("MULTI"):
             parameters.update(_read_multi(fiter))
-        elif line.startswith("SELEC"):
-            parameters.update(_read_selec(fiter))
         elif line.startswith("SOLVR"):
             parameters.update(_read_solvr(fiter))
         elif line.startswith("START"):
@@ -88,6 +86,8 @@ def read_buffer(f, label_length):
                 parameters["default"].update(param["default"])
             else:
                 parameters["default"] = param["default"]
+        elif line.startswith("SELEC"):
+            parameters.update(_read_selec(fiter))
         elif line.startswith("INDOM"):
             indom = _read_indom(fiter, f)
             for k, v in indom["rocks"].items():
@@ -243,29 +243,6 @@ def _read_multi(f):
     return multi
 
 
-def _read_selec(f):
-    """Read SELEC block data."""
-    fmt = block_to_format["SELEC"]
-    selec = {"selections": {}}
-
-    line = next(f)
-    data = read_record(line, fmt[1])
-    selec["selections"]["integers"] = {k + 1: v for k, v in enumerate(data)}
-
-    if selec["selections"]["integers"][1]:
-        selec["selections"]["floats"] = []
-        for _ in range(selec["selections"]["integers"][1]):
-            line = next(f)
-            data = read_record(line, fmt[2])
-            selec["selections"]["floats"].append(prune_nones_list(data))
-
-    selec["selections"]["integers"] = prune_nones_dict(selec["selections"]["integers"])
-    if selec["selections"]["integers"][1] == 1:
-        selec["selections"]["floats"] = selec["selections"]["floats"][0]
-
-    return selec
-
-
 def _read_solvr(f):
     """Read SOLVR block data."""
     fmt = block_to_format["SOLVR"]
@@ -367,6 +344,29 @@ def _read_param(f, fh):
     param["extra_options"] = prune_nones_dict(param["extra_options"])
 
     return param
+
+
+def _read_selec(f):
+    """Read SELEC block data."""
+    fmt = block_to_format["SELEC"]
+    selec = {"selections": {}}
+
+    line = next(f)
+    data = read_record(line, fmt[1])
+    selec["selections"]["integers"] = {k + 1: v for k, v in enumerate(data)}
+
+    if selec["selections"]["integers"][1]:
+        selec["selections"]["floats"] = []
+        for _ in range(selec["selections"]["integers"][1]):
+            line = next(f)
+            data = read_record(line, fmt[2])
+            selec["selections"]["floats"].append(prune_nones_list(data))
+
+    selec["selections"]["integers"] = prune_nones_dict(selec["selections"]["integers"])
+    if selec["selections"]["integers"][1] == 1:
+        selec["selections"]["floats"] = selec["selections"]["floats"][0]
+
+    return selec
 
 
 def _read_indom(f, fh):
