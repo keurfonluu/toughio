@@ -196,48 +196,6 @@ def test_multi(write_read, isothermal):
     assert parameters_ref["isothermal"] == parameters["isothermal"]
 
 
-@pytest.mark.parametrize(
-    "write_read, num_floats",
-    [
-        (write_read_tough, None),
-        (write_read_tough, 8),
-        (write_read_json, None),
-        (write_read_json, 8),
-    ],
-)
-def test_selec(write_read, num_floats):
-    parameters_ref = {
-        "selections": {
-            "integers": {
-                k + 1: v for k, v in enumerate(numpy.random.randint(100, size=16))
-            },
-            "floats": (
-                numpy.random.rand(num_floats)
-                if num_floats is not None and num_floats <= 8
-                else numpy.random.rand(numpy.random.randint(100) + 1, numpy.random.randint(8) + 1)
-            ),
-        },
-    }
-    parameters_ref["selections"]["integers"][1] = (
-        len(parameters_ref["selections"]["floats"])
-        if numpy.ndim(parameters_ref["selections"]["floats"]) == 2
-        else 1
-    )
-    parameters = write_read(parameters_ref)
-
-    helpers.allclose_dict(
-        parameters_ref["selections"]["integers"], parameters["selections"]["integers"]
-    )
-    if "floats" in parameters["selections"].keys():
-        assert numpy.allclose(
-            parameters_ref["selections"]["floats"],
-            parameters["selections"]["floats"],
-            atol=1.0e-4,
-        )
-    else:
-        assert parameters_ref["selections"]["integers"][1] == 0
-
-
 @pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
 def test_solvr(write_read):
     parameters_ref = {
@@ -315,6 +273,48 @@ def test_param(write_read, t_steps, num_pvars):
         )
     else:
         assert not len(parameters_ref["default"]["initial_condition"])
+
+
+@pytest.mark.parametrize(
+    "write_read, num_floats",
+    [
+        (write_read_tough, None),
+        (write_read_tough, 8),
+        (write_read_json, None),
+        (write_read_json, 8),
+    ],
+)
+def test_selec(write_read, num_floats):
+    parameters_ref = {
+        "selections": {
+            "integers": {
+                k + 1: v for k, v in enumerate(numpy.random.randint(100, size=16))
+            },
+            "floats": (
+                numpy.random.rand(num_floats)
+                if num_floats is not None and num_floats <= 8
+                else numpy.random.rand(numpy.random.randint(100) + 1, numpy.random.randint(8) + 1)
+            ),
+        },
+    }
+    parameters_ref["selections"]["integers"][1] = (
+        len(parameters_ref["selections"]["floats"])
+        if numpy.ndim(parameters_ref["selections"]["floats"]) == 2
+        else 1
+    )
+    parameters = write_read(parameters_ref)
+
+    helpers.allclose_dict(
+        parameters_ref["selections"]["integers"], parameters["selections"]["integers"]
+    )
+    if "floats" in parameters["selections"].keys():
+        assert numpy.allclose(
+            parameters_ref["selections"]["floats"],
+            parameters["selections"]["floats"],
+            atol=1.0e-4,
+        )
+    else:
+        assert parameters_ref["selections"]["integers"][1] == 0
 
 
 @pytest.mark.parametrize(

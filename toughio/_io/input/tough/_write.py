@@ -101,10 +101,10 @@ def write_buffer(parameters, mesh):
         out += _write_rpcap(parameters) if rpcap else []
         out += _write_flac(parameters) if parameters["flac"] is not None else []
         out += _write_multi(parameters) if multi else []
-        out += _write_selec(parameters) if parameters["selections"] else []
         out += _write_solvr(parameters) if parameters["solver"] else []
         out += _write_start() if parameters["start"] else []
         out += _write_param(parameters)
+        out += _write_selec(parameters) if parameters["selections"] else []
         out += _write_indom(parameters) if indom else []
         out += _write_momop(parameters) if parameters["more_options"] else []
         out += _write_times(parameters) if parameters["times"] is not None else []
@@ -346,57 +346,6 @@ def _write_multi(parameters):
     return out
 
 
-@check_parameters(dtypes["SELEC"], keys="selections")
-@block("SELEC")
-def _write_selec(parameters):
-    """Write SELEC block data."""
-    # Load data
-    from ._common import selections
-
-    data = deepcopy(selections)
-    if parameters["selections"]["integers"]:
-        data["integers"].update(parameters["selections"]["integers"])
-    if len(parameters["selections"]["floats"]):
-        data["floats"] = parameters["selections"]["floats"]
-
-    # Check floats and overwrite IE(1)
-    if data["floats"] is not None and len(data["floats"]):
-        if isinstance(data["floats"][0], (list, tuple, numpy.ndarray)):
-            for x in data["floats"]:
-                if len(x) > 8:
-                    raise ValueError()
-
-            data["integers"][1] = len(data["floats"])
-            ndim = 2
-
-        else:
-            if len(data["floats"]) > 8:
-                raise ValueError()
-
-            data["integers"][1] = 1
-            ndim = 1
-    else:
-        ndim = None
-
-    # Formats
-    fmt = block_to_format["SELEC"]
-    fmt1 = str2format(fmt[1])
-    fmt2 = str2format(fmt[2])
-
-    # Record 1
-    values = [data["integers"][k] for k in sorted(data["integers"].keys())]
-    out = write_record(values, fmt1)
-
-    # Record 2
-    if ndim == 1:
-        out += write_record(data["floats"], fmt2)
-    elif ndim == 2:
-        for x in data["floats"]:
-            out += write_record(x, fmt2)
-
-    return out
-
-
 @check_parameters(dtypes["SOLVR"], keys="solver")
 @block("SOLVR")
 def _write_solvr(parameters):
@@ -511,6 +460,57 @@ def _write_param(parameters):
     if len(parameters["default"]["initial_condition"]) > 4:
         values = parameters["default"]["initial_condition"][n:]
         out += write_record(values, fmt5)
+
+    return out
+
+
+@check_parameters(dtypes["SELEC"], keys="selections")
+@block("SELEC")
+def _write_selec(parameters):
+    """Write SELEC block data."""
+    # Load data
+    from ._common import selections
+
+    data = deepcopy(selections)
+    if parameters["selections"]["integers"]:
+        data["integers"].update(parameters["selections"]["integers"])
+    if len(parameters["selections"]["floats"]):
+        data["floats"] = parameters["selections"]["floats"]
+
+    # Check floats and overwrite IE(1)
+    if data["floats"] is not None and len(data["floats"]):
+        if isinstance(data["floats"][0], (list, tuple, numpy.ndarray)):
+            for x in data["floats"]:
+                if len(x) > 8:
+                    raise ValueError()
+
+            data["integers"][1] = len(data["floats"])
+            ndim = 2
+
+        else:
+            if len(data["floats"]) > 8:
+                raise ValueError()
+
+            data["integers"][1] = 1
+            ndim = 1
+    else:
+        ndim = None
+
+    # Formats
+    fmt = block_to_format["SELEC"]
+    fmt1 = str2format(fmt[1])
+    fmt2 = str2format(fmt[2])
+
+    # Record 1
+    values = [data["integers"][k] for k in sorted(data["integers"].keys())]
+    out = write_record(values, fmt1)
+
+    # Record 2
+    if ndim == 1:
+        out += write_record(data["floats"], fmt2)
+    elif ndim == 2:
+        for x in data["floats"]:
+            out += write_record(x, fmt2)
 
     return out
 
