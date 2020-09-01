@@ -388,11 +388,15 @@ def _read_indom(f, fh):
             # Record 3 (EOS7R)
             if two_lines:
                 i = fh.tell()
-                try:
-                    line = next(f)
-                    data += read_record(line, fmt[0])
-                except ValueError:
-                    two_lines = False
+                line = next(f)
+
+                if line.strip():
+                    try:
+                        data += read_record(line, fmt[0])
+                    except ValueError:
+                        two_lines = False
+                        fh.seek(i)
+                else:
                     fh.seek(i)
 
             data = prune_nones_list(data)
@@ -695,11 +699,15 @@ def _read_incon(f, label_length, fh):
             # Record 3 (EOS7R)
             if two_lines:
                 i = fh.tell()
-                try:
-                    line = next(f)
-                    data += read_record(line, fmt[0])
-                except ValueError:
-                    two_lines = False
+                line = next(f)
+
+                if line.strip() and not line.startswith("+++"):
+                    try:
+                        data += read_record(line, fmt[0])
+                    except ValueError:
+                        two_lines = False
+                        fh.seek(i)
+                else:
                     fh.seek(i)
 
             incon["initial_conditions"][label]["values"] = prune_nones_list(data)
