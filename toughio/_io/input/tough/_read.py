@@ -105,7 +105,7 @@ def read_buffer(f, label_length):
         elif line.startswith("GENER"):
             parameters.update(_read_gener(fiter, label_length))
         elif line.startswith("DIFFU"):
-            parameters.update(_read_diffu(fiter))
+            parameters.update(_read_diffu(fiter, f))
         elif line.startswith("OUTPU"):
             parameters.update(_read_outpu(fiter))
         elif line.startswith("ELEME"):
@@ -524,15 +524,24 @@ def _read_gener(f, label_length):
     }
 
 
-def _read_diffu(f):
+def _read_diffu(f, fh):
     """Read DIFFU block data."""
     fmt = block_to_format["DIFFU"]
     diffu = {"diffusion": []}
 
-    for _ in range(2):
+    while True:
+        i = fh.tell()
         line = next(f)
-        data = read_record(line, fmt)
-        diffu["diffusion"].append(prune_nones_list(data))
+
+        if line.split():
+            try:
+                data = read_record(line, fmt)
+                diffu["diffusion"].append(prune_nones_list(data))
+            except ValueError:
+                fh.seek(i)
+                break
+        else:
+            break
 
     return diffu
 
