@@ -304,21 +304,24 @@ def test_param(write_read, t_steps, num_pvars):
 
 
 @pytest.mark.parametrize(
-    "write_read, num_pvars",
+    "write_read, num_pvars, num_items",
     [
-        (write_read_tough, 4),
-        (write_read_json, 4),
-        (write_read_tough, 6),
-        (write_read_json, 6),
+        (write_read_tough, 4, None),
+        (write_read_tough, 6, None),
+        (write_read_tough, 4, 1),
+        (write_read_tough, 6, 1),
+        (write_read_json, 4, None),
+        (write_read_json, 6, None),
     ],
 )
-def test_indom(write_read, num_pvars):
+def test_indom(write_read, num_pvars, num_items):
+    num_items = num_items if num_items else numpy.random.randint(10) + 1
     parameters_ref = {
         "rocks": {
             helpers.random_string(5): {
                 "initial_condition": numpy.random.rand(num_pvars),
             }
-            for _ in numpy.random.rand(10) + 1
+            for _ in range(num_items)
         },
     }
     parameters = write_read(parameters_ref)
@@ -627,19 +630,22 @@ def test_conne(write_read, label_length):
 
 
 @pytest.mark.parametrize(
-    "write_read, label_length, num_pvars",
+    "write_read, label_length, num_pvars, num_items",
     [
-        (write_read_tough, 5, 4),
-        (write_read_json, 5, 4),
-        (write_read_tough, 5, 6),
-        (write_read_json, 5, 6),
-        (write_read_tough, 6, 4),
-        (write_read_json, 6, 4),
+        (write_read_tough, 5, 4, None),
+        (write_read_tough, 5, 6, None),
+        (write_read_tough, 6, 4, None),
+        (write_read_tough, 5, 4, 1),
+        (write_read_tough, 5, 6, 1),
+        (write_read_json, 5, 4, None),
+        (write_read_json, 5, 6, None),
+        (write_read_json, 6, 4, None),
     ],
 )
-def test_incon(write_read, label_length, num_pvars):
+def test_incon(write_read, label_length, num_pvars, num_items):
+    num_items = num_items if num_items else numpy.random.randint(10) + 1
     labels = [
-        helpers.random_label(label_length) for _ in range(numpy.random.randint(10) + 1)
+        helpers.random_label(label_length) for _ in range(num_items)
     ]
     keys = [
         "porosity",
