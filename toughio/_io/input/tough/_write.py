@@ -780,19 +780,27 @@ def _write_outpu(parameters):
 
     # Variables
     if data["variables"]:
-        out += write_record([str(len(data["variables"]))], fmt2)
-
+        buffer = []
+        num_vars = 0
         for k, v in data["variables"].items():
             values = [k.upper()]
 
-            if v is not None:
-                v = list(v) if isinstance(v, (list, tuple, numpy.ndarray)) else [v]
-                if not (0 < len(v) < 3):
-                    raise ValueError()
+            if numpy.ndim(v) == 0:
+                buffer += write_record(values, fmt3)
+                num_vars += 1
+            else:
+                if numpy.ndim(v[0]) == 0:
+                    values += list(v)
+                    buffer += write_record(values, fmt3)
+                    num_vars += 1
                 else:
-                    values += v
+                    for vv in v:
+                        values_in = values + list(vv)
+                        buffer += write_record(values_in, fmt3)
+                    num_vars += len(v)
 
-            out += write_record(values, fmt3)
+        out += write_record([str(num_vars)], fmt2)
+        out += buffer
 
     return out
 
