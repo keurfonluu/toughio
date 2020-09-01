@@ -515,11 +515,9 @@ def test_outpu(write_read, fmt):
             "format": fmt,
             "variables": {
                 helpers.random_string(20): None,
-                helpers.random_string(20): [numpy.random.randint(10)],
-                helpers.random_string(20): [
-                    numpy.random.randint(10),
-                    numpy.random.randint(10),
-                ],
+                helpers.random_string(20): numpy.random.randint(10, size=1),
+                helpers.random_string(20): numpy.random.randint(10, size=2),
+                helpers.random_string(20): numpy.random.randint(10, size=(numpy.random.randint(1, 10), 2)),
             },
         },
     }
