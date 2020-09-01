@@ -474,7 +474,7 @@ def test_diffu(write_read):
     n_phase = numpy.random.randint(8) + 1
     parameters_ref = {
         "n_phase": n_phase,
-        "diffusion": numpy.random.rand(2, n_phase),
+        "diffusion": numpy.random.rand(numpy.random.randint(5) + 1, n_phase),
     }
     parameters = write_read(parameters_ref)
 
