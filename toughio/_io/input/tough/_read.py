@@ -257,11 +257,11 @@ def _read_selec(f):
         for _ in range(selec["selections"]["integers"][1]):
             line = next(f)
             data = read_record(line, fmt[2])
-            selec["selections"]["floats"] += data
+            selec["selections"]["floats"].append(prune_nones_list(data))
 
     selec["selections"]["integers"] = prune_nones_dict(selec["selections"]["integers"])
-    if selec["selections"]["integers"][1]:
-        selec["selections"]["floats"] = prune_nones_list(selec["selections"]["floats"])
+    if selec["selections"]["integers"][1] == 1:
+        selec["selections"]["floats"] = selec["selections"]["floats"][0]
 
     return selec
 
