@@ -562,21 +562,35 @@ def _read_outpu(f):
         line = next(f).strip()
 
     # Variables
+    names = {}
     if line.isdigit():
-        n_var = int(line)
+        num_vars = int(line)
         outpu["output"]["variables"] = {}
 
-        for _ in range(n_var):
+        for _ in range(num_vars):
             line = next(f)
             data = read_record(line, fmt[3])
             name = data[0].lower()
-            outpu["output"]["variables"][name] = prune_nones_list(data[1:])
-            outpu["output"]["variables"][name] = (
-                outpu["output"]["variables"][name]
-                if len(outpu["output"]["variables"][name]) == 2
-                else outpu["output"]["variables"][name][0]
-                if len(outpu["output"]["variables"][name]) == 1
-                else None
+            
+            tmp = prune_nones_list(data[1:])
+            if name not in names.keys():
+                names[name] = 1
+                outpu["output"]["variables"][name] = tmp
+            else:
+                if names[name] == 1:
+                    outpu["output"]["variables"][name] = [outpu["output"]["variables"][name], tmp]
+                else:
+                    outpu["output"]["variables"][name].append(tmp)
+
+                names[name] += 1
+
+        for k, v in outpu["output"]["variables"].items():
+            outpu["output"]["variables"][k] = (
+                None
+                if len(v) == 0
+                else v[0]
+                if len(v) == 1
+                else v
             )
 
     return outpu
