@@ -724,19 +724,13 @@ def _write_gener(parameters):
 @block("DIFFU")
 def _write_diffu(parameters):
     """Write DIFFU block data."""
-    if numpy.shape(parameters["diffusion"]) != (2, parameters["n_phase"]):
-        raise ValueError()
-    mass1, mass2 = parameters["diffusion"]
-
     # Format
     fmt = block_to_format["DIFFU"]
     fmt = str2format(fmt)
 
-    # Record 1
-    out = write_record(mass1, fmt, multi=True)
-
-    # Record 2
-    out += write_record(mass2, fmt, multi=True)
+    out = []
+    for mass in parameters["diffusion"]:
+        out += write_record(mass, fmt, multi=True)
 
     return out
 
