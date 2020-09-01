@@ -359,6 +359,25 @@ def _write_selec(parameters):
     if len(parameters["selections"]["floats"]):
         data["floats"] = parameters["selections"]["floats"]
 
+    # Check floats and overwrite IE(1)
+    if data["floats"] is not None and len(data["floats"]):
+        if isinstance(data["floats"][0], (list, tuple, numpy.ndarray)):
+            for x in data["floats"]:
+                if len(x) > 8:
+                    raise ValueError()
+
+            data["integers"][1] = len(data["floats"])
+            ndim = 2
+
+        else:
+            if len(data["floats"]) > 8:
+                raise ValueError()
+
+            data["integers"][1] = 1
+            ndim = 1
+    else:
+        ndim = None
+
     # Formats
     fmt = block_to_format["SELEC"]
     fmt1 = str2format(fmt[1])
@@ -369,8 +388,11 @@ def _write_selec(parameters):
     out = write_record(values, fmt1)
 
     # Record 2
-    if data["floats"] is not None and len(data["floats"]):
-        out += write_record(data["floats"], fmt2, multi=True)
+    if ndim == 1:
+        out += write_record(data["floats"], fmt2)
+    elif ndim == 2:
+        for x in data["floats"]:
+            out += write_record(x, fmt2)
 
     return out
 
