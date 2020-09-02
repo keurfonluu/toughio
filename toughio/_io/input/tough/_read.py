@@ -403,7 +403,7 @@ def _read_indom(f, fh):
             indom["rocks"][rock] = {"initial_condition": data}
         else:
             break
-        
+
         line = next(f)
 
     return indom
@@ -571,14 +571,17 @@ def _read_outpu(f):
             line = next(f)
             data = read_record(line, fmt[3])
             name = data[0].lower()
-            
+
             tmp = prune_nones_list(data[1:])
             if name not in names.keys():
                 names[name] = 1
                 outpu["output"]["variables"][name] = tmp
             else:
                 if names[name] == 1:
-                    outpu["output"]["variables"][name] = [outpu["output"]["variables"][name], tmp]
+                    outpu["output"]["variables"][name] = [
+                        outpu["output"]["variables"][name],
+                        tmp,
+                    ]
                 else:
                     outpu["output"]["variables"][name].append(tmp)
 
@@ -586,11 +589,7 @@ def _read_outpu(f):
 
         for k, v in outpu["output"]["variables"].items():
             outpu["output"]["variables"][k] = (
-                None
-                if len(v) == 0
-                else v[0]
-                if len(v) == 1
-                else v
+                None if len(v) == 0 else v[0] if len(v) == 1 else v
             )
 
     return outpu
@@ -693,7 +692,7 @@ def _read_incon(f, label_length, fh):
     line = next(f)
     if not label_length:
         label_length = get_label_length(line[:9])
-    
+
     two_lines = True
     while True:
         if line.strip() and not line.startswith("+++"):
