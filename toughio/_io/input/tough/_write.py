@@ -14,7 +14,7 @@ __all__ = [
 ]
 
 
-def write(filename, parameters, mesh=False):
+def write(filename, parameters, block="all"):
     """
     Write TOUGH input file.
 
@@ -24,11 +24,18 @@ def write(filename, parameters, mesh=False):
         Output file name.
     parameters : dict
         Parameters to export.
-    mesh : bool, optional, default False
-        If `True`, only write blocks ELEME, COORD, CONNE and INCON.
+    block : str {'all', 'gener', 'mesh', 'incon'}, optional, default 'all'
+        Blocks to be written:
+         - 'all': write all blocks,
+         - 'gener': only write block GENER,
+         - 'mesh': only write blocks ELEME, COORD and CONNE,
+         - 'incon': only write block INCON.
 
     """
     from ._common import Parameters, default
+
+    if block not in {"all", "gener", "mesh", "incon"}:
+        raise ValueError()
 
     params = deepcopy(Parameters)
     params.update(deepcopy(parameters))
@@ -52,14 +59,14 @@ def write(filename, parameters, mesh=False):
             if cond1 and cond2:
                 params["rocks"][rock][k] = v
 
-    buffer = write_buffer(params, mesh)
+    buffer = write_buffer(params, block)
     with open(filename, "w") as f:
         for record in buffer:
             f.write(record)
 
 
 @check_parameters(dtypes["PARAMETERS"])
-def write_buffer(parameters, mesh):
+def write_buffer(parameters, block):
     """Write TOUGH input file as a list of 80-character long record strings."""
     from ._common import eos
 
@@ -95,16 +102,16 @@ def write_buffer(parameters, mesh):
 
     # Define input file contents
     out = []
-    if not mesh:
+    if block == "all":
         out += ["{:80}\n".format(title) for title in parameters["title"]]
         out += _write_rocks(parameters)
         out += _write_rpcap(parameters) if rpcap else []
         out += _write_flac(parameters) if parameters["flac"] is not None else []
         out += _write_multi(parameters) if multi else []
-        out += _write_selec(parameters) if parameters["selections"] else []
         out += _write_solvr(parameters) if parameters["solver"] else []
         out += _write_start() if parameters["start"] else []
         out += _write_param(parameters)
+        out += _write_selec(parameters) if parameters["selections"] else []
         out += _write_indom(parameters) if indom else []
         out += _write_momop(parameters) if parameters["more_options"] else []
         out += _write_times(parameters) if parameters["times"] is not None else []
@@ -121,16 +128,23 @@ def write_buffer(parameters, mesh):
             if parameters["generator_history"] is not None
             else []
         )
+
+    if block in {"all", "gener"}:
         out += _write_gener(parameters) if parameters["generators"] else []
+
+    if block == "all":
         out += _write_diffu(parameters) if parameters["diffusion"] is not None else []
         out += _write_outpu(parameters) if parameters["output"] else []
 
-    out += _write_eleme(parameters) if parameters["elements"] else []
-    out += _write_coord(parameters) if parameters["coordinates"] else []
-    out += _write_conne(parameters) if parameters["connections"] else []
-    out += _write_incon(parameters) if parameters["initial_conditions"] else []
+    if block in {"all", "mesh"}:
+        out += _write_eleme(parameters) if parameters["elements"] else []
+        out += _write_coord(parameters) if parameters["coordinates"] else []
+        out += _write_conne(parameters) if parameters["connections"] else []
 
-    if not mesh:
+    if block in {"all", "incon"}:
+        out += _write_incon(parameters) if parameters["initial_conditions"] else []
+
+    if block == "all":
         out += _write_nover() if parameters["nover"] else []
         out += _write_endcy()
 
@@ -346,35 +360,6 @@ def _write_multi(parameters):
     return out
 
 
-@check_parameters(dtypes["SELEC"], keys="selections")
-@block("SELEC")
-def _write_selec(parameters):
-    """Write SELEC block data."""
-    # Load data
-    from ._common import selections
-
-    data = deepcopy(selections)
-    if parameters["selections"]["integers"]:
-        data["integers"].update(parameters["selections"]["integers"])
-    if len(parameters["selections"]["floats"]):
-        data["floats"] = parameters["selections"]["floats"]
-
-    # Formats
-    fmt = block_to_format["SELEC"]
-    fmt1 = str2format(fmt[1])
-    fmt2 = str2format(fmt[2])
-
-    # Record 1
-    values = [data["integers"][k] for k in sorted(data["integers"].keys())]
-    out = write_record(values, fmt1)
-
-    # Record 2
-    if data["floats"] is not None and len(data["floats"]):
-        out += write_record(data["floats"], fmt2, multi=True)
-
-    return out
-
-
 @check_parameters(dtypes["SOLVR"], keys="solver")
 @block("SOLVR")
 def _write_solvr(parameters):
@@ -481,8 +466,65 @@ def _write_param(parameters):
     out += write_record(values, fmt4)
 
     # Record 4
-    values = parameters["default"]["initial_condition"]
+    n = min(4, len(parameters["default"]["initial_condition"]))
+    values = parameters["default"]["initial_condition"][:n]
     out += write_record(values, fmt5)
+
+    # Record 5 (EOS7R)
+    if len(parameters["default"]["initial_condition"]) > 4:
+        values = parameters["default"]["initial_condition"][n:]
+        out += write_record(values, fmt5)
+
+    return out
+
+
+@check_parameters(dtypes["SELEC"], keys="selections")
+@block("SELEC")
+def _write_selec(parameters):
+    """Write SELEC block data."""
+    # Load data
+    from ._common import selections
+
+    data = deepcopy(selections)
+    if parameters["selections"]["integers"]:
+        data["integers"].update(parameters["selections"]["integers"])
+    if len(parameters["selections"]["floats"]):
+        data["floats"] = parameters["selections"]["floats"]
+
+    # Check floats and overwrite IE(1)
+    if data["floats"] is not None and len(data["floats"]):
+        if isinstance(data["floats"][0], (list, tuple, numpy.ndarray)):
+            for x in data["floats"]:
+                if len(x) > 8:
+                    raise ValueError()
+
+            data["integers"][1] = len(data["floats"])
+            ndim = 2
+
+        else:
+            if len(data["floats"]) > 8:
+                raise ValueError()
+
+            data["integers"][1] = 1
+            ndim = 1
+    else:
+        ndim = None
+
+    # Formats
+    fmt = block_to_format["SELEC"]
+    fmt1 = str2format(fmt[1])
+    fmt2 = str2format(fmt[2])
+
+    # Record 1
+    values = [data["integers"][k] for k in sorted(data["integers"].keys())]
+    out = write_record(values, fmt1)
+
+    # Record 2
+    if ndim == 1:
+        out += write_record(data["floats"], fmt2)
+    elif ndim == 2:
+        for x in data["floats"]:
+            out += write_record(x, fmt2)
 
     return out
 
@@ -500,17 +542,27 @@ def _write_indom(parameters):
 
     # Formats
     fmt = block_to_format["INDOM"]
-    fmt = str2format(fmt[5]) + str2format(fmt[0])
-    fmt[0] = "{}\n".format(fmt[0])
+    fmt1 = str2format(fmt[5])
+    fmt2 = str2format(fmt[0])
 
     out = []
     for k in order:
         if "initial_condition" in parameters["rocks"][k]:
             data = parameters["rocks"][k]["initial_condition"]
             if any(x is not None for x in data):
+                # Record 1
                 values = [k]
-                values += list(data)
-                out += write_record(values, fmt)
+                out += write_record(values, fmt1)
+
+                # Record 2
+                n = min(4, len(data))
+                values = list(data[:n])
+                out += write_record(values, fmt2)
+
+                # Record 3
+                if len(data) > 4:
+                    values = list(data[4:])
+                    out += write_record(values, fmt2)
 
     return out
 
@@ -708,19 +760,13 @@ def _write_gener(parameters):
 @block("DIFFU")
 def _write_diffu(parameters):
     """Write DIFFU block data."""
-    if numpy.shape(parameters["diffusion"]) != (2, parameters["n_phase"]):
-        raise ValueError()
-    mass1, mass2 = parameters["diffusion"]
-
     # Format
     fmt = block_to_format["DIFFU"]
     fmt = str2format(fmt)
 
-    # Record 1
-    out = write_record(mass1, fmt, multi=True)
-
-    # Record 2
-    out += write_record(mass2, fmt, multi=True)
+    out = []
+    for mass in parameters["diffusion"]:
+        out += write_record(mass, fmt, multi=True)
 
     return out
 
@@ -748,19 +794,27 @@ def _write_outpu(parameters):
 
     # Variables
     if data["variables"]:
-        out += write_record([str(len(data["variables"]))], fmt2)
-
+        buffer = []
+        num_vars = 0
         for k, v in data["variables"].items():
             values = [k.upper()]
 
-            if v is not None:
-                v = list(v) if isinstance(v, (list, tuple, numpy.ndarray)) else [v]
-                if not (0 < len(v) < 3):
-                    raise ValueError()
+            if numpy.ndim(v) == 0:
+                buffer += write_record(values, fmt3)
+                num_vars += 1
+            else:
+                if numpy.ndim(v[0]) == 0:
+                    values += list(v)
+                    buffer += write_record(values, fmt3)
+                    num_vars += 1
                 else:
-                    values += v
+                    for vv in v:
+                        values_in = values + list(vv)
+                        buffer += write_record(values_in, fmt3)
+                    num_vars += len(v)
 
-            out += write_record(values, fmt3)
+        out += write_record([str(num_vars)], fmt2)
+        out += buffer
 
     return out
 
@@ -903,7 +957,12 @@ def _write_incon(parameters):
         out += write_record(values, fmt1)
 
         # Record 2
-        out += write_record(data["values"], fmt2)
+        n = min(4, len(data["values"]))
+        out += write_record(data["values"][:n], fmt2)
+
+        # Record 3 (EOS7R)
+        if len(data["values"]) > 4:
+            out += write_record(data["values"][4:], fmt2)
 
     return out
 

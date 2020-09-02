@@ -197,34 +197,6 @@ def test_multi(write_read, isothermal):
 
 
 @pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
-def test_selec(write_read):
-    parameters_ref = {
-        "selections": {
-            "integers": {
-                k + 1: v for k, v in enumerate(numpy.random.randint(100, size=16))
-            },
-            "floats": numpy.random.rand(numpy.random.randint(100)),
-        },
-    }
-    parameters_ref["selections"]["integers"][1] = (
-        len(parameters_ref["selections"]["floats"]) - 1
-    ) // 8 + 1
-    parameters = write_read(parameters_ref)
-
-    helpers.allclose_dict(
-        parameters_ref["selections"]["integers"], parameters["selections"]["integers"]
-    )
-    if "floats" in parameters["selections"].keys():
-        assert numpy.allclose(
-            parameters_ref["selections"]["floats"],
-            parameters["selections"]["floats"],
-            atol=1.0e-4,
-        )
-    else:
-        assert parameters_ref["selections"]["integers"][1] == 0
-
-
-@pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
 def test_solvr(write_read):
     parameters_ref = {
         "solver": {
@@ -251,15 +223,17 @@ def test_solvr(write_read):
 
 
 @pytest.mark.parametrize(
-    "write_read, t_steps",
+    "write_read, t_steps, num_pvars",
     [
-        (write_read_tough, numpy.random.rand()),
-        (write_read_tough, numpy.random.rand(numpy.random.randint(100) + 1)),
-        (write_read_json, numpy.random.rand()),
-        (write_read_json, numpy.random.rand(numpy.random.randint(100) + 1)),
+        (write_read_tough, numpy.random.rand(), 4),
+        (write_read_tough, numpy.random.rand(numpy.random.randint(100) + 1), 4),
+        (write_read_tough, numpy.random.rand(numpy.random.randint(100) + 1), 6),
+        (write_read_json, numpy.random.rand(), 4),
+        (write_read_json, numpy.random.rand(numpy.random.randint(100) + 1), 4),
+        (write_read_json, numpy.random.rand(numpy.random.randint(100) + 1), 6),
     ],
 )
-def test_param(write_read, t_steps):
+def test_param(write_read, t_steps, num_pvars):
     parameters_ref = {
         "options": {
             "n_iteration": numpy.random.randint(10),
@@ -285,7 +259,7 @@ def test_param(write_read, t_steps):
         "extra_options": {
             k + 1: v for k, v in enumerate(numpy.random.randint(10, size=24))
         },
-        "default": {"initial_condition": numpy.random.rand(numpy.random.randint(5))},
+        "default": {"initial_condition": numpy.random.rand(num_pvars)},
     }
     parameters = write_read(parameters_ref)
 
@@ -301,14 +275,69 @@ def test_param(write_read, t_steps):
         assert not len(parameters_ref["default"]["initial_condition"])
 
 
-@pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
-def test_indom(write_read):
+@pytest.mark.parametrize(
+    "write_read, num_floats",
+    [
+        (write_read_tough, None),
+        (write_read_tough, 8),
+        (write_read_json, None),
+        (write_read_json, 8),
+    ],
+)
+def test_selec(write_read, num_floats):
+    parameters_ref = {
+        "selections": {
+            "integers": {
+                k + 1: v for k, v in enumerate(numpy.random.randint(100, size=16))
+            },
+            "floats": (
+                numpy.random.rand(num_floats)
+                if num_floats is not None and num_floats <= 8
+                else numpy.random.rand(
+                    numpy.random.randint(100) + 1, numpy.random.randint(8) + 1
+                )
+            ),
+        },
+    }
+    parameters_ref["selections"]["integers"][1] = (
+        len(parameters_ref["selections"]["floats"])
+        if numpy.ndim(parameters_ref["selections"]["floats"]) == 2
+        else 1
+    )
+    parameters = write_read(parameters_ref)
+
+    helpers.allclose_dict(
+        parameters_ref["selections"]["integers"], parameters["selections"]["integers"]
+    )
+    if "floats" in parameters["selections"].keys():
+        assert numpy.allclose(
+            parameters_ref["selections"]["floats"],
+            parameters["selections"]["floats"],
+            atol=1.0e-4,
+        )
+    else:
+        assert parameters_ref["selections"]["integers"][1] == 0
+
+
+@pytest.mark.parametrize(
+    "write_read, num_pvars, num_items",
+    [
+        (write_read_tough, 4, None),
+        (write_read_tough, 6, None),
+        (write_read_tough, 4, 1),
+        (write_read_tough, 6, 1),
+        (write_read_json, 4, None),
+        (write_read_json, 6, None),
+    ],
+)
+def test_indom(write_read, num_pvars, num_items):
+    num_items = num_items if num_items else numpy.random.randint(10) + 1
     parameters_ref = {
         "rocks": {
             helpers.random_string(5): {
-                "initial_condition": numpy.random.rand(numpy.random.randint(4) + 1),
+                "initial_condition": numpy.random.rand(num_pvars),
             }
-            for _ in numpy.random.rand(10) + 1
+            for _ in range(num_items)
         },
     }
     parameters = write_read(parameters_ref)
@@ -464,7 +493,7 @@ def test_diffu(write_read):
     n_phase = numpy.random.randint(8) + 1
     parameters_ref = {
         "n_phase": n_phase,
-        "diffusion": numpy.random.rand(2, n_phase),
+        "diffusion": numpy.random.rand(numpy.random.randint(5) + 1, n_phase),
     }
     parameters = write_read(parameters_ref)
 
@@ -488,11 +517,11 @@ def test_outpu(write_read, fmt):
             "format": fmt,
             "variables": {
                 helpers.random_string(20): None,
-                helpers.random_string(20): [numpy.random.randint(10)],
-                helpers.random_string(20): [
-                    numpy.random.randint(10),
-                    numpy.random.randint(10),
-                ],
+                helpers.random_string(20): numpy.random.randint(10, size=1),
+                helpers.random_string(20): numpy.random.randint(10, size=2),
+                helpers.random_string(20): numpy.random.randint(
+                    10, size=(numpy.random.randint(1, 10), 2)
+                ),
             },
         },
     }
@@ -617,18 +646,21 @@ def test_conne(write_read, label_length):
 
 
 @pytest.mark.parametrize(
-    "write_read, label_length",
+    "write_read, label_length, num_pvars, num_items",
     [
-        (write_read_tough, 5),
-        (write_read_json, 5),
-        (write_read_tough, 6),
-        (write_read_json, 6),
+        (write_read_tough, 5, 4, None),
+        (write_read_tough, 5, 6, None),
+        (write_read_tough, 6, 4, None),
+        (write_read_tough, 5, 4, 1),
+        (write_read_tough, 5, 6, 1),
+        (write_read_json, 5, 4, None),
+        (write_read_json, 5, 6, None),
+        (write_read_json, 6, 4, None),
     ],
 )
-def test_incon(write_read, label_length):
-    labels = [
-        helpers.random_label(label_length) for _ in range(numpy.random.randint(10) + 1)
-    ]
+def test_incon(write_read, label_length, num_pvars, num_items):
+    num_items = num_items if num_items else numpy.random.randint(10) + 1
+    labels = [helpers.random_label(label_length) for _ in range(num_items)]
     keys = [
         "porosity",
         "userx",
@@ -642,7 +674,7 @@ def test_incon(write_read, label_length):
                     if key == "porosity"
                     else numpy.random.rand(numpy.random.randint(5) + 1)
                     if key == "userx"
-                    else numpy.random.rand(numpy.random.randint(4) + 1)
+                    else numpy.random.rand(num_pvars)
                 )
                 for key in keys
             }
