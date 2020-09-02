@@ -114,9 +114,10 @@ def _write_incon(labels, values, porosity=None, userx=None):
             record = fmt1.format(*values)
 
             # Record 2
+            n = min(4, len(value))
             values = []
             ignore_types = []
-            for i, v in enumerate(value):
+            for i, v in enumerate(value[:n]):
                 if v > -1.0e9:
                     values.append(v)
                 else:
@@ -126,6 +127,21 @@ def _write_incon(labels, values, porosity=None, userx=None):
             fmt2 = str2format(fmt[0], ignore_types=ignore_types)
             fmt2 = "{}\n".format("".join(fmt2[: len(values)]))
             record += fmt2.format(*values)
+
+            # Record 3 (EOS7R)
+            if len(value) > 4:
+                values = []
+                ignore_types = []
+                for i, v in enumerate(value[n:]):
+                    if v > -1.0e9:
+                        values.append(v)
+                    else:
+                        values.append("")
+                        ignore_types.append(i)
+
+                fmt2 = str2format(fmt[0], ignore_types=ignore_types)
+                fmt2 = "{}\n".format("".join(fmt2[: len(values)]))
+                record += fmt2.format(*values)
 
             yield record
         else:

@@ -135,7 +135,7 @@ default = {
     "klinkenberg_parameter": None,
     "distribution_coefficient_3": None,
     "distribution_coefficient_4": None,
-    "initial_condition": [None for _ in range(4)],
+    "initial_condition": [None for _ in range(6)],
     "relative_permeability": {"id": None, "parameters": []},
     "capillarity": {"id": None, "parameters": []},
     "permeability_model": {"id": 1, "parameters": []},

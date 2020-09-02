@@ -1,4 +1,5 @@
 import os
+import sys
 from copy import deepcopy
 
 import numpy
@@ -188,3 +189,35 @@ def test_near():
     mesh = toughio.meshmaker.structured_grid(dx, dy, dz, origin=numpy.zeros(3))
 
     assert mesh.near((1.5, 1.5, 1.5)) == 13
+
+
+@pytest.mark.skipif(sys.version_info < (3, 6), reason="Order of keys in dictionary")
+@pytest.mark.parametrize("num_pvars", [4, 6])
+def test_write_tough(num_pvars):
+    this_dir = os.path.dirname(os.path.abspath(__file__))
+    filename = os.path.join(this_dir, "support_files", "all_cell_types.f3grid")
+    mesh_ref = toughio.read_mesh(filename)
+
+    tempdir = helpers.tempdir()
+    mesh_filename = os.path.join(tempdir, "MESH")
+    incon_filename = os.path.join(tempdir, "INCON")
+
+    pvars = numpy.random.rand(mesh_ref.n_cells, num_pvars)
+    mesh_ref.add_cell_data("initial_condition", pvars)
+
+    bcond = (mesh_ref.centers[:, 2] < 0.5).astype(int)
+    mesh_ref.add_cell_data("boundary_condition", bcond)
+
+    mesh_ref.write_tough(mesh_filename, incon=True)
+    mesh = toughio.read_input(mesh_filename, file_format="tough")
+    incon = toughio.read_input(incon_filename, file_format="tough")
+
+    volumes = [v["volume"] for v in mesh["elements"].values()]
+    volumes = [v if v < 1.0e20 else v * 1.0e-50 for v in volumes]
+    assert numpy.allclose(mesh_ref.volumes, volumes, atol=1.0e-6)
+
+    centers = [v["center"] for v in mesh["elements"].values()]
+    assert numpy.allclose(mesh_ref.centers, centers, atol=1.0e-3)
+
+    pvars = numpy.row_stack([v["values"] for v in incon["initial_conditions"].values()])
+    assert numpy.allclose(mesh_ref.cell_data["initial_condition"], pvars)

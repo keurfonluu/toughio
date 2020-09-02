@@ -55,68 +55,71 @@ def read_buffer(f, label_length):
     f.seek(0)
 
     # Loop over blocks
-    for line in f:
+    # Some blocks (INCON, INDOM, PARAM) need to rewind to previous line but tell and seek are disabled by next
+    # See <https://stackoverflow.com/questions/22688505/is-there-a-way-to-go-back-when-reading-a-file-using-seek-and-calls-to-next>
+    fiter = iter(f.readline, "")
+    for line in fiter:
         if line.startswith("ROCKS"):
-            parameters.update(_read_rocks(f))
+            parameters.update(_read_rocks(fiter))
         elif line.startswith("RPCAP"):
-            rpcap = _read_rpcap(f)
+            rpcap = _read_rpcap(fiter)
             if "default" in parameters.keys():
                 parameters["default"].update(rpcap)
             else:
                 parameters["default"] = rpcap
         elif line.startswith("FLAC"):
-            flac = _read_flac(f, parameters["rocks_order"])
+            flac = _read_flac(fiter, parameters["rocks_order"])
             parameters["flac"] = flac["flac"]
             for k, v in flac["rocks"].items():
                 parameters["rocks"][k].update(v)
         elif line.startswith("MULTI"):
-            parameters.update(_read_multi(f))
-        elif line.startswith("SELEC"):
-            parameters.update(_read_selec(f))
+            parameters.update(_read_multi(fiter))
         elif line.startswith("SOLVR"):
-            parameters.update(_read_solvr(f))
+            parameters.update(_read_solvr(fiter))
         elif line.startswith("START"):
             parameters["start"] = True
         elif line.startswith("PARAM"):
-            param = _read_param(f)
+            param = _read_param(fiter, f)
             parameters["options"] = param["options"]
             parameters["extra_options"] = param["extra_options"]
             if "default" in parameters.keys():
                 parameters["default"].update(param["default"])
             else:
                 parameters["default"] = param["default"]
+        elif line.startswith("SELEC"):
+            parameters.update(_read_selec(fiter))
         elif line.startswith("INDOM"):
-            indom = _read_indom(f)
+            indom = _read_indom(fiter, f)
             for k, v in indom["rocks"].items():
                 parameters["rocks"][k].update(v)
         elif line.startswith("MOMOP"):
-            parameters.update(_read_momop(f))
+            parameters.update(_read_momop(fiter))
         elif line.startswith("TIMES"):
-            parameters.update(_read_times(f))
+            parameters.update(_read_times(fiter))
         elif line.startswith("FOFT"):
-            parameters.update(_read_oft(f, "element_history"))
+            parameters.update(_read_oft(fiter, "element_history"))
         elif line.startswith("COFT"):
-            parameters.update(_read_oft(f, "connection_history"))
+            parameters.update(_read_oft(fiter, "connection_history"))
         elif line.startswith("GOFT"):
-            parameters.update(_read_oft(f, "generator_history"))
+            parameters.update(_read_oft(fiter, "generator_history"))
         elif line.startswith("GENER"):
-            parameters.update(_read_gener(f, label_length))
+            parameters.update(_read_gener(fiter, label_length))
         elif line.startswith("DIFFU"):
-            parameters.update(_read_diffu(f))
+            parameters.update(_read_diffu(fiter, f))
         elif line.startswith("OUTPU"):
-            parameters.update(_read_outpu(f))
+            parameters.update(_read_outpu(fiter))
         elif line.startswith("ELEME"):
-            parameters.update(_read_eleme(f, label_length))
+            parameters.update(_read_eleme(fiter, label_length))
             parameters["coordinates"] = False
         elif line.startswith("COORD"):
-            coord = _read_coord(f)
+            coord = _read_coord(fiter)
             for k, v in zip(parameters["elements_order"], coord):
                 parameters["elements"][k]["center"] = v
             parameters["coordinates"] = True
         elif line.startswith("CONNE"):
-            parameters.update(_read_conne(f, label_length))
+            parameters.update(_read_conne(fiter, label_length))
         elif line.startswith("INCON"):
-            parameters.update(_read_incon(f, label_length))
+            parameters.update(_read_incon(fiter, label_length, f))
         elif line.startswith("NOVER"):
             parameters["nover"] = True
         elif line.startswith("ENDCY"):
@@ -240,29 +243,6 @@ def _read_multi(f):
     return multi
 
 
-def _read_selec(f):
-    """Read SELEC block data."""
-    fmt = block_to_format["SELEC"]
-    selec = {"selections": {}}
-
-    line = next(f)
-    data = read_record(line, fmt[1])
-    selec["selections"]["integers"] = {k + 1: v for k, v in enumerate(data)}
-
-    if selec["selections"]["integers"][1]:
-        selec["selections"]["floats"] = []
-        for _ in range(selec["selections"]["integers"][1]):
-            line = next(f)
-            data = read_record(line, fmt[2])
-            selec["selections"]["floats"] += data
-
-    selec["selections"]["integers"] = prune_nones_dict(selec["selections"]["integers"])
-    if selec["selections"]["integers"][1]:
-        selec["selections"]["floats"] = prune_nones_list(selec["selections"]["floats"])
-
-    return selec
-
-
 def _read_solvr(f):
     """Read SOLVR block data."""
     fmt = block_to_format["SOLVR"]
@@ -281,7 +261,7 @@ def _read_solvr(f):
     return solvr
 
 
-def _read_param(f):
+def _read_param(f, fh):
     """Read PARAM block data."""
     fmt = block_to_format["PARAM"]
     param = {}
@@ -342,9 +322,17 @@ def _read_param(f):
         }
     )
 
-    # Record 4
+    # Record 4 and record 5 (EOS7R)
     line = next(f)
     data = read_record(line, fmt[5])
+
+    i = fh.tell()
+    try:
+        line = next(f)
+        data += read_record(line, fmt[5])
+    except ValueError:
+        fh.seek(i)
+
     if any(x is not None for x in data):
         data = prune_nones_list(data)
         param["default"] = {"initial_condition": data}
@@ -358,22 +346,65 @@ def _read_param(f):
     return param
 
 
-def _read_indom(f):
+def _read_selec(f):
+    """Read SELEC block data."""
+    fmt = block_to_format["SELEC"]
+    selec = {"selections": {}}
+
+    line = next(f)
+    data = read_record(line, fmt[1])
+    selec["selections"]["integers"] = {k + 1: v for k, v in enumerate(data)}
+
+    if selec["selections"]["integers"][1]:
+        selec["selections"]["floats"] = []
+        for _ in range(selec["selections"]["integers"][1]):
+            line = next(f)
+            data = read_record(line, fmt[2])
+            selec["selections"]["floats"].append(prune_nones_list(data))
+
+    selec["selections"]["integers"] = prune_nones_dict(selec["selections"]["integers"])
+    if selec["selections"]["integers"][1] == 1:
+        selec["selections"]["floats"] = selec["selections"]["floats"][0]
+
+    return selec
+
+
+def _read_indom(f, fh):
     """Read INDOM block data."""
     fmt = block_to_format["INDOM"]
     indom = {"rocks": {}}
 
+    line = next(f)
+    two_lines = True
     while True:
-        line = next(f)
-
         if line.strip():
+            # Record 1
             rock = read_record(line, fmt[5])[0]
+
+            # Record 2
             line = next(f)
             data = read_record(line, fmt[0])
+
+            # Record 3 (EOS7R)
+            if two_lines:
+                i = fh.tell()
+                line = next(f)
+
+                if line.strip():
+                    try:
+                        data += read_record(line, fmt[0])
+                    except ValueError:
+                        two_lines = False
+                        fh.seek(i)
+                else:
+                    fh.seek(i)
+
             data = prune_nones_list(data)
             indom["rocks"][rock] = {"initial_condition": data}
         else:
             break
+
+        line = next(f)
 
     return indom
 
@@ -497,15 +528,24 @@ def _read_gener(f, label_length):
     }
 
 
-def _read_diffu(f):
+def _read_diffu(f, fh):
     """Read DIFFU block data."""
     fmt = block_to_format["DIFFU"]
     diffu = {"diffusion": []}
 
-    for _ in range(2):
+    while True:
+        i = fh.tell()
         line = next(f)
-        data = read_record(line, fmt)
-        diffu["diffusion"].append(prune_nones_list(data))
+
+        if line.split():
+            try:
+                data = read_record(line, fmt)
+                diffu["diffusion"].append(prune_nones_list(data))
+            except ValueError:
+                fh.seek(i)
+                break
+        else:
+            break
 
     return diffu
 
@@ -522,21 +562,34 @@ def _read_outpu(f):
         line = next(f).strip()
 
     # Variables
+    names = {}
     if line.isdigit():
-        n_var = int(line)
+        num_vars = int(line)
         outpu["output"]["variables"] = {}
 
-        for _ in range(n_var):
+        for _ in range(num_vars):
             line = next(f)
             data = read_record(line, fmt[3])
             name = data[0].lower()
-            outpu["output"]["variables"][name] = prune_nones_list(data[1:])
-            outpu["output"]["variables"][name] = (
-                outpu["output"]["variables"][name]
-                if len(outpu["output"]["variables"][name]) == 2
-                else outpu["output"]["variables"][name][0]
-                if len(outpu["output"]["variables"][name]) == 1
-                else None
+
+            tmp = prune_nones_list(data[1:])
+            if name not in names.keys():
+                names[name] = 1
+                outpu["output"]["variables"][name] = tmp
+            else:
+                if names[name] == 1:
+                    outpu["output"]["variables"][name] = [
+                        outpu["output"]["variables"][name],
+                        tmp,
+                    ]
+                else:
+                    outpu["output"]["variables"][name].append(tmp)
+
+                names[name] += 1
+
+        for k, v in outpu["output"]["variables"].items():
+            outpu["output"]["variables"][k] = (
+                None if len(v) == 0 else v[0] if len(v) == 1 else v
             )
 
     return outpu
@@ -631,7 +684,7 @@ def _read_conne(f, label_length):
     return conne
 
 
-def _read_incon(f, label_length):
+def _read_incon(f, label_length, fh):
     """Read INCON block data."""
     fmt = block_to_format["INCON"]
     incon = {"initial_conditions": {}, "initial_conditions_order": []}
@@ -640,6 +693,7 @@ def _read_incon(f, label_length):
     if not label_length:
         label_length = get_label_length(line[:9])
 
+    two_lines = True
     while True:
         if line.strip() and not line.startswith("+++"):
             # Record 1
@@ -654,8 +708,22 @@ def _read_incon(f, label_length):
             # Record 2
             line = next(f)
             data = read_record(line, fmt[0])
-            incon["initial_conditions"][label]["values"] = prune_nones_list(data)
 
+            # Record 3 (EOS7R)
+            if two_lines:
+                i = fh.tell()
+                line = next(f)
+
+                if line.strip() and not line.startswith("+++"):
+                    try:
+                        data += read_record(line, fmt[0])
+                    except ValueError:
+                        two_lines = False
+                        fh.seek(i)
+                else:
+                    fh.seek(i)
+
+            incon["initial_conditions"][label]["values"] = prune_nones_list(data)
             incon["initial_conditions_order"].append(label)
         else:
             break
