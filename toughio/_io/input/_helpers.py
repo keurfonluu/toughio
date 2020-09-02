@@ -80,8 +80,12 @@ def write(filename, parameters, file_format=None, **kwargs):
 
     Other Parameters
     ----------------
-    mesh : bool, optional, default False
-        Only if ``file_format = "tough"``. If `True`, only write blocks ELEME, COORD, CONNE and INCON.
+    block : str {'all', 'gener', 'mesh', 'incon'}, optional, default 'all'
+        Only if ``file_format = "tough"``. Blocks to be written:
+         - 'all': write all blocks,
+         - 'gener': only write block GENER,
+         - 'mesh': only write blocks ELEME, COORD and CONNE,
+         - 'incon': only write block INCON.
 
     """
     if not isinstance(filename, str):
