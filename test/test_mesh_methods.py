@@ -191,7 +191,7 @@ def test_near():
     assert mesh.near((1.5, 1.5, 1.5)) == 13
 
 
-@pytest.mark.skipif(sys.version_info < (3,), reason="Order of keys in dictionary")
+@pytest.mark.skipif(sys.version_info < (3, 6), reason="Order of keys in dictionary")
 @pytest.mark.parametrize("num_pvars", [4, 6])
 def test_write_tough(num_pvars):
     this_dir = os.path.dirname(os.path.abspath(__file__))
