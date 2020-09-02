@@ -14,7 +14,7 @@ __all__ = [
 ]
 
 
-def write(filename, parameters, mesh=False):
+def write(filename, parameters, block="all"):
     """
     Write TOUGH input file.
 
@@ -24,11 +24,18 @@ def write(filename, parameters, mesh=False):
         Output file name.
     parameters : dict
         Parameters to export.
-    mesh : bool, optional, default False
-        If `True`, only write blocks ELEME, COORD, CONNE and INCON.
+    block : str {'all', 'gener', 'mesh', 'incon'}, optional, default 'all'
+        Blocks to be written:
+         - 'all': write all blocks,
+         - 'gener': only write block GENER,
+         - 'mesh': only write blocks ELEME, COORD and CONNE,
+         - 'incon': only write block INCON.
 
     """
     from ._common import Parameters, default
+
+    if block not in {"all", "gener", "mesh", "incon"}:
+        raise ValueError()
 
     params = deepcopy(Parameters)
     params.update(deepcopy(parameters))
@@ -52,14 +59,14 @@ def write(filename, parameters, mesh=False):
             if cond1 and cond2:
                 params["rocks"][rock][k] = v
 
-    buffer = write_buffer(params, mesh)
+    buffer = write_buffer(params, block)
     with open(filename, "w") as f:
         for record in buffer:
             f.write(record)
 
 
 @check_parameters(dtypes["PARAMETERS"])
-def write_buffer(parameters, mesh):
+def write_buffer(parameters, block):
     """Write TOUGH input file as a list of 80-character long record strings."""
     from ._common import eos
 
@@ -95,7 +102,7 @@ def write_buffer(parameters, mesh):
 
     # Define input file contents
     out = []
-    if not mesh:
+    if block == "all":
         out += ["{:80}\n".format(title) for title in parameters["title"]]
         out += _write_rocks(parameters)
         out += _write_rpcap(parameters) if rpcap else []
@@ -121,16 +128,23 @@ def write_buffer(parameters, mesh):
             if parameters["generator_history"] is not None
             else []
         )
+
+    if block in {"all", "gener"}:
         out += _write_gener(parameters) if parameters["generators"] else []
+
+    if block == "all":
         out += _write_diffu(parameters) if parameters["diffusion"] is not None else []
         out += _write_outpu(parameters) if parameters["output"] else []
 
-    out += _write_eleme(parameters) if parameters["elements"] else []
-    out += _write_coord(parameters) if parameters["coordinates"] else []
-    out += _write_conne(parameters) if parameters["connections"] else []
-    out += _write_incon(parameters) if parameters["initial_conditions"] else []
+    if block in {"all", "mesh"}:
+        out += _write_eleme(parameters) if parameters["elements"] else []
+        out += _write_coord(parameters) if parameters["coordinates"] else []
+        out += _write_conne(parameters) if parameters["connections"] else []
 
-    if not mesh:
+    if block in {"all", "incon"}:
+        out += _write_incon(parameters) if parameters["initial_conditions"] else []
+
+    if block == "all":
         out += _write_nover() if parameters["nover"] else []
         out += _write_endcy()
 
