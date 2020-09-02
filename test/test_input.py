@@ -293,7 +293,9 @@ def test_selec(write_read, num_floats):
             "floats": (
                 numpy.random.rand(num_floats)
                 if num_floats is not None and num_floats <= 8
-                else numpy.random.rand(numpy.random.randint(100) + 1, numpy.random.randint(8) + 1)
+                else numpy.random.rand(
+                    numpy.random.randint(100) + 1, numpy.random.randint(8) + 1
+                )
             ),
         },
     }
@@ -517,7 +519,9 @@ def test_outpu(write_read, fmt):
                 helpers.random_string(20): None,
                 helpers.random_string(20): numpy.random.randint(10, size=1),
                 helpers.random_string(20): numpy.random.randint(10, size=2),
-                helpers.random_string(20): numpy.random.randint(10, size=(numpy.random.randint(1, 10), 2)),
+                helpers.random_string(20): numpy.random.randint(
+                    10, size=(numpy.random.randint(1, 10), 2)
+                ),
             },
         },
     }
@@ -656,9 +660,7 @@ def test_conne(write_read, label_length):
 )
 def test_incon(write_read, label_length, num_pvars, num_items):
     num_items = num_items if num_items else numpy.random.randint(10) + 1
-    labels = [
-        helpers.random_label(label_length) for _ in range(num_items)
-    ]
+    labels = [helpers.random_label(label_length) for _ in range(num_items)]
     keys = [
         "porosity",
         "userx",
