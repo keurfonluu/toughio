@@ -5,6 +5,7 @@ import meshio
 import numpy
 
 from ._common import get_meshio_version, get_new_meshio_cells, get_old_meshio_cells
+from ._filter import MeshFilter
 from ._properties import (
     _connections,
     _face_areas,
@@ -529,71 +530,40 @@ class Mesh(object):
             raise ValueError()
         self.cell_data[label] = numpy.asarray(data)
 
-    def set_material(self, material, xlim=None, ylim=None, zlim=None):
+    def set_material(self, material, cells):
         """
-        Set material to cells in box.
-
-        Set material for cells within box selection defined by `xlim`, `ylim` and `zlim`.
+        Set material to cells.
 
         Parameters
         ----------
         material : str
             Material name.
-        xlim : array_like or None, optional, default None
-            Minimum and maximum values in X direction.
-        ylim : array_like or None, optional, default None
-            Minimum and maximum values in Y direction.
-        zlim : array_like or None, optional, default None
-            Minimum and maximum values in Z direction.
-
-        Raises
-        ------
-        AssertionError
-            If any input argument is not valid.
+        cells : array_like
+            Indices of cells or array of booleans.
 
         """
+        ints = (int, numpy.int8, numpy.int16, numpy.int32, numpy.int64)
+        cond_int = all(isinstance(c, ints) for c in cells)
+        cond_bool = all(isinstance(c, (bool, numpy.bool_)) for c in cells)
 
-        def isinbounds(x, bounds):
-            return (
-                numpy.logical_and(x >= min(bounds), x <= max(bounds))
-                if bounds is not None
-                else numpy.ones(len(x), dtype=bool)
-            )
-
-        if not isinstance(material, str):
+        if cond_int:
+            if numpy.min(cells) < 0 or numpy.max(cells) >= self.n_cells:
+                raise ValueError()
+        elif cond_bool:
+            if len(cells) != self.n_cells:
+                raise ValueError()
+            cells = numpy.arange(self.n_cells)[cells]
+        else:
             raise TypeError()
-        if not (xlim is not None or ylim is not None or zlim is not None):
-            raise TypeError()
-        if not (
-            xlim is None
-            or (isinstance(xlim, (list, tuple, numpy.ndarray)) and len(xlim) == 2)
-        ):
-            raise ValueError()
-        if not (
-            ylim is None
-            or (isinstance(ylim, (list, tuple, numpy.ndarray)) and len(ylim) == 2)
-        ):
-            raise ValueError()
-        if not (
-            zlim is None
-            or (isinstance(zlim, (list, tuple, numpy.ndarray)) and len(zlim) == 2)
-        ):
-            raise ValueError()
 
-        x, y, z = self.centers.T
-        mask_x = isinbounds(x, xlim)
-        mask_y = isinbounds(y, ylim)
-        mask_z = isinbounds(z, zlim)
-        mask = numpy.logical_and(numpy.logical_and(mask_x, mask_y), mask_z)
-
-        if mask.any():
+        if len(cells):
             data = self.cell_data["material"]
             imat = (
                 self.field_data[material][0]
                 if material in self.field_data.keys()
                 else data.max() + 1
             )
-            data[mask] = imat
+            data[cells] = imat
             self.add_cell_data("material", data)
             self.field_data[material] = numpy.array([imat, 3])
 
@@ -827,6 +797,24 @@ class Mesh(object):
 
         """
         return numpy.array([numpy.min(out) for out in _qualities(self)])
+
+    @property
+    def filter(self):
+        """
+        Filter mesh.
+
+        Parameters
+        ----------
+        filter_ : str, optional, default 'box'
+            Filter method.
+
+        Returns
+        -------
+        array_like
+            Indices of cells filtered.
+
+        """
+        return MeshFilter(self)
 
 
 def from_meshio(mesh, material="dfalt"):
