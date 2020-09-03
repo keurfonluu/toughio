@@ -24,7 +24,7 @@ class MeshFilter(object):
         ----------
         mesh : toughio.Mesh
             Mesh to filter.
-        
+
         """
         self._mesh = mesh
 
@@ -36,12 +36,12 @@ class MeshFilter(object):
         ----------
         filter_ : str, optional, default 'box'
             Filter method.
-        
+
         Returns
         -------
         array_like
             Indices of cells filtered.
-        
+
         """
         return _filter_map[filter_](self._mesh, **kwargs)
 
@@ -68,14 +68,6 @@ class MeshFilter(object):
         -------
         array_like
             Indices of cells within the domain defined by the box.
-        
+
         """
-        return self(
-            filter_="box",
-            x0=x0,
-            y0=y0,
-            z0=z0,
-            dx=dx,
-            dy=dy,
-            dz=dz,
-        )
+        return self(filter_="box", x0=x0, y0=y0, z0=z0, dx=dx, dy=dy, dz=dz,)
