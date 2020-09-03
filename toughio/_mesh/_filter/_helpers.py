@@ -1,7 +1,3 @@
-from functools import partial
-
-import numpy
-
 __all__ = [
     "MeshFilter",
 ]
