@@ -807,12 +807,12 @@ class Mesh(object):
         ----------
         filter_ : str, optional, default 'box'
             Filter method.
-        
+
         Returns
         -------
         array_like
             Indices of cells filtered.
-        
+
         """
         return MeshFilter(self)
 

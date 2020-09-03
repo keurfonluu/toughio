@@ -158,7 +158,7 @@ def test_set_material(bool_cells):
     dy = numpy.ones(10)
     dz = numpy.ones(10)
     mesh = toughio.meshmaker.structured_grid(dx, dy, dz, origin=numpy.zeros(3))
-    
+
     idx = mesh.filter.box(4.0, 4.0, 4.0, 2.0, 2.0, 2.0)
     if bool_cells:
         cells = numpy.zeros(mesh.n_cells, dtype=bool)
