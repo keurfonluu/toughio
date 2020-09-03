@@ -152,12 +152,20 @@ def test_add_cell_data():
     assert numpy.allclose(data, mesh.cell_data["a"])
 
 
-def test_set_material():
+@pytest.mark.parametrize("bool_cells", [False, True])
+def test_set_material(bool_cells):
     dx = numpy.ones(10)
     dy = numpy.ones(10)
     dz = numpy.ones(10)
     mesh = toughio.meshmaker.structured_grid(dx, dy, dz, origin=numpy.zeros(3))
-    mesh.set_material("test", xlim=(4.0, 6.0), ylim=(4.0, 6.0), zlim=(4.0, 6.0))
+    
+    idx = mesh.filter.box(4.0, 4.0, 4.0, 2.0, 2.0, 2.0)
+    if bool_cells:
+        cells = numpy.zeros(mesh.n_cells, dtype=bool)
+        cells[idx] = True
+    else:
+        cells = idx
+    mesh.set_material("test", cells)
 
     assert (mesh.materials == "test").sum() == 8
 
