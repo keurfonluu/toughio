@@ -66,4 +66,4 @@ class MeshFilter(object):
             Indices of cells within the domain defined by the box.
 
         """
-        return self(filter_="box", x0=x0, y0=y0, z0=z0, dx=dx, dy=dy, dz=dz,)
+        return self(filter_="box", x0=x0, y0=y0, z0=z0, dx=dx, dy=dy, dz=dz)
