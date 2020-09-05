@@ -800,6 +800,7 @@ def _write_outpu(parameters):
             values = [k.upper()]
 
             if numpy.ndim(v) == 0:
+                values += [v]
                 buffer += write_record(values, fmt3)
                 num_vars += 1
             else:
