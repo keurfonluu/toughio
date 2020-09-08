@@ -705,10 +705,12 @@ def _write_gener(parameters):
             v["times"], (list, tuple, numpy.ndarray)
         ):
             ltab = len(v["times"])
-            if not isinstance(v["rates"], (list, tuple, numpy.ndarray)):
-                raise TypeError()
-            if not (ltab > 1 and ltab == len(v["rates"])):
-                raise ValueError()
+            for key in ["rates", "specific_enthalpy"]:
+                if v[key] is not None:
+                    if not isinstance(v[key], (list, tuple, numpy.ndarray)):
+                        raise TypeError()
+                    if not (ltab > 1 and ltab == len(v[key])):
+                        raise ValueError()
         else:
             # Rates and specific enthalpy tables cannot be written without a
             # time table
@@ -800,6 +802,7 @@ def _write_outpu(parameters):
             values = [k.upper()]
 
             if numpy.ndim(v) == 0:
+                values += [v]
                 buffer += write_record(values, fmt3)
                 num_vars += 1
             else:
