@@ -151,12 +151,18 @@ def read_history(filename):
 
     with open(filename, "r") as f:
         line = f.readline().strip()
-        headers = line.split()[1:]
+
+        if line.startswith('"'):
+            sep = ","
+            line = line.replace('"', "")
+        else:
+            sep = None
+        headers = [x.strip() for x in line.split(sep)[1:]]
 
         data = []
         line = f.readline().strip()
         while line:
-            data += [[float(x) for x in line.split()]]
+            data += [[float(x) for x in line.split(sep)]]
             line = f.readline().strip()
         data = numpy.transpose(data)
 
