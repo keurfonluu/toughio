@@ -1,6 +1,7 @@
 from ..._common import filetype_from_filename, register_format
 
 __all__ = [
+    "register",
     "read",
     "write",
 ]
@@ -12,7 +13,21 @@ _writer_map = {}
 
 
 def register(file_format, extensions, reader, writer=None):
-    """Register a new format."""
+    """
+    Register a new input format.
+
+    Parameters
+    ----------
+    file_format : str
+        File format to register.
+    extensions : array_like
+        List of extensions to associate to the new format.
+    reader : callable
+        Read fumction.
+    writer : callable or None, optional, default None
+        Write function.
+    
+    """
     register_format(
         fmt=file_format,
         ext_to_fmt=_extension_to_filetype,
