@@ -24,7 +24,7 @@ _materials = ["material", "gmsh:physical", "medit:ref"]
 def register(file_format, extensions, reader, writer=None, material=None):
     """
     Register a new mesh format.
-    
+
     Parameters
     ----------
     file_format : str
