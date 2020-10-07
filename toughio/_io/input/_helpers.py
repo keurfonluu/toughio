@@ -26,7 +26,7 @@ def register(file_format, extensions, reader, writer=None):
         Read fumction.
     writer : callable or None, optional, default None
         Write function.
-    
+
     """
     register_format(
         fmt=file_format,
