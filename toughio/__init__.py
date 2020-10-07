@@ -8,6 +8,7 @@ from .__about__ import (
 )
 from ._io import (
     Output,
+    register_input,
     read_history,
     read_input,
     read_output,
@@ -26,6 +27,7 @@ __all__ = [
     "CellBlock",
     "Output",
     "meshmaker",
+    "register_input",
     "register_mesh",
     "read_history",
     "read_input",
