@@ -15,6 +15,7 @@ from ._io import (
     write_output,
 )
 from ._mesh import CellBlock, Mesh, from_meshio, from_pyvista
+from ._mesh import register as register_mesh
 from ._mesh import read as read_mesh
 from ._mesh import read_time_series
 from ._mesh import write as write_mesh
@@ -25,6 +26,7 @@ __all__ = [
     "CellBlock",
     "Output",
     "meshmaker",
+    "register_mesh",
     "read_history",
     "read_input",
     "read_output",

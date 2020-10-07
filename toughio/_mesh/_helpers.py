@@ -7,6 +7,7 @@ from .._common import filetype_from_filename, register_format
 from ._mesh import from_meshio
 
 __all__ = [
+    "register",
     "read",
     "write",
     "read_time_series",
@@ -21,7 +22,23 @@ _materials = ["material", "gmsh:physical", "medit:ref"]
 
 
 def register(file_format, extensions, reader, writer=None, material=None):
-    """Register a new format."""
+    """
+    Register a new mesh format.
+    
+    Parameters
+    ----------
+    file_format : str
+        File format to register.
+    extensions : array_like
+        List of extensions to associate to the new format.
+    reader : callable
+        Read fumction.
+    writer : callable or None, optional, default None
+        Write function.
+    material : str or None, optional, default None
+        Cell data key associated to material.
+
+    """
     register_format(
         fmt=file_format,
         ext_to_fmt=_extension_to_filetype,
