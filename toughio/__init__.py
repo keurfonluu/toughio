@@ -9,6 +9,7 @@ from .__about__ import (
 from ._io import (
     Output,
     register_input,
+    register_output,
     read_history,
     read_input,
     read_output,
@@ -28,6 +29,7 @@ __all__ = [
     "Output",
     "meshmaker",
     "register_input",
+    "register_output",
     "register_mesh",
     "read_history",
     "read_input",
