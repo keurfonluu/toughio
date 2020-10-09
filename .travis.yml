@@ -25,6 +25,8 @@ install:
   - git lfs pull
   - pip install -e .[full]
   - pip install -r doc/requirements.txt
+  # for pygmsh >= 7.0
+  # - sudo apt install libglu1
 
 script:
   - set -e
