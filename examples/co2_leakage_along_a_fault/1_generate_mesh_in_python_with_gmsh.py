@@ -6,7 +6,7 @@ This examples describes how to generate a mesh using Gmsh in Python. It requires
 
 .. code-block:: bash
 
-    pip install pygmsh --user
+    pip install pygmsh==6.1.1 --user
 
 The mesh can also be generated from scratch directly in Gmsh either using its GUI and/or its internal scripting language.
 

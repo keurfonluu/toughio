@@ -8,6 +8,8 @@ Input parameters
 
 .. autofunction:: toughio.write_input
 
+.. autofunction:: toughio.register_input
+
 
 Simulation outputs
 ------------------
@@ -17,3 +19,5 @@ Simulation outputs
 .. autofunction:: toughio.read_output
 
 .. autofunction:: toughio.write_output
+
+.. autofunction:: toughio.register_output

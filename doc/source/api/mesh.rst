@@ -12,6 +12,8 @@ I/O
 
 .. autofunction:: toughio.write_mesh
 
+.. autofunction:: toughio.register_mesh
+
 .. autofunction:: toughio.read_time_series
 
 .. autofunction:: toughio.write_time_series
