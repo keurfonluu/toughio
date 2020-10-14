@@ -100,7 +100,7 @@ def export(argv=None):
             print("Mesh is {}D, voxelizing mesh ...".format(ndim), end="")
             sys.stdout.flush()
 
-            mesh = voxelize(points, args.origin)
+            mesh = voxelize(points, args.origin, layer=args.layer)
             mesh.cell_dada = {}
 
             idx = numpy.arange(len(points))
@@ -256,6 +256,14 @@ def _get_parser():
         type=float,
         default=None,
         help="coordinates of origin point (only if option --voxelize is enabled)",
+    )
+
+    # Layer
+    parser.add_argument(
+        "--layer",
+        default=False,
+        action="store_true",
+        help="voxelize mesh by layers (only if option --voxelize is enabled)",
     )
 
     return parser
