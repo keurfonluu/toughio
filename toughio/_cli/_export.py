@@ -18,9 +18,10 @@ format_to_ext = {
 def export(argv=None):
     import os
     import sys
+
     from .. import read_mesh, read_output, write_time_series
     from .._io.output._common import reorder_labels
-    from ..meshmaker import voxelize, triangulate
+    from ..meshmaker import triangulate, voxelize
 
     parser = _get_parser()
     args = parser.parse_args(argv)
@@ -100,7 +101,7 @@ def export(argv=None):
             print("Mesh is {}D, voxelizing mesh ...".format(ndim), end="")
             sys.stdout.flush()
 
-            mesh = voxelize(points, args.origin)
+            mesh = voxelize(points, args.origin, layer=args.layer)
             mesh.cell_dada = {}
 
             idx = numpy.arange(len(points))
@@ -256,6 +257,14 @@ def _get_parser():
         type=float,
         default=None,
         help="coordinates of origin point (only if option --voxelize is enabled)",
+    )
+
+    # Layer
+    parser.add_argument(
+        "--layer",
+        default=False,
+        action="store_true",
+        help="voxelize mesh by layers (only if option --voxelize is enabled)",
     )
 
     return parser

@@ -33,6 +33,7 @@ def _write_eleme(labels, materials, volumes, nodes, material_name=None):
             if material_name and material in material_name.keys()
             else material
         )
+        mat = mat if isinstance(mat, str) else "{:>5}".format(str(mat))
         record = fmt.format(
             label,  # ID
             "",  # NSEQ

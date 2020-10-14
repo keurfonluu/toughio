@@ -1,7 +1,7 @@
+import helpers
 import numpy
 import pytest
 
-import helpers
 import toughio
 
 write_read = lambda x, **kwargs: helpers.write_read(
@@ -175,6 +175,7 @@ def test_flac(write_read):
 )
 def test_multi(write_read, isothermal):
     import random
+
     from toughio._io.input.tough._common import eos
 
     parameters_ref = {

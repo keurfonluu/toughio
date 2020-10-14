@@ -5,8 +5,9 @@ __all__ = [
 
 def co2tab(argv=None):
     import os
-    import pkg_resources
     import shutil
+
+    import pkg_resources
 
     parser = _get_parser()
     args = parser.parse_args(argv)
