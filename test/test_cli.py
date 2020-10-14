@@ -1,10 +1,10 @@
 import glob
 import os
 
+import helpers
 import numpy
 import pytest
 
-import helpers
 import toughio
 
 

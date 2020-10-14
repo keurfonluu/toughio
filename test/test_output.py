@@ -1,9 +1,9 @@
 import os
 
+import helpers
 import numpy
 import pytest
 
-import helpers
 import toughio
 
 write_read = lambda output, writer_kws, reader_kws: helpers.write_read(

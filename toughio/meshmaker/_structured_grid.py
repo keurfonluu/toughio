@@ -114,11 +114,7 @@ def _grid_3d(dx, dy, dz, order):
     for i in range(nx * ny):
         i1 = i * nz
         i2 = i1 + nz
-        cells[i1 : i2] = (
-            cells[i2 - 1 : i1 - 1 : -1]
-            if i > 0
-            else cells[i2 - 1 :: -1]
-        )
+        cells[i1:i2] = cells[i2 - 1 : i1 - 1 : -1] if i > 0 else cells[i2 - 1 :: -1]
 
     return (
         numpy.array(points, dtype=float),
