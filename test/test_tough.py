@@ -1,7 +1,7 @@
+import helpers
 import numpy
 import pytest
 
-import helpers
 import toughio
 
 
@@ -105,7 +105,7 @@ def test_mesh(nodal_distance, bound, coord):
     assert sum(angles) == sum(isot_x) + sum(isot_y)
 
     angles = [
-        v["gravity_cosine_angle"] == -1.0 for v in parameters["connections"].values()
+        v["gravity_cosine_angle"] == 1.0 for v in parameters["connections"].values()
     ]
     assert sum(angles) == sum(isot_z)
 

@@ -277,10 +277,8 @@ class Mesh(object):
         try:
             import pyvista
             import vtk
-            from ._common import (
-                meshio_to_vtk_type,
-                vtk_type_to_numnodes,
-            )
+
+            from ._common import meshio_to_vtk_type, vtk_type_to_numnodes
 
             VTK9 = vtk.vtkVersion().GetVTKMajorVersion() >= 9
         except ImportError:
@@ -375,7 +373,7 @@ class Mesh(object):
         mesh.
 
         """
-        from .tough._tough import init_incon, check_incon, write_incon
+        from .tough._tough import check_incon, init_incon, write_incon
 
         primary_variables, porosities, permeabilities = init_incon(self)
         incon = check_incon(
@@ -906,6 +904,7 @@ def from_pyvista(mesh, material="dfalt"):
     try:
         import pyvista
         import vtk
+
         from ._common import vtk_to_meshio_type
 
         VTK9 = vtk.vtkVersion().GetVTKMajorVersion() >= 9
