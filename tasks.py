@@ -56,8 +56,8 @@ def docstring(c):
 
 @task
 def isort(c):
-    c.run("isort -rc toughio")
-    c.run("isort -rc test")
+    c.run("isort toughio")
+    c.run("isort test")
 
 
 @task
