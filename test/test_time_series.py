@@ -1,10 +1,10 @@
 import sys
 from copy import deepcopy
 
+import helpers
 import numpy
 import pytest
 
-import helpers
 import toughio
 
 

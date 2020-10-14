@@ -402,7 +402,7 @@ def _write_start():
 def _write_param(parameters):
     """Write PARAM block data."""
     # Load data
-    from ._common import options, extra_options
+    from ._common import extra_options, options
 
     data = deepcopy(options)
     data.update(parameters["options"])

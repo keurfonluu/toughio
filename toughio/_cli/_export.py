@@ -18,9 +18,10 @@ format_to_ext = {
 def export(argv=None):
     import os
     import sys
+
     from .. import read_mesh, read_output, write_time_series
     from .._io.output._common import reorder_labels
-    from ..meshmaker import voxelize, triangulate
+    from ..meshmaker import triangulate, voxelize
 
     parser = _get_parser()
     args = parser.parse_args(argv)
