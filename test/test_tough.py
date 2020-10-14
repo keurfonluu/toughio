@@ -24,7 +24,7 @@ def test_mesh(nodal_distance, bound, coord):
     dy = numpy.arange(4) + 1
     dz = numpy.arange(5) + 1
     mesh = toughio.meshmaker.structured_grid(
-        dx, dy, dz, material=helpers.random_string(5)
+        dx, dy, dz, layer=True, material=helpers.random_string(5)
     )
 
     idx = numpy.random.choice(mesh.n_cells, mesh.n_cells // 2, replace=False)
