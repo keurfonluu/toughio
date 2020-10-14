@@ -74,7 +74,7 @@ def structured_grid(dx, dy, dz=None, origin=None, material="dfalt"):
 def _grid_3d(dx, dy, dz):
     """Generate 3D structured grid."""
     # Internal functions
-    def meshgrid(x, y, z, indexing="ij", order="F"):
+    def meshgrid(x, y, z, indexing="ij", order="C"):
         X, Y, Z = numpy.meshgrid(x, y, z, indexing=indexing)
         return X.ravel(order), Y.ravel(order), Z.ravel(order)
 
@@ -101,11 +101,21 @@ def _grid_3d(dx, dy, dz):
     points = [[x, y, z] for x, y, z in zip(X, Y, Z)]
     cells = [
         [
-            numpy.ravel_multi_index(vertex, xyz_shape, order="F")
+            numpy.ravel_multi_index(vertex, xyz_shape, order="C")
             for vertex in mesh_vertices(i, j, k)
         ]
         for i, j, k in zip(I, J, K)
     ]
+
+    # Reorder cells from top to bottom
+    for i in range(nx * ny):
+        i1 = i * nz
+        i2 = i1 + nz
+        cells[i1 : i2] = (
+            cells[i2 - 1 : i1 - 1 : -1]
+            if i > 0
+            else cells[i2 - 1 :: -1]
+        )
 
     return (
         numpy.array(points, dtype=float),
@@ -116,7 +126,7 @@ def _grid_3d(dx, dy, dz):
 def _grid_2d(dx, dy):
     """Generate 2D structured grid."""
     # Internal functions
-    def meshgrid(x, y, indexing="ij", order="F"):
+    def meshgrid(x, y, indexing="ij", order="C"):
         X, Y = numpy.meshgrid(x, y, indexing=indexing)
         return X.ravel(order), Y.ravel(order)
 
@@ -139,7 +149,7 @@ def _grid_2d(dx, dy):
     points = [[x, y] for x, y in zip(X, Y)]
     cells = [
         [
-            numpy.ravel_multi_index(vertex, xy_shape, order="F")
+            numpy.ravel_multi_index(vertex, xy_shape, order="C")
             for vertex in mesh_vertices(i, j)
         ]
         for i, j in zip(I, J)
