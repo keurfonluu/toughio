@@ -111,9 +111,14 @@ def _grid_3d(dx, dy, dz, order):
     ]
 
     # Reorder cells from top to bottom
-    for i in range(nx * ny):
-        i1 = i * nz
-        i2 = i1 + nz
+    if order == "F":
+        cells = cells[::-1]
+
+    n1 = nz if order == "F" else nx * ny
+    n2 = nx * ny if order == "F" else nz
+    for i in range(n1):
+        i1 = i * n2
+        i2 = i1 + n2
         cells[i1:i2] = cells[i2 - 1 : i1 - 1 : -1] if i > 0 else cells[i2 - 1 :: -1]
 
     return (
