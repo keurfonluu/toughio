@@ -117,7 +117,7 @@ class Mesh(object):
         if axis not in [0, 1, 2]:
             raise ValueError("axis must be 0, 1 or 2.")
         mesh = self if inplace else deepcopy(self)
-        height = [height] if isinstance(height, (int, float)) else height
+        height = [height] if numpy.ndim(height) == 0 else height
 
         npts, nh = len(mesh.points), len(height)
         if mesh.points.shape[1] == 3:
@@ -133,7 +133,11 @@ class Mesh(object):
             extra_points[:, axis] += h
             mesh.points = numpy.vstack((mesh.points, extra_points))
         for k, v in mesh.point_data.items():
-            mesh.point_data[k] = numpy.tile(v, nh + 1)
+            mesh.point_data[k] = (
+                numpy.tile(v, nh + 1)
+                if numpy.ndim(v) == 1
+                else numpy.tile(v, (nh + 1, 1))
+            )
 
         extruded_types = {
             "triangle": "wedge",
@@ -153,7 +157,12 @@ class Mesh(object):
                 cells.append(cell)
 
                 for k, v in cell_data.items():
-                    v[ic] = numpy.tile(v[ic], nh)
+                    v[ic] = (
+                        numpy.tile(v[ic], nh)
+                        if numpy.ndim(v[ic]) == 1
+                        else numpy.tile(v[ic], (nh, 1))
+                    )
+
         mesh.cells = cells
         mesh.cell_data = {k: numpy.concatenate(v) for k, v in cell_data.items()}
 
