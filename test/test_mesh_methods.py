@@ -41,22 +41,32 @@ def test_extrude_to_3d():
     dx = numpy.random.rand(10)
     dy = numpy.random.rand(5)
     mesh_ref = toughio.meshmaker.structured_grid(dx, dy)
-    mesh_ref.point_data["points"] = numpy.random.rand(mesh_ref.n_points)
-    mesh_ref.cell_data["cells"] = numpy.random.rand(mesh_ref.n_cells)
+    mesh_ref.point_data["a"] = numpy.random.rand(mesh_ref.n_points)
+    mesh_ref.point_data["b"] = numpy.random.rand(mesh_ref.n_points, 3)
+    mesh_ref.cell_data["c"] = numpy.random.rand(mesh_ref.n_cells)
+    mesh_ref.cell_data["d"] = numpy.random.rand(mesh_ref.n_cells, 3)
 
     # Extrude mesh to 3D
     mesh = mesh_ref.extrude_to_3d(numpy.random.rand(5), axis=2, inplace=False)
 
     assert mesh.n_points == 6 * mesh_ref.n_points
     assert mesh.n_cells == 5 * mesh_ref.n_cells
-    assert mesh.point_data["points"].size == 6 * mesh_ref.n_points
-    assert mesh.cell_data["cells"].size == 5 * mesh_ref.n_cells
+    assert mesh.point_data["a"].shape == (6 * mesh_ref.n_points,)
+    assert mesh.point_data["b"].shape == (6 * mesh_ref.n_points, 3)
+    assert mesh.cell_data["c"].shape == (5 * mesh_ref.n_cells,)
+    assert mesh.cell_data["d"].shape == (5 * mesh_ref.n_cells, 3)
 
-    for v in mesh.point_data["points"].reshape((6, mesh.n_points // 6)):
-        assert numpy.allclose(mesh_ref.point_data["points"], v)
+    for v in mesh.point_data["a"].reshape((6, mesh.n_points // 6)):
+        assert numpy.allclose(mesh_ref.point_data["a"], v)
 
-    for v in mesh.cell_data["cells"].reshape((5, mesh.n_cells // 5)):
-        assert numpy.allclose(mesh_ref.cell_data["cells"], v)
+    for v in mesh.point_data["b"].reshape((6, mesh.n_points // 6, 3)):
+        assert numpy.allclose(mesh_ref.point_data["b"], v)
+
+    for v in mesh.cell_data["c"].reshape((5, mesh.n_cells // 5)):
+        assert numpy.allclose(mesh_ref.cell_data["c"], v)
+
+    for v in mesh.cell_data["d"].reshape((5, mesh.n_cells // 5, 3)):
+        assert numpy.allclose(mesh_ref.cell_data["d"], v)
 
 
 def test_prune_duplicates():
