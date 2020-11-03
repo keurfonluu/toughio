@@ -70,11 +70,7 @@ class CylindricMesh(Mesh):
         areas, heights = self._get_areas_heights()
         out = areas * heights
 
-        return (
-            out
-            if self._layer
-            else out.reshape((nz, nr)).ravel(order="F")
-        )
+        return out if self._layer else out.reshape((nz, nr)).ravel(order="F")
 
 
 def cylindric_grid(dr, dz, origin_z=None, layer=False, material="dfalt"):
@@ -118,7 +114,12 @@ def cylindric_grid(dr, dz, origin_z=None, layer=False, material="dfalt"):
     origin_z = origin_z if origin_z is not None else -dz.sum()
 
     mesh = structured_grid(
-        dr, [1.0], dz, origin=[0.0, -0.5, origin_z], layer=layer, material=material,
+        dr,
+        [1.0],
+        dz,
+        origin=[0.0, -0.5, origin_z],
+        layer=layer,
+        material=material,
     )
 
     return CylindricMesh(
