@@ -71,3 +71,18 @@ def test_voxelize():
 
     mesh = toughio.meshmaker.voxelize(mesh_ref.centers, origin=origin)
     helpers.allclose_mesh(mesh_ref, mesh)
+
+
+def test_layer():
+    dr = numpy.array([1.0, 2.0, 3.0, 4.0])
+    dz = numpy.array([1.0, 2.0, 3.0])
+
+    mesh = toughio.meshmaker.cylindric_grid(dr, dz, layer=False)
+    mesh_layer = toughio.meshmaker.cylindric_grid(dr, dz, layer=True)
+
+    point = 3.5, 0.0, 1.5
+    i1 = mesh.near(point)
+    i2 = mesh_layer.near(point)
+
+    assert numpy.allclose(mesh.volumes[i1], mesh_layer.volumes[i2])
+    assert numpy.allclose(mesh.face_areas[i1], mesh_layer.face_areas[i2])

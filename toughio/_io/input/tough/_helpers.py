@@ -190,7 +190,9 @@ def check_parameters(input_types, keys=None, is_list=False):
             if not (v is None or isinstance(v, input_type)):
                 raise TypeError(
                     "Invalid type for parameter '{}' {}(expected {}).".format(
-                        k, "in {} ".format(keys) if keys else "", input_types[k],
+                        k,
+                        "in {} ".format(keys) if keys else "",
+                        input_types[k],
                     )
                 )
 
