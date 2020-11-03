@@ -9,11 +9,15 @@ write_read = lambda x, **kwargs: helpers.write_read(
 )
 
 write_read_tough = lambda x: write_read(
-    x, writer_kws={"file_format": "tough"}, reader_kws={"file_format": "tough"},
+    x,
+    writer_kws={"file_format": "tough"},
+    reader_kws={"file_format": "tough"},
 )
 
 write_read_json = lambda x: write_read(
-    x, writer_kws={"file_format": "json"}, reader_kws={"file_format": "json"},
+    x,
+    writer_kws={"file_format": "json"},
+    reader_kws={"file_format": "json"},
 )
 
 
@@ -171,7 +175,8 @@ def test_flac(write_read):
 
 
 @pytest.mark.parametrize(
-    "write_read, isothermal", [(write_read_tough, True), (write_read_tough, False)],
+    "write_read, isothermal",
+    [(write_read_tough, True), (write_read_tough, False)],
 )
 def test_multi(write_read, isothermal):
     import random
