@@ -93,7 +93,7 @@ def _read_table(f, file_type, label_length):
                     if first:
                         try:
                             # Set line parser and try parsing first line
-                            reader = lambda line: [str2float(x) for x in line.split()]
+                            reader = lambda line: [_str2float(x) for x in line.split()]
                             _ = reader(line)
 
                         except ValueError:
@@ -130,3 +130,12 @@ def _read_table(f, file_type, label_length):
                     break
 
     return headers, times, variables
+
+
+def _str2float(x):
+    """Return numpy.nan if x cannot be converted."""
+    try:
+        return str2float(x)
+
+    except ValueError:
+        return numpy.nan
