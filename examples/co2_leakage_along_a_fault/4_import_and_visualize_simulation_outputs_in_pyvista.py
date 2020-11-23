@@ -61,7 +61,6 @@ p.show_grid(
     zlabel="Elevation (m)",
     ticks="outside",
     font_family="arial",
-    shadow=True,
 )
 p.view_xz()
 p.show()
