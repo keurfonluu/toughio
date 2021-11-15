@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Luu"
+  given-names: "Keurfon"
+  orcid: "https://orcid.org/0000-0001-7927-0019"
+title: "toughio: Pre- and post-processing Python library for TOUGH"
+doi: 10.21105/joss.02412
+url: https://github.com/keurfonluu/toughio
+license: BSD-3-Clause
