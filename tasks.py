@@ -10,7 +10,7 @@ import toughio
 @task
 def build(c):
     shutil.rmtree("dist", ignore_errors=True)
-    c.run("python setup.py sdist bdist_wheel")
+    c.run("python -m build --sdist --wheel .")
 
 
 @task
