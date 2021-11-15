@@ -47,12 +47,12 @@ CLASSIFIERS = [
 # }
 if sys.version_info < (3,):
     REQUIREMENTS = ["meshio == 2.3.10"]
-    EXTRA_REQUIREMENTS = {"full": ["imageio==2.6.1", "lxml", "pyvista == 0.22.4"]}
+    EXTRA_REQUIREMENTS = {"full": ["imageio==2.6.1", "lxml", "pyvista == 0.22.4", "netcdf4==1.5.3"]}
 else:
     REQUIREMENTS = ["meshio >= 4.0.11, < 5.0"]
-    EXTRA_REQUIREMENTS = {"full": ["pyvista >= 0.23.1"]}
+    EXTRA_REQUIREMENTS = {"full": ["pyvista >= 0.23.1", "netcdf4"]}
 REQUIREMENTS += ["numpy >= 1.13.0"]
-EXTRA_REQUIREMENTS["full"] += ["matplotlib", "h5py", "netcdf4", "scipy>=0.9"]
+EXTRA_REQUIREMENTS["full"] += ["matplotlib", "h5py", "scipy>=0.9"]
 
 
 PACKAGE_DATA = {
