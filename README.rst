@@ -68,7 +68,7 @@ Documentation
 
 Refer to the online `documentation <https://keurfonluu.github.io/toughio//>`__ for detailed description of the API and examples.
 
-Alternatively, the documentation can be built using `Sphinx <https://www.sphinx-doc.org/en/master/>`__
+Alternatively, the documentation can be built using `Sphinx <https://www.sphinx-doc.org/en/master/>`__:
 
 .. code:: bash
 
