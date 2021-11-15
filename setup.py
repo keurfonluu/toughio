@@ -46,7 +46,7 @@ CLASSIFIERS = [
 # }
 if sys.version_info < (3,):
     REQUIREMENTS = ["meshio == 2.3.10"]
-    EXTRA_REQUIREMENTS = {"full": ["imageio == 2.6.1", "lxml", "pyvista == 0.22.4", "netcdf4 == 1.5.3"]}
+    EXTRA_REQUIREMENTS = {"full": ["imageio == 2.6.1", "lxml", "pyvista == 0.22.4", "netcdf4 == 1.5.3", "scooby == 0.5.6"]}
 else:
     REQUIREMENTS = ["meshio >= 4.0.11, < 5.0"]
     EXTRA_REQUIREMENTS = {"full": ["pyvista >= 0.23.1", "netcdf4"]}
