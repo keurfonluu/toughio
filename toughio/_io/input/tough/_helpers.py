@@ -12,7 +12,7 @@ dtypes = {
         "eos": "str",
         "n_component": "int",
         "n_phase": "int",
-        "n_component_mass": "int",
+        "n_component_incon": "int",
         "flac": "dict",
         "isothermal": "bool",
         "start": "bool",

@@ -352,8 +352,8 @@ def _write_multi(parameters):
         parameters["n_phase"] = values[2]  # Save for later check
 
     # Number of mass components
-    if parameters["n_component_mass"]:
-        values.append(parameters["n_component_mass"])
+    if parameters["n_component_incon"]:
+        values.append(parameters["n_component_incon"])
 
     out = write_record(values, fmt)
 

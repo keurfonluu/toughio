@@ -3,7 +3,7 @@ _Parameters = {
     "eos": "",
     "n_component": None,
     "n_phase": None,
-    "n_component_mass": None,
+    "n_component_incon": None,
     "flac": None,
     "isothermal": False,
     "start": True,
