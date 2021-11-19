@@ -239,6 +239,7 @@ def _read_multi(f):
     multi["n_component"] = data[0]
     multi["isothermal"] = data[1] == data[0]
     multi["n_phase"] = data[2]
+    multi["n_component_incon"] = data[4]
 
     return multi
 
