@@ -72,6 +72,8 @@ def read_buffer(f, label_length):
             parameters["flac"] = flac["flac"]
             for k, v in flac["rocks"].items():
                 parameters["rocks"][k].update(v)
+        elif line.startswith("NCGAS"):
+            parameters.update(_read_ncgas(fiter))
         elif line.startswith("MULTI"):
             parameters.update(_read_multi(fiter))
         elif line.startswith("SOLVR"):
@@ -227,6 +229,24 @@ def _read_flac(f, rocks_order):
     flac["flac"] = prune_nones_dict(flac["flac"])
 
     return flac
+
+
+def _read_ncgas(f):
+    """Read NCGAS block data."""
+    fmt = block_to_format["NCGAS"]
+    ncgas = {"non_condensible_gas": []}
+
+    # Record 1
+    line = next(f)
+    n = read_record(line, fmt[1])[0]
+
+    # Record 2
+    for _ in range(n):
+        line = next(f)
+        data = read_record(line, fmt[2])
+        ncgas["non_condensible_gas"].append(data[0])
+
+    return ncgas
 
 
 def _read_multi(f):

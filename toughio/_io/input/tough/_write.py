@@ -107,6 +107,7 @@ def write_buffer(parameters, block):
         out += _write_rocks(parameters)
         out += _write_rpcap(parameters) if rpcap else []
         out += _write_flac(parameters) if parameters["flac"] is not None else []
+        out += _write_ncgas(parameters) if parameters["non_condensible_gas"] is not None else []
         out += _write_multi(parameters) if multi else []
         out += _write_solvr(parameters) if parameters["solver"] else []
         out += _write_start() if parameters["start"] else []
@@ -328,6 +329,25 @@ def _write_flac(parameters):
         values = [data["equivalent_pore_pressure"]["id"], None]
         values += list(data["equivalent_pore_pressure"]["parameters"])
         out += write_record(values, fmt3)
+
+    return out
+
+
+@block("NCGAS")
+def _write_ncgas(parameters):
+    """Write NCGAS block data."""
+    data = parameters["non_condensible_gas"]
+
+    # Formats
+    fmt = block_to_format["NCGAS"]
+    fmt1 = str2format(fmt[1])
+    fmt2 = str2format(fmt[2])
+
+    # Record 1
+    out = write_record([len(data)], fmt1)
+
+    # Record 2
+    out += write_record(data, fmt2, multi=True)
 
     return out
 
