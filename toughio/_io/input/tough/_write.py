@@ -488,7 +488,7 @@ def _write_selec(parameters):
     data = deepcopy(selections)
     if parameters["selections"]["integers"]:
         data["integers"].update(parameters["selections"]["integers"])
-    if len(parameters["selections"]["floats"]):
+    if "floats" in parameters["selections"] and len(parameters["selections"]["floats"]):
         data["floats"] = parameters["selections"]["floats"]
 
     # Check floats and overwrite IE(1)
