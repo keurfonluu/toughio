@@ -337,11 +337,16 @@ def _write_multi(parameters):
     """Write MULTI block data."""
     from ._common import eos
 
+    if "eos" in parameters and parameters["eos"] == "tmvoc":
+        for keyword in {"n_component", "n_phase"}:
+            if parameters[keyword] is None:
+                raise ValueError("for 'tmvoc', at least 'n_component' and 'n_phase' must be specified")
+
     # Formats
     fmt = block_to_format["MULTI"]
     fmt = str2format(fmt)
 
-    values = list(eos[parameters["eos"]]) if parameters["eos"] else [0, 0, 0, 6]
+    values = list(eos[parameters["eos"]]) if parameters["eos"] and parameters["eos"] != "tmvoc" else [0, 0, 0, 6]
     values[0] = parameters["n_component"] if parameters["n_component"] else values[0]
     values[1] = values[0] if parameters["isothermal"] else values[0] + 1
     values[2] = parameters["n_phase"] if parameters["n_phase"] else values[2]
