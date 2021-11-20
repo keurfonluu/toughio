@@ -334,9 +334,13 @@ def _write_flac(parameters):
     return out
 
 
+@check_parameters(dtypes["CHEMP"], keys="chemical_properties", is_list=True)
 @block("CHEMP")
 def _write_chemp(parameters):
     """Write CHEMP block data."""
+    # Load data
+    from ._common import chemical_properties
+    
     data = parameters["chemical_properties"]
 
     # Formats
@@ -350,65 +354,68 @@ def _write_chemp(parameters):
 
     # Record 2
     for k, v in data.items():
+        vv = deepcopy(chemical_properties)
+        vv.update(v)
+
         out += write_record([k], fmt2)
 
         values = [
-            v["temperature_crit"],
-            v["pressure_crit"],
-            v["compressibility_crit"],
-            v["pitzer_factor"],
-            v["dipole_moment"],
+            vv["temperature_crit"],
+            vv["pressure_crit"],
+            vv["compressibility_crit"],
+            vv["pitzer_factor"],
+            vv["dipole_moment"],
         ]
         out += write_record(values, fmt3)
 
         values = [
-            v["boiling_point"],
-            v["vapor_pressure_a"],
-            v["vapor_pressure_b"],
-            v["vapor_pressure_c"],
-            v["vapor_pressure_d"],
+            vv["boiling_point"],
+            vv["vapor_pressure_a"],
+            vv["vapor_pressure_b"],
+            vv["vapor_pressure_c"],
+            vv["vapor_pressure_d"],
         ]
         out += write_record(values, fmt3)
 
         values = [
-            v["molecular_weight"],
-            v["heat_capacity_a"],
-            v["heat_capacity_b"],
-            v["heat_capacity_c"],
-            v["heat_capacity_d"],
+            vv["molecular_weight"],
+            vv["heat_capacity_a"],
+            vv["heat_capacity_b"],
+            vv["heat_capacity_c"],
+            vv["heat_capacity_d"],
         ]
         out += write_record(values, fmt3)
 
         values = [
-            v["napl_density_ref"],
-            v["napl_temperature_ref"],
-            v["gas_diffusivity_ref"],
-            v["gas_temperature_ref"],
-            v["exponent"],
+            vv["napl_density_ref"],
+            vv["napl_temperature_ref"],
+            vv["gas_diffusivity_ref"],
+            vv["gas_temperature_ref"],
+            vv["exponent"],
         ]
         out += write_record(values, fmt3)
 
         values = [
-            v["napl_viscosity_a"],
-            v["napl_viscosity_b"],
-            v["napl_viscosity_c"],
-            v["napl_viscosity_d"],
-            v["volume_crit"],
+            vv["napl_viscosity_a"],
+            vv["napl_viscosity_b"],
+            vv["napl_viscosity_c"],
+            vv["napl_viscosity_d"],
+            vv["volume_crit"],
         ]
         out += write_record(values, fmt3)
 
         values = [
-            v["solubility_a"],
-            v["solubility_b"],
-            v["solubility_c"],
-            v["solubility_d"],
+            vv["solubility_a"],
+            vv["solubility_b"],
+            vv["solubility_c"],
+            vv["solubility_d"],
         ]
         out += write_record(values, fmt3)
 
         values = [
-            v["oc_coeff"],
-            v["oc_fraction"],
-            v["oc_decay"],
+            vv["oc_coeff"],
+            vv["oc_fraction"],
+            vv["oc_decay"],
         ]
         out += write_record(values, fmt3)
 
