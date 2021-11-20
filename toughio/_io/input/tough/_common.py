@@ -5,6 +5,7 @@ _Parameters = {
     "n_phase": None,
     "n_component_incon": None,
     "flac": None,
+    "chemical_properties": None,
     "non_condensible_gas": None,
     "isothermal": False,
     "start": True,

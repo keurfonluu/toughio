@@ -107,6 +107,7 @@ def write_buffer(parameters, block):
         out += _write_rocks(parameters)
         out += _write_rpcap(parameters) if rpcap else []
         out += _write_flac(parameters) if parameters["flac"] is not None else []
+        out += _write_chemp(parameters) if parameters["chemical_properties"] is not None else []
         out += _write_ncgas(parameters) if parameters["non_condensible_gas"] is not None else []
         out += _write_multi(parameters) if multi else []
         out += _write_solvr(parameters) if parameters["solver"] else []
@@ -328,6 +329,87 @@ def _write_flac(parameters):
         # Equivalent pore pressure
         values = [data["equivalent_pore_pressure"]["id"], None]
         values += list(data["equivalent_pore_pressure"]["parameters"])
+        out += write_record(values, fmt3)
+
+    return out
+
+
+@block("CHEMP")
+def _write_chemp(parameters):
+    """Write CHEMP block data."""
+    data = parameters["chemical_properties"]
+
+    # Formats
+    fmt = block_to_format["CHEMP"]
+    fmt1 = str2format(fmt[1])
+    fmt2 = str2format(fmt[2])
+    fmt3 = str2format(fmt[3])
+
+    # Record 1
+    out = write_record([len(data)], fmt1)
+
+    # Record 2
+    for k, v in data.items():
+        out += write_record([k], fmt2)
+
+        values = [
+            v["temperature_crit"],
+            v["pressure_crit"],
+            v["compressibility_crit"],
+            v["pitzer_factor"],
+            v["dipole_moment"],
+        ]
+        out += write_record(values, fmt3)
+
+        values = [
+            v["boiling_point"],
+            v["vapor_pressure_a"],
+            v["vapor_pressure_b"],
+            v["vapor_pressure_c"],
+            v["vapor_pressure_d"],
+        ]
+        out += write_record(values, fmt3)
+
+        values = [
+            v["molecular_weight"],
+            v["heat_capacity_a"],
+            v["heat_capacity_b"],
+            v["heat_capacity_c"],
+            v["heat_capacity_d"],
+        ]
+        out += write_record(values, fmt3)
+
+        values = [
+            v["napl_density_ref"],
+            v["napl_temperature_ref"],
+            v["gas_diffusivity_ref"],
+            v["gas_temperature_ref"],
+            v["exponent"],
+        ]
+        out += write_record(values, fmt3)
+
+        values = [
+            v["napl_viscosity_a"],
+            v["napl_viscosity_b"],
+            v["napl_viscosity_c"],
+            v["napl_viscosity_d"],
+            v["volume_crit"],
+        ]
+        out += write_record(values, fmt3)
+
+        values = [
+            v["solubility_a"],
+            v["solubility_b"],
+            v["solubility_c"],
+            v["solubility_d"],
+        ]
+        out += write_record(values, fmt3)
+
+        values = [
+            v["oc_coeff"],
+            v["oc_fraction"],
+            v["oc_decay"],
+        ]
         out += write_record(values, fmt3)
 
     return out

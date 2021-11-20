@@ -14,6 +14,7 @@ dtypes = {
         "n_phase": "int",
         "n_component_incon": "int",
         "flac": "dict",
+        "chemical_properties": "dict",
         "non_condensible_gas": "str_array_like",
         "isothermal": "bool",
         "start": "bool",
