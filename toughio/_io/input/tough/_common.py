@@ -3,8 +3,10 @@ _Parameters = {
     "eos": "",
     "n_component": None,
     "n_phase": None,
-    "n_component_mass": None,
+    "n_component_incon": None,
     "flac": None,
+    "chemical_properties": None,
+    "non_condensible_gas": None,
     "isothermal": False,
     "start": True,
     "nover": False,
@@ -38,6 +40,41 @@ flac = {
     "creep": False,
     "porosity_model": None,
     "version": None,
+}
+
+chemical_properties = {
+    "temperature_crit": None,
+    "pressure_crit": None,
+    "compressibility_crit": None,
+    "pitzer_factor": None,
+    "dipole_moment": None,
+    "boiling_point": None,
+    "vapor_pressure_a": None,
+    "vapor_pressure_b": None,
+    "vapor_pressure_c": None,
+    "vapor_pressure_d": None,
+    "molecular_weight": None,
+    "heat_capacity_a": None,
+    "heat_capacity_b": None,
+    "heat_capacity_c": None,
+    "heat_capacity_d": None,
+    "napl_density_ref": None,
+    "napl_temperature_ref": None,
+    "gas_diffusivity_ref": None,
+    "gas_temperature_ref": None,
+    "exponent": None,
+    "napl_viscosity_a": None,
+    "napl_viscosity_b": None,
+    "napl_viscosity_c": None,
+    "napl_viscosity_d": None,
+    "volume_crit": None,
+    "solubility_a": None,
+    "solubility_b": None,
+    "solubility_c": None,
+    "solubility_d": None,
+    "oc_coeff": None,
+    "oc_fraction": None,
+    "oc_decay": None,
 }
 
 selections = {
@@ -155,6 +192,7 @@ eos = {
     "eco2n": [3, 4, 3, 6],
     "eco2n_v2": [3, 4, 3, 6],
     "eco2m": [3, 4, 4, 6],
+    "tmvoc": None,
 }
 
 header = "----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8"

@@ -111,11 +111,7 @@ def write(
 
 
 def check_incon(
-    incon,
-    primary_variables,
-    porosities,
-    permeabilities,
-    num_cells,
+    incon, primary_variables, porosities, permeabilities, num_cells,
 ):
     """Check INCON inputs and show warnings if necessary."""
     do_incon = incon
@@ -124,8 +120,7 @@ def check_incon(
         do_incon = False
 
     cond = numpy.logical_and(
-        primary_variables[:, 0] > -1.0e9,
-        primary_variables[:, 0] < 0.0,
+        primary_variables[:, 0] > -1.0e9, primary_variables[:, 0] < 0.0,
     )
     if cond.any():
         logging.warning("Negative pore pressures found in 'INCON'.")
@@ -198,10 +193,7 @@ def write_mesh(
 
         if coord:
             _write_coord(
-                f,
-                nodes,
-                materials,
-                material_end,
+                f, nodes, materials, material_end,
             )
 
         _write_conne(
@@ -220,20 +212,12 @@ def write_mesh(
 
 
 def write_incon(
-    filename,
-    labels,
-    primary_variables,
-    porosities,
-    permeabilities,
+    filename, labels, primary_variables, porosities, permeabilities,
 ):
     """Write INCON file."""
     with open(filename, "w") as f:
         _write_incon(
-            f,
-            labels,
-            primary_variables,
-            porosities,
-            permeabilities,
+            f, labels, primary_variables, porosities, permeabilities,
         )
 
 
@@ -271,10 +255,7 @@ def _write_eleme(
 
 @block("COORD")
 def _write_coord(
-    f,
-    nodes,
-    materials,
-    material_end,
+    f, nodes, materials, material_end,
 ):
     """Write COORD block."""
     from ._helpers import _write_coord as writer

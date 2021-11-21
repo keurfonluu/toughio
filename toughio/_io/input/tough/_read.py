@@ -72,6 +72,10 @@ def read_buffer(f, label_length):
             parameters["flac"] = flac["flac"]
             for k, v in flac["rocks"].items():
                 parameters["rocks"][k].update(v)
+        elif line.startswith("CHEMP"):
+            parameters.update(_read_chemp(fiter))
+        elif line.startswith("NCGAS"):
+            parameters.update(_read_ncgas(fiter))
         elif line.startswith("MULTI"):
             parameters.update(_read_multi(fiter))
         elif line.startswith("SOLVR"):
@@ -229,6 +233,99 @@ def _read_flac(f, rocks_order):
     return flac
 
 
+def _read_chemp(f):
+    """Read CHEMP block data."""
+    fmt = block_to_format["CHEMP"]
+    chemp = {"chemical_properties": {}}
+
+    # Record 1
+    line = next(f)
+    n = read_record(line, fmt[1])[0]
+
+    # Record 2
+    for _ in range(n):
+        tmp = {}
+
+        line = next(f)
+        data = read_record(line, fmt[2])
+        chem = data[0]
+
+        line = next(f)
+        data = read_record(line, fmt[3])
+        tmp["temperature_crit"] = data[0]
+        tmp["pressure_crit"] = data[1]
+        tmp["compressibility_crit"] = data[2]
+        tmp["pitzer_factor"] = data[3]
+        tmp["dipole_moment"] = data[4]
+
+        line = next(f)
+        data = read_record(line, fmt[3])
+        tmp["boiling_point"] = data[0]
+        tmp["vapor_pressure_a"] = data[1]
+        tmp["vapor_pressure_b"] = data[2]
+        tmp["vapor_pressure_c"] = data[3]
+        tmp["vapor_pressure_d"] = data[4]
+
+        line = next(f)
+        data = read_record(line, fmt[3])
+        tmp["molecular_weight"] = data[0]
+        tmp["heat_capacity_a"] = data[1]
+        tmp["heat_capacity_b"] = data[2]
+        tmp["heat_capacity_c"] = data[3]
+        tmp["heat_capacity_d"] = data[4]
+
+        line = next(f)
+        data = read_record(line, fmt[3])
+        tmp["napl_density_ref"] = data[0]
+        tmp["napl_temperature_ref"] = data[1]
+        tmp["gas_diffusivity_ref"] = data[2]
+        tmp["gas_temperature_ref"] = data[3]
+        tmp["exponent"] = data[4]
+
+        line = next(f)
+        data = read_record(line, fmt[3])
+        tmp["napl_viscosity_a"] = data[0]
+        tmp["napl_viscosity_b"] = data[1]
+        tmp["napl_viscosity_c"] = data[2]
+        tmp["napl_viscosity_d"] = data[3]
+        tmp["volume_crit"] = data[4]
+
+        line = next(f)
+        data = read_record(line, fmt[3])
+        tmp["solubility_a"] = data[0]
+        tmp["solubility_b"] = data[1]
+        tmp["solubility_c"] = data[2]
+        tmp["solubility_d"] = data[3]
+
+        line = next(f)
+        data = read_record(line, fmt[3])
+        tmp["oc_coeff"] = data[0]
+        tmp["oc_fraction"] = data[1]
+        tmp["oc_decay"] = data[2]
+
+        chemp["chemical_properties"][chem] = tmp
+
+    return chemp
+
+
+def _read_ncgas(f):
+    """Read NCGAS block data."""
+    fmt = block_to_format["NCGAS"]
+    ncgas = {"non_condensible_gas": []}
+
+    # Record 1
+    line = next(f)
+    n = read_record(line, fmt[1])[0]
+
+    # Record 2
+    for _ in range(n):
+        line = next(f)
+        data = read_record(line, fmt[2])
+        ncgas["non_condensible_gas"].append(data[0])
+
+    return ncgas
+
+
 def _read_multi(f):
     """Read MULTI block data."""
     fmt = block_to_format["MULTI"]
@@ -239,6 +336,7 @@ def _read_multi(f):
     multi["n_component"] = data[0]
     multi["isothermal"] = data[1] == data[0]
     multi["n_phase"] = data[2]
+    multi["n_component_incon"] = data[4]
 
     return multi
 
