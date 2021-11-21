@@ -174,6 +174,67 @@ def test_flac(write_read):
             helpers.allclose_dict(vv, parameters["rocks"][k][kk], atol=1.0e-4)
 
 
+@pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
+def test_chemp(write_read):
+    parameters_ref = {
+        "chemical_properties": {
+            helpers.random_string(20): {
+                "temperature_crit": numpy.random.rand(),
+                "pressure_crit": numpy.random.rand(),
+                "compressibility_crit": numpy.random.rand(),
+                "pitzer_factor": numpy.random.rand(),
+                "dipole_moment": numpy.random.rand(),
+                "boiling_point": numpy.random.rand(),
+                "vapor_pressure_a": numpy.random.rand(),
+                "vapor_pressure_b": numpy.random.rand(),
+                "vapor_pressure_c": numpy.random.rand(),
+                "vapor_pressure_d": numpy.random.rand(),
+                "molecular_weight": numpy.random.rand(),
+                "heat_capacity_a": numpy.random.rand(),
+                "heat_capacity_b": numpy.random.rand(),
+                "heat_capacity_c": numpy.random.rand(),
+                "heat_capacity_d": numpy.random.rand(),
+                "napl_density_ref": numpy.random.rand(),
+                "napl_temperature_ref": numpy.random.rand(),
+                "gas_diffusivity_ref": numpy.random.rand(),
+                "gas_temperature_ref": numpy.random.rand(),
+                "exponent": numpy.random.rand(),
+                "napl_viscosity_a": numpy.random.rand(),
+                "napl_viscosity_b": numpy.random.rand(),
+                "napl_viscosity_c": numpy.random.rand(),
+                "napl_viscosity_d": numpy.random.rand(),
+                "volume_crit": numpy.random.rand(),
+                "solubility_a": numpy.random.rand(),
+                "solubility_b": numpy.random.rand(),
+                "solubility_c": numpy.random.rand(),
+                "solubility_d": numpy.random.rand(),
+                "oc_coeff": numpy.random.rand(),
+                "oc_fraction": numpy.random.rand(),
+                "oc_decay": numpy.random.rand(),
+            }
+            for _ in numpy.random.rand(10) + 1
+        }
+    }
+    parameters = write_read(parameters_ref)
+
+    assert len(parameters["chemical_properties"]) == len(parameters_ref["chemical_properties"])
+    for k, v in parameters_ref["chemical_properties"].items():
+        for kk, vv in v.items():
+            assert numpy.allclose(vv, parameters["chemical_properties"][k][kk], atol=1.0e-4)
+
+
+@pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
+def test_ncgas(write_read):
+    parameters_ref = {
+        "non_condensible_gas": [helpers.random_string(10) for _ in numpy.random.rand(10) + 1]
+    }
+    parameters = write_read(parameters_ref)
+
+    assert len(parameters["non_condensible_gas"]) == len(parameters_ref["non_condensible_gas"])
+    for v1, v2 in zip(parameters["non_condensible_gas"], parameters_ref["non_condensible_gas"]):
+        assert v1 == v2
+
+
 @pytest.mark.parametrize(
     "write_read, isothermal",
     [(write_read_tough, True), (write_read_tough, False)],
