@@ -251,7 +251,7 @@ def test_multi(write_read, isothermal):
 
     parameters_ref = {
         "eos": random.choice(
-            [k for k in eos.keys() if k not in {"eos7", "eos8", "eos9"}]
+            [k for k in eos.keys() if k not in {"eos7", "eos8", "eos9", "tmvoc"}]
         ),
         "isothermal": isothermal,
     }
