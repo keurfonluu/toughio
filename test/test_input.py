@@ -484,7 +484,7 @@ def test_oft(write_read, oft, n):
     ],
 )
 def test_gener(write_read, specific_enthalpy, label_length):
-    n_rnd = numpy.random.randint(100) + 1
+    n_rnd = numpy.random.randint(100) + 2
     parameters_ref = {
         "generators": {
             helpers.random_label(label_length): {
