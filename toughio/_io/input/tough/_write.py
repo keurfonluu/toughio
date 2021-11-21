@@ -107,8 +107,16 @@ def write_buffer(parameters, block):
         out += _write_rocks(parameters)
         out += _write_rpcap(parameters) if rpcap else []
         out += _write_flac(parameters) if parameters["flac"] is not None else []
-        out += _write_chemp(parameters) if parameters["chemical_properties"] is not None else []
-        out += _write_ncgas(parameters) if parameters["non_condensible_gas"] is not None else []
+        out += (
+            _write_chemp(parameters)
+            if parameters["chemical_properties"] is not None
+            else []
+        )
+        out += (
+            _write_ncgas(parameters)
+            if parameters["non_condensible_gas"] is not None
+            else []
+        )
         out += _write_multi(parameters) if multi else []
         out += _write_solvr(parameters) if parameters["solver"] else []
         out += _write_start() if parameters["start"] else []
@@ -340,7 +348,7 @@ def _write_chemp(parameters):
     """Write CHEMP block data."""
     # Load data
     from ._common import chemical_properties
-    
+
     data = parameters["chemical_properties"]
 
     # Formats
@@ -449,13 +457,19 @@ def _write_multi(parameters):
     if "eos" in parameters and parameters["eos"] == "tmvoc":
         for keyword in {"n_component", "n_phase"}:
             if parameters[keyword] is None:
-                raise ValueError("for 'tmvoc', at least 'n_component' and 'n_phase' must be specified")
+                raise ValueError(
+                    "for 'tmvoc', at least 'n_component' and 'n_phase' must be specified"
+                )
 
     # Formats
     fmt = block_to_format["MULTI"]
     fmt = str2format(fmt)
 
-    values = list(eos[parameters["eos"]]) if parameters["eos"] and parameters["eos"] != "tmvoc" else [0, 0, 0, 6]
+    values = (
+        list(eos[parameters["eos"]])
+        if parameters["eos"] and parameters["eos"] != "tmvoc"
+        else [0, 0, 0, 6]
+    )
     values[0] = parameters["n_component"] if parameters["n_component"] else values[0]
     values[1] = values[0] if parameters["isothermal"] else values[0] + 1
     values[2] = parameters["n_phase"] if parameters["n_phase"] else values[2]

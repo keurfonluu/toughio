@@ -9,15 +9,11 @@ write_read = lambda x, **kwargs: helpers.write_read(
 )
 
 write_read_tough = lambda x: write_read(
-    x,
-    writer_kws={"file_format": "tough"},
-    reader_kws={"file_format": "tough"},
+    x, writer_kws={"file_format": "tough"}, reader_kws={"file_format": "tough"},
 )
 
 write_read_json = lambda x: write_read(
-    x,
-    writer_kws={"file_format": "json"},
-    reader_kws={"file_format": "json"},
+    x, writer_kws={"file_format": "json"}, reader_kws={"file_format": "json"},
 )
 
 
@@ -217,27 +213,36 @@ def test_chemp(write_read):
     }
     parameters = write_read(parameters_ref)
 
-    assert len(parameters["chemical_properties"]) == len(parameters_ref["chemical_properties"])
+    assert len(parameters["chemical_properties"]) == len(
+        parameters_ref["chemical_properties"]
+    )
     for k, v in parameters_ref["chemical_properties"].items():
         for kk, vv in v.items():
-            assert numpy.allclose(vv, parameters["chemical_properties"][k][kk], atol=1.0e-4)
+            assert numpy.allclose(
+                vv, parameters["chemical_properties"][k][kk], atol=1.0e-4
+            )
 
 
 @pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
 def test_ncgas(write_read):
     parameters_ref = {
-        "non_condensible_gas": [helpers.random_string(10) for _ in numpy.random.rand(10) + 1]
+        "non_condensible_gas": [
+            helpers.random_string(10) for _ in numpy.random.rand(10) + 1
+        ]
     }
     parameters = write_read(parameters_ref)
 
-    assert len(parameters["non_condensible_gas"]) == len(parameters_ref["non_condensible_gas"])
-    for v1, v2 in zip(parameters["non_condensible_gas"], parameters_ref["non_condensible_gas"]):
+    assert len(parameters["non_condensible_gas"]) == len(
+        parameters_ref["non_condensible_gas"]
+    )
+    for v1, v2 in zip(
+        parameters["non_condensible_gas"], parameters_ref["non_condensible_gas"]
+    ):
         assert v1 == v2
 
 
 @pytest.mark.parametrize(
-    "write_read, isothermal",
-    [(write_read_tough, True), (write_read_tough, False)],
+    "write_read, isothermal", [(write_read_tough, True), (write_read_tough, False)],
 )
 def test_multi(write_read, isothermal):
     import random

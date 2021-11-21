@@ -101,8 +101,7 @@ def test_output_eleme(filename, filename_ref):
 
 
 @pytest.mark.parametrize(
-    "filename",
-    ["OUTPUT_CONNE.csv", "OUTPUT.out", "OUTPUT_6.out"],
+    "filename", ["OUTPUT_CONNE.csv", "OUTPUT.out", "OUTPUT_6.out"],
 )
 def test_output_conne(filename):
     this_dir = os.path.dirname(os.path.abspath(__file__))
@@ -147,9 +146,7 @@ def test_output_conne(filename):
 )
 def test_output(output_ref, file_format):
     output = write_read(
-        output=output_ref,
-        writer_kws={"file_format": file_format},
-        reader_kws={},
+        output=output_ref, writer_kws={"file_format": file_format}, reader_kws={},
     )
 
     output_ref = output_ref if isinstance(output_ref, list) else [output_ref]
