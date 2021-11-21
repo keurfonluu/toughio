@@ -42,25 +42,17 @@ def _get_parser():
 
     # Input file
     parser.add_argument(
-        "infile",
-        type=str,
-        help="SAVE file to convert",
+        "infile", type=str, help="SAVE file to convert",
     )
 
     # Output file
     parser.add_argument(
-        "outfile",
-        type=str,
-        help="converted INCON file",
+        "outfile", type=str, help="converted INCON file",
     )
 
     # Reset
     parser.add_argument(
-        "--reset",
-        "-r",
-        default=False,
-        action="store_true",
-        help="reset all counters",
+        "--reset", "-r", default=False, action="store_true", help="reset all counters",
     )
 
     return parser

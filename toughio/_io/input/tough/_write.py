@@ -107,6 +107,16 @@ def write_buffer(parameters, block):
         out += _write_rocks(parameters)
         out += _write_rpcap(parameters) if rpcap else []
         out += _write_flac(parameters) if parameters["flac"] is not None else []
+        out += (
+            _write_chemp(parameters)
+            if parameters["chemical_properties"] is not None
+            else []
+        )
+        out += (
+            _write_ncgas(parameters)
+            if parameters["non_condensible_gas"] is not None
+            else []
+        )
         out += _write_multi(parameters) if multi else []
         out += _write_solvr(parameters) if parameters["solver"] else []
         out += _write_start() if parameters["start"] else []
@@ -332,16 +342,134 @@ def _write_flac(parameters):
     return out
 
 
+@check_parameters(dtypes["CHEMP"], keys="chemical_properties", is_list=True)
+@block("CHEMP")
+def _write_chemp(parameters):
+    """Write CHEMP block data."""
+    # Load data
+    from ._common import chemical_properties
+
+    data = parameters["chemical_properties"]
+
+    # Formats
+    fmt = block_to_format["CHEMP"]
+    fmt1 = str2format(fmt[1])
+    fmt2 = str2format(fmt[2])
+    fmt3 = str2format(fmt[3])
+
+    # Record 1
+    out = write_record([len(data)], fmt1)
+
+    # Record 2
+    for k, v in data.items():
+        vv = deepcopy(chemical_properties)
+        vv.update(v)
+
+        out += write_record([k], fmt2)
+
+        values = [
+            vv["temperature_crit"],
+            vv["pressure_crit"],
+            vv["compressibility_crit"],
+            vv["pitzer_factor"],
+            vv["dipole_moment"],
+        ]
+        out += write_record(values, fmt3)
+
+        values = [
+            vv["boiling_point"],
+            vv["vapor_pressure_a"],
+            vv["vapor_pressure_b"],
+            vv["vapor_pressure_c"],
+            vv["vapor_pressure_d"],
+        ]
+        out += write_record(values, fmt3)
+
+        values = [
+            vv["molecular_weight"],
+            vv["heat_capacity_a"],
+            vv["heat_capacity_b"],
+            vv["heat_capacity_c"],
+            vv["heat_capacity_d"],
+        ]
+        out += write_record(values, fmt3)
+
+        values = [
+            vv["napl_density_ref"],
+            vv["napl_temperature_ref"],
+            vv["gas_diffusivity_ref"],
+            vv["gas_temperature_ref"],
+            vv["exponent"],
+        ]
+        out += write_record(values, fmt3)
+
+        values = [
+            vv["napl_viscosity_a"],
+            vv["napl_viscosity_b"],
+            vv["napl_viscosity_c"],
+            vv["napl_viscosity_d"],
+            vv["volume_crit"],
+        ]
+        out += write_record(values, fmt3)
+
+        values = [
+            vv["solubility_a"],
+            vv["solubility_b"],
+            vv["solubility_c"],
+            vv["solubility_d"],
+        ]
+        out += write_record(values, fmt3)
+
+        values = [
+            vv["oc_coeff"],
+            vv["oc_fraction"],
+            vv["oc_decay"],
+        ]
+        out += write_record(values, fmt3)
+
+    return out
+
+
+@block("NCGAS")
+def _write_ncgas(parameters):
+    """Write NCGAS block data."""
+    data = parameters["non_condensible_gas"]
+
+    # Formats
+    fmt = block_to_format["NCGAS"]
+    fmt1 = str2format(fmt[1])
+    fmt2 = str2format(fmt[2])
+
+    # Record 1
+    out = write_record([len(data)], fmt1)
+
+    # Record 2
+    out += write_record(data, fmt2, multi=True)
+
+    return out
+
+
 @block("MULTI")
 def _write_multi(parameters):
     """Write MULTI block data."""
     from ._common import eos
 
+    if "eos" in parameters and parameters["eos"] == "tmvoc":
+        for keyword in {"n_component", "n_phase"}:
+            if parameters[keyword] is None:
+                raise ValueError(
+                    "for 'tmvoc', at least 'n_component' and 'n_phase' must be specified"
+                )
+
     # Formats
     fmt = block_to_format["MULTI"]
     fmt = str2format(fmt)
 
-    values = list(eos[parameters["eos"]]) if parameters["eos"] else [0, 0, 0, 6]
+    values = (
+        list(eos[parameters["eos"]])
+        if parameters["eos"] and parameters["eos"] != "tmvoc"
+        else [0, 0, 0, 6]
+    )
     values[0] = parameters["n_component"] if parameters["n_component"] else values[0]
     values[1] = values[0] if parameters["isothermal"] else values[0] + 1
     values[2] = parameters["n_phase"] if parameters["n_phase"] else values[2]
@@ -352,8 +480,8 @@ def _write_multi(parameters):
         parameters["n_phase"] = values[2]  # Save for later check
 
     # Number of mass components
-    if parameters["n_component_mass"]:
-        values.append(parameters["n_component_mass"])
+    if parameters["n_component_incon"]:
+        values.append(parameters["n_component_incon"])
 
     out = write_record(values, fmt)
 
@@ -488,7 +616,7 @@ def _write_selec(parameters):
     data = deepcopy(selections)
     if parameters["selections"]["integers"]:
         data["integers"].update(parameters["selections"]["integers"])
-    if len(parameters["selections"]["floats"]):
+    if "floats" in parameters["selections"] and len(parameters["selections"]["floats"]):
         data["floats"] = parameters["selections"]["floats"]
 
     # Check floats and overwrite IE(1)
