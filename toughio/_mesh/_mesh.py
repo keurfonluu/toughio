@@ -806,6 +806,20 @@ class Mesh(object):
         return numpy.array([numpy.min(out) for out in _qualities(self)])
 
     @property
+    def dim(self):
+        """Return mesh dimension."""
+        celltypes = set([cell.type for cell in self.cells])
+        
+        if celltypes.intersection({"tetra", "pyramid", "wedge", "hexahedron"}):
+            return 3
+
+        elif celltypes.intersection({"quad", "triangle"}):
+            return 2
+
+        else:
+            raise ValueError()
+
+    @property
     def filter(self):
         """
         Filter mesh.
