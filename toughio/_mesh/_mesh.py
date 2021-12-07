@@ -809,7 +809,7 @@ class Mesh(object):
     def dim(self):
         """Return mesh dimension."""
         celltypes = set([cell.type for cell in self.cells])
-        
+
         if celltypes.intersection({"tetra", "pyramid", "wedge", "hexahedron"}):
             return 3
 
