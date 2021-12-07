@@ -3,7 +3,7 @@ from __future__ import division, with_statement
 import logging
 from copy import deepcopy
 
-import numpy
+import numpy as np
 
 from ...._common import block_to_format, str2format
 from ._common import default
@@ -213,8 +213,8 @@ def _write_rocks(parameters):
 
         # Permeability
         per = data["permeability"]
-        per = [per] * 3 if not numpy.ndim(per) else per
-        if not (isinstance(per, (list, tuple, numpy.ndarray)) and len(per) == 3):
+        per = [per] * 3 if not np.ndim(per) else per
+        if not (isinstance(per, (list, tuple, np.ndarray)) and len(per) == 3):
             raise TypeError()
 
         # Record 1
@@ -536,7 +536,7 @@ def _write_param(parameters):
     data.update(parameters["options"])
 
     # Table
-    if not isinstance(data["t_steps"], (list, tuple, numpy.ndarray)):
+    if not isinstance(data["t_steps"], (list, tuple, np.ndarray)):
         data["t_steps"] = [data["t_steps"]]
 
     # Formats
@@ -621,7 +621,7 @@ def _write_selec(parameters):
 
     # Check floats and overwrite IE(1)
     if data["floats"] is not None and len(data["floats"]):
-        if isinstance(data["floats"][0], (list, tuple, numpy.ndarray)):
+        if isinstance(data["floats"][0], (list, tuple, np.ndarray)):
             for x in data["floats"]:
                 if len(x) > 8:
                     raise ValueError()
@@ -718,7 +718,7 @@ def _write_momop(parameters):
 def _write_times(parameters):
     """Write TIMES block data."""
     data = parameters["times"]
-    data = data if numpy.ndim(data) else [data]
+    data = data if np.ndim(data) else [data]
 
     # Formats
     fmt = block_to_format["TIMES"]
@@ -795,7 +795,7 @@ def _write_gener(parameters):
             # Check that values in dict have the same length
             for key in keys:
                 if data[key] is not None:
-                    if not isinstance(data[key], (list, tuple, numpy.ndarray)):
+                    if not isinstance(data[key], (list, tuple, np.ndarray)):
                         raise TypeError()
                     if len(data[key]) != num_comps:
                         raise ValueError()
@@ -815,7 +815,7 @@ def _write_gener(parameters):
             # Only one component for this element
             # Check that values are scalar or 1D array_like
             for key in keys:
-                if numpy.ndim(data[key]) not in {0, 1}:
+                if np.ndim(data[key]) not in {0, 1}:
                     raise ValueError()
             generator_data.append((k, data))
 
@@ -829,13 +829,11 @@ def _write_gener(parameters):
     for k, v in generator_data:
         # Table
         ltab = None
-        if v["times"] is not None and isinstance(
-            v["times"], (list, tuple, numpy.ndarray)
-        ):
+        if v["times"] is not None and isinstance(v["times"], (list, tuple, np.ndarray)):
             ltab = len(v["times"])
             for key in ["rates", "specific_enthalpy"]:
                 if v[key] is not None:
-                    if not isinstance(v[key], (list, tuple, numpy.ndarray)):
+                    if not isinstance(v[key], (list, tuple, np.ndarray)):
                         raise TypeError()
                     if not (ltab > 1 and ltab == len(v[key])):
                         raise ValueError()
@@ -843,13 +841,11 @@ def _write_gener(parameters):
             # Rates and specific enthalpy tables cannot be written without a
             # time table
             for key in ["rates", "specific_enthalpy"]:
-                if v[key] is not None and numpy.ndim(v[key]) != 0:
+                if v[key] is not None and np.ndim(v[key]) != 0:
                     raise ValueError()
 
         itab = (
-            1
-            if isinstance(v["specific_enthalpy"], (list, tuple, numpy.ndarray))
-            else None
+            1 if isinstance(v["specific_enthalpy"], (list, tuple, np.ndarray)) else None
         )
 
         # Record 1
@@ -877,10 +873,10 @@ def _write_gener(parameters):
 
         # Record 4
         if ltab and v["specific_enthalpy"] is not None:
-            if isinstance(v["specific_enthalpy"], (list, tuple, numpy.ndarray)):
+            if isinstance(v["specific_enthalpy"], (list, tuple, np.ndarray)):
                 specific_enthalpy = v["specific_enthalpy"]
             else:
-                specific_enthalpy = numpy.full(ltab, v["specific_enthalpy"])
+                specific_enthalpy = np.full(ltab, v["specific_enthalpy"])
 
             out += write_record(specific_enthalpy, fmt2, multi=True)
 
@@ -929,12 +925,12 @@ def _write_outpu(parameters):
         for k, v in data["variables"].items():
             values = [k.upper()]
 
-            if numpy.ndim(v) == 0:
+            if np.ndim(v) == 0:
                 values += [v]
                 buffer += write_record(values, fmt3)
                 num_vars += 1
             else:
-                if numpy.ndim(v[0]) == 0:
+                if np.ndim(v[0]) == 0:
                     values += list(v)
                     buffer += write_record(values, fmt3)
                     num_vars += 1

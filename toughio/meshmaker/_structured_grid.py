@@ -1,4 +1,4 @@
-import numpy
+import numpy as np
 
 from .._mesh._mesh import CellBlock, Mesh
 
@@ -32,11 +32,11 @@ def structured_grid(dx, dy, dz=None, origin=None, layer=False, material="dfalt")
         Output non-uniform structured mesh.
 
     """
-    if not isinstance(dx, (list, tuple, numpy.ndarray)):
+    if not isinstance(dx, (list, tuple, np.ndarray)):
         raise TypeError()
-    if not isinstance(dy, (list, tuple, numpy.ndarray)):
+    if not isinstance(dy, (list, tuple, np.ndarray)):
         raise TypeError()
-    if not (dz is None or isinstance(dz, (list, tuple, numpy.ndarray))):
+    if not (dz is None or isinstance(dz, (list, tuple, np.ndarray))):
         raise TypeError()
     if not isinstance(material, str):
         raise TypeError()
@@ -51,25 +51,21 @@ def structured_grid(dx, dy, dz=None, origin=None, layer=False, material="dfalt")
 
     if not (
         origin is None
-        or (isinstance(origin, (list, tuple, numpy.ndarray)) and len(origin) == ndim)
+        or (isinstance(origin, (list, tuple, np.ndarray)) and len(origin) == ndim)
     ):
         raise ValueError()
     origin = (
-        numpy.asarray(origin)
+        np.asarray(origin)
         if origin is not None
-        else (
-            numpy.zeros(ndim) if ndim == 2 else numpy.array([0.0, 0.0, -numpy.sum(dz)])
-        )
+        else (np.zeros(ndim) if ndim == 2 else np.array([0.0, 0.0, -np.sum(dz)]))
     )
     points += origin
 
-    points = (
-        points if ndim == 3 else numpy.column_stack((points, numpy.zeros(len(points))))
-    )
+    points = points if ndim == 3 else np.column_stack((points, np.zeros(len(points))))
 
     mesh = Mesh(points, cells)
-    mesh.add_cell_data("material", numpy.ones(mesh.n_cells, dtype=int))
-    mesh.field_data[material] = numpy.array([1, 3])
+    mesh.add_cell_data("material", np.ones(mesh.n_cells, dtype=int))
+    mesh.field_data[material] = np.array([1, 3])
 
     return mesh
 
@@ -78,7 +74,7 @@ def _grid_3d(dx, dy, dz, order):
     """Generate 3D structured grid."""
     # Internal functions
     def meshgrid(x, y, z, indexing="ij", order=order):
-        X, Y, Z = numpy.meshgrid(x, y, z, indexing=indexing)
+        X, Y, Z = np.meshgrid(x, y, z, indexing=indexing)
         return X.ravel(order), Y.ravel(order), Z.ravel(order)
 
     def mesh_vertices(i, j, k):
@@ -97,14 +93,14 @@ def _grid_3d(dx, dy, dz, order):
     nx, ny, nz = len(dx), len(dy), len(dz)
     xyz_shape = [nx + 1, ny + 1, nz + 1]
     ijk_shape = [nx, ny, nz]
-    X, Y, Z = meshgrid(*[numpy.cumsum(numpy.r_[0, ar]) for ar in [dx, dy, dz]])
-    I, J, K = meshgrid(*[numpy.arange(n) for n in ijk_shape])
+    X, Y, Z = meshgrid(*[np.cumsum(np.r_[0, ar]) for ar in [dx, dy, dz]])
+    I, J, K = meshgrid(*[np.arange(n) for n in ijk_shape])
 
     # Points and cells
     points = [[x, y, z] for x, y, z in zip(X, Y, Z)]
     cells = [
         [
-            numpy.ravel_multi_index(vertex, xyz_shape, order=order)
+            np.ravel_multi_index(vertex, xyz_shape, order=order)
             for vertex in mesh_vertices(i, j, k)
         ]
         for i, j, k in zip(I, J, K)
@@ -122,8 +118,8 @@ def _grid_3d(dx, dy, dz, order):
         cells[i1:i2] = cells[i2 - 1 : i1 - 1 : -1] if i > 0 else cells[i2 - 1 :: -1]
 
     return (
-        numpy.array(points, dtype=float),
-        [CellBlock("hexahedron", numpy.array(cells))],
+        np.array(points, dtype=float),
+        [CellBlock("hexahedron", np.array(cells))],
     )
 
 
@@ -131,7 +127,7 @@ def _grid_2d(dx, dy, order):
     """Generate 2D structured grid."""
     # Internal functions
     def meshgrid(x, y, indexing="ij", order=order):
-        X, Y = numpy.meshgrid(x, y, indexing=indexing)
+        X, Y = np.meshgrid(x, y, indexing=indexing)
         return X.ravel(order), Y.ravel(order)
 
     def mesh_vertices(i, j):
@@ -146,17 +142,17 @@ def _grid_2d(dx, dy, order):
     nx, ny = len(dx), len(dy)
     xy_shape = [nx + 1, ny + 1]
     ij_shape = [nx, ny]
-    X, Y = meshgrid(*[numpy.cumsum(numpy.r_[0, ar]) for ar in [dx, dy]])
-    I, J = meshgrid(*[numpy.arange(n) for n in ij_shape])
+    X, Y = meshgrid(*[np.cumsum(np.r_[0, ar]) for ar in [dx, dy]])
+    I, J = meshgrid(*[np.arange(n) for n in ij_shape])
 
     # Points and cells
     points = [[x, y] for x, y in zip(X, Y)]
     cells = [
         [
-            numpy.ravel_multi_index(vertex, xy_shape, order=order)
+            np.ravel_multi_index(vertex, xy_shape, order=order)
             for vertex in mesh_vertices(i, j)
         ]
         for i, j in zip(I, J)
     ]
 
-    return numpy.array(points, dtype=float), [CellBlock("quad", numpy.array(cells))]
+    return np.array(points, dtype=float), [CellBlock("quad", np.array(cells))]

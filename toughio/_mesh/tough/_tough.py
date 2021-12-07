@@ -3,7 +3,7 @@ from __future__ import division, unicode_literals, with_statement
 import logging
 import os
 
-import numpy
+import numpy as np
 
 from ._helpers import block
 
@@ -62,11 +62,11 @@ def write(
     boundary_conditions = (
         mesh.cell_data["boundary_condition"]
         if "boundary_condition" in mesh.cell_data.keys()
-        else numpy.zeros(num_cells, dtype=int)
+        else np.zeros(num_cells, dtype=int)
     )
     points = mesh.points
     connections = mesh.connections
-    gravity = numpy.array([0.0, 0.0, -1.0])
+    gravity = np.array([0.0, 0.0, -1.0])
 
     # Define parameters related to faces
     faces = mesh.faces
@@ -119,7 +119,7 @@ def check_incon(
         logging.warning("Initial conditions are not defined. Skipping INCON.")
         do_incon = False
 
-    cond = numpy.logical_and(
+    cond = np.logical_and(
         primary_variables[:, 0] > -1.0e9, primary_variables[:, 0] < 0.0,
     )
     if cond.any():
@@ -320,24 +320,20 @@ def _write_conne(
             )
         cell_list.add(i)
 
-    centers = numpy.array(centers)
-    int_points = numpy.array(int_points)
-    int_normals = numpy.array(int_normals)
-    bounds = numpy.array(bounds)
+    centers = np.array(centers)
+    int_points = np.array(int_points)
+    int_normals = np.array(int_normals)
+    bounds = np.array(bounds)
 
     # Calculate remaining variables
-    lines = numpy.diff(centers, axis=1)[:, 0]
+    lines = np.diff(centers, axis=1)[:, 0]
     isot = _isot(lines)
-    angles = numpy.dot(lines, gravity) / numpy.linalg.norm(lines, axis=1)
+    angles = np.dot(lines, gravity) / np.linalg.norm(lines, axis=1)
 
     if nodal_distance == "line":
         fp = _intersection_line_plane(centers[:, 0], lines, int_points, int_normals)
-        d1 = numpy.where(
-            bounds[:, 0], 1.0e-9, numpy.linalg.norm(centers[:, 0] - fp, axis=1)
-        )
-        d2 = numpy.where(
-            bounds[:, 1], 1.0e-9, numpy.linalg.norm(centers[:, 1] - fp, axis=1)
-        )
+        d1 = np.where(bounds[:, 0], 1.0e-9, np.linalg.norm(centers[:, 0] - fp, axis=1))
+        d2 = np.where(bounds[:, 1], 1.0e-9, np.linalg.norm(centers[:, 1] - fp, axis=1))
     elif nodal_distance == "orthogonal":
         d1 = _distance_point_plane(centers[:, 0], int_points, int_normals, bounds[:, 0])
         d2 = _distance_point_plane(centers[:, 1], int_points, int_normals, bounds[:, 1])
@@ -367,7 +363,7 @@ def init_incon(mesh):
     primary_variables = (
         mesh.cell_data["initial_condition"]
         if "initial_condition" in mesh.cell_data.keys()
-        else numpy.full((mesh.n_cells, 4), -1.0e9)
+        else np.full((mesh.n_cells, 4), -1.0e9)
     )
     porosities = (
         mesh.cell_data["porosity"] if "porosity" in mesh.cell_data.keys() else None
@@ -401,7 +397,7 @@ def _distance_point_plane(center, int_points, int_normals, mask):
     normal vector.
 
     """
-    return numpy.where(mask, 1.0e-9, numpy.abs(_dot(center - int_points, int_normals)))
+    return np.where(mask, 1.0e-9, np.abs(_dot(center - int_points, int_normals)))
 
 
 def _isot(lines):
@@ -417,7 +413,7 @@ def _isot(lines):
 
     """
     mask = lines != 0.0
-    return numpy.where(mask.sum(axis=1) == 1, mask.argmax(axis=1) + 1, 1)
+    return np.where(mask.sum(axis=1) == 1, mask.argmax(axis=1) + 1, 1)
 
 
 def _dot(A, B):

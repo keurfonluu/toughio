@@ -1,6 +1,6 @@
 from __future__ import with_statement
 
-import numpy
+import numpy as np
 
 from .._common import to_output
 
@@ -46,9 +46,7 @@ def read(filename, file_type, file_format, labels_order):
             if file_type == "element"
             else labels
         )
-        variables = numpy.array(
-            [[v[ilab:] for v in variable] for variable in variables]
-        )
+        variables = np.array([[v[ilab:] for v in variable] for variable in variables])
 
     return to_output(
         file_type, file_format, labels_order, headers, times, labels, variables

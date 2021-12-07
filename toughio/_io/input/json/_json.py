@@ -2,7 +2,7 @@ from __future__ import with_statement
 
 import json
 
-import numpy
+import numpy as np
 
 __all__ = [
     "read",
@@ -63,11 +63,11 @@ def write(filename, parameters):
 
     def jsonify(x):
         """JSON serialize data."""
-        if isinstance(x, (numpy.int32, numpy.int64)):
+        if isinstance(x, (np.int32, np.int64)):
             return int(x)
         elif isinstance(x, (list, tuple)):
             return [jsonify(xx) for xx in x]
-        elif isinstance(x, numpy.ndarray):
+        elif isinstance(x, np.ndarray):
             return x.tolist()
         elif isinstance(x, dict):
             return {k: jsonify(v) for k, v in x.items()}

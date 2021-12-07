@@ -1,4 +1,4 @@
-import numpy
+import numpy as np
 
 from .._io.output import read as read_output
 from .._io.output import write as write_output
@@ -48,13 +48,13 @@ def extract(argv=None):
 
     try:
         if not args.connection:
-            points = numpy.vstack(
+            points = np.vstack(
                 [parameters["elements"][label]["center"] for label in output[-1].labels]
             )
         else:
-            points = numpy.array(
+            points = np.array(
                 [
-                    numpy.mean(
+                    np.mean(
                         [parameters["elements"][l]["center"] for l in label], axis=0
                     )
                     for label in output[-1].labels

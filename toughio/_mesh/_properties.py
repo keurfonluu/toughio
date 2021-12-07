@@ -1,7 +1,7 @@
 import logging
 from itertools import chain
 
-import numpy
+import numpy as np
 
 
 def _materials(mesh):
@@ -23,27 +23,25 @@ def _materials(mesh):
         else:
             out = mesh.cell_data["material"]
     else:
-        out = numpy.ones(mesh.n_cells, dtype=int)
+        out = np.ones(mesh.n_cells, dtype=int)
 
-    return numpy.asarray(out)
+    return np.asarray(out)
 
 
 def _faces(mesh):
     """Return connectivity of faces of cell in mesh."""
     meshio_type_to_faces = {
-        "tetra": {
-            "triangle": numpy.array([[1, 2, 3], [0, 3, 2], [0, 1, 3], [0, 2, 1]]),
-        },
+        "tetra": {"triangle": np.array([[1, 2, 3], [0, 3, 2], [0, 1, 3], [0, 2, 1]]),},
         "pyramid": {
-            "triangle": numpy.array([[0, 1, 4], [1, 2, 4], [2, 3, 4], [3, 0, 4]]),
-            "quad": numpy.array([[0, 3, 2, 1]]),
+            "triangle": np.array([[0, 1, 4], [1, 2, 4], [2, 3, 4], [3, 0, 4]]),
+            "quad": np.array([[0, 3, 2, 1]]),
         },
         "wedge": {
-            "triangle": numpy.array([[0, 2, 1], [3, 4, 5]]),
-            "quad": numpy.array([[0, 1, 4, 3], [1, 2, 5, 4], [0, 3, 5, 2]]),
+            "triangle": np.array([[0, 2, 1], [3, 4, 5]]),
+            "quad": np.array([[0, 1, 4, 3], [1, 2, 5, 4], [0, 3, 5, 2]]),
         },
         "hexahedron": {
-            "quad": numpy.array(
+            "quad": np.array(
                 [
                     [0, 3, 2, 1],
                     [4, 5, 6, 7],
@@ -68,15 +66,15 @@ def _face_normals(mesh):
     faces_dict, faces_cell, _ = _get_faces(_faces(mesh))
 
     # Face normal vectors
-    normals = numpy.concatenate(
+    normals = np.concatenate(
         [_get_triangle_normals(mesh, v) for k, v in faces_dict.items()]
     )
-    normals_mag = numpy.linalg.norm(normals, axis=-1)
+    normals_mag = np.linalg.norm(normals, axis=-1)
     normals /= normals_mag[:, None]
 
     # Reorganize outputs
     face_normals = [[] for _ in range(mesh.n_cells)]
-    iface = numpy.concatenate([v for v in faces_cell.values()])
+    iface = np.concatenate([v for v in faces_cell.values()])
     for i, normal in zip(iface, normals):
         face_normals[i].append(normal)
 
@@ -88,50 +86,50 @@ def _face_areas(mesh):
     faces_dict, faces_cell, _ = _get_faces(_faces(mesh))
 
     # Face areas
-    areas = numpy.concatenate(
+    areas = np.concatenate(
         [_get_triangle_normals(mesh, v) for k, v in faces_dict.items()]
     )
-    areas = numpy.linalg.norm(areas, axis=-1)
+    areas = np.linalg.norm(areas, axis=-1)
     if "quad" in faces_dict.keys() and len(faces_dict["quad"]):
-        tmp = numpy.concatenate(
+        tmp = np.concatenate(
             [
                 _get_triangle_normals(mesh, v, [0, 2, 3])
                 if k == "quad"
-                else numpy.zeros((len(v), 3))
+                else np.zeros((len(v), 3))
                 for k, v in faces_dict.items()
             ]
         )
-        areas += numpy.linalg.norm(tmp, axis=-1)
+        areas += np.linalg.norm(tmp, axis=-1)
     areas *= 0.5
 
     # Reorganize outputs
     face_areas = [[] for _ in range(mesh.n_cells)]
-    iface = numpy.concatenate([v for v in faces_cell.values()])
+    iface = np.concatenate([v for v in faces_cell.values()])
     for i, area in zip(iface, areas):
         face_areas[i].append(area)
 
-    return [numpy.array(face) for face in face_areas]
+    return [np.array(face) for face in face_areas]
 
 
 def _volumes(mesh):
     """Return volumes of cell in mesh."""
     meshio_type_to_tetra = {
-        "tetra": numpy.array([[0, 1, 2, 3]]),
-        "pyramid": numpy.array([[0, 1, 3, 4], [1, 2, 3, 4]]),
-        "wedge": numpy.array([[0, 1, 2, 5], [0, 1, 4, 5], [0, 3, 4, 5]]),
-        "hexahedron": numpy.array(
+        "tetra": np.array([[0, 1, 2, 3]]),
+        "pyramid": np.array([[0, 1, 3, 4], [1, 2, 3, 4]]),
+        "wedge": np.array([[0, 1, 2, 5], [0, 1, 4, 5], [0, 3, 4, 5]]),
+        "hexahedron": np.array(
             [[0, 1, 3, 4], [1, 4, 5, 6], [1, 2, 3, 6], [3, 4, 6, 7], [1, 3, 4, 6]]
         ),
     }
 
     out = []
     for cell in mesh.cells:
-        tetras = numpy.vstack([c[meshio_type_to_tetra[cell.type]] for c in cell.data])
+        tetras = np.vstack([c[meshio_type_to_tetra[cell.type]] for c in cell.data])
         tetras = mesh.points[tetras]
         out.append(
-            numpy.sum(
-                numpy.split(
-                    numpy.abs(
+            np.sum(
+                np.split(
+                    np.abs(
                         _scalar_triple_product(
                             tetras[:, 1] - tetras[:, 0],
                             tetras[:, 2] - tetras[:, 0],
@@ -144,7 +142,7 @@ def _volumes(mesh):
             )
             / 6.0
         )
-    return numpy.concatenate(out)
+    return np.concatenate(out)
 
 
 def _connections(mesh):
@@ -154,16 +152,16 @@ def _connections(mesh):
     Assume conformity and that points and cells are uniquely defined in mesh.
 
     """
-    if numpy.shape(mesh.points)[1] != 3:
+    if np.shape(mesh.points)[1] != 3:
         raise ValueError("Connections for 2D mesh has not been implemented yet.")
 
     faces_dict, faces_cell, faces_index = _get_faces(_faces(mesh))
-    faces_dict = {k: numpy.sort(numpy.vstack(v), axis=1) for k, v in faces_dict.items()}
+    faces_dict = {k: np.sort(np.vstack(v), axis=1) for k, v in faces_dict.items()}
 
     # Prune duplicate faces
     uf, tmp1, tmp2 = {}, {}, {}
     for k, v in faces_dict.items():
-        up, uf[k] = numpy.unique(v, axis=0, return_inverse=True)
+        up, uf[k] = np.unique(v, axis=0, return_inverse=True)
         tmp1[k] = [[] for _ in range(len(up))]
         tmp2[k] = [[] for _ in range(len(up))]
 
@@ -176,7 +174,7 @@ def _connections(mesh):
     iface = [vv for v in tmp2.values() for vv in v if len(vv) == 2]
 
     # Reorganize output
-    out = numpy.full((mesh.n_cells, 6), -1)
+    out = np.full((mesh.n_cells, 6), -1)
     for (i1, i2), (j1, j2) in zip(conne, iface):
         out[i1, j1] = i2
         out[i2, j2] = i1
@@ -201,10 +199,10 @@ def _qualities(mesh):
 
         cell_list.add(i)
 
-    int_normals = numpy.array(int_normals)
-    lines = numpy.diff(centers, axis=1)[:, 0]
-    lines /= numpy.linalg.norm(lines, axis=1)[:, None]
-    angles = numpy.abs((lines * int_normals).sum(axis=1))
+    int_normals = np.array(int_normals)
+    lines = np.diff(centers, axis=1)[:, 0]
+    lines /= np.linalg.norm(lines, axis=1)[:, None]
+    angles = np.abs((lines * int_normals).sum(axis=1))
 
     # Reorganize output
     out = [[] for _ in range(mesh.n_cells)]
@@ -231,7 +229,7 @@ def _get_faces(faces):
             faces_index[face_type].append(j)
 
     # Stack arrays or remove empty cells
-    faces_dict = {k: numpy.vstack(v) for k, v in faces_dict.items() if len(v)}
+    faces_dict = {k: np.vstack(v) for k, v in faces_dict.items() if len(v)}
     faces_cell = {k: v for k, v in faces_cell.items() if len(v)}
     faces_index = {k: v for k, v in faces_index.items() if len(v)}
 
@@ -242,14 +240,14 @@ def _get_triangle_normals(mesh, faces, islice=None):
     """Calculate normal vectors of triangular faces."""
     islice = islice if islice is not None else [0, 1, 2]
 
-    triangles = numpy.vstack([c[islice] for c in faces])
+    triangles = np.vstack([c[islice] for c in faces])
     triangles = mesh.points[triangles]
 
     return _cross(triangles[:, 1] - triangles[:, 0], triangles[:, 2] - triangles[:, 0])
 
 
 def _cross(a, b):
-    """Calculate cross product (faster than :func:`numpy.cross`)."""
+    """Calculate cross product (faster than :func:`np.cross`)."""
     return a[:, [1, 2, 0]] * b[:, [2, 0, 1]] - a[:, [2, 0, 1]] * b[:, [1, 2, 0]]
 
 

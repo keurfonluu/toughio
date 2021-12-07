@@ -1,6 +1,6 @@
 import collections
 
-import numpy
+import numpy as np
 
 __all__ = [
     "Output",
@@ -17,8 +17,8 @@ def to_output(file_type, file_format, labels_order, headers, times, labels, vari
             file_type,
             file_format,
             time,
-            numpy.array(label),
-            {k: v for k, v in zip(headers, numpy.transpose(variable))},
+            np.array(label),
+            {k: v for k, v in zip(headers, np.transpose(variable))},
         )
         for time, label, variable in zip(times, labels, variables)
     ]

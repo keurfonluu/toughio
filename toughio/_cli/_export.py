@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-import numpy
+import numpy as np
 
 __all__ = [
     "export",
@@ -104,8 +104,8 @@ def export(argv=None):
             mesh = voxelize(points, args.origin, layer=args.layer)
             mesh.cell_dada = {}
 
-            idx = numpy.arange(len(points))
-            idx = numpy.array(
+            idx = np.arange(len(points))
+            idx = np.array(
                 [
                     x
                     for x, _ in sorted(
@@ -278,53 +278,53 @@ def _get_points(output):
     count = 0
 
     if "X" in output.data.keys():
-        X = numpy.array(output.data["X"])
+        X = np.array(output.data["X"])
         count += 1
     else:
-        X = numpy.zeros(n_points)
+        X = np.zeros(n_points)
 
     if "Y" in output.data.keys():
-        Y = numpy.array(output.data["Y"])
+        Y = np.array(output.data["Y"])
         count += 1
     else:
-        Y = numpy.zeros(n_points)
+        Y = np.zeros(n_points)
 
     if "Z" in output.data.keys():
-        Z = numpy.array(output.data["Z"])
+        Z = np.array(output.data["Z"])
         count += 1
     else:
-        Z = numpy.zeros(n_points)
+        Z = np.zeros(n_points)
 
     if count == 0:
         raise ValueError("No coordinate array ('X', 'Y', 'Z') found.")
 
     # Assert dimension of the problem
-    nx = len(numpy.unique(X))
-    ny = len(numpy.unique(Y))
-    nz = len(numpy.unique(Z))
+    nx = len(np.unique(X))
+    ny = len(np.unique(Y))
+    nz = len(np.unique(Z))
 
     # Reconstruct points cloud
-    zeros = numpy.zeros(n_points)
+    zeros = np.zeros(n_points)
     if ny == 1 and nz == 1:
-        points = numpy.column_stack((X, zeros, zeros))
+        points = np.column_stack((X, zeros, zeros))
         axis = [0]
     elif nx == 1 and nz == 1:
-        points = numpy.column_stack((zeros, Y, zeros))
+        points = np.column_stack((zeros, Y, zeros))
         axis = [1]
     elif nx == 1 and ny == 1:
-        points = numpy.column_stack((zeros, zeros, Z))
+        points = np.column_stack((zeros, zeros, Z))
         axis = [2]
     elif nx == 1:
-        points = numpy.column_stack((zeros, Y, Z))
+        points = np.column_stack((zeros, Y, Z))
         axis = [1, 2]
     elif ny == 1:
-        points = numpy.column_stack((X, zeros, Z))
+        points = np.column_stack((X, zeros, Z))
         axis = [0, 2]
     elif nz == 1:
-        points = numpy.column_stack((X, Y, zeros))
+        points = np.column_stack((X, Y, zeros))
         axis = [0, 1]
     else:
-        points = numpy.column_stack((X, Y, Z))
+        points = np.column_stack((X, Y, Z))
         axis = [0, 1, 2]
 
     return points, axis

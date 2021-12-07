@@ -2,7 +2,7 @@ from __future__ import division, unicode_literals, with_statement
 
 import logging
 
-import numpy
+import numpy as np
 
 from ...__about__ import __version__ as version
 from .._helpers import _materials, get_material_key
@@ -77,9 +77,9 @@ def read_buffer(f):
     # Read cell data
     if num_cell_data:
         cdata = _read_data(f, num_cells, cell_ids)
-        sections = numpy.cumsum([len(c[1]) for c in cells[:-1]])
+        sections = np.cumsum([len(c[1]) for c in cells[:-1]])
         for k, v in cdata.items():
-            cell_data[k] = numpy.split(v, sections)
+            cell_data[k] = np.split(v, sections)
 
     return Mesh(points, cells, point_data=point_data, cell_data=cell_data)
 
@@ -89,7 +89,7 @@ def _read_nodes(f, num_nodes):
     for _ in range(num_nodes):
         line = f.readline().strip()
         data += [[float(x) for x in line.split()]]
-    data = numpy.array(data)
+    data = np.array(data)
     points_ids = {int(pid): i for i, pid in enumerate(data[:, 0])}
     return points_ids, data[:, 1:]
 
@@ -119,9 +119,9 @@ def _read_cells(f, num_cells, point_ids):
     # Convert to numpy arrays
     for k, c in enumerate(cells):
         cells[k] = CellBlock(
-            c.type, numpy.array(c.data)[:, avsucd_to_meshio_order[c.type]]
+            c.type, np.array(c.data)[:, avsucd_to_meshio_order[c.type]]
         )
-        cell_data["avsucd:material"][k] = numpy.array(cell_data["avsucd:material"][k])
+        cell_data["avsucd:material"][k] = np.array(cell_data["avsucd:material"][k])
     return cell_ids, cells, cell_data
 
 
@@ -135,9 +135,7 @@ def _read_data(f, num_entities, entity_ids):
         line = f.readline().strip().split(",")
         labels[i] = line[0].strip().replace(" ", "_")
         data[labels[i]] = (
-            numpy.empty(num_entities)
-            if dsize == 1
-            else numpy.empty((num_entities, dsize))
+            np.empty(num_entities) if dsize == 1 else np.empty((num_entities, dsize))
         )
 
     for _ in range(num_entities):
@@ -162,8 +160,8 @@ def write(filename, mesh):
             "AVS-UCD requires 3D points, but 2D points given. "
             "Appending 0 third component."
         )
-        mesh.points = numpy.column_stack(
-            [mesh.points[:, 0], mesh.points[:, 1], numpy.zeros(mesh.points.shape[0])]
+        mesh.points = np.column_stack(
+            [mesh.points[:, 0], mesh.points[:, 1], np.zeros(mesh.points.shape[0])]
         )
 
     with open(filename, "w") as f:
@@ -177,7 +175,7 @@ def write(filename, mesh):
             1 if v.ndim == 1 else v.shape[1] for v in mesh.point_data.values()
         ]
         num_cell_data = [
-            1 if numpy.concatenate(v).ndim == 1 else numpy.concatenate(v).shape[1]
+            1 if np.concatenate(v).ndim == 1 else np.concatenate(v).shape[1]
             for k, v in mesh.cell_data.items()
             if k not in _materials
         ]
@@ -198,7 +196,7 @@ def write(filename, mesh):
         # Write node data
         if num_node_data_sum:
             labels = mesh.point_data.keys()
-            data_array = numpy.column_stack([v for v in mesh.point_data.values()])
+            data_array = np.column_stack([v for v in mesh.point_data.values()])
             _write_data(
                 f, labels, data_array, num_nodes, num_node_data, num_node_data_sum
             )
@@ -206,9 +204,9 @@ def write(filename, mesh):
         # Write cell data
         if num_cell_data_sum:
             labels = [k for k in mesh.cell_data.keys() if k not in _materials]
-            data_array = numpy.column_stack(
+            data_array = np.column_stack(
                 [
-                    numpy.concatenate(v)
+                    np.concatenate(v)
                     for k, v in mesh.cell_data.items()
                     if k not in _materials
                 ]
@@ -229,9 +227,9 @@ def _write_cells(f, cells, cell_data, num_cells):
 
     # Material array
     if mat_data:
-        material = numpy.concatenate(cell_data[mat_data])
+        material = np.concatenate(cell_data[mat_data])
     else:
-        material = numpy.zeros(num_cells, dtype=int)
+        material = np.zeros(num_cells, dtype=int)
 
     # Loop over cells
     i = 0
@@ -253,5 +251,5 @@ def _write_data(f, labels, data_array, num_entities, num_data, num_data_sum):
     for label in labels:
         f.write("{}, real\n".format(label))
 
-    data_array = numpy.column_stack((numpy.arange(1, num_entities + 1), data_array))
-    numpy.savetxt(f, data_array, delimiter=" ", fmt=["%d"] + ["%.14e"] * num_data_sum)
+    data_array = np.column_stack((np.arange(1, num_entities + 1), data_array))
+    np.savetxt(f, data_array, delimiter=" ", fmt=["%d"] + ["%.14e"] * num_data_sum)

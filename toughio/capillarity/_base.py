@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
 
-import numpy
+import numpy as np
 
 __all__ = [
     "BaseCapillarity",
@@ -36,15 +36,15 @@ class BaseCapillarity(ABC):
 
     def __call__(self, sl):
         """Calculate capillary pressure given liquid saturation."""
-        if numpy.ndim(sl) == 0:
+        if np.ndim(sl) == 0:
             if not (0.0 <= sl <= 1.0):
                 raise ValueError()
             return self._eval(sl, *self.parameters)
         else:
-            sl = numpy.asarray(sl)
-            if not numpy.logical_and((sl >= 0.0).all(), (sl <= 1.0).all()):
+            sl = np.asarray(sl)
+            if not np.logical_and((sl >= 0.0).all(), (sl <= 1.0).all()):
                 raise ValueError()
-            return numpy.array([self._eval(sat, *self.parameters) for sat in sl])
+            return np.array([self._eval(sat, *self.parameters) for sat in sl])
 
     @abstractmethod
     def _eval(self, sl, *args):
@@ -77,7 +77,7 @@ class BaseCapillarity(ABC):
             raise ValueError()
         if not (ax is None or isinstance(ax, plt.Axes)):
             raise TypeError()
-        if not (figsize is None or isinstance(figsize, (tuple, list, numpy.ndarray))):
+        if not (figsize is None or isinstance(figsize, (tuple, list, np.ndarray))):
             raise TypeError()
         if len(figsize) != 2:
             raise ValueError()
@@ -98,11 +98,11 @@ class BaseCapillarity(ABC):
             ax1 = fig.add_subplot(1, 1, 1)
 
         # Calculate capillary pressure
-        sl = numpy.linspace(0.0, 1.0, n)
+        sl = np.linspace(0.0, 1.0, n)
         pcap = self(sl)
 
         # Plot
-        ax1.semilogy(sl, numpy.abs(pcap), **_kwargs)
+        ax1.semilogy(sl, np.abs(pcap), **_kwargs)
         ax1.set_xlim(0.0, 1.0)
         ax1.set_xlabel("Saturation (liquid)")
         ax1.set_ylabel("Capillary pressure (Pa)")

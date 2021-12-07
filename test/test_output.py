@@ -1,7 +1,7 @@
 import os
 
 import helpers
-import numpy
+import numpy as np
 import pytest
 
 import toughio
@@ -55,7 +55,7 @@ def test_history(filename, data_ref):
     data = toughio.read_history(filename)
 
     for k, v in data_ref.items():
-        assert numpy.allclose(v, data[k].sum())
+        assert np.allclose(v, data[k].sum())
 
 
 @pytest.mark.parametrize(
@@ -96,8 +96,8 @@ def test_output_eleme(filename, filename_ref):
         if output.format != "tough":
             assert keys_ref == sorted(list(output.data.keys()))
 
-    assert numpy.allclose(save.data["X1"], outputs[-1].data["PRES"])
-    assert numpy.allclose(save.data["X2"], outputs[-1].data["TEMP"], atol=0.1)
+    assert np.allclose(save.data["X1"], outputs[-1].data["PRES"])
+    assert np.allclose(save.data["X2"], outputs[-1].data["TEMP"], atol=0.1)
 
 
 @pytest.mark.parametrize(
@@ -128,7 +128,7 @@ def test_output_conne(filename):
             len(set("".join(labels) for labels in output.labels))
             == output.data["HEAT"].size
         )
-        assert numpy.allclose(data, numpy.abs(output.data["HEAT"]).mean(), atol=1.0)
+        assert np.allclose(data, np.abs(output.data["HEAT"]).mean(), atol=1.0)
 
 
 @pytest.mark.parametrize(
@@ -160,10 +160,10 @@ def test_save():
     save = toughio.read_output(filename)
 
     x_ref = [6.35804123e05, 1.42894499e02, 9.91868799e-01]
-    assert numpy.allclose(
-        x_ref, numpy.mean([save.data["X1"], save.data["X2"], save.data["X3"]], axis=1)
+    assert np.allclose(
+        x_ref, np.mean([save.data["X1"], save.data["X2"], save.data["X3"]], axis=1)
     )
 
-    assert numpy.allclose(0.01, save.data["porosity"].mean())
+    assert np.allclose(0.01, save.data["porosity"].mean())
 
     assert "userx" not in save.data.keys()
