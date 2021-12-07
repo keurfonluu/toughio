@@ -120,7 +120,9 @@ def read(filename, file_format=None, **kwargs):
         if idx.sum() < len(mesh.cells):
             mesh.cells = [cell for keep, cell in zip(idx, mesh.cells) if keep]
             for k, v in cell_data.items():
-                mesh.cell_data[k] = np.concatenate([vv for keep, vv in zip(idx, v) if keep])
+                mesh.cell_data[k] = np.concatenate(
+                    [vv for keep, vv in zip(idx, v) if keep]
+                )
 
             mesh.prune_duplicates()
 
