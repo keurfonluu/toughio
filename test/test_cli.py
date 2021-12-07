@@ -2,7 +2,7 @@ import glob
 import os
 
 import helpers
-import numpy
+import numpy as np
 import pytest
 
 import toughio
@@ -68,7 +68,7 @@ def test_export(filename, mesh, voxelize, ext):
         ]
 
     if ext != "xdmf":
-        t = numpy.random.randint(len(outputs))
+        t = np.random.randint(len(outputs))
         argv += ["-t", str(t)]
         output = outputs[t]
 
@@ -77,34 +77,34 @@ def test_export(filename, mesh, voxelize, ext):
     if ext != "xdmf":
         mesh_in = toughio.read_mesh(output_filename)
 
-        centers_ref = numpy.column_stack([output.data[dim] for dim in ["X", "Y", "Z"]])
+        centers_ref = np.column_stack([output.data[dim] for dim in ["X", "Y", "Z"]])
         assert (
-            numpy.allclose(centers_ref, mesh_in.centers)
+            np.allclose(centers_ref, mesh_in.centers)
             if mesh or voxelize
-            else numpy.allclose(centers_ref[:, :2], mesh_in.points[:, :2])
+            else np.allclose(centers_ref[:, :2], mesh_in.points[:, :2])
         )
 
         for k, v in output.data.items():
             if k not in {"X", "Y", "Z"}:
                 assert (
-                    numpy.allclose(v, mesh_in.cell_data[k])
+                    np.allclose(v, mesh_in.cell_data[k])
                     if mesh or voxelize
-                    else numpy.allclose(v, mesh_in.point_data[k])
+                    else np.allclose(v, mesh_in.point_data[k])
                 )
     else:
         mesh_in = toughio.read_time_series(output_filename)
         points, cells, point_data, cell_data, time_steps = mesh_in
 
-        centers_ref = numpy.column_stack(
+        centers_ref = np.column_stack(
             [outputs[-1].data[dim] for dim in ["X", "Y", "Z"]]
         )
         assert (
-            numpy.allclose(
+            np.allclose(
                 centers_ref,
-                numpy.concatenate([points[c.data].mean(axis=1) for c in cells]),
+                np.concatenate([points[c.data].mean(axis=1) for c in cells]),
             )
             if mesh or voxelize
-            else numpy.allclose(centers_ref[:, :2], points[:, :2])
+            else np.allclose(centers_ref[:, :2], points[:, :2])
         )
 
         assert len(point_data) == len(outputs)
@@ -118,14 +118,14 @@ def test_export(filename, mesh, voxelize, ext):
 
         for t, pdata in enumerate(point_data):
             for k, v in pdata.items():
-                assert numpy.allclose(v, outputs[t].data[k])
+                assert np.allclose(v, outputs[t].data[k])
 
         for t, cdata in enumerate(cell_data):
             for k, v in cdata.items():
-                assert numpy.allclose(v, outputs[t].data[k])
+                assert np.allclose(v, outputs[t].data[k])
 
         time_steps_ref = [output.time for output in outputs]
-        assert numpy.allclose(time_steps, time_steps_ref)
+        assert np.allclose(time_steps, time_steps_ref)
 
 
 @pytest.mark.parametrize(
@@ -172,7 +172,7 @@ def test_extract(file_format, split, connection):
         for output_ref, output in zip(outputs_ref, outputs):
             assert output_ref.time == output.time
             for k, v in output_ref.data.items():
-                assert numpy.allclose(v.mean(), output.data[k].mean(), atol=1.0e-2)
+                assert np.allclose(v.mean(), output.data[k].mean(), atol=1.0e-2)
     else:
         filenames = glob.glob(os.path.join(tempdir, "{}_*.csv".format(base_filename)))
         for i, output_filename in enumerate(sorted(filenames)):
@@ -185,7 +185,7 @@ def test_extract(file_format, split, connection):
 
             assert output_ref.time == output.time
             for k, v in output_ref.data.items():
-                assert numpy.allclose(v.mean(), output.data[k].mean(), atol=1.0e-2)
+                assert np.allclose(v.mean(), output.data[k].mean(), atol=1.0e-2)
 
 
 @pytest.mark.parametrize("incon", [True, False])
@@ -196,7 +196,7 @@ def test_merge(incon):
     output_filename = os.path.join(tempdir, "OUTFILE")
 
     with open(filename, "w") as f:
-        n_lines_rocks, n_lines_param = numpy.random.randint(20, size=2) + 1
+        n_lines_rocks, n_lines_param = np.random.randint(20, size=2) + 1
 
         f.write("ROCKS\n")
         for _ in range(n_lines_rocks):
@@ -210,7 +210,7 @@ def test_merge(incon):
         f.write("ENDCY\n")
 
     with open(mesh_file, "w") as f:
-        n_lines_eleme, n_lines_conne = numpy.random.randint(20, size=2) + 1
+        n_lines_eleme, n_lines_conne = np.random.randint(20, size=2) + 1
 
         f.write("ELEME\n")
         for _ in range(n_lines_eleme):
@@ -226,7 +226,7 @@ def test_merge(incon):
         incon_file = os.path.join(tempdir, "INCON")
 
         with open(incon_file, "w") as f:
-            n_lines_incon = numpy.random.randint(20) + 1
+            n_lines_incon = np.random.randint(20) + 1
 
             f.write("INCON\n")
             for _ in range(n_lines_incon):

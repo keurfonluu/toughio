@@ -1,4 +1,4 @@
-import numpy
+import numpy as np
 
 from ._structured_grid import structured_grid
 
@@ -34,7 +34,7 @@ def voxelize(points, origin, layer=False, material="dfalt"):
     def voronoi1d(x, x0, xstr):
         """1D Voronoi tessellation."""
         if x.size > 1:
-            x = numpy.sort(x)
+            x = np.sort(x)
             if x0 >= x[0]:
                 raise ValueError(
                     "{}-coordinate of origin must be lower than {:.3f}, got {:.3f}".format(
@@ -50,15 +50,15 @@ def voxelize(points, origin, layer=False, material="dfalt"):
 
         return vor
 
-    if not isinstance(points, (list, tuple, numpy.ndarray)):
+    if not isinstance(points, (list, tuple, np.ndarray)):
         raise TypeError()
-    if numpy.ndim(points) != 2:
+    if np.ndim(points) != 2:
         raise ValueError()
 
-    x, y, z = numpy.transpose(points)
-    x = numpy.unique(x)
-    y = numpy.unique(y)
-    z = numpy.unique(z)
+    x, y, z = np.transpose(points)
+    x = np.unique(x)
+    y = np.unique(y)
+    z = np.unique(z)
     if x.size * y.size * z.size != len(points):
         raise ValueError("Input points do not form a structured grid.")
 
@@ -66,9 +66,9 @@ def voxelize(points, origin, layer=False, material="dfalt"):
     x = voronoi1d(x, x0, "x")
     y = voronoi1d(y, y0, "y")
     z = voronoi1d(z, z0, "z")
-    dx = numpy.diff(x)
-    dy = numpy.diff(y)
-    dz = numpy.diff(z)
+    dx = np.diff(x)
+    dy = np.diff(y)
+    dz = np.diff(z)
     mesh = structured_grid(dx, dy, dz, origin=origin, layer=layer, material=material)
 
     return mesh

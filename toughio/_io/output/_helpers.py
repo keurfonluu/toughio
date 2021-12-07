@@ -1,6 +1,6 @@
 from __future__ import with_statement
 
-import numpy
+import numpy as np
 
 from ..._common import filetype_from_filename, register_format
 from ._common import Output
@@ -99,7 +99,7 @@ def read(filename, labels_order=None, connection=False, label_length=None, **kwa
     if not isinstance(filename, str):
         raise TypeError()
     if not (
-        labels_order is None or isinstance(labels_order, (list, tuple, numpy.ndarray))
+        labels_order is None or isinstance(labels_order, (list, tuple, np.ndarray))
     ):
         raise TypeError()
 
@@ -179,7 +179,7 @@ def read_history(filename):
         while line:
             data += [[float(x) for x in line.split(sep)]]
             line = f.readline().strip()
-        data = numpy.transpose(data)
+        data = np.transpose(data)
 
         out = {"TIME": data[0]}
         for header, X in zip(headers, data[1:]):

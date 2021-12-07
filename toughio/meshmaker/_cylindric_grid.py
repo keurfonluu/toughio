@@ -1,4 +1,4 @@
-import numpy
+import numpy as np
 
 from .._mesh import Mesh
 from ._structured_grid import structured_grid
@@ -29,11 +29,11 @@ class CylindricMesh(Mesh):
     def _get_areas_heights(self):
         """Return areas and heights of cells in mesh."""
         nr, nz = len(self._dr), len(self._dz)
-        r2 = numpy.cumsum(self._dr) ** 2
+        r2 = np.cumsum(self._dr) ** 2
         areas = (
-            numpy.tile(numpy.concatenate(([r2[0]], r2[1:] - r2[:-1])), nz) * numpy.pi
+            np.tile(np.concatenate(([r2[0]], r2[1:] - r2[:-1])), nz) * np.pi
         )
-        heights = numpy.tile(self._dz[:, None], nr).ravel()
+        heights = np.tile(self._dz[:, None], nr).ravel()
 
         return areas, heights
 
@@ -41,12 +41,12 @@ class CylindricMesh(Mesh):
     def face_areas(self):
         """Areas of faces in mesh."""
         nr, nz = len(self._dr), len(self._dz)
-        dr = numpy.concatenate(([0.0], self._dr))
-        perimeters_in = numpy.tile(numpy.cumsum(dr[:-1]), nz) * 2.0 * numpy.pi
-        perimeters_out = numpy.tile(numpy.cumsum(dr[1:]), nz) * 2.0 * numpy.pi
+        dr = np.concatenate(([0.0], self._dr))
+        perimeters_in = np.tile(np.cumsum(dr[:-1]), nz) * 2.0 * np.pi
+        perimeters_out = np.tile(np.cumsum(dr[1:]), nz) * 2.0 * np.pi
         areas, heights = self._get_areas_heights()
-        sections = numpy.tile(self._dr, nz) * heights
-        out = numpy.transpose(
+        sections = np.tile(self._dr, nz) * heights
+        out = np.transpose(
             [
                 areas,
                 areas,
@@ -96,17 +96,17 @@ def cylindric_grid(dr, dz, origin_z=None, layer=False, material="dfalt"):
         Output cylindric mesh.
 
     """
-    if not isinstance(dr, (list, tuple, numpy.ndarray)):
+    if not isinstance(dr, (list, tuple, np.ndarray)):
         raise TypeError()
-    if not isinstance(dz, (list, tuple, numpy.ndarray)):
+    if not isinstance(dz, (list, tuple, np.ndarray)):
         raise TypeError()
     if not (origin_z is None or isinstance(origin_z, (int, float))):
         raise TypeError()
     if not isinstance(material, str):
         raise TypeError()
 
-    dr = numpy.asarray(dr)
-    dz = numpy.asarray(dz)
+    dr = np.asarray(dr)
+    dz = np.asarray(dz)
     if not (dr > 0.0).all():
         raise ValueError()
     if not (dz > 0.0).all():

@@ -1,6 +1,6 @@
 from __future__ import with_statement
 
-import numpy
+import numpy as np
 
 from ...._mesh.tecplot._tecplot import _read_variables, _read_zone
 from .._common import to_output
@@ -39,7 +39,7 @@ def read(filename, file_type, file_format, labels_order):
             for _ in range(zone["I"]):
                 line = f.readline().strip()
                 data.append([float(x) for x in line.split()])
-            data = numpy.array(data)
+            data = np.array(data)
 
             # Output
             times.append(zone["T"])
@@ -84,7 +84,7 @@ def write(filename, output):
             f.write("{}\n".format(record))
 
             # Table
-            data = numpy.transpose([out.data[k] for k in headers])
+            data = np.transpose([out.data[k] for k in headers])
             for d in data:
                 record = "".join("{:20.12e}".format(x) for x in d)
                 f.write("{}{}\n".format("{:18}".format(""), record))

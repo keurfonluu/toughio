@@ -1,5 +1,5 @@
 import helpers
-import numpy
+import numpy as np
 import pytest
 
 import toughio
@@ -31,7 +31,7 @@ def test_title(write_read, single):
         "title": (
             helpers.random_string(80)
             if single
-            else [helpers.random_string(80) for _ in range(numpy.random.randint(5) + 2)]
+            else [helpers.random_string(80) for _ in range(np.random.randint(5) + 2)]
         ),
     }
     parameters = write_read(parameters_ref)
@@ -57,45 +57,45 @@ def test_rocks(write_read):
     ]
     parameters_ref = {
         "rocks": {
-            helpers.random_string(5): {key: numpy.random.rand() for key in keys[:5]},
+            helpers.random_string(5): {key: np.random.rand() for key in keys[:5]},
             helpers.random_string(5): {
-                key: numpy.random.rand()
+                key: np.random.rand()
                 if key != "permeability"
-                else numpy.random.rand(3)
+                else np.random.rand(3)
                 for key in keys[:5]
             },
-            helpers.random_string(5): {key: numpy.random.rand() for key in keys},
-            helpers.random_string(5): {key: numpy.random.rand() for key in keys},
-            helpers.random_string(5): {key: numpy.random.rand() for key in keys},
-            helpers.random_string(5): {key: numpy.random.rand() for key in keys},
+            helpers.random_string(5): {key: np.random.rand() for key in keys},
+            helpers.random_string(5): {key: np.random.rand() for key in keys},
+            helpers.random_string(5): {key: np.random.rand() for key in keys},
+            helpers.random_string(5): {key: np.random.rand() for key in keys},
         }
     }
     names = list(parameters_ref["rocks"].keys())
     parameters_ref["rocks"][names[-1]].update(
         {
             "relative_permeability": {
-                "id": numpy.random.randint(10),
-                "parameters": numpy.random.rand(numpy.random.randint(7) + 1),
+                "id": np.random.randint(10),
+                "parameters": np.random.rand(np.random.randint(7) + 1),
             },
         }
     )
     parameters_ref["rocks"][names[-2]].update(
         {
             "capillarity": {
-                "id": numpy.random.randint(10),
-                "parameters": numpy.random.rand(numpy.random.randint(7) + 1),
+                "id": np.random.randint(10),
+                "parameters": np.random.rand(np.random.randint(7) + 1),
             },
         }
     )
     parameters_ref["rocks"][names[-3]].update(
         {
             "relative_permeability": {
-                "id": numpy.random.randint(10),
-                "parameters": numpy.random.rand(numpy.random.randint(7) + 1),
+                "id": np.random.randint(10),
+                "parameters": np.random.rand(np.random.randint(7) + 1),
             },
             "capillarity": {
-                "id": numpy.random.randint(10),
-                "parameters": numpy.random.rand(numpy.random.randint(7) + 1),
+                "id": np.random.randint(10),
+                "parameters": np.random.rand(np.random.randint(7) + 1),
             },
         }
     )
@@ -106,7 +106,7 @@ def test_rocks(write_read):
     for k, v in parameters_ref["rocks"].items():
         for kk, vv in v.items():
             if not isinstance(vv, dict):
-                assert numpy.allclose(vv, parameters["rocks"][k][kk], atol=1.0e-5)
+                assert np.allclose(vv, parameters["rocks"][k][kk], atol=1.0e-5)
             else:
                 helpers.allclose_dict(vv, parameters["rocks"][k][kk], atol=1.0e-4)
 
@@ -126,13 +126,13 @@ def test_rpcap(write_read, rpcap):
     parameters_ref = {"default": {}}
     if rpcap in {"rp", "both"}:
         parameters_ref["default"]["relative_permeability"] = {
-            "id": numpy.random.randint(10),
-            "parameters": numpy.random.rand(numpy.random.randint(7) + 1),
+            "id": np.random.randint(10),
+            "parameters": np.random.rand(np.random.randint(7) + 1),
         }
     if rpcap in {"cap", "both"}:
         parameters_ref["default"]["capillarity"] = {
-            "id": numpy.random.randint(10),
-            "parameters": numpy.random.rand(numpy.random.randint(7) + 1),
+            "id": np.random.randint(10),
+            "parameters": np.random.rand(np.random.randint(7) + 1),
         }
     parameters = write_read(parameters_ref)
 
@@ -144,22 +144,22 @@ def test_rpcap(write_read, rpcap):
 def test_flac(write_read):
     parameters_ref = {
         "flac": {
-            "creep": bool(numpy.random.randint(2)),
-            "porosity_model": numpy.random.randint(10),
-            "version": numpy.random.randint(10),
+            "creep": bool(np.random.randint(2)),
+            "porosity_model": np.random.randint(10),
+            "version": np.random.randint(10),
         },
         "rocks": {
             helpers.random_string(5): {
                 "permeability_model": {
-                    "id": numpy.random.randint(10),
-                    "parameters": numpy.random.rand(numpy.random.randint(7) + 1),
+                    "id": np.random.randint(10),
+                    "parameters": np.random.rand(np.random.randint(7) + 1),
                 },
                 "equivalent_pore_pressure": {
-                    "id": numpy.random.randint(10),
-                    "parameters": numpy.random.rand(numpy.random.randint(7) + 1),
+                    "id": np.random.randint(10),
+                    "parameters": np.random.rand(np.random.randint(7) + 1),
                 },
             }
-            for _ in numpy.random.rand(10) + 1
+            for _ in np.random.rand(10) + 1
         },
     }
     parameters = write_read(parameters_ref)
@@ -175,40 +175,40 @@ def test_chemp(write_read):
     parameters_ref = {
         "chemical_properties": {
             helpers.random_string(20): {
-                "temperature_crit": numpy.random.rand(),
-                "pressure_crit": numpy.random.rand(),
-                "compressibility_crit": numpy.random.rand(),
-                "pitzer_factor": numpy.random.rand(),
-                "dipole_moment": numpy.random.rand(),
-                "boiling_point": numpy.random.rand(),
-                "vapor_pressure_a": numpy.random.rand(),
-                "vapor_pressure_b": numpy.random.rand(),
-                "vapor_pressure_c": numpy.random.rand(),
-                "vapor_pressure_d": numpy.random.rand(),
-                "molecular_weight": numpy.random.rand(),
-                "heat_capacity_a": numpy.random.rand(),
-                "heat_capacity_b": numpy.random.rand(),
-                "heat_capacity_c": numpy.random.rand(),
-                "heat_capacity_d": numpy.random.rand(),
-                "napl_density_ref": numpy.random.rand(),
-                "napl_temperature_ref": numpy.random.rand(),
-                "gas_diffusivity_ref": numpy.random.rand(),
-                "gas_temperature_ref": numpy.random.rand(),
-                "exponent": numpy.random.rand(),
-                "napl_viscosity_a": numpy.random.rand(),
-                "napl_viscosity_b": numpy.random.rand(),
-                "napl_viscosity_c": numpy.random.rand(),
-                "napl_viscosity_d": numpy.random.rand(),
-                "volume_crit": numpy.random.rand(),
-                "solubility_a": numpy.random.rand(),
-                "solubility_b": numpy.random.rand(),
-                "solubility_c": numpy.random.rand(),
-                "solubility_d": numpy.random.rand(),
-                "oc_coeff": numpy.random.rand(),
-                "oc_fraction": numpy.random.rand(),
-                "oc_decay": numpy.random.rand(),
+                "temperature_crit": np.random.rand(),
+                "pressure_crit": np.random.rand(),
+                "compressibility_crit": np.random.rand(),
+                "pitzer_factor": np.random.rand(),
+                "dipole_moment": np.random.rand(),
+                "boiling_point": np.random.rand(),
+                "vapor_pressure_a": np.random.rand(),
+                "vapor_pressure_b": np.random.rand(),
+                "vapor_pressure_c": np.random.rand(),
+                "vapor_pressure_d": np.random.rand(),
+                "molecular_weight": np.random.rand(),
+                "heat_capacity_a": np.random.rand(),
+                "heat_capacity_b": np.random.rand(),
+                "heat_capacity_c": np.random.rand(),
+                "heat_capacity_d": np.random.rand(),
+                "napl_density_ref": np.random.rand(),
+                "napl_temperature_ref": np.random.rand(),
+                "gas_diffusivity_ref": np.random.rand(),
+                "gas_temperature_ref": np.random.rand(),
+                "exponent": np.random.rand(),
+                "napl_viscosity_a": np.random.rand(),
+                "napl_viscosity_b": np.random.rand(),
+                "napl_viscosity_c": np.random.rand(),
+                "napl_viscosity_d": np.random.rand(),
+                "volume_crit": np.random.rand(),
+                "solubility_a": np.random.rand(),
+                "solubility_b": np.random.rand(),
+                "solubility_c": np.random.rand(),
+                "solubility_d": np.random.rand(),
+                "oc_coeff": np.random.rand(),
+                "oc_fraction": np.random.rand(),
+                "oc_decay": np.random.rand(),
             }
-            for _ in numpy.random.rand(10) + 1
+            for _ in np.random.rand(10) + 1
         }
     }
     parameters = write_read(parameters_ref)
@@ -218,7 +218,7 @@ def test_chemp(write_read):
     )
     for k, v in parameters_ref["chemical_properties"].items():
         for kk, vv in v.items():
-            assert numpy.allclose(
+            assert np.allclose(
                 vv, parameters["chemical_properties"][k][kk], atol=1.0e-4
             )
 
@@ -227,7 +227,7 @@ def test_chemp(write_read):
 def test_ncgas(write_read):
     parameters_ref = {
         "non_condensible_gas": [
-            helpers.random_string(10) for _ in numpy.random.rand(10) + 1
+            helpers.random_string(10) for _ in np.random.rand(10) + 1
         ]
     }
     parameters = write_read(parameters_ref)
@@ -272,11 +272,11 @@ def test_multi(write_read, isothermal):
 def test_solvr(write_read):
     parameters_ref = {
         "solver": {
-            "method": numpy.random.randint(10),
+            "method": np.random.randint(10),
             "z_precond": helpers.random_string(2),
             "o_precond": helpers.random_string(2),
-            "rel_iter_max": numpy.random.rand(),
-            "eps": numpy.random.rand(),
+            "rel_iter_max": np.random.rand(),
+            "eps": np.random.rand(),
         },
     }
     parameters = write_read(parameters_ref)
@@ -284,12 +284,12 @@ def test_solvr(write_read):
     assert parameters_ref["solver"]["method"] == parameters["solver"]["method"]
     assert parameters_ref["solver"]["z_precond"] == parameters["solver"]["z_precond"]
     assert parameters_ref["solver"]["o_precond"] == parameters["solver"]["o_precond"]
-    assert numpy.allclose(
+    assert np.allclose(
         parameters_ref["solver"]["rel_iter_max"],
         parameters["solver"]["rel_iter_max"],
         atol=1.0e-5,
     )
-    assert numpy.allclose(
+    assert np.allclose(
         parameters_ref["solver"]["eps"], parameters["solver"]["eps"], atol=1.0e-5
     )
 
@@ -297,48 +297,48 @@ def test_solvr(write_read):
 @pytest.mark.parametrize(
     "write_read, t_steps, num_pvars",
     [
-        (write_read_tough, numpy.random.rand(), 4),
-        (write_read_tough, numpy.random.rand(numpy.random.randint(100) + 1), 4),
-        (write_read_tough, numpy.random.rand(numpy.random.randint(100) + 1), 6),
-        (write_read_json, numpy.random.rand(), 4),
-        (write_read_json, numpy.random.rand(numpy.random.randint(100) + 1), 4),
-        (write_read_json, numpy.random.rand(numpy.random.randint(100) + 1), 6),
+        (write_read_tough, np.random.rand(), 4),
+        (write_read_tough, np.random.rand(np.random.randint(100) + 1), 4),
+        (write_read_tough, np.random.rand(np.random.randint(100) + 1), 6),
+        (write_read_json, np.random.rand(), 4),
+        (write_read_json, np.random.rand(np.random.randint(100) + 1), 4),
+        (write_read_json, np.random.rand(np.random.randint(100) + 1), 6),
     ],
 )
 def test_param(write_read, t_steps, num_pvars):
     parameters_ref = {
         "options": {
-            "n_iteration": numpy.random.randint(10),
-            "n_cycle": numpy.random.randint(10),
-            "n_second": numpy.random.randint(10),
-            "n_cycle_print": numpy.random.randint(10),
-            "verbosity": numpy.random.randint(10),
-            "temperature_dependence_gas": numpy.random.rand(),
-            "effective_strength_vapor": numpy.random.rand(),
-            "t_ini": numpy.random.rand(),
-            "t_max": numpy.random.rand(),
+            "n_iteration": np.random.randint(10),
+            "n_cycle": np.random.randint(10),
+            "n_second": np.random.randint(10),
+            "n_cycle_print": np.random.randint(10),
+            "verbosity": np.random.randint(10),
+            "temperature_dependence_gas": np.random.rand(),
+            "effective_strength_vapor": np.random.rand(),
+            "t_ini": np.random.rand(),
+            "t_max": np.random.rand(),
             "t_steps": t_steps,
-            "t_step_max": numpy.random.rand(),
-            "t_reduce_factor": numpy.random.rand(),
-            "gravity": numpy.random.rand(),
-            "mesh_scale_factor": numpy.random.rand(),
-            "eps1": numpy.random.rand(),
-            "eps2": numpy.random.rand(),
-            "w_upstream": numpy.random.rand(),
-            "w_newton": numpy.random.rand(),
-            "derivative_factor": numpy.random.rand(),
+            "t_step_max": np.random.rand(),
+            "t_reduce_factor": np.random.rand(),
+            "gravity": np.random.rand(),
+            "mesh_scale_factor": np.random.rand(),
+            "eps1": np.random.rand(),
+            "eps2": np.random.rand(),
+            "w_upstream": np.random.rand(),
+            "w_newton": np.random.rand(),
+            "derivative_factor": np.random.rand(),
         },
         "extra_options": {
-            k + 1: v for k, v in enumerate(numpy.random.randint(10, size=24))
+            k + 1: v for k, v in enumerate(np.random.randint(10, size=24))
         },
-        "default": {"initial_condition": numpy.random.rand(num_pvars)},
+        "default": {"initial_condition": np.random.rand(num_pvars)},
     }
     parameters = write_read(parameters_ref)
 
     helpers.allclose_dict(parameters_ref["options"], parameters["options"], atol=1.0e-5)
     helpers.allclose_dict(parameters_ref["extra_options"], parameters["extra_options"])
     if "initial_condition" in parameters["default"].keys():
-        assert numpy.allclose(
+        assert np.allclose(
             parameters_ref["default"]["initial_condition"],
             parameters["default"]["initial_condition"],
             atol=1.0e-5,
@@ -360,20 +360,20 @@ def test_selec(write_read, num_floats):
     parameters_ref = {
         "selections": {
             "integers": {
-                k + 1: v for k, v in enumerate(numpy.random.randint(100, size=16))
+                k + 1: v for k, v in enumerate(np.random.randint(100, size=16))
             },
             "floats": (
-                numpy.random.rand(num_floats)
+                np.random.rand(num_floats)
                 if num_floats is not None and num_floats <= 8
-                else numpy.random.rand(
-                    numpy.random.randint(100) + 1, numpy.random.randint(8) + 1
+                else np.random.rand(
+                    np.random.randint(100) + 1, np.random.randint(8) + 1
                 )
             ),
         },
     }
     parameters_ref["selections"]["integers"][1] = (
         len(parameters_ref["selections"]["floats"])
-        if numpy.ndim(parameters_ref["selections"]["floats"]) == 2
+        if np.ndim(parameters_ref["selections"]["floats"]) == 2
         else 1
     )
     parameters = write_read(parameters_ref)
@@ -382,7 +382,7 @@ def test_selec(write_read, num_floats):
         parameters_ref["selections"]["integers"], parameters["selections"]["integers"]
     )
     if "floats" in parameters["selections"].keys():
-        assert numpy.allclose(
+        assert np.allclose(
             parameters_ref["selections"]["floats"],
             parameters["selections"]["floats"],
             atol=1.0e-4,
@@ -403,11 +403,11 @@ def test_selec(write_read, num_floats):
     ],
 )
 def test_indom(write_read, num_pvars, num_items):
-    num_items = num_items if num_items else numpy.random.randint(10) + 1
+    num_items = num_items if num_items else np.random.randint(10) + 1
     parameters_ref = {
         "rocks": {
             helpers.random_string(5): {
-                "initial_condition": numpy.random.rand(num_pvars),
+                "initial_condition": np.random.rand(num_pvars),
             }
             for _ in range(num_items)
         },
@@ -415,7 +415,7 @@ def test_indom(write_read, num_pvars, num_items):
     parameters = write_read(parameters_ref)
 
     for k, v in parameters_ref["rocks"].items():
-        assert numpy.allclose(
+        assert np.allclose(
             v["initial_condition"],
             parameters["rocks"][k]["initial_condition"],
             atol=1.0e-4,
@@ -426,7 +426,7 @@ def test_indom(write_read, num_pvars, num_items):
 def test_momop(write_read):
     parameters_ref = {
         "more_options": {
-            k + 1: v for k, v in enumerate(numpy.random.randint(10, size=40))
+            k + 1: v for k, v in enumerate(np.random.randint(10, size=40))
         },
     }
     parameters = write_read(parameters_ref)
@@ -437,17 +437,17 @@ def test_momop(write_read):
 @pytest.mark.parametrize(
     "write_read, times",
     [
-        (write_read_tough, numpy.random.rand()),
-        (write_read_tough, numpy.random.rand(numpy.random.randint(100) + 1)),
-        (write_read_json, numpy.random.rand()),
-        (write_read_json, numpy.random.rand(numpy.random.randint(100) + 1)),
+        (write_read_tough, np.random.rand()),
+        (write_read_tough, np.random.rand(np.random.randint(100) + 1)),
+        (write_read_json, np.random.rand()),
+        (write_read_json, np.random.rand(np.random.randint(100) + 1)),
     ],
 )
 def test_times(write_read, times):
     parameters_ref = {"times": times}
     parameters = write_read(parameters_ref)
 
-    assert numpy.allclose(parameters_ref["times"], parameters["times"], atol=1.0e-5)
+    assert np.allclose(parameters_ref["times"], parameters["times"], atol=1.0e-5)
 
 
 @pytest.mark.parametrize(
@@ -463,7 +463,7 @@ def test_times(write_read, times):
 )
 def test_oft(write_read, oft, n):
     parameters_ref = {
-        oft: [helpers.random_string(n) for _ in range(numpy.random.randint(10) + 1)]
+        oft: [helpers.random_string(n) for _ in range(np.random.randint(10) + 1)]
     }
     parameters = write_read(parameters_ref)
 
@@ -484,7 +484,7 @@ def test_oft(write_read, oft, n):
     ],
 )
 def test_gener(write_read, specific_enthalpy, label_length):
-    n_rnd = numpy.random.randint(100) + 2
+    n_rnd = np.random.randint(100) + 2
     parameters_ref = {
         "generators": {
             helpers.random_label(label_length): {
@@ -493,44 +493,44 @@ def test_gener(write_read, specific_enthalpy, label_length):
                     helpers.random_string(5),
                     helpers.random_string(5),
                 ],
-                "nseq": numpy.random.randint(10, size=3),
-                "nadd": numpy.random.randint(10, size=3),
-                "nads": numpy.random.randint(10, size=3),
+                "nseq": np.random.randint(10, size=3),
+                "nadd": np.random.randint(10, size=3),
+                "nads": np.random.randint(10, size=3),
                 "type": [
                     helpers.random_string(4),
                     helpers.random_string(4),
                     helpers.random_string(4),
                 ],
-                "times": [numpy.random.rand(10), None, numpy.random.rand(n_rnd)],
+                "times": [np.random.rand(10), None, np.random.rand(n_rnd)],
                 "rates": [
-                    numpy.random.rand(10),
-                    numpy.random.rand(),
-                    numpy.random.rand(n_rnd),
+                    np.random.rand(10),
+                    np.random.rand(),
+                    np.random.rand(n_rnd),
                 ],
                 "specific_enthalpy": [
-                    numpy.random.rand(10),
-                    numpy.random.rand(),
-                    numpy.random.rand(n_rnd),
+                    np.random.rand(10),
+                    np.random.rand(),
+                    np.random.rand(n_rnd),
                 ]
                 if specific_enthalpy
                 else None,
-                "layer_thickness": numpy.random.rand(3),
+                "layer_thickness": np.random.rand(3),
             },
             helpers.random_label(label_length): {
                 "name": [helpers.random_string(5), helpers.random_string(5)],
-                "nseq": numpy.random.randint(10, size=2),
-                "nadd": numpy.random.randint(10, size=2),
-                "nads": numpy.random.randint(10, size=2),
+                "nseq": np.random.randint(10, size=2),
+                "nadd": np.random.randint(10, size=2),
+                "nads": np.random.randint(10, size=2),
                 "type": [helpers.random_string(4), helpers.random_string(4)],
-                "rates": numpy.random.rand(2),
+                "rates": np.random.rand(2),
             },
             helpers.random_label(label_length): {
-                "nseq": numpy.random.randint(10),
-                "nadd": numpy.random.randint(10),
-                "nads": numpy.random.randint(10),
+                "nseq": np.random.randint(10),
+                "nadd": np.random.randint(10),
+                "nads": np.random.randint(10),
                 "type": helpers.random_string(4),
-                "rates": numpy.random.rand(),
-                "layer_thickness": numpy.random.rand(),
+                "rates": np.random.rand(),
+                "layer_thickness": np.random.rand(),
             },
         },
     }
@@ -547,29 +547,29 @@ def test_gener(write_read, specific_enthalpy, label_length):
             else:
                 if kk == "specific_enthalpy" and not specific_enthalpy:
                     continue
-                if numpy.ndim(vv):
+                if np.ndim(vv):
                     for i, arr_ref in enumerate(vv):
                         arr = parameters["generators"][k][kk][i]
                         if arr_ref is not None:
-                            assert numpy.allclose(arr, arr_ref, atol=1.0e-4)
+                            assert np.allclose(arr, arr_ref, atol=1.0e-4)
                         else:
                             assert arr is None
                 else:
-                    assert numpy.allclose(
+                    assert np.allclose(
                         vv, parameters["generators"][k][kk], atol=1.0e-4
                     )
 
 
 @pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
 def test_diffu(write_read):
-    n_phase = numpy.random.randint(8) + 1
+    n_phase = np.random.randint(8) + 1
     parameters_ref = {
         "n_phase": n_phase,
-        "diffusion": numpy.random.rand(numpy.random.randint(5) + 1, n_phase),
+        "diffusion": np.random.rand(np.random.randint(5) + 1, n_phase),
     }
     parameters = write_read(parameters_ref)
 
-    assert numpy.allclose(
+    assert np.allclose(
         parameters_ref["diffusion"], parameters["diffusion"], atol=1.0e-4
     )
 
@@ -589,11 +589,11 @@ def test_outpu(write_read, fmt):
             "format": fmt,
             "variables": {
                 helpers.random_string(20): None,
-                helpers.random_string(20): numpy.random.randint(10),
-                helpers.random_string(20): numpy.random.randint(10, size=1),
-                helpers.random_string(20): numpy.random.randint(10, size=2),
-                helpers.random_string(20): numpy.random.randint(
-                    10, size=(numpy.random.randint(1, 10), 2)
+                helpers.random_string(20): np.random.randint(10),
+                helpers.random_string(20): np.random.randint(10, size=1),
+                helpers.random_string(20): np.random.randint(10, size=2),
+                helpers.random_string(20): np.random.randint(
+                    10, size=(np.random.randint(1, 10), 2)
                 ),
             },
         },
@@ -620,7 +620,7 @@ def test_outpu(write_read, fmt):
 )
 def test_eleme(write_read, label_length, coord):
     labels = [
-        helpers.random_label(label_length) for _ in range(numpy.random.randint(10) + 1)
+        helpers.random_label(label_length) for _ in range(np.random.randint(10) + 1)
     ]
     keys = [
         "nseq",
@@ -635,13 +635,13 @@ def test_eleme(write_read, label_length, coord):
         "elements": {
             label: {
                 key: (
-                    numpy.random.randint(10)
+                    np.random.randint(10)
                     if key in {"nseq", "nadd"}
                     else helpers.random_string(5)
                     if key == "material"
-                    else numpy.random.rand(3)
+                    else np.random.rand(3)
                     if key == "center"
-                    else numpy.random.rand()
+                    else np.random.rand()
                 )
                 for key in keys
             }
@@ -658,7 +658,7 @@ def test_eleme(write_read, label_length, coord):
     for k, v in parameters_ref["elements"].items():
         for kk, vv in v.items():
             if not isinstance(vv, str):
-                assert numpy.allclose(vv, parameters["elements"][k][kk], atol=1.0e-4)
+                assert np.allclose(vv, parameters["elements"][k][kk], atol=1.0e-4)
             else:
                 assert vv == parameters["elements"][k][kk]
 
@@ -677,7 +677,7 @@ def test_eleme(write_read, label_length, coord):
 def test_conne(write_read, label_length):
     labels = [
         "".join(helpers.random_label(label_length) for _ in range(2))
-        for _ in range(numpy.random.randint(10) + 1)
+        for _ in range(np.random.randint(10) + 1)
     ]
     keys = [
         "nseq",
@@ -692,15 +692,15 @@ def test_conne(write_read, label_length):
         "connections": {
             label: {
                 key: (
-                    numpy.random.randint(10)
+                    np.random.randint(10)
                     if key == "nseq"
-                    else numpy.random.randint(10, size=2)
+                    else np.random.randint(10, size=2)
                     if key == "nadd"
-                    else numpy.random.randint(1, 4)
+                    else np.random.randint(1, 4)
                     if key == "permeability_direction"
-                    else numpy.random.rand(2)
+                    else np.random.rand(2)
                     if key == "nodal_distances"
-                    else numpy.random.rand()
+                    else np.random.rand()
                 )
                 for key in keys
             }
@@ -715,7 +715,7 @@ def test_conne(write_read, label_length):
 
     for k, v in parameters_ref["connections"].items():
         for kk, vv in v.items():
-            assert numpy.allclose(vv, parameters["connections"][k][kk], atol=1.0e-4)
+            assert np.allclose(vv, parameters["connections"][k][kk], atol=1.0e-4)
 
 
 @pytest.mark.parametrize(
@@ -732,7 +732,7 @@ def test_conne(write_read, label_length):
     ],
 )
 def test_incon(write_read, label_length, num_pvars, num_items):
-    num_items = num_items if num_items else numpy.random.randint(10) + 1
+    num_items = num_items if num_items else np.random.randint(10) + 1
     labels = [helpers.random_label(label_length) for _ in range(num_items)]
     keys = [
         "porosity",
@@ -743,11 +743,11 @@ def test_incon(write_read, label_length, num_pvars, num_items):
         "initial_conditions": {
             label: {
                 key: (
-                    numpy.random.rand()
+                    np.random.rand()
                     if key == "porosity"
-                    else numpy.random.rand(numpy.random.randint(5) + 1)
+                    else np.random.rand(np.random.randint(5) + 1)
                     if key == "userx"
-                    else numpy.random.rand(num_pvars)
+                    else np.random.rand(num_pvars)
                 )
                 for key in keys
             }
@@ -762,7 +762,7 @@ def test_incon(write_read, label_length, num_pvars, num_items):
 
     for k, v in parameters_ref["initial_conditions"].items():
         for kk, vv in v.items():
-            assert numpy.allclose(
+            assert np.allclose(
                 vv, parameters["initial_conditions"][k][kk], atol=1.0e-3
             )
 
