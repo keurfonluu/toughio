@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
 
-import numpy
+import numpy as np
 
 __all__ = [
     "BaseRelativePermeability",
@@ -38,15 +38,15 @@ class BaseRelativePermeability(ABC):
 
     def __call__(self, sl):
         """Calculate relative permeability given liquid saturation."""
-        if numpy.ndim(sl) == 0:
+        if np.ndim(sl) == 0:
             if not (0.0 <= sl <= 1.0):
                 raise ValueError()
             return self._eval(sl, *self.parameters)
         else:
-            sl = numpy.asarray(sl)
-            if not numpy.logical_and((sl >= 0.0).all(), (sl <= 1.0).all()):
+            sl = np.asarray(sl)
+            if not np.logical_and((sl >= 0.0).all(), (sl <= 1.0).all()):
                 raise ValueError()
-            return numpy.transpose([self._eval(sat, *self.parameters) for sat in sl])
+            return np.transpose([self._eval(sat, *self.parameters) for sat in sl])
 
     @abstractmethod
     def _eval(self, sl, *args):
@@ -79,7 +79,7 @@ class BaseRelativePermeability(ABC):
             raise TypeError()
         if not (ax is None or isinstance(ax, plt.Axes)):
             raise TypeError()
-        if not (figsize is None or isinstance(figsize, (tuple, list, numpy.ndarray))):
+        if not (figsize is None or isinstance(figsize, (tuple, list, np.ndarray))):
             raise TypeError()
         if len(figsize) != 2:
             raise ValueError()
@@ -100,7 +100,7 @@ class BaseRelativePermeability(ABC):
             ax1 = fig.add_subplot(1, 1, 1)
 
         # Calculate liquid and gas relative permeability
-        sl = numpy.linspace(0.0, 1.0, n)
+        sl = np.linspace(0.0, 1.0, n)
         kl, kg = self(sl)
 
         # Plot

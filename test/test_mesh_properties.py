@@ -1,6 +1,6 @@
 import os
 
-import numpy
+import numpy as np
 
 import toughio
 
@@ -12,22 +12,22 @@ def test_mesh():
     mesh = toughio.read_mesh(filename)
 
     volumes = mesh.volumes.sum()
-    assert numpy.allclose(volumes, 1.7083333333333344)
+    assert np.allclose(volumes, 1.7083333333333344)
 
     face_areas = sum(face.sum() for face in mesh.face_areas)
-    assert numpy.allclose(face_areas, 39.16535341331142)
+    assert np.allclose(face_areas, 39.16535341331142)
 
-    face_normals = sum(numpy.abs(face).sum() for face in mesh.face_normals)
-    assert numpy.allclose(face_normals, 719.3660094744944)
+    face_normals = sum(np.abs(face).sum() for face in mesh.face_normals)
+    assert np.allclose(face_normals, 719.3660094744944)
 
     connections = mesh.connections.sum()
-    assert numpy.allclose(connections, 25353)
+    assert np.allclose(connections, 25353)
 
 
 def test_quality():
-    dx = numpy.ones(3)
-    dy = numpy.ones(3)
-    dz = numpy.ones(3)
-    mesh = toughio.meshmaker.structured_grid(dx, dy, dz, origin=numpy.zeros(3))
+    dx = np.ones(3)
+    dy = np.ones(3)
+    dz = np.ones(3)
+    mesh = toughio.meshmaker.structured_grid(dx, dy, dz, origin=np.zeros(3))
 
-    assert numpy.allclose(mesh.qualities, numpy.ones(mesh.n_cells))
+    assert np.allclose(mesh.qualities, np.ones(mesh.n_cells))

@@ -1,7 +1,7 @@
 import logging
 
 import meshio
-import numpy
+import numpy as np
 
 vtk_to_meshio_type = {
     0: "empty",
@@ -125,13 +125,13 @@ def get_old_meshio_cells(cells, cell_data=None):
         else:
             old_cells[c.type].append(c.data)
             cell_blocks[c.type].append(ic)
-    old_cells = {k: numpy.concatenate(v) for k, v in old_cells.items()}
+    old_cells = {k: np.concatenate(v) for k, v in old_cells.items()}
 
     if cell_data is not None:
         old_cell_data = (
             {
                 cell_type: {
-                    k: numpy.concatenate([cell_data[k][i] for i in iblock])
+                    k: np.concatenate([cell_data[k][i] for i in iblock])
                     for k in cell_data.keys()
                 }
                 for cell_type, iblock in cell_blocks.items()
@@ -168,7 +168,7 @@ def get_new_meshio_cells(cells, cell_data=None):
     new_cells = [CellBlock(k, v) for k, v in cells.items()]
 
     if cell_data is not None:
-        labels = numpy.unique([kk for k, v in cell_data.items() for kk in v.keys()])
+        labels = np.unique([kk for k, v in cell_data.items() for kk in v.keys()])
         new_cell_data = {k: [] for k in labels}
         for k in new_cell_data.keys():
             for kk in cells.keys():
@@ -202,34 +202,34 @@ def labeler(n_cells, label_length=None):
     from string import ascii_uppercase
 
     if not label_length:
-        bins = 3185000 * 10 ** numpy.arange(5, dtype=numpy.int64) + 1
-        label_length = numpy.digitize(n_cells, bins) + 5
+        bins = 3185000 * 10 ** np.arange(5, dtype=np.int64) + 1
+        label_length = np.digitize(n_cells, bins) + 5
         if label_length > 5:
             logging.warning("Cell labels are {}-character long.".format(label_length))
 
     n = label_length - 3
     fmt = "{{:0>{}}}".format(n)
-    alpha = numpy.array(list(ascii_uppercase))
-    numer = numpy.array([fmt.format(i) for i in range(10 ** n)])
-    nomen = numpy.concatenate((["{:1}".format(i + 1) for i in range(9)], alpha))
+    alpha = np.array(list(ascii_uppercase))
+    numer = np.array([fmt.format(i) for i in range(10 ** n)])
+    nomen = np.concatenate((["{:1}".format(i + 1) for i in range(9)], alpha))
 
-    q1, r1 = numpy.divmod(numpy.arange(n_cells), numer.size)
-    q2, r2 = numpy.divmod(q1, nomen.size)
-    q3, r3 = numpy.divmod(q2, nomen.size)
-    _, r4 = numpy.divmod(q3, nomen.size)
+    q1, r1 = np.divmod(np.arange(n_cells), numer.size)
+    q2, r2 = np.divmod(q1, nomen.size)
+    q3, r3 = np.divmod(q2, nomen.size)
+    _, r4 = np.divmod(q3, nomen.size)
 
     iterables = (alpha[r4], nomen[r3], nomen[r2], numer[r1])
-    return numpy.array(["".join(name) for name in zip(*iterables)])
+    return np.array(["".join(name) for name in zip(*iterables)])
 
 
 def interpolate_data(data, entities, weights=None):
     """Interpolate input data."""
     return {
         k: (
-            numpy.array([numpy.mean(v[e]) for e in entities])
+            np.array([np.mean(v[e]) for e in entities])
             if not weights
-            else numpy.array(
-                [numpy.average(v[e], weights=w) for e, w in zip(entities, weights)]
+            else np.array(
+                [np.average(v[e], weights=w) for e, w in zip(entities, weights)]
             )
         )
         for k, v in data.items()

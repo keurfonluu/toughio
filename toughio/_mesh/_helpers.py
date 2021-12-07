@@ -1,7 +1,7 @@
 from copy import deepcopy
 
 import meshio
-import numpy
+import numpy as np
 
 from .._common import filetype_from_filename, register_format
 from ._mesh import from_meshio
@@ -95,9 +95,7 @@ def read(filename, file_format=None, **kwargs):
     if fmt in _reader_map.keys():
         mesh = _reader_map[fmt](filename, **kwargs)
         if fmt not in {"tough", "pickle"}:
-            mesh.cell_data = {
-                k: numpy.concatenate(v) for k, v in mesh.cell_data.items()
-            }
+            mesh.cell_data = {k: np.concatenate(v) for k, v in mesh.cell_data.items()}
             key = get_material_key(mesh.cell_data)
             if key:
                 mesh.cell_data["material"] = mesh.cell_data.pop(key)
@@ -106,26 +104,27 @@ def read(filename, file_format=None, **kwargs):
         mesh = from_meshio(mesh)
 
     # Remove lower order cells
-    idx = numpy.ones(len(mesh.cells), dtype=bool)
+    if not isinstance(mesh, dict):
+        idx = np.ones(len(mesh.cells), dtype=bool)
 
-    celltypes = numpy.array([cell.type for cell in mesh.cells])
-    cell_data = {k: mesh.split(v) for k, v in mesh.cell_data.items()}
+        celltypes = np.array([cell.type for cell in mesh.cells])
+        cell_data = {k: mesh.split(v) for k, v in mesh.cell_data.items()}
 
-    idx = numpy.logical_and(idx, celltypes != "vertex")
-    idx = numpy.logical_and(idx, celltypes != "line")
+        idx = np.logical_and(idx, celltypes != "vertex")
+        idx = np.logical_and(idx, celltypes != "line")
 
-    if mesh.dim == 3:
-        idx = numpy.logical_and(idx, celltypes != "quad")
-        idx = numpy.logical_and(idx, celltypes != "triangle")
+        if mesh.dim == 3:
+            idx = np.logical_and(idx, celltypes != "quad")
+            idx = np.logical_and(idx, celltypes != "triangle")
 
-    if idx.sum() < len(mesh.cells):
-        mesh.cells = [cell for keep, cell in zip(idx, mesh.cells) if keep]
-        for k, v in cell_data.items():
-            mesh.cell_data[k] = numpy.concatenate(
-                [vv for keep, vv in zip(idx, v) if keep]
-            )
+        if idx.sum() < len(mesh.cells):
+            mesh.cells = [cell for keep, cell in zip(idx, mesh.cells) if keep]
+            for k, v in cell_data.items():
+                mesh.cell_data[k] = np.concatenate(
+                    [vv for keep, vv in zip(idx, v) if keep]
+                )
 
-        mesh.prune_duplicates()
+            mesh.prune_duplicates()
 
     return mesh
 
@@ -232,7 +231,7 @@ def read_time_series(filename):
     # Concatenate cell data arrays
     for cdata in cell_data:
         for k in cdata.keys():
-            cdata[k] = numpy.concatenate(cdata[k])
+            cdata[k] = np.concatenate(cdata[k])
 
     return points, cells, point_data, cell_data, time_steps
 
@@ -267,9 +266,7 @@ def write_time_series(
         raise TypeError()
     if cell_data is not None and not isinstance(cell_data, (list, tuple)):
         raise TypeError()
-    if time_steps is not None and not isinstance(
-        time_steps, (list, tuple, numpy.ndarray)
-    ):
+    if time_steps is not None and not isinstance(time_steps, (list, tuple, np.ndarray)):
         raise TypeError()
 
     if not (point_data or cell_data):
@@ -289,13 +286,13 @@ def write_time_series(
     time_steps = time_steps if time_steps is not None else list(range(nt))
 
     # Split cell data arrays
-    sizes = numpy.cumsum([len(c.data) for c in cells[:-1]])
+    sizes = np.cumsum([len(c.data) for c in cells[:-1]])
     cell_data = [
-        {k: numpy.split(v, sizes) for k, v in cdata.items()} for cdata in cell_data
+        {k: np.split(v, sizes) for k, v in cdata.items()} for cdata in cell_data
     ]
 
     # Sort data with time steps
-    idx = numpy.argsort(time_steps)
+    idx = np.argsort(time_steps)
     point_data = [point_data[i] for i in idx]
     cell_data = [cell_data[i] for i in idx]
     time_steps = [time_steps[i] for i in idx]

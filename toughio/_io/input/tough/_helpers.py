@@ -4,7 +4,7 @@ import logging
 from copy import deepcopy
 from functools import wraps
 
-import numpy
+import numpy as np
 
 dtypes = {
     "PARAMETERS": {
@@ -163,26 +163,26 @@ dtypes = {
 
 
 str_to_dtype = {
-    "int": (int, numpy.int32, numpy.int64),
-    "float": (float, numpy.float32, numpy.float64),
+    "int": (int, np.int32, np.int64),
+    "float": (float, np.float32, np.float64),
     "str": (str,),
     "bool": (bool,),
-    "str_int": (str, int, numpy.int32, numpy.int64),
-    "array_like": (list, tuple, numpy.ndarray),
+    "str_int": (str, int, np.int32, np.int64),
+    "array_like": (list, tuple, np.ndarray),
     "dict": (dict,),
-    "scalar": (int, float, numpy.int32, numpy.int64, numpy.float32, numpy.float64),
+    "scalar": (int, float, np.int32, np.int64, np.float32, np.float64),
     "scalar_array_like": (
         int,
         float,
         list,
         tuple,
-        numpy.int32,
-        numpy.int64,
-        numpy.float32,
-        numpy.float64,
-        numpy.ndarray,
+        np.int32,
+        np.int64,
+        np.float32,
+        np.float64,
+        np.ndarray,
     ),
-    "str_array_like": (str, list, tuple, numpy.ndarray),
+    "str_array_like": (str, list, tuple, np.ndarray),
 }
 
 
@@ -307,7 +307,7 @@ def write_record(data, fmt, multi=False):
         ncol = len(fmt)
         data = [
             data[ncol * i : min(ncol * i + ncol, n)]
-            for i in range(int(numpy.ceil(n / ncol)))
+            for i in range(int(np.ceil(n / ncol)))
         ]
 
         out = []

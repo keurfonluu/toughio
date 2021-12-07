@@ -9,7 +9,7 @@ Now that the mesh has been pre-processed, we can define the TOUGH simulation par
 ########################################################################################
 # As always, we first import the required modules for this example.
 
-import numpy
+import numpy as np
 import toughio
 
 ########################################################################################
@@ -152,7 +152,7 @@ parameters["generators"] = {
 # Let's customize the outputs.
 # For this example, we want TOUGH to save the output every three months (i.e. 4 outputs per year). To reduce the size of the output file, we also want TOUGH to only save the saturation of phase 1 (gas) in addition to the cell coordinates. Note that this option is only available in TOUGH3.
 
-parameters["times"] = numpy.arange(1, 13) * 90.0 * 24.0 * 3600.0
+parameters["times"] = np.arange(1, 13) * 90.0 * 24.0 * 3600.0
 parameters["output"] = {
     "variables": {
         "saturation": 1,

@@ -1,14 +1,14 @@
 import os
 import tempfile
 
-import numpy
+import numpy as np
 
 import toughio
 
-numpy.random.seed(42)
+np.random.seed(42)
 
 tet_mesh = toughio.Mesh(
-    points=numpy.array(
+    points=np.array(
         [
             [0.0, 0.0, 0.0],
             [1.0, 0.0, 0.0],
@@ -17,13 +17,13 @@ tet_mesh = toughio.Mesh(
             [0.5, 0.5, 0.5],
         ]
     ),
-    cells=[("tetra", numpy.array([[0, 1, 2, 4], [0, 2, 3, 4]]))],
-    point_data={"a": numpy.random.rand(5), "b": numpy.random.rand(5)},
-    cell_data={"c": numpy.random.rand(2), "material": numpy.ones(2)},
+    cells=[("tetra", np.array([[0, 1, 2, 4], [0, 2, 3, 4]]))],
+    point_data={"a": np.random.rand(5), "b": np.random.rand(5)},
+    cell_data={"c": np.random.rand(2), "material": np.ones(2)},
 )
 
 hex_mesh = toughio.Mesh(
-    points=numpy.array(
+    points=np.array(
         [
             [0.0, 0.0, 0.0],
             [1.0, 0.0, 0.0],
@@ -35,13 +35,13 @@ hex_mesh = toughio.Mesh(
             [0.0, 1.0, 1.0],
         ]
     ),
-    cells=[("hexahedron", numpy.array([[0, 1, 2, 3, 4, 5, 6, 7]]))],
-    point_data={"a": numpy.random.rand(8), "b": numpy.random.rand(8)},
-    cell_data={"c": numpy.random.rand(1), "material": numpy.ones(1)},
+    cells=[("hexahedron", np.array([[0, 1, 2, 3, 4, 5, 6, 7]]))],
+    point_data={"a": np.random.rand(8), "b": np.random.rand(8)},
+    cell_data={"c": np.random.rand(1), "material": np.ones(1)},
 )
 
 hybrid_mesh = toughio.Mesh(
-    points=numpy.array(
+    points=np.array(
         [
             [0.0, 0.0, 0.0],
             [1.0, 0.0, 0.0],
@@ -61,13 +61,13 @@ hybrid_mesh = toughio.Mesh(
         ]
     ),
     cells=[
-        ("hexahedron", numpy.array([[0, 1, 2, 3, 4, 5, 6, 7]])),
-        ("pyramid", numpy.array([[4, 5, 6, 7, 8]])),
-        ("tetra", numpy.array([[4, 8, 7, 9], [5, 6, 8, 10]])),
-        ("wedge", numpy.array([[1, 11, 5, 2, 12, 6], [13, 0, 4, 14, 3, 7]])),
+        ("hexahedron", np.array([[0, 1, 2, 3, 4, 5, 6, 7]])),
+        ("pyramid", np.array([[4, 5, 6, 7, 8]])),
+        ("tetra", np.array([[4, 8, 7, 9], [5, 6, 8, 10]])),
+        ("wedge", np.array([[1, 11, 5, 2, 12, 6], [13, 0, 4, 14, 3, 7]])),
     ],
-    point_data={"a": numpy.random.rand(15), "b": numpy.random.rand(15)},
-    cell_data={"c": numpy.random.rand(6), "material": numpy.ones(6)},
+    point_data={"a": np.random.rand(15), "b": np.random.rand(15)},
+    cell_data={"c": np.random.rand(6), "material": np.ones(6)},
 )
 
 output_eleme = [
@@ -75,13 +75,13 @@ output_eleme = [
         "element",
         None,
         float(time),
-        numpy.array(["AAA0{}".format(i) for i in range(10)]),
+        np.array(["AAA0{}".format(i) for i in range(10)]),
         {
-            "X": numpy.random.rand(10),
-            "Y": numpy.random.rand(10),
-            "Z": numpy.random.rand(10),
-            "PRES": numpy.random.rand(10),
-            "TEMP": numpy.random.rand(10),
+            "X": np.random.rand(10),
+            "Y": np.random.rand(10),
+            "Z": np.random.rand(10),
+            "PRES": np.random.rand(10),
+            "TEMP": np.random.rand(10),
         },
     )
     for time in range(3)
@@ -92,13 +92,13 @@ output_conne = [
         "connection",
         None,
         float(time),
-        numpy.array([["AAA0{}".format(i), "AAA0{}".format(i)] for i in range(10)]),
+        np.array([["AAA0{}".format(i), "AAA0{}".format(i)] for i in range(10)]),
         {
-            "X": numpy.random.rand(10),
-            "Y": numpy.random.rand(10),
-            "Z": numpy.random.rand(10),
-            "HEAT": numpy.random.rand(10),
-            "FLOW": numpy.random.rand(10),
+            "X": np.random.rand(10),
+            "Y": np.random.rand(10),
+            "Z": np.random.rand(10),
+            "HEAT": np.random.rand(10),
+            "FLOW": np.random.rand(10),
         },
     )
     for time in range(3)
@@ -134,35 +134,35 @@ def random_label(label_length):
     n = label_length - 3
     fmt = "{{:0{}d}}".format(n)
 
-    return random_string(3) + fmt.format(numpy.random.randint(10 ** n))
+    return random_string(3) + fmt.format(np.random.randint(10 ** n))
 
 
 def allclose_dict(a, b, atol=1.0e-8):
     for k, v in a.items():
         if v is not None:
-            assert numpy.allclose(v, b[k], atol=atol)
+            assert np.allclose(v, b[k], atol=atol)
         else:
             assert b[k] is None
 
 
 def allclose_mesh(mesh_ref, mesh):
-    assert numpy.allclose(mesh_ref.points, mesh.points)
+    assert np.allclose(mesh_ref.points, mesh.points)
 
     for i, cell in enumerate(mesh_ref.cells):
         assert cell.type == mesh.cells[i].type
-        assert numpy.allclose(cell.data, mesh.cells[i].data)
+        assert np.allclose(cell.data, mesh.cells[i].data)
 
     if mesh.point_data:
         for k, v in mesh_ref.point_data.items():
-            assert numpy.allclose(v, mesh.point_data[k])
+            assert np.allclose(v, mesh.point_data[k])
 
     if mesh.cell_data:
         for k, v in mesh_ref.cell_data.items():
-            assert numpy.allclose(v, mesh.cell_data[k])
+            assert np.allclose(v, mesh.cell_data[k])
 
 
 def allclose_output(output_ref, output):
     assert output_ref.type == output.type
-    assert numpy.allclose(output_ref.time, output.time)
+    assert np.allclose(output_ref.time, output.time)
     assert output_ref.labels.tolist() == output_ref.labels.tolist()
     allclose_dict(output_ref.data, output.data)

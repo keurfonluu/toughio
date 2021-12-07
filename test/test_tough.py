@@ -1,5 +1,5 @@
 import helpers
-import numpy
+import numpy as np
 import pytest
 
 import toughio
@@ -20,22 +20,22 @@ import toughio
 )
 def test_mesh(nodal_distance, bound, coord):
     # Create 3D mesh
-    dx = numpy.arange(3) + 1
-    dy = numpy.arange(4) + 1
-    dz = numpy.arange(5) + 1
+    dx = np.arange(3) + 1
+    dy = np.arange(4) + 1
+    dz = np.arange(5) + 1
     mesh = toughio.meshmaker.structured_grid(
         dx, dy, dz, material=helpers.random_string(5)
     )
 
-    idx = numpy.random.choice(mesh.n_cells, mesh.n_cells // 2, replace=False)
+    idx = np.random.choice(mesh.n_cells, mesh.n_cells // 2, replace=False)
     mesh.cell_data["material"][idx] = 2
-    mesh.field_data[helpers.random_string(5)] = numpy.array([2, 3])
+    mesh.field_data[helpers.random_string(5)] = np.array([2, 3])
 
-    idx = numpy.random.choice(mesh.n_cells, mesh.n_cells // 2, replace=False)
+    idx = np.random.choice(mesh.n_cells, mesh.n_cells // 2, replace=False)
     boundary_condition = (
-        (numpy.random.rand(mesh.n_cells) < numpy.random.rand()).astype(int)
+        (np.random.rand(mesh.n_cells) < np.random.rand()).astype(int)
         if bound
-        else numpy.zeros(mesh.n_cells)
+        else np.zeros(mesh.n_cells)
     )
     mesh.add_cell_data("boundary_condition", boundary_condition)
 
@@ -59,17 +59,17 @@ def test_mesh(nodal_distance, bound, coord):
         for label, bcond in zip(mesh.labels, boundary_condition)
         if not bcond
     ]
-    assert numpy.allclose(mesh.volumes[boundary_condition == 0], volumes)
+    assert np.allclose(mesh.volumes[boundary_condition == 0], volumes)
 
     volumes = [
         parameters["elements"][label]["volume"]
         for label, bcond in zip(mesh.labels, boundary_condition)
         if bcond
     ]
-    assert numpy.allclose(mesh.volumes[boundary_condition == 1] * 1.0e50, volumes)
+    assert np.allclose(mesh.volumes[boundary_condition == 1] * 1.0e50, volumes)
 
     centers = [parameters["elements"][label]["center"] for label in mesh.labels]
-    assert numpy.allclose(mesh.centers, centers)
+    assert np.allclose(mesh.centers, centers)
 
     # Check block COORD
     assert parameters["coordinates"] == coord
@@ -116,30 +116,30 @@ def test_mesh(nodal_distance, bound, coord):
             ny * nz * (xmax - xmin) + nx * nz * (ymax - ymin) + nx * ny * (zmax - zmin)
         )
         distances = [v["nodal_distances"] for v in parameters["connections"].values()]
-        assert numpy.allclose(distances_ref, numpy.sum(distances))
+        assert np.allclose(distances_ref, np.sum(distances))
 
 
 @pytest.mark.parametrize("anisotropic", [True, False, None])
 def test_incon(anisotropic):
     # Create 3D mesh
-    dx = numpy.arange(3) + 1
-    dy = numpy.arange(4) + 1
-    dz = numpy.arange(5) + 1
+    dx = np.arange(3) + 1
+    dy = np.arange(4) + 1
+    dz = np.arange(5) + 1
     mesh = toughio.meshmaker.structured_grid(
         dx, dy, dz, material=helpers.random_string(5)
     )
 
-    initial_condition = numpy.random.rand(mesh.n_cells, 4)
+    initial_condition = np.random.rand(mesh.n_cells, 4)
     mesh.add_cell_data("initial_condition", initial_condition)
 
-    porosity = numpy.random.rand(mesh.n_cells)
+    porosity = np.random.rand(mesh.n_cells)
     mesh.add_cell_data("porosity", porosity)
 
     if anisotropic is not None:
         permeability = (
-            numpy.random.rand(mesh.n_cells, 3)
+            np.random.rand(mesh.n_cells, 3)
             if anisotropic
-            else numpy.random.rand(mesh.n_cells)
+            else np.random.rand(mesh.n_cells)
         )
         mesh.add_cell_data("permeability", permeability)
 
@@ -157,16 +157,16 @@ def test_incon(anisotropic):
     values = [
         parameters["initial_conditions"][label]["values"] for label in mesh.labels
     ]
-    assert numpy.allclose(mesh.cell_data["initial_condition"], values)
+    assert np.allclose(mesh.cell_data["initial_condition"], values)
 
     porosity = [
         parameters["initial_conditions"][label]["porosity"] for label in mesh.labels
     ]
-    assert numpy.allclose(mesh.cell_data["porosity"], porosity)
+    assert np.allclose(mesh.cell_data["porosity"], porosity)
 
     if anisotropic is not None:
-        userx = numpy.array(
+        userx = np.array(
             [parameters["initial_conditions"][label]["userx"] for label in mesh.labels]
         )
         permeability = userx[:, :3] if anisotropic else userx[:, 0]
-        assert numpy.allclose(mesh.cell_data["permeability"], permeability, atol=1.0e-4)
+        assert np.allclose(mesh.cell_data["permeability"], permeability, atol=1.0e-4)

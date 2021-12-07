@@ -1,6 +1,6 @@
 from __future__ import with_statement
 
-import numpy
+import numpy as np
 
 from .._common import to_output
 
@@ -30,12 +30,12 @@ def read(filename, file_type, file_format, labels_order):
             else:
                 break
 
-    times = numpy.array(times)
-    elements = numpy.array(elements)
-    data = numpy.array(data)
+    times = np.array(times)
+    elements = np.array(elements)
+    data = np.array(data)
 
     labels, unique_times, variables = [], [], []
-    for time in numpy.unique(times):
+    for time in np.unique(times):
         idx = times == time
         labels.append(elements[idx])
         unique_times.append(time)
@@ -65,7 +65,7 @@ def write(filename, output):
 
         # Data
         for out in output:
-            data = numpy.transpose([out.data[k] for k in headers])
+            data = np.transpose([out.data[k] for k in headers])
             formats = ["{:20.12e}", "{:>18}", "{:20d}"]
             formats += ["{:20.12e}"] * len(out.data)
 

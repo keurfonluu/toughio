@@ -1,7 +1,7 @@
 import os
 
 import matplotlib.pyplot as plt
-import numpy
+import numpy as np
 import pytest
 
 import toughio
@@ -18,13 +18,13 @@ if not os.environ.get("DISPLAY", ""):
         (
             toughio.capillarity.TRUST,
             [1.0e6, 0.3, 1.3, 0.8, 1.0e7],
-            numpy.linspace(0.02, 1.0, 50),
+            np.linspace(0.02, 1.0, 50),
         ),
         (toughio.capillarity.Milly, [0.25], None),
         (
             toughio.capillarity.vanGenuchten,
             [0.457, 0.0, 5.105e-4, 1.0e7, 1.0],
-            numpy.linspace(0.02, 1.0, 50),
+            np.linspace(0.02, 1.0, 50),
         ),
     ],
 )
@@ -36,11 +36,11 @@ def test_capillarity(model, parameters, sl, monkeypatch):
     with open(filename, "r") as f:
         pcap_ref = json.load(f)
 
-    sl = numpy.linspace(0.0, 1.0, 51) if sl is None else sl
+    sl = np.linspace(0.0, 1.0, 51) if sl is None else sl
 
     cap = model(*parameters)
     pcap = cap(sl)
-    assert numpy.allclose(pcap, pcap_ref[cap.name][: len(pcap)])
+    assert np.allclose(pcap, pcap_ref[cap.name][: len(pcap)])
 
     monkeypatch.setattr(plt, "show", lambda: None)
     cap.plot()
