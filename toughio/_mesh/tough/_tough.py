@@ -332,12 +332,8 @@ def _write_conne(
 
     if nodal_distance == "line":
         fp = _intersection_line_plane(centers[:, 0], lines, int_points, int_normals)
-        d1 = np.where(
-            bounds[:, 0], 1.0e-9, np.linalg.norm(centers[:, 0] - fp, axis=1)
-        )
-        d2 = np.where(
-            bounds[:, 1], 1.0e-9, np.linalg.norm(centers[:, 1] - fp, axis=1)
-        )
+        d1 = np.where(bounds[:, 0], 1.0e-9, np.linalg.norm(centers[:, 0] - fp, axis=1))
+        d2 = np.where(bounds[:, 1], 1.0e-9, np.linalg.norm(centers[:, 1] - fp, axis=1))
     elif nodal_distance == "orthogonal":
         d1 = _distance_point_plane(centers[:, 0], int_points, int_normals, bounds[:, 0])
         d2 = _distance_point_plane(centers[:, 1], int_points, int_normals, bounds[:, 1])

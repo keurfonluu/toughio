@@ -135,9 +135,7 @@ def _read_data(f, num_entities, entity_ids):
         line = f.readline().strip().split(",")
         labels[i] = line[0].strip().replace(" ", "_")
         data[labels[i]] = (
-            np.empty(num_entities)
-            if dsize == 1
-            else np.empty((num_entities, dsize))
+            np.empty(num_entities) if dsize == 1 else np.empty((num_entities, dsize))
         )
 
     for _ in range(num_entities):

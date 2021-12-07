@@ -829,9 +829,7 @@ def _write_gener(parameters):
     for k, v in generator_data:
         # Table
         ltab = None
-        if v["times"] is not None and isinstance(
-            v["times"], (list, tuple, np.ndarray)
-        ):
+        if v["times"] is not None and isinstance(v["times"], (list, tuple, np.ndarray)):
             ltab = len(v["times"])
             for key in ["rates", "specific_enthalpy"]:
                 if v[key] is not None:
@@ -847,9 +845,7 @@ def _write_gener(parameters):
                     raise ValueError()
 
         itab = (
-            1
-            if isinstance(v["specific_enthalpy"], (list, tuple, np.ndarray))
-            else None
+            1 if isinstance(v["specific_enthalpy"], (list, tuple, np.ndarray)) else None
         )
 
         # Record 1

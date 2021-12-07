@@ -134,9 +134,7 @@ class Mesh(object):
             mesh.points = np.vstack((mesh.points, extra_points))
         for k, v in mesh.point_data.items():
             mesh.point_data[k] = (
-                np.tile(v, nh + 1)
-                if np.ndim(v) == 1
-                else np.tile(v, (nh + 1, 1))
+                np.tile(v, nh + 1) if np.ndim(v) == 1 else np.tile(v, (nh + 1, 1))
             )
 
         extruded_types = {
@@ -450,8 +448,7 @@ class Mesh(object):
                     data[k][iv].append(v[i] * line)
 
             data = {
-                k: np.array([np.sum(vv, axis=0) for vv in v])
-                for k, v in data.items()
+                k: np.array([np.sum(vv, axis=0) for vv in v]) for k, v in data.items()
             }
             self.cell_data.update(data)
 

@@ -57,15 +57,11 @@ def structured_grid(dx, dy, dz=None, origin=None, layer=False, material="dfalt")
     origin = (
         np.asarray(origin)
         if origin is not None
-        else (
-            np.zeros(ndim) if ndim == 2 else np.array([0.0, 0.0, -np.sum(dz)])
-        )
+        else (np.zeros(ndim) if ndim == 2 else np.array([0.0, 0.0, -np.sum(dz)]))
     )
     points += origin
 
-    points = (
-        points if ndim == 3 else np.column_stack((points, np.zeros(len(points))))
-    )
+    points = points if ndim == 3 else np.column_stack((points, np.zeros(len(points))))
 
     mesh = Mesh(points, cells)
     mesh.add_cell_data("material", np.ones(mesh.n_cells, dtype=int))
