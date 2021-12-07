@@ -3,7 +3,7 @@ from __future__ import division, unicode_literals, with_statement
 import struct
 import time
 
-import numpy
+import numpy as np
 
 from ...__about__ import __version__ as version
 from .._helpers import get_material_key
@@ -181,21 +181,21 @@ def read_buffer(f, binary):
             line = f.readline().rstrip().split()
 
     if field_data:
-        num_cells = numpy.cumsum([len(c[1]) for c in cells])
-        cell_data = numpy.zeros(num_cells[-1], dtype=int)
+        num_cells = np.cumsum([len(c[1]) for c in cells])
+        cell_data = np.zeros(num_cells[-1], dtype=int)
         for k, v in mapper.items():
             if not slots[k]:
                 continue
 
             for cid, zid in v.values():
                 cell_data[cid] = zid
-        cell_data = {"flac3d:group": numpy.split(cell_data, num_cells[:-1])}
+        cell_data = {"flac3d:group": np.split(cell_data, num_cells[:-1])}
     else:
         cell_data = {}
 
     return Mesh(
-        points=numpy.array(points),
-        cells=[(k, numpy.array(v)[:, flac3d_to_meshio_order[k]]) for k, v in cells],
+        points=np.array(points),
+        cells=[(k, np.array(v)[:, flac3d_to_meshio_order[k]]) for k, v in cells],
         cell_data=cell_data,
         field_data=field_data,
     )
@@ -282,7 +282,7 @@ def _update_field_data(field_data, mapper, data, name, gidx, flag):
     """Update field data dict."""
     for cid in data:
         mapper[cid].append(gidx)
-    field_data[name] = numpy.array([gidx, flag_to_numdim[flag]])
+    field_data[name] = np.array([gidx, flag_to_numdim[flag]])
 
     return field_data, mapper
 
@@ -311,7 +311,7 @@ def write(filename, mesh, float_fmt=".16e", binary=False):
     if mesh.cell_data:
         key = get_material_key(mesh.cell_data)
         if key:
-            material = numpy.concatenate(mesh.cell_data[key])
+            material = np.concatenate(mesh.cell_data[key])
 
     mode = "wb" if binary else "w"
     with open(filename, mode) as f:
@@ -359,10 +359,10 @@ def _write_cells(f, points, cells, flag, binary):
         )
         for _, cdata in cells:
             num_cells, num_verts = cdata.shape
-            tmp = numpy.column_stack(
+            tmp = np.column_stack(
                 (
-                    numpy.arange(1, num_cells + 1) + count,
-                    numpy.full(num_cells, num_verts),
+                    np.arange(1, num_cells + 1) + count,
+                    np.full(num_cells, num_verts),
                     cdata + 1,
                 )
             )
@@ -450,7 +450,7 @@ def _translate_zones(points, cells):
         det = slicing_summing(tmp[1] - tmp[0], tmp[2] - tmp[0], tmp[3] - tmp[0])
 
         # Reorder corner points
-        data = numpy.where(
+        data = np.where(
             (det > 0)[:, None],
             idx[:, meshio_to_flac3d_order[key]],
             idx[:, meshio_to_flac3d_order_2[key]],
@@ -476,15 +476,15 @@ def _translate_faces(cells):
 
 def _translate_groups(cells, cell_data, field_data, flag):
     """Convert toughio cell_data to FLAC3D groups."""
-    num_dims = numpy.concatenate(
-        [numpy.full(len(c[1]), 2 if c[0] in meshio_only["face"] else 3) for c in cells]
+    num_dims = np.concatenate(
+        [np.full(len(c[1]), 2 if c[0] in meshio_only["face"] else 3) for c in cells]
     )
     groups = {
-        k: numpy.nonzero(
-            numpy.logical_and(cell_data == k, num_dims == flag_to_numdim[flag])
+        k: np.nonzero(
+            np.logical_and(cell_data == k, num_dims == flag_to_numdim[flag])
         )[0]
         + 1
-        for k in numpy.unique(cell_data)
+        for k in np.unique(cell_data)
     }
     groups = {k: v for k, v in groups.items() if v.size}
 
@@ -501,7 +501,7 @@ def _translate_groups(cells, cell_data, field_data, flag):
 def _write_table(f, data, ncol=20):
     """Write group data table."""
     nrow = len(data) // ncol
-    lines = numpy.split(data, numpy.full(nrow, ncol).cumsum())
+    lines = np.split(data, np.full(nrow, ncol).cumsum())
     for line in lines:
         if len(line):
             f.write(" {}\n".format(" ".join([str(l) for l in line])))

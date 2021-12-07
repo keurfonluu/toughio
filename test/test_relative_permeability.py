@@ -1,7 +1,7 @@
 import os
 
 import matplotlib.pyplot as plt
-import numpy
+import numpy as np
 import pytest
 
 import toughio
@@ -32,12 +32,12 @@ def test_relative_permeability(model, parameters, monkeypatch):
     with open(filename, "r") as f:
         relperm_ref = json.load(f)
 
-    sl = numpy.linspace(0.0, 1.0, 201)
+    sl = np.linspace(0.0, 1.0, 201)
 
     perm = model(*parameters)
-    relperm = numpy.transpose(perm(sl))
+    relperm = np.transpose(perm(sl))
 
-    assert numpy.allclose(relperm, relperm_ref[perm.name])
+    assert np.allclose(relperm, relperm_ref[perm.name])
 
     monkeypatch.setattr(plt, "show", lambda: None)
     perm.plot()

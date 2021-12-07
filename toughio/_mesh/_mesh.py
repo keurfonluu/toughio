@@ -2,7 +2,7 @@ import collections
 from copy import deepcopy
 
 import meshio
-import numpy
+import numpy as np
 
 from ._common import get_meshio_version, get_new_meshio_cells, get_old_meshio_cells
 from ._filter import MeshFilter
@@ -117,26 +117,26 @@ class Mesh(object):
         if axis not in [0, 1, 2]:
             raise ValueError("axis must be 0, 1 or 2.")
         mesh = self if inplace else deepcopy(self)
-        height = [height] if numpy.ndim(height) == 0 else height
+        height = [height] if np.ndim(height) == 0 else height
 
         npts, nh = len(mesh.points), len(height)
         if mesh.points.shape[1] == 3:
             if len(set(mesh.points[:, axis])) != 1:
                 raise ValueError("Cannot extrude mesh along axis {}.".format(axis))
         else:
-            mesh.points = numpy.column_stack((mesh.points, numpy.zeros(npts)))
+            mesh.points = np.column_stack((mesh.points, np.zeros(npts)))
             if axis != 2:
                 mesh.points[:, [axis, 2]] = mesh.points[:, [2, axis]]
 
-        extra_points = numpy.array(mesh.points)
+        extra_points = np.array(mesh.points)
         for h in height:
             extra_points[:, axis] += h
-            mesh.points = numpy.vstack((mesh.points, extra_points))
+            mesh.points = np.vstack((mesh.points, extra_points))
         for k, v in mesh.point_data.items():
             mesh.point_data[k] = (
-                numpy.tile(v, nh + 1)
-                if numpy.ndim(v) == 1
-                else numpy.tile(v, (nh + 1, 1))
+                np.tile(v, nh + 1)
+                if np.ndim(v) == 1
+                else np.tile(v, (nh + 1, 1))
             )
 
         extruded_types = {
@@ -149,7 +149,7 @@ class Mesh(object):
             if c.type in extruded_types.keys():
                 extruded_type = extruded_types[c.type]
                 nr, nc = c.data.shape
-                cell = CellBlock(extruded_type, numpy.tile(c.data, (nh, 2)))
+                cell = CellBlock(extruded_type, np.tile(c.data, (nh, 2)))
                 for i in range(nh):
                     ibeg, iend = i * nr, (i + 1) * nr
                     cell.data[ibeg:iend, :nc] += i * npts
@@ -158,13 +158,13 @@ class Mesh(object):
 
                 for k, v in cell_data.items():
                     v[ic] = (
-                        numpy.tile(v[ic], nh)
-                        if numpy.ndim(v[ic]) == 1
-                        else numpy.tile(v[ic], (nh, 1))
+                        np.tile(v[ic], nh)
+                        if np.ndim(v[ic]) == 1
+                        else np.tile(v[ic], (nh, 1))
                     )
 
         mesh.cells = cells
-        mesh.cell_data = {k: numpy.concatenate(v) for k, v in cell_data.items()}
+        mesh.cell_data = {k: np.concatenate(v) for k, v in cell_data.items()}
 
         if mesh.field_data:
             for k in mesh.field_data.keys():
@@ -196,7 +196,7 @@ class Mesh(object):
         cells = [[c.type, c.data] for c in mesh.cells]
 
         # Prune duplicate points
-        unique_points, pind, pinv = numpy.unique(
+        unique_points, pind, pinv = np.unique(
             mesh.points, axis=0, return_index=True, return_inverse=True,
         )
         if len(unique_points) < len(mesh.points):
@@ -209,13 +209,13 @@ class Mesh(object):
         # Prune duplicate cells
         cell_data = {k: mesh.split(v) for k, v in mesh.cell_data.items()}
         for ic, (k, v) in enumerate(cells):
-            vsort = numpy.sort(v, axis=1)
-            _, order = numpy.unique(vsort, axis=0, return_index=True)
+            vsort = np.sort(v, axis=1)
+            _, order = np.unique(vsort, axis=0, return_index=True)
             cells[ic][1] = v[order]
             for kk, vv in cell_data.items():
                 cell_data[kk][ic] = vv[ic][order]
         mesh.cells = cells
-        mesh.cell_data = {k: numpy.concatenate(v) for k, v in cell_data.items()}
+        mesh.cell_data = {k: np.concatenate(v) for k, v in cell_data.items()}
 
         if not inplace:
             return mesh
@@ -237,9 +237,9 @@ class Mesh(object):
         """
         if len(arr) != self.n_cells:
             raise ValueError()
-        sizes = numpy.cumsum([len(c.data) for c in self.cells])
+        sizes = np.cumsum([len(c.data) for c in self.cells])
 
-        return numpy.split(numpy.asarray(arr), sizes[:-1])
+        return np.split(np.asarray(arr), sizes[:-1])
 
     def to_meshio(self):
         """
@@ -304,7 +304,7 @@ class Mesh(object):
             vtk_type = meshio_to_vtk_type[c.type]
             numnodes = vtk_type_to_numnodes[vtk_type]
             cells.append(
-                numpy.hstack((numpy.full((len(c.data), 1), numnodes), c.data)).ravel()
+                np.hstack((np.full((len(c.data), 1), numnodes), c.data)).ravel()
             )
             cell_type += [vtk_type] * len(c.data)
             if not VTK9:
@@ -314,25 +314,25 @@ class Mesh(object):
         # Create pyvista.UnstructuredGrid object
         points = self.points
         if points.shape[1] == 2:
-            points = numpy.hstack((points, numpy.zeros((len(points), 1))))
+            points = np.hstack((points, np.zeros((len(points), 1))))
 
         if VTK9:
             mesh = pyvista.UnstructuredGrid(
-                numpy.concatenate(cells),
-                numpy.array(cell_type),
-                numpy.array(points, numpy.float64),
+                np.concatenate(cells),
+                np.array(cell_type),
+                np.array(points, np.float64),
             )
         else:
             mesh = pyvista.UnstructuredGrid(
-                numpy.array(offset),
-                numpy.concatenate(cells),
-                numpy.array(cell_type),
-                numpy.array(points, numpy.float64),
+                np.array(offset),
+                np.concatenate(cells),
+                np.array(cell_type),
+                np.array(points, np.float64),
             )
 
         # Set point data
         mesh.point_arrays.update(
-            {k: numpy.array(v, numpy.float64) for k, v in self.point_data.items()}
+            {k: np.array(v, np.float64) for k, v in self.point_data.items()}
         )
 
         # Set cell data
@@ -443,14 +443,14 @@ class Mesh(object):
             for i, (label1, label2) in enumerate(out.labels):
                 i1, i2 = labels_map[label1], labels_map[label2]
                 line = centers[i1] - centers[i2]
-                line /= numpy.linalg.norm(line)
+                line /= np.linalg.norm(line)
 
                 for k, v in out.data.items():
                     iv = i1 if v[i] > 0.0 else i2
                     data[k][iv].append(v[i] * line)
 
             data = {
-                k: numpy.array([numpy.sum(vv, axis=0) for vv in v])
+                k: np.array([np.sum(vv, axis=0) for vv in v])
                 for k, v in data.items()
             }
             self.cell_data.update(data)
@@ -511,11 +511,11 @@ class Mesh(object):
         """
         if not isinstance(label, str):
             raise TypeError()
-        if not isinstance(data, (list, tuple, numpy.ndarray)):
+        if not isinstance(data, (list, tuple, np.ndarray)):
             raise TypeError()
         if len(data) != self.n_points:
             raise ValueError()
-        self.point_data[label] = numpy.asarray(data)
+        self.point_data[label] = np.asarray(data)
 
     def add_cell_data(self, label, data):
         """
@@ -531,11 +531,11 @@ class Mesh(object):
         """
         if not isinstance(label, str):
             raise TypeError()
-        if not isinstance(data, (list, tuple, numpy.ndarray)):
+        if not isinstance(data, (list, tuple, np.ndarray)):
             raise TypeError()
         if len(data) != self.n_cells:
             raise ValueError()
-        self.cell_data[label] = numpy.asarray(data)
+        self.cell_data[label] = np.asarray(data)
 
     def set_material(self, material, cells):
         """
@@ -549,17 +549,17 @@ class Mesh(object):
             Indices of cells or array of booleans.
 
         """
-        ints = (int, numpy.int8, numpy.int16, numpy.int32, numpy.int64)
+        ints = (int, np.int8, np.int16, np.int32, np.int64)
         cond_int = all(isinstance(c, ints) for c in cells)
-        cond_bool = all(isinstance(c, (bool, numpy.bool_)) for c in cells)
+        cond_bool = all(isinstance(c, (bool, np.bool_)) for c in cells)
 
         if cond_int:
-            if numpy.min(cells) < 0 or numpy.max(cells) >= self.n_cells:
+            if np.min(cells) < 0 or np.max(cells) >= self.n_cells:
                 raise ValueError()
         elif cond_bool:
             if len(cells) != self.n_cells:
                 raise ValueError()
-            cells = numpy.arange(self.n_cells)[cells]
+            cells = np.arange(self.n_cells)[cells]
         else:
             raise TypeError()
 
@@ -572,7 +572,7 @@ class Mesh(object):
             )
             data[cells] = imat
             self.add_cell_data("material", data)
-            self.field_data[material] = numpy.array([imat, 3])
+            self.field_data[material] = np.array([imat, 3])
 
     def cell_data_to_point_data(self):
         """Interpolate cell data to point data."""
@@ -623,20 +623,20 @@ class Mesh(object):
         def distance(point, points):
             """Distance between point to list of points."""
             dp = points - point
-            return numpy.einsum("ij,ij->i", dp, dp)
+            return np.einsum("ij,ij->i", dp, dp)
 
-        ndim = numpy.ndim(points)
+        ndim = np.ndim(points)
         if ndim == 0:
             raise TypeError()
         elif ndim == 1:
-            points = numpy.array([points])
+            points = np.array([points])
         else:
-            points = numpy.asarray(points)
+            points = np.asarray(points)
         if points.shape[1] != self.points.shape[1]:
             raise ValueError()
 
         centers = self.centers
-        idx = numpy.argmin([distance(point, centers) for point in points], axis=1)
+        idx = np.argmin([distance(point, centers) for point in points], axis=1)
         return idx[0] if ndim == 1 else idx
 
     @property
@@ -747,7 +747,7 @@ class Mesh(object):
     @property
     def centers(self):
         """Return node centers of cell in mesh."""
-        return numpy.concatenate([self.points[c.data].mean(axis=1) for c in self.cells])
+        return np.concatenate([self.points[c.data].mean(axis=1) for c in self.cells])
 
     @property
     def materials(self):
@@ -758,7 +758,7 @@ class Mesh(object):
     def faces(self):
         """Return connectivity of faces of cell in mesh."""
         out = _faces(self)
-        arr = numpy.full((self.n_cells, 6, 4), -1)
+        arr = np.full((self.n_cells, 6, 4), -1)
         for i, x in enumerate(out):
             arr[i, : len(x[0]), : x[0].shape[1]] = x[0]
             if len(x) > 1:
@@ -803,7 +803,7 @@ class Mesh(object):
         connection line and the interface normal vectors.
 
         """
-        return numpy.array([numpy.min(out) for out in _qualities(self)])
+        return np.array([np.min(out) for out in _qualities(self)])
 
     @property
     def dim(self):
@@ -874,7 +874,7 @@ def from_meshio(mesh, material="dfalt"):
         key = get_material_key(cell_data)
         if key:
             cell_data["material"] = cell_data.pop(key)
-        cell_data = {k: numpy.concatenate(v) for k, v in cell_data.items()}
+        cell_data = {k: np.concatenate(v) for k, v in cell_data.items()}
     else:
         cells = mesh.cells if version[0] >= 4 else get_new_meshio_cells(mesh.cells)
         cell_data = {}
@@ -897,12 +897,12 @@ def from_meshio(mesh, material="dfalt"):
 
     if "material" not in out.cell_data.keys():
         imat = (
-            numpy.max([v[0] for v in mesh.field_data.values() if v[1] == 3]) + 1
+            np.max([v[0] for v in mesh.field_data.values() if v[1] == 3]) + 1
             if mesh.field_data
             else 1
         )
-        out.cell_data["material"] = numpy.full(out.n_cells, imat, dtype=int)
-        out.field_data[material] = numpy.array([imat, 3])
+        out.cell_data["material"] = np.full(out.n_cells, imat, dtype=int)
+        out.field_data[material] = np.array([imat, 3])
 
     return out
 
@@ -948,7 +948,7 @@ def from_pyvista(mesh, material="dfalt"):
 
     # Check that meshio supports all cell types in input mesh
     pixel_voxel = {8, 11}  # Handle pixels and voxels
-    for cell_type in numpy.unique(vtk_cell_type):
+    for cell_type in np.unique(vtk_cell_type):
         if not (cell_type in vtk_to_meshio_type.keys() or cell_type in pixel_voxel):
             raise ValueError("toughio does not support VTK type {}.".format(cell_type))
 
@@ -982,7 +982,7 @@ def from_pyvista(mesh, material="dfalt"):
             cells.append((cell_type, [cell]))
 
     for k, c in enumerate(cells):
-        cells[k] = (c[0], numpy.array(c[1]))
+        cells[k] = (c[0], np.array(c[1]))
 
     # Get point data
     point_data = {k.replace(" ", "_"): v for k, v in mesh.point_arrays.items()}
@@ -992,7 +992,7 @@ def from_pyvista(mesh, material="dfalt"):
 
     # Create toughio.Mesh
     out = Mesh(
-        points=numpy.array(mesh.points),
+        points=np.array(mesh.points),
         cells=cells,
         point_data=point_data,
         cell_data=cell_data,
@@ -1000,7 +1000,7 @@ def from_pyvista(mesh, material="dfalt"):
 
     if "material" not in out.cell_data.keys():
         imat = 1
-        out.cell_data["material"] = numpy.full(out.n_cells, imat, dtype=int)
-        out.field_data[material] = numpy.array([imat, 3])
+        out.cell_data["material"] = np.full(out.n_cells, imat, dtype=int)
+        out.field_data[material] = np.array([imat, 3])
 
     return out

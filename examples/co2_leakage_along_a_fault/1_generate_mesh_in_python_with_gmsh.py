@@ -17,7 +17,7 @@ Note that :mod:`toughio` is not required at this preliminary stage of the pre-pr
 ########################################################################################
 # First, we import :mod:`numpy` and :mod:`pygmsh`, and initialize a :class:`pygmsh.Geometry` object that will be used to construct all the geometrical entities of the model.
 
-import numpy
+import numpy as np
 import pygmsh
 
 geo = pygmsh.built_in.Geometry()
@@ -34,7 +34,7 @@ zmin, zmax = -500.0, -2500.0            # Z axis boundaries
 inj_z = -1500.0                         # Depth of injection
 flt_offset = 50.0                       # Offset of fault
 flt_thick = 10.0                        # Thickness of fault
-tana = numpy.tan(numpy.deg2rad(80.0))   # Tangeant of dipping angle of fault
+tana = np.tan(np.deg2rad(80.0))   # Tangeant of dipping angle of fault
 dist = 500.0 - 0.5 * flt_thick          # Distance from injection point (0.0, -1500.0) to left wall of fault
 
 bnd_thick = 10.0                        # Thickness of boundary elements

@@ -1,4 +1,4 @@
-import numpy
+import numpy as np
 
 from .._mesh._mesh import CellBlock, Mesh
 
@@ -29,21 +29,21 @@ def triangulate(points, material="dfalt"):
     except ImportError:
         raise ImportError("Triangulation requires scipy >= 0.9 to be installed.")
 
-    if not isinstance(points, (list, tuple, numpy.ndarray)):
+    if not isinstance(points, (list, tuple, np.ndarray)):
         raise TypeError()
-    if numpy.ndim(points) != 2:
+    if np.ndim(points) != 2:
         raise ValueError()
-    if numpy.shape(points)[1] not in {2, 3}:
+    if np.shape(points)[1] not in {2, 3}:
         raise ValueError()
     if not isinstance(material, str):
         raise TypeError()
 
-    points = numpy.asarray(points)
+    points = np.asarray(points)
     connectivity = Delaunay(points).simplices
     cell_type = "triangle" if points.shape[1] == 2 else "tetra"
     cells = [CellBlock(cell_type, connectivity)]
     mesh = Mesh(points, cells)
-    mesh.add_cell_data("material", numpy.ones(mesh.n_cells, dtype=int))
-    mesh.field_data[material] = numpy.array([1, 3])
+    mesh.add_cell_data("material", np.ones(mesh.n_cells, dtype=int))
+    mesh.field_data[material] = np.array([1, 3])
 
     return mesh
