@@ -104,24 +104,25 @@ def read(filename, file_format=None, **kwargs):
         mesh = from_meshio(mesh)
 
     # Remove lower order cells
-    idx = np.ones(len(mesh.cells), dtype=bool)
+    if not isinstance(mesh, dict):
+        idx = np.ones(len(mesh.cells), dtype=bool)
 
-    celltypes = np.array([cell.type for cell in mesh.cells])
-    cell_data = {k: mesh.split(v) for k, v in mesh.cell_data.items()}
+        celltypes = np.array([cell.type for cell in mesh.cells])
+        cell_data = {k: mesh.split(v) for k, v in mesh.cell_data.items()}
 
-    idx = np.logical_and(idx, celltypes != "vertex")
-    idx = np.logical_and(idx, celltypes != "line")
+        idx = np.logical_and(idx, celltypes != "vertex")
+        idx = np.logical_and(idx, celltypes != "line")
 
-    if mesh.dim == 3:
-        idx = np.logical_and(idx, celltypes != "quad")
-        idx = np.logical_and(idx, celltypes != "triangle")
+        if mesh.dim == 3:
+            idx = np.logical_and(idx, celltypes != "quad")
+            idx = np.logical_and(idx, celltypes != "triangle")
 
-    if idx.sum() < len(mesh.cells):
-        mesh.cells = [cell for keep, cell in zip(idx, mesh.cells) if keep]
-        for k, v in cell_data.items():
-            mesh.cell_data[k] = np.concatenate([vv for keep, vv in zip(idx, v) if keep])
+        if idx.sum() < len(mesh.cells):
+            mesh.cells = [cell for keep, cell in zip(idx, mesh.cells) if keep]
+            for k, v in cell_data.items():
+                mesh.cell_data[k] = np.concatenate([vv for keep, vv in zip(idx, v) if keep])
 
-        mesh.prune_duplicates()
+            mesh.prune_duplicates()
 
     return mesh
 
