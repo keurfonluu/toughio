@@ -104,6 +104,27 @@ def read(filename, file_format=None, **kwargs):
     else:
         mesh = meshio.read(filename, file_format)
         mesh = from_meshio(mesh)
+
+    # Remove lower order cells
+    idx = numpy.ones(len(mesh.cells), dtype=bool)
+
+    celltypes = numpy.array([cell.type for cell in mesh.cells])
+    cell_data = {k: mesh.split(v) for k, v in mesh.cell_data.items()}
+
+    idx = numpy.logical_and(idx, celltypes != "vertex")
+    idx = numpy.logical_and(idx, celltypes != "line")
+
+    if mesh.dim == 3:
+        idx = numpy.logical_and(idx, celltypes != "quad")
+        idx = numpy.logical_and(idx, celltypes != "triangle")
+
+    if idx.sum() < len(mesh.cells):
+        mesh.cells = [cell for keep, cell in zip(idx, mesh.cells) if keep]
+        for k, v in cell_data.items():
+            mesh.cell_data[k] = numpy.concatenate([vv for keep, vv in zip(idx, v) if keep])
+
+        mesh.prune_duplicates()
+
     return mesh
 
 
