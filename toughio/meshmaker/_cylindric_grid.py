@@ -30,9 +30,7 @@ class CylindricMesh(Mesh):
         """Return areas and heights of cells in mesh."""
         nr, nz = len(self._dr), len(self._dz)
         r2 = np.cumsum(self._dr) ** 2
-        areas = (
-            np.tile(np.concatenate(([r2[0]], r2[1:] - r2[:-1])), nz) * np.pi
-        )
+        areas = np.tile(np.concatenate(([r2[0]], r2[1:] - r2[:-1])), nz) * np.pi
         heights = np.tile(self._dz[:, None], nr).ravel()
 
         return areas, heights

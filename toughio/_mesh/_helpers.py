@@ -95,9 +95,7 @@ def read(filename, file_format=None, **kwargs):
     if fmt in _reader_map.keys():
         mesh = _reader_map[fmt](filename, **kwargs)
         if fmt not in {"tough", "pickle"}:
-            mesh.cell_data = {
-                k: np.concatenate(v) for k, v in mesh.cell_data.items()
-            }
+            mesh.cell_data = {k: np.concatenate(v) for k, v in mesh.cell_data.items()}
             key = get_material_key(mesh.cell_data)
             if key:
                 mesh.cell_data["material"] = mesh.cell_data.pop(key)
@@ -121,9 +119,7 @@ def read(filename, file_format=None, **kwargs):
     if idx.sum() < len(mesh.cells):
         mesh.cells = [cell for keep, cell in zip(idx, mesh.cells) if keep]
         for k, v in cell_data.items():
-            mesh.cell_data[k] = np.concatenate(
-                [vv for keep, vv in zip(idx, v) if keep]
-            )
+            mesh.cell_data[k] = np.concatenate([vv for keep, vv in zip(idx, v) if keep])
 
         mesh.prune_duplicates()
 
@@ -267,9 +263,7 @@ def write_time_series(
         raise TypeError()
     if cell_data is not None and not isinstance(cell_data, (list, tuple)):
         raise TypeError()
-    if time_steps is not None and not isinstance(
-        time_steps, (list, tuple, np.ndarray)
-    ):
+    if time_steps is not None and not isinstance(time_steps, (list, tuple, np.ndarray)):
         raise TypeError()
 
     if not (point_data or cell_data):

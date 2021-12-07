@@ -31,9 +31,7 @@ def _materials(mesh):
 def _faces(mesh):
     """Return connectivity of faces of cell in mesh."""
     meshio_type_to_faces = {
-        "tetra": {
-            "triangle": np.array([[1, 2, 3], [0, 3, 2], [0, 1, 3], [0, 2, 1]]),
-        },
+        "tetra": {"triangle": np.array([[1, 2, 3], [0, 3, 2], [0, 1, 3], [0, 2, 1]]),},
         "pyramid": {
             "triangle": np.array([[0, 1, 4], [1, 2, 4], [2, 3, 4], [3, 0, 4]]),
             "quad": np.array([[0, 3, 2, 1]]),

@@ -480,9 +480,9 @@ def _translate_groups(cells, cell_data, field_data, flag):
         [np.full(len(c[1]), 2 if c[0] in meshio_only["face"] else 3) for c in cells]
     )
     groups = {
-        k: np.nonzero(
-            np.logical_and(cell_data == k, num_dims == flag_to_numdim[flag])
-        )[0]
+        k: np.nonzero(np.logical_and(cell_data == k, num_dims == flag_to_numdim[flag]))[
+            0
+        ]
         + 1
         for k in np.unique(cell_data)
     }

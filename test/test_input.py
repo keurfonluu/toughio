@@ -59,9 +59,7 @@ def test_rocks(write_read):
         "rocks": {
             helpers.random_string(5): {key: np.random.rand() for key in keys[:5]},
             helpers.random_string(5): {
-                key: np.random.rand()
-                if key != "permeability"
-                else np.random.rand(3)
+                key: np.random.rand() if key != "permeability" else np.random.rand(3)
                 for key in keys[:5]
             },
             helpers.random_string(5): {key: np.random.rand() for key in keys},
@@ -406,9 +404,7 @@ def test_indom(write_read, num_pvars, num_items):
     num_items = num_items if num_items else np.random.randint(10) + 1
     parameters_ref = {
         "rocks": {
-            helpers.random_string(5): {
-                "initial_condition": np.random.rand(num_pvars),
-            }
+            helpers.random_string(5): {"initial_condition": np.random.rand(num_pvars),}
             for _ in range(num_items)
         },
     }
@@ -502,11 +498,7 @@ def test_gener(write_read, specific_enthalpy, label_length):
                     helpers.random_string(4),
                 ],
                 "times": [np.random.rand(10), None, np.random.rand(n_rnd)],
-                "rates": [
-                    np.random.rand(10),
-                    np.random.rand(),
-                    np.random.rand(n_rnd),
-                ],
+                "rates": [np.random.rand(10), np.random.rand(), np.random.rand(n_rnd),],
                 "specific_enthalpy": [
                     np.random.rand(10),
                     np.random.rand(),
@@ -555,9 +547,7 @@ def test_gener(write_read, specific_enthalpy, label_length):
                         else:
                             assert arr is None
                 else:
-                    assert np.allclose(
-                        vv, parameters["generators"][k][kk], atol=1.0e-4
-                    )
+                    assert np.allclose(vv, parameters["generators"][k][kk], atol=1.0e-4)
 
 
 @pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
@@ -762,9 +752,7 @@ def test_incon(write_read, label_length, num_pvars, num_items):
 
     for k, v in parameters_ref["initial_conditions"].items():
         for kk, vv in v.items():
-            assert np.allclose(
-                vv, parameters["initial_conditions"][k][kk], atol=1.0e-3
-            )
+            assert np.allclose(vv, parameters["initial_conditions"][k][kk], atol=1.0e-3)
 
 
 @pytest.mark.parametrize(

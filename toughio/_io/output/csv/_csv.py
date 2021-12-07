@@ -46,9 +46,7 @@ def read(filename, file_type, file_format, labels_order):
             if file_type == "element"
             else labels
         )
-        variables = np.array(
-            [[v[ilab:] for v in variable] for variable in variables]
-        )
+        variables = np.array([[v[ilab:] for v in variable] for variable in variables])
 
     return to_output(
         file_type, file_format, labels_order, headers, times, labels, variables
