@@ -38,20 +38,24 @@ def read(filename, label_length=None):
 
 def read_buffer(f, label_length):
     """Read TOUGH input file."""
+    from ._common import blocks
+
     parameters = {}
 
     # Title
-    line = f.readline().strip()
-    if line[:5] not in {"ROCKS", "ELEME", "INCON", "GENER"}:
-        title = [line]
-        while True:
-            line = f.readline().strip()
-            if not line.startswith("ROCKS"):
-                title.append(line)
-            else:
-                break
+    title = []
+    while True:
+        line = f.readline().strip()
 
+        if line[:5].upper() not in blocks:
+            title.append(line)
+
+        else:
+            break
+
+    if title:
         parameters["title"] = title[0] if len(title) == 1 else title
+
     f.seek(0)
 
     # Loop over blocks
