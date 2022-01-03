@@ -41,7 +41,7 @@ def write(filename, parameters, block="all"):
 @check_parameters(dtypes["PARAMETERS"])
 def write_buffer(params, block):
     """Write TOUGH input file as a list of 80-character long record strings."""
-    from ._common import eos, Parameters, default
+    from ._common import Parameters, default, eos
 
     # Some preprocessing
     if block not in {"all", "gener", "mesh", "incon"}:
@@ -51,7 +51,9 @@ def write_buffer(params, block):
     parameters.update(deepcopy(params))
 
     parameters["title"] = (
-        [parameters["title"]] if isinstance(parameters["title"], str) else parameters["title"]
+        [parameters["title"]]
+        if isinstance(parameters["title"], str)
+        else parameters["title"]
     )
 
     for k, v in default.items():
@@ -71,11 +73,17 @@ def write_buffer(params, block):
 
     # Make sure that some keys are integers and not strings
     if "more_options" in parameters:
-        parameters["more_options"] = {int(k): v for k, v in parameters["more_options"].items()}
+        parameters["more_options"] = {
+            int(k): v for k, v in parameters["more_options"].items()
+        }
     if "extra_options" in parameters:
-        parameters["extra_options"] = {int(k): v for k, v in parameters["extra_options"].items()}
+        parameters["extra_options"] = {
+            int(k): v for k, v in parameters["extra_options"].items()
+        }
     if "selections" in parameters and "integers" in parameters["selections"]:
-        parameters["selections"]["integers"] = {int(k): v for k, v in parameters["selections"]["integers"].items()}
+        parameters["selections"]["integers"] = {
+            int(k): v for k, v in parameters["selections"]["integers"].items()
+        }
 
     # Check that EOS is defined (for block MULTI)
     if parameters["eos"] and parameters["eos"] not in eos.keys():
