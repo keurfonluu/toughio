@@ -32,43 +32,58 @@ def write(filename, parameters, block="all"):
          - 'incon': only write block INCON.
 
     """
-    from ._common import Parameters, default
-
-    if block not in {"all", "gener", "mesh", "incon"}:
-        raise ValueError()
-
-    params = deepcopy(Parameters)
-    params.update(deepcopy(parameters))
-
-    params["title"] = (
-        [params["title"]] if isinstance(params["title"], str) else params["title"]
-    )
-
-    for k, v in default.items():
-        if k not in params["default"].keys():
-            params["default"][k] = v
-
-    for rock in params["rocks"].keys():
-        for k, v in params["default"].items():
-            cond1 = k not in params["rocks"][rock].keys()
-            cond2 = k not in {
-                "initial_condition",
-                "relative_permeability",
-                "capillarity",
-            }
-            if cond1 and cond2:
-                params["rocks"][rock][k] = v
-
-    buffer = write_buffer(params, block)
+    buffer = write_buffer(parameters, block)
     with open(filename, "w") as f:
         for record in buffer:
             f.write(record)
 
 
 @check_parameters(dtypes["PARAMETERS"])
-def write_buffer(parameters, block):
+def write_buffer(params, block):
     """Write TOUGH input file as a list of 80-character long record strings."""
-    from ._common import eos
+    from ._common import Parameters, default, eos
+
+    # Some preprocessing
+    if block not in {"all", "gener", "mesh", "incon"}:
+        raise ValueError()
+
+    parameters = deepcopy(Parameters)
+    parameters.update(deepcopy(params))
+
+    parameters["title"] = (
+        [parameters["title"]]
+        if isinstance(parameters["title"], str)
+        else parameters["title"]
+    )
+
+    for k, v in default.items():
+        if k not in parameters["default"].keys():
+            parameters["default"][k] = v
+
+    for rock in parameters["rocks"].keys():
+        for k, v in parameters["default"].items():
+            cond1 = k not in parameters["rocks"][rock].keys()
+            cond2 = k not in {
+                "initial_condition",
+                "relative_permeability",
+                "capillarity",
+            }
+            if cond1 and cond2:
+                parameters["rocks"][rock][k] = v
+
+    # Make sure that some keys are integers and not strings
+    if "more_options" in parameters:
+        parameters["more_options"] = {
+            int(k): v for k, v in parameters["more_options"].items()
+        }
+    if "extra_options" in parameters:
+        parameters["extra_options"] = {
+            int(k): v for k, v in parameters["extra_options"].items()
+        }
+    if "selections" in parameters and "integers" in parameters["selections"]:
+        parameters["selections"]["integers"] = {
+            int(k): v for k, v in parameters["selections"]["integers"].items()
+        }
 
     # Check that EOS is defined (for block MULTI)
     if parameters["eos"] and parameters["eos"] not in eos.keys():
