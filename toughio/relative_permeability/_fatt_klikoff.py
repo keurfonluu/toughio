@@ -7,7 +7,7 @@ __all__ = [
 
 class FattKlikoff(BaseRelativePermeability):
 
-    _id = 7
+    _id = 6
     _name = "Fatt-Klikoff"
 
     def __init__(self, slr):

@@ -17,13 +17,13 @@ class Linear(BaseRelativePermeability):
         Parameters
         ----------
         slmin : scalar
-            Lower liquid saturation threshold (CP(1)).
+            Lower liquid saturation threshold (RP(1)).
         sgmin : scalar
-            Lower gas saturation threshold (CP(2)).
+            Lower gas saturation threshold (RP(2)).
         slmax : scalar
-            Upper liquid saturation threshold (CP(3)).
+            Upper liquid saturation threshold (RP(3)).
         sgmax : scalar
-            Upper gas saturation threshold (CP(4)).
+            Upper gas saturation threshold (RP(4)).
 
         """
         if slmin >= slmax:
