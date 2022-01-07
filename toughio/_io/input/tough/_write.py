@@ -835,7 +835,7 @@ def _write_gener(parameters):
             generator_data.append((k, data))
 
     # Format
-    label_length = len(max(parameters["generators"], key=len))
+    label_length = max(len(max(parameters["generators"], key=len)), 5)
     fmt = block_to_format["GENER"]
     fmt1 = str2format(fmt[label_length])
     fmt2 = str2format(fmt[0])
