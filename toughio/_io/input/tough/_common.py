@@ -22,6 +22,7 @@ blocks = {
     "COORD",
     "CONNE",
     "INCON",
+    "MESHM",
     "NOVER",
     "ENDCY",
 }
