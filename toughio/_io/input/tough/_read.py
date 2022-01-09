@@ -664,10 +664,9 @@ def _read_outpu(f):
         line = next(f).strip()
 
     # Variables
-    names = {}
     if line.isdigit():
         num_vars = int(line)
-        outpu["output"]["variables"] = {}
+        outpu["output"]["variables"] = []
 
         for _ in range(num_vars):
             line = next(f)
@@ -675,24 +674,11 @@ def _read_outpu(f):
             name = data[0].lower()
 
             tmp = prune_nones_list(data[1:])
-            if name not in names.keys():
-                names[name] = 1
-                outpu["output"]["variables"][name] = tmp
-            else:
-                if names[name] == 1:
-                    outpu["output"]["variables"][name] = [
-                        outpu["output"]["variables"][name],
-                        tmp,
-                    ]
-                else:
-                    outpu["output"]["variables"][name].append(tmp)
+            options = None if len(tmp) == 0 else tmp[0] if len(tmp) == 1 else tmp
 
-                names[name] += 1
-
-        for k, v in outpu["output"]["variables"].items():
-            outpu["output"]["variables"][k] = (
-                None if len(v) == 0 else v[0] if len(v) == 1 else v
-            )
+            outpu["output"]["variables"].append({"name": name})
+            if options is not None:
+                outpu["output"]["variables"][-1]["options"] = options
 
     return outpu
 

@@ -936,24 +936,30 @@ def _write_outpu(parameters):
     # Variables
     if data["variables"]:
         buffer = []
-        num_vars = 0
-        for k, v in data["variables"].items():
-            values = [k.upper()]
+        num_vars = len(data["variables"])
 
-            if np.ndim(v) == 0:
-                values += [v]
-                buffer += write_record(values, fmt3)
-                num_vars += 1
-            else:
-                if np.ndim(v[0]) == 0:
-                    values += list(v)
+        for variable in data["variables"]:
+            values = [variable["name"].upper() if "name" in variable else None]
+
+            if "options" in variable:
+                v = variable["options"]
+
+                if np.ndim(v) == 0:
+                    values += [v]
                     buffer += write_record(values, fmt3)
-                    num_vars += 1
+
                 else:
-                    for vv in v:
-                        values_in = values + list(vv)
-                        buffer += write_record(values_in, fmt3)
-                    num_vars += len(v)
+                    if np.ndim(v[0]) == 0:
+                        values += list(v)
+                        buffer += write_record(values, fmt3)
+
+                    else:
+                        for vv in v:
+                            values_in = values + list(vv)
+                            buffer += write_record(values_in, fmt3)
+
+            else:
+                buffer += write_record(values, fmt3)
 
         out += write_record([str(num_vars)], fmt2)
         out += buffer
