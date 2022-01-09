@@ -43,6 +43,11 @@ def write_buffer(params, block):
     """Write TOUGH input file as a list of 80-character long record strings."""
     from ._common import Parameters, default, eos
 
+    # Deprecation error
+    if "output" in params:
+        if "variables" in params["output"] and isinstance(params["output"]["variables"], dict):
+            raise ValueError("'variables' must be a list of dicts since v1.7.0.")
+
     # Some preprocessing
     if block not in {"all", "gener", "mesh", "incon"}:
         raise ValueError()
