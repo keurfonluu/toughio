@@ -564,7 +564,7 @@ def _read_oft(f, oft):
 def _read_gener(f, label_length):
     """Read GENER block data."""
     fmt = block_to_format["GENER"]
-    gener = {"generators": {}}
+    gener = {"generators": []}
 
     line = next(f)
     if not label_length:
@@ -573,14 +573,14 @@ def _read_gener(f, label_length):
     while True:
         if line.strip():
             data = read_record(line, fmt[label_length])
-            label = data[0]
             tmp = {
-                "name": [data[1]],
-                "nseq": [data[2]],
-                "nadd": [data[3]],
-                "nads": [data[4]],
-                "type": [data[7]],
-                "layer_thickness": [data[11]],
+                "label": data[0],
+                "name": data[1],
+                "nseq": data[2],
+                "nadd": data[3],
+                "nads": data[4],
+                "type": data[7],
+                "layer_thickness": data[11],
             }
 
             ltab = data[5]
@@ -596,37 +596,29 @@ def _read_gener(f, label_length):
                         data = read_record(line, fmt[0])
                         table += prune_nones_list(data)
 
-                    tmp[key] = [table]
+                    tmp[key] = table
+
             else:
                 tmp.update(
                     {
-                        "times": [None],
-                        "rates": [data[9]],
-                        "specific_enthalpy": [data[10]],
+                        "times": None,
+                        "rates": data[9],
+                        "specific_enthalpy": data[10],
                     }
                 )
 
-            if label in gener["generators"].keys():
-                for k, v in gener["generators"][label].items():
-                    v += tmp[k]
-            else:
-                gener["generators"][label] = tmp
+            gener["generators"].append(tmp)
+
         else:
             break
 
         line = next(f)
 
-    # Tidy up
-    for generator in gener["generators"].values():
-        for k, v in generator.items():
-            if len(v) == 1:
-                generator[k] = v[0]
-            else:
-                if all(x is None for x in v):
-                    generator[k] = None
-
     return {
-        k: {kk: prune_nones_dict(vv) for kk, vv in v.items()} for k, v in gener.items()
+        "generators": [
+            prune_nones_dict(generator)
+            for generator in gener["generators"]
+        ]
     }
 
 

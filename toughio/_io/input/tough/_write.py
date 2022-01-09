@@ -794,104 +794,85 @@ def _write_gener(parameters):
     """Write GENER block data."""
     from ._common import generators
 
-    # Handle multicomponent generators
-    generator_data = []
-    keys = [key for key in generators.keys() if key != "type"]
-    for k, v in parameters["generators"].items():
-        # Load data
-        data = deepcopy(generators)
-        data.update(v)
-
-        # Check that data are consistent
-        if not isinstance(data["type"], str):
-            # Number of components
-            num_comps = len(data["type"])
-
-            # Check that values in dict have the same length
-            for key in keys:
-                if data[key] is not None:
-                    if not isinstance(data[key], (list, tuple, np.ndarray)):
-                        raise TypeError()
-                    if len(data[key]) != num_comps:
-                        raise ValueError()
-
-            # Split dict
-            for i in range(num_comps):
-                generator_data.append(
-                    (
-                        k,
-                        {
-                            key: (data[key][i] if data[key] is not None else None)
-                            for key in generators.keys()
-                        },
-                    )
-                )
-        else:
-            # Only one component for this element
-            # Check that values are scalar or 1D array_like
-            for key in keys:
-                if np.ndim(data[key]) not in {0, 1}:
-                    raise ValueError()
-            generator_data.append((k, data))
-
     # Format
-    label_length = max(len(max(parameters["generators"], key=len)), 5)
+    label_length = max(
+        [
+            len(generator["label"]) if "label" in generator else 0
+            for generator in parameters["generators"]
+        ]
+    )
+    label_length = max(label_length, 5)
     fmt = block_to_format["GENER"]
     fmt1 = str2format(fmt[label_length])
     fmt2 = str2format(fmt[0])
 
     out = []
-    for k, v in generator_data:
+    for v in parameters["generators"]:
+        # Load data
+        data = deepcopy(generators)
+        data.update(v)
+
         # Table
-        ltab = None
-        if v["times"] is not None and isinstance(v["times"], (list, tuple, np.ndarray)):
-            ltab = len(v["times"])
+        ltab = 1
+        if data["times"] is not None and isinstance(data["times"], (list, tuple, np.ndarray)):
+            ltab = len(data["times"])
+
             for key in ["rates", "specific_enthalpy"]:
-                if v[key] is not None:
-                    if not isinstance(v[key], (list, tuple, np.ndarray)):
-                        raise TypeError()
-                    if not (ltab > 1 and ltab == len(v[key])):
-                        raise ValueError()
+                if data[key] is not None:
+                    if ltab == 1 and np.ndim(data[key]) == 1:
+                        if len(data[key]) > 1:
+                            raise ValueError()
+
+                        data[key] = data[key][0]
+
+                    else:
+                        if np.ndim(data[key]) != 1:
+                            raise TypeError()
+
+                        if ltab != len(data[key]):
+                            raise ValueError()
+        
         else:
-            # Rates and specific enthalpy tables cannot be written without a
-            # time table
             for key in ["rates", "specific_enthalpy"]:
-                if v[key] is not None and np.ndim(v[key]) != 0:
-                    raise ValueError()
+                if key in data and np.ndim(data[key]) > 0:
+                    if len(data[key]) > 1:
+                        raise ValueError()
+
+                    data[key] = data[key][0]
 
         itab = (
-            1 if isinstance(v["specific_enthalpy"], (list, tuple, np.ndarray)) else None
+            1 if isinstance(data["specific_enthalpy"], (list, tuple, np.ndarray)) else None
         )
 
         # Record 1
         values = [
-            k,
-            v["name"],
-            v["nseq"],
-            v["nadd"],
-            v["nads"],
-            ltab,
+            data["label"] if "label" in data else "",
+            data["name"],
+            data["nseq"],
+            data["nadd"],
+            data["nads"],
+            ltab if ltab > 1 else None,
             None,
-            v["type"],
+            data["type"],
             itab,
-            None if ltab else v["rates"],
-            None if ltab else v["specific_enthalpy"],
-            v["layer_thickness"],
+            None if ltab > 1 else data["rates"],
+            None if ltab > 1 else data["specific_enthalpy"],
+            data["layer_thickness"],
         ]
         out += write_record(values, fmt1)
 
         # Record 2
-        out += write_record(v["times"], fmt2, multi=True) if ltab else []
+        out += write_record(data["times"], fmt2, multi=True) if ltab > 1 else []
 
         # Record 3
-        out += write_record(v["rates"], fmt2, multi=True) if ltab else []
+        out += write_record(data["rates"], fmt2, multi=True) if ltab > 1 else []
 
         # Record 4
-        if ltab and v["specific_enthalpy"] is not None:
-            if isinstance(v["specific_enthalpy"], (list, tuple, np.ndarray)):
-                specific_enthalpy = v["specific_enthalpy"]
+        if ltab > 1 and data["specific_enthalpy"] is not None:
+            if isinstance(data["specific_enthalpy"], (list, tuple, np.ndarray)):
+                specific_enthalpy = data["specific_enthalpy"]
             else:
-                specific_enthalpy = np.full(ltab, v["specific_enthalpy"])
+                specific_enthalpy = np.full(ltab, data["specific_enthalpy"])
 
             out += write_record(specific_enthalpy, fmt2, multi=True)
 
