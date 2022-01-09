@@ -45,6 +45,9 @@ def read_buffer(f, label_length):
     # Title
     title = []
     while True:
+        if len(title) >= 100:
+            raise ValueError()
+
         line = f.readline().strip()
 
         if line[:5].upper() not in blocks:
