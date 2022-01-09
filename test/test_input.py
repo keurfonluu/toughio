@@ -577,22 +577,22 @@ def test_outpu(write_read, fmt):
     parameters_ref = {
         "output": {
             "format": fmt,
-            "variables": {
-                helpers.random_string(20): None,
-                helpers.random_string(20): np.random.randint(10),
-                helpers.random_string(20): np.random.randint(10, size=1),
-                helpers.random_string(20): np.random.randint(10, size=2),
-                helpers.random_string(20): np.random.randint(
-                    10, size=(np.random.randint(1, 10), 2)
-                ),
-            },
+            "variables": [
+                {"name": helpers.random_string(20)},
+                {"name": helpers.random_string(20), "options": None},
+                {"name": helpers.random_string(20), "options": np.random.randint(10)},
+                {"name": helpers.random_string(20), "options": np.random.randint(10, size=1)},
+                {"name": helpers.random_string(20), "options": np.random.randint(10, size=2)},
+            ],
         },
     }
     parameters = write_read(parameters_ref)
 
-    helpers.allclose_dict(
-        parameters_ref["output"]["variables"], parameters["output"]["variables"]
-    )
+    for variable_ref, variable in zip(parameters_ref["output"]["variables"], parameters["output"]["variables"]):
+        assert variable_ref["name"] == variable["name"]
+
+        if "options" in variable_ref and variable_ref["options"] is not None:
+            assert np.allclose(variable_ref["options"], variable["options"])
 
 
 @pytest.mark.parametrize(
