@@ -32,6 +32,15 @@ def write(filename, parameters, block="all"):
          - 'incon': only write block INCON.
 
     """
+    # Deprecation error
+    if "generators" in parameters:
+        if isinstance(parameters["generators"], dict):
+            raise ValueError("'generators' must be a list of dicts since v1.7.0.")
+
+    if "output" in parameters:
+        if "variables" in parameters["output"] and isinstance(parameters["output"]["variables"], dict):
+            raise ValueError("'variables' must be a list of dicts since v1.7.0.")
+
     buffer = write_buffer(parameters, block)
     with open(filename, "w") as f:
         for record in buffer:
@@ -42,11 +51,6 @@ def write(filename, parameters, block="all"):
 def write_buffer(params, block):
     """Write TOUGH input file as a list of 80-character long record strings."""
     from ._common import Parameters, default, eos
-
-    # Deprecation error
-    if "output" in params:
-        if "variables" in params["output"] and isinstance(params["output"]["variables"], dict):
-            raise ValueError("'variables' must be a list of dicts since v1.7.0.")
 
     # Some preprocessing
     if block not in {"all", "gener", "mesh", "incon"}:
