@@ -46,7 +46,7 @@ _Parameters = {
     "more_options": {},
     "selections": {},
     "solver": {},
-    "generators": {},
+    "generators": None,
     "diffusion": None,
     "times": None,
     "element_history": None,
@@ -146,6 +146,7 @@ solver = {
 }
 
 generators = {
+    "label": None,
     "name": None,
     "nseq": None,
     "nadd": None,
