@@ -38,7 +38,9 @@ def write(filename, parameters, block="all"):
             raise ValueError("'generators' must be a list of dicts since v1.7.0.")
 
     if "output" in parameters:
-        if "variables" in parameters["output"] and isinstance(parameters["output"]["variables"], dict):
+        if "variables" in parameters["output"] and isinstance(
+            parameters["output"]["variables"], dict
+        ):
             raise ValueError("'variables' must be a list of dicts since v1.7.0.")
 
     buffer = write_buffer(parameters, block)
@@ -823,7 +825,9 @@ def _write_gener(parameters):
 
         # Table
         ltab = 1
-        if data["times"] is not None and isinstance(data["times"], (list, tuple, np.ndarray)):
+        if data["times"] is not None and isinstance(
+            data["times"], (list, tuple, np.ndarray)
+        ):
             ltab = len(data["times"])
 
             for key in ["rates", "specific_enthalpy"]:
@@ -840,7 +844,7 @@ def _write_gener(parameters):
 
                         if ltab != len(data[key]):
                             raise ValueError()
-        
+
         else:
             for key in ["rates", "specific_enthalpy"]:
                 if key in data and np.ndim(data[key]) > 0:
@@ -850,7 +854,9 @@ def _write_gener(parameters):
                     data[key] = data[key][0]
 
         itab = (
-            1 if isinstance(data["specific_enthalpy"], (list, tuple, np.ndarray)) else None
+            1
+            if isinstance(data["specific_enthalpy"], (list, tuple, np.ndarray))
+            else None
         )
 
         # Record 1

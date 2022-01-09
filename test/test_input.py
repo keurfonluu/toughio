@@ -511,7 +511,9 @@ def test_gener(write_read, specific_enthalpy, label_length):
 
     assert len(parameters_ref["generators"]) == len(parameters["generators"])
 
-    for generator_ref, generator in zip(parameters_ref["generators"], parameters["generators"]):
+    for generator_ref, generator in zip(
+        parameters_ref["generators"], parameters["generators"]
+    ):
         for k, v in generator_ref.items():
             if k in {"label", "name", "type"}:
                 assert v == generator[k]
@@ -551,14 +553,22 @@ def test_outpu(write_read, fmt):
                 {"name": helpers.random_string(20)},
                 {"name": helpers.random_string(20), "options": None},
                 {"name": helpers.random_string(20), "options": np.random.randint(10)},
-                {"name": helpers.random_string(20), "options": np.random.randint(10, size=1)},
-                {"name": helpers.random_string(20), "options": np.random.randint(10, size=2)},
+                {
+                    "name": helpers.random_string(20),
+                    "options": np.random.randint(10, size=1),
+                },
+                {
+                    "name": helpers.random_string(20),
+                    "options": np.random.randint(10, size=2),
+                },
             ],
         },
     }
     parameters = write_read(parameters_ref)
 
-    for variable_ref, variable in zip(parameters_ref["output"]["variables"], parameters["output"]["variables"]):
+    for variable_ref, variable in zip(
+        parameters_ref["output"]["variables"], parameters["output"]["variables"]
+    ):
         assert variable_ref["name"] == variable["name"]
 
         if "options" in variable_ref and variable_ref["options"] is not None:
