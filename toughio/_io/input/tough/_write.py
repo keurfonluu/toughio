@@ -55,8 +55,9 @@ def write(filename, parameters, block="all", ignore_blocks=None):
 @check_parameters(dtypes["PARAMETERS"])
 def write_buffer(params, block, ignore_blocks=None):
     """Write TOUGH input file as a list of 80-character long record strings."""
-    from ._common import Parameters, default, eos
+    from ._common import Parameters
     from ._common import blocks as blocks_
+    from ._common import default, eos
 
     # Block filters
     if block is not None:
