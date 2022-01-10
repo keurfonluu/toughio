@@ -1,4 +1,5 @@
 blocks = {
+    "TITLE",
     "ROCKS",
     "RPCAP",
     "FLAC",
@@ -22,6 +23,7 @@ blocks = {
     "COORD",
     "CONNE",
     "INCON",
+    "MESHM",
     "NOVER",
     "ENDCY",
 }
@@ -45,7 +47,7 @@ _Parameters = {
     "more_options": {},
     "selections": {},
     "solver": {},
-    "generators": {},
+    "generators": None,
     "diffusion": None,
     "times": None,
     "element_history": None,
@@ -145,6 +147,7 @@ solver = {
 }
 
 generators = {
+    "label": None,
     "name": None,
     "nseq": None,
     "nadd": None,

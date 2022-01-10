@@ -482,72 +482,44 @@ def test_oft(write_read, oft, n):
 def test_gener(write_read, specific_enthalpy, label_length):
     n_rnd = np.random.randint(100) + 2
     parameters_ref = {
-        "generators": {
-            helpers.random_label(label_length): {
-                "name": [
-                    helpers.random_string(5),
-                    helpers.random_string(5),
-                    helpers.random_string(5),
-                ],
-                "nseq": np.random.randint(10, size=3),
-                "nadd": np.random.randint(10, size=3),
-                "nads": np.random.randint(10, size=3),
-                "type": [
-                    helpers.random_string(4),
-                    helpers.random_string(4),
-                    helpers.random_string(4),
-                ],
-                "times": [np.random.rand(10), None, np.random.rand(n_rnd)],
-                "rates": [np.random.rand(10), np.random.rand(), np.random.rand(n_rnd),],
-                "specific_enthalpy": [
-                    np.random.rand(10),
-                    np.random.rand(),
-                    np.random.rand(n_rnd),
-                ]
-                if specific_enthalpy
-                else None,
-                "layer_thickness": np.random.rand(3),
-            },
-            helpers.random_label(label_length): {
-                "name": [helpers.random_string(5), helpers.random_string(5)],
-                "nseq": np.random.randint(10, size=2),
-                "nadd": np.random.randint(10, size=2),
-                "nads": np.random.randint(10, size=2),
-                "type": [helpers.random_string(4), helpers.random_string(4)],
-                "rates": np.random.rand(2),
-            },
-            helpers.random_label(label_length): {
+        "generators": [
+            {
+                "label": helpers.random_label(label_length),
+                "name": helpers.random_string(5),
                 "nseq": np.random.randint(10),
                 "nadd": np.random.randint(10),
                 "nads": np.random.randint(10),
                 "type": helpers.random_string(4),
                 "rates": np.random.rand(),
+                "specific_enthalpy": np.random.rand(),
                 "layer_thickness": np.random.rand(),
             },
-        },
+            {
+                "label": helpers.random_label(label_length),
+                "nseq": np.random.randint(10),
+                "nadd": np.random.randint(10),
+                "nads": np.random.randint(10),
+                "type": helpers.random_string(4),
+                "times": np.random.rand(n_rnd),
+                "rates": np.random.rand(n_rnd),
+                "specific_enthalpy": np.random.rand(n_rnd),
+                "layer_thickness": np.random.rand(),
+            },
+        ],
     }
     parameters = write_read(parameters_ref)
 
-    assert sorted(parameters_ref["generators"].keys()) == sorted(
-        parameters["generators"].keys()
-    )
+    assert len(parameters_ref["generators"]) == len(parameters["generators"])
 
-    for k, v in parameters_ref["generators"].items():
-        for kk, vv in v.items():
-            if kk in {"name", "type"}:
-                assert vv == parameters["generators"][k][kk]
+    for generator_ref, generator in zip(
+        parameters_ref["generators"], parameters["generators"]
+    ):
+        for k, v in generator_ref.items():
+            if k in {"label", "name", "type"}:
+                assert v == generator[k]
+
             else:
-                if kk == "specific_enthalpy" and not specific_enthalpy:
-                    continue
-                if np.ndim(vv):
-                    for i, arr_ref in enumerate(vv):
-                        arr = parameters["generators"][k][kk][i]
-                        if arr_ref is not None:
-                            assert np.allclose(arr, arr_ref, atol=1.0e-4)
-                        else:
-                            assert arr is None
-                else:
-                    assert np.allclose(vv, parameters["generators"][k][kk], atol=1.0e-4)
+                assert np.allclose(v, generator[k], atol=1.0e-4)
 
 
 @pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
@@ -577,22 +549,30 @@ def test_outpu(write_read, fmt):
     parameters_ref = {
         "output": {
             "format": fmt,
-            "variables": {
-                helpers.random_string(20): None,
-                helpers.random_string(20): np.random.randint(10),
-                helpers.random_string(20): np.random.randint(10, size=1),
-                helpers.random_string(20): np.random.randint(10, size=2),
-                helpers.random_string(20): np.random.randint(
-                    10, size=(np.random.randint(1, 10), 2)
-                ),
-            },
+            "variables": [
+                {"name": helpers.random_string(20)},
+                {"name": helpers.random_string(20), "options": None},
+                {"name": helpers.random_string(20), "options": np.random.randint(10)},
+                {
+                    "name": helpers.random_string(20),
+                    "options": np.random.randint(10, size=1),
+                },
+                {
+                    "name": helpers.random_string(20),
+                    "options": np.random.randint(10, size=2),
+                },
+            ],
         },
     }
     parameters = write_read(parameters_ref)
 
-    helpers.allclose_dict(
+    for variable_ref, variable in zip(
         parameters_ref["output"]["variables"], parameters["output"]["variables"]
-    )
+    ):
+        assert variable_ref["name"] == variable["name"]
+
+        if "options" in variable_ref and variable_ref["options"] is not None:
+            assert np.allclose(variable_ref["options"], variable["options"])
 
 
 @pytest.mark.parametrize(
