@@ -9,7 +9,7 @@ class FileIterator:
 
     def __next__(self):
         self.count += 1
-        return self.fiter.__next__()
+        return next(self.fiter)
 
     def next(self):
         return self.__next__()
