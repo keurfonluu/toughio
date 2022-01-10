@@ -1,5 +1,7 @@
 from __future__ import division, with_statement
 
+from ...._exceptions import ReadError
+from ...._helpers import FileIterator
 from ...._common import block_to_format, get_label_length
 from ._helpers import prune_nones_dict, prune_nones_list, read_record
 
@@ -64,77 +66,113 @@ def read_buffer(f, label_length):
     # Loop over blocks
     # Some blocks (INCON, INDOM, PARAM) need to rewind to previous line but tell and seek are disabled by next
     # See <https://stackoverflow.com/questions/22688505/is-there-a-way-to-go-back-when-reading-a-file-using-seek-and-calls-to-next>
-    fiter = iter(f.readline, "")
-    for line in fiter:
-        if line.startswith("ROCKS"):
-            parameters.update(_read_rocks(fiter))
-        elif line.startswith("RPCAP"):
-            rpcap = _read_rpcap(fiter)
-            if "default" in parameters.keys():
-                parameters["default"].update(rpcap)
-            else:
-                parameters["default"] = rpcap
-        elif line.startswith("FLAC"):
-            flac = _read_flac(fiter, parameters["rocks_order"])
-            parameters["flac"] = flac["flac"]
-            for k, v in flac["rocks"].items():
-                parameters["rocks"][k].update(v)
-        elif line.startswith("CHEMP"):
-            parameters.update(_read_chemp(fiter))
-        elif line.startswith("NCGAS"):
-            parameters.update(_read_ncgas(fiter))
-        elif line.startswith("MULTI"):
-            parameters.update(_read_multi(fiter))
-        elif line.startswith("SOLVR"):
-            parameters.update(_read_solvr(fiter))
-        elif line.startswith("START"):
-            parameters["start"] = True
-        elif line.startswith("PARAM"):
-            param = _read_param(fiter, f)
-            parameters["options"] = param["options"]
-            parameters["extra_options"] = param["extra_options"]
-            if "default" in parameters.keys():
-                parameters["default"].update(param["default"])
-            else:
-                parameters["default"] = param["default"]
-        elif line.startswith("SELEC"):
-            parameters.update(_read_selec(fiter))
-        elif line.startswith("INDOM"):
-            indom = _read_indom(fiter, f)
-            for k, v in indom["rocks"].items():
-                parameters["rocks"][k].update(v)
-        elif line.startswith("MOMOP"):
-            parameters.update(_read_momop(fiter))
-        elif line.startswith("TIMES"):
-            parameters.update(_read_times(fiter))
-        elif line.startswith("FOFT"):
-            parameters.update(_read_oft(fiter, "element_history"))
-        elif line.startswith("COFT"):
-            parameters.update(_read_oft(fiter, "connection_history"))
-        elif line.startswith("GOFT"):
-            parameters.update(_read_oft(fiter, "generator_history"))
-        elif line.startswith("GENER"):
-            parameters.update(_read_gener(fiter, label_length))
-        elif line.startswith("DIFFU"):
-            parameters.update(_read_diffu(fiter, f))
-        elif line.startswith("OUTPU"):
-            parameters.update(_read_outpu(fiter))
-        elif line.startswith("ELEME"):
-            parameters.update(_read_eleme(fiter, label_length))
-            parameters["coordinates"] = False
-        elif line.startswith("COORD"):
-            coord = _read_coord(fiter)
-            for k, v in zip(parameters["elements_order"], coord):
-                parameters["elements"][k]["center"] = v
-            parameters["coordinates"] = True
-        elif line.startswith("CONNE"):
-            parameters.update(_read_conne(fiter, label_length))
-        elif line.startswith("INCON"):
-            parameters.update(_read_incon(fiter, label_length, f))
-        elif line.startswith("NOVER"):
-            parameters["nover"] = True
-        elif line.startswith("ENDCY"):
-            break
+    fiter = FileIterator(f)
+
+    try:
+        for line in fiter:
+            if line.startswith("ROCKS"):
+                parameters.update(_read_rocks(fiter))
+
+            elif line.startswith("RPCAP"):
+                rpcap = _read_rpcap(fiter)
+
+                if "default" in parameters.keys():
+                    parameters["default"].update(rpcap)
+
+                else:
+                    parameters["default"] = rpcap
+
+            elif line.startswith("FLAC"):
+                flac = _read_flac(fiter, parameters["rocks_order"])
+                parameters["flac"] = flac["flac"]
+
+                for k, v in flac["rocks"].items():
+                    parameters["rocks"][k].update(v)
+
+            elif line.startswith("CHEMP"):
+                parameters.update(_read_chemp(fiter))
+
+            elif line.startswith("NCGAS"):
+                parameters.update(_read_ncgas(fiter))
+
+            elif line.startswith("MULTI"):
+                parameters.update(_read_multi(fiter))
+
+            elif line.startswith("SOLVR"):
+                parameters.update(_read_solvr(fiter))
+
+            elif line.startswith("START"):
+                parameters["start"] = True
+
+            elif line.startswith("PARAM"):
+                param = _read_param(fiter)
+                parameters["options"] = param["options"]
+                parameters["extra_options"] = param["extra_options"]
+
+                if "default" in parameters.keys():
+                    parameters["default"].update(param["default"])
+
+                else:
+                    parameters["default"] = param["default"]
+
+            elif line.startswith("SELEC"):
+                parameters.update(_read_selec(fiter))
+
+            elif line.startswith("INDOM"):
+                indom = _read_indom(fiter)
+
+                for k, v in indom["rocks"].items():
+                    parameters["rocks"][k].update(v)
+
+            elif line.startswith("MOMOP"):
+                parameters.update(_read_momop(fiter))
+
+            elif line.startswith("TIMES"):
+                parameters.update(_read_times(fiter))
+
+            elif line.startswith("FOFT"):
+                parameters.update(_read_oft(fiter, "element_history"))
+
+            elif line.startswith("COFT"):
+                parameters.update(_read_oft(fiter, "connection_history"))
+
+            elif line.startswith("GOFT"):
+                parameters.update(_read_oft(fiter, "generator_history"))
+
+            elif line.startswith("GENER"):
+                parameters.update(_read_gener(fiter, label_length))
+
+            elif line.startswith("DIFFU"):
+                parameters.update(_read_diffu(fiter))
+
+            elif line.startswith("OUTPU"):
+                parameters.update(_read_outpu(fiter))
+
+            elif line.startswith("ELEME"):
+                parameters.update(_read_eleme(fiter, label_length))
+                parameters["coordinates"] = False
+
+            elif line.startswith("COORD"):
+                coord = _read_coord(fiter)
+
+                for k, v in zip(parameters["elements_order"], coord):
+                    parameters["elements"][k]["center"] = v
+
+                parameters["coordinates"] = True
+
+            elif line.startswith("CONNE"):
+                parameters.update(_read_conne(fiter, label_length))
+
+            elif line.startswith("INCON"):
+                parameters.update(_read_incon(fiter, label_length))
+
+            elif line.startswith("NOVER"):
+                parameters["nover"] = True
+
+            elif line.startswith("ENDCY"):
+                break
+    except:
+        raise ReadError("failed to parse line {}.".format(fiter.count))
 
     return parameters
 
@@ -145,7 +183,7 @@ def _read_rocks(f):
     rocks = {"rocks": {}, "rocks_order": []}
 
     while True:
-        line = next(f)
+        line = f.next()
 
         if line.strip():
             # Record 1
@@ -162,7 +200,7 @@ def _read_rocks(f):
             nad = data[1]
             if nad is not None:
                 # Record 2
-                line = next(f)
+                line = f.next()
                 data = read_record(line, fmt[2])
                 rocks["rocks"][rock].update(
                     {
@@ -194,7 +232,7 @@ def _read_rpcap(f):
     rpcap = {}
 
     for key in ["relative_permeability", "capillarity"]:
-        line = next(f)
+        line = f.next()
         data = read_record(line, fmt)
         if data[0] is not None:
             rpcap[key] = {
@@ -211,7 +249,7 @@ def _read_flac(f, rocks_order):
     flac = {"rocks": {}, "flac": {}}
 
     # Record 1
-    line = next(f)
+    line = f.next()
     data = read_record(line, fmt[1])
     flac["flac"]["creep"] = data[0]
     flac["flac"]["porosity_model"] = data[1]
@@ -221,14 +259,14 @@ def _read_flac(f, rocks_order):
     for rock in rocks_order:
         flac["rocks"][rock] = {}
 
-        line = next(f)
+        line = f.next()
         data = read_record(line, fmt[2])
         flac["rocks"][rock]["permeability_model"] = {
             "id": data[0],
             "parameters": prune_nones_list(data[1:]),
         }
 
-        line = next(f)
+        line = f.next()
         data = read_record(line, fmt[3])
         flac["rocks"][rock]["equivalent_pore_pressure"] = {
             "id": data[0],
@@ -246,18 +284,18 @@ def _read_chemp(f):
     chemp = {"chemical_properties": {}}
 
     # Record 1
-    line = next(f)
+    line = f.next()
     n = read_record(line, fmt[1])[0]
 
     # Record 2
     for _ in range(n):
         tmp = {}
 
-        line = next(f)
+        line = f.next()
         data = read_record(line, fmt[2])
         chem = data[0]
 
-        line = next(f)
+        line = f.next()
         data = read_record(line, fmt[3])
         tmp["temperature_crit"] = data[0]
         tmp["pressure_crit"] = data[1]
@@ -265,7 +303,7 @@ def _read_chemp(f):
         tmp["pitzer_factor"] = data[3]
         tmp["dipole_moment"] = data[4]
 
-        line = next(f)
+        line = f.next()
         data = read_record(line, fmt[3])
         tmp["boiling_point"] = data[0]
         tmp["vapor_pressure_a"] = data[1]
@@ -273,7 +311,7 @@ def _read_chemp(f):
         tmp["vapor_pressure_c"] = data[3]
         tmp["vapor_pressure_d"] = data[4]
 
-        line = next(f)
+        line = f.next()
         data = read_record(line, fmt[3])
         tmp["molecular_weight"] = data[0]
         tmp["heat_capacity_a"] = data[1]
@@ -281,7 +319,7 @@ def _read_chemp(f):
         tmp["heat_capacity_c"] = data[3]
         tmp["heat_capacity_d"] = data[4]
 
-        line = next(f)
+        line = f.next()
         data = read_record(line, fmt[3])
         tmp["napl_density_ref"] = data[0]
         tmp["napl_temperature_ref"] = data[1]
@@ -289,7 +327,7 @@ def _read_chemp(f):
         tmp["gas_temperature_ref"] = data[3]
         tmp["exponent"] = data[4]
 
-        line = next(f)
+        line = f.next()
         data = read_record(line, fmt[3])
         tmp["napl_viscosity_a"] = data[0]
         tmp["napl_viscosity_b"] = data[1]
@@ -297,14 +335,14 @@ def _read_chemp(f):
         tmp["napl_viscosity_d"] = data[3]
         tmp["volume_crit"] = data[4]
 
-        line = next(f)
+        line = f.next()
         data = read_record(line, fmt[3])
         tmp["solubility_a"] = data[0]
         tmp["solubility_b"] = data[1]
         tmp["solubility_c"] = data[2]
         tmp["solubility_d"] = data[3]
 
-        line = next(f)
+        line = f.next()
         data = read_record(line, fmt[3])
         tmp["oc_coeff"] = data[0]
         tmp["oc_fraction"] = data[1]
@@ -321,12 +359,12 @@ def _read_ncgas(f):
     ncgas = {"non_condensible_gas": []}
 
     # Record 1
-    line = next(f)
+    line = f.next()
     n = read_record(line, fmt[1])[0]
 
     # Record 2
     for _ in range(n):
-        line = next(f)
+        line = f.next()
         data = read_record(line, fmt[2])
         ncgas["non_condensible_gas"].append(data[0])
 
@@ -338,7 +376,7 @@ def _read_multi(f):
     fmt = block_to_format["MULTI"]
     multi = {}
 
-    line = next(f)
+    line = f.next()
     data = read_record(line, fmt)
     multi["n_component"] = data[0]
     multi["isothermal"] = data[1] == data[0]
@@ -353,7 +391,7 @@ def _read_solvr(f):
     fmt = block_to_format["SOLVR"]
     solvr = {}
 
-    line = next(f)
+    line = f.next()
     data = read_record(line, fmt)
     solvr["solver"] = {
         "method": data[0],
@@ -366,13 +404,13 @@ def _read_solvr(f):
     return solvr
 
 
-def _read_param(f, fh):
+def _read_param(f):
     """Read PARAM block data."""
     fmt = block_to_format["PARAM"]
     param = {}
 
     # Record 1
-    line = next(f)
+    line = f.next()
     data = read_record(line, fmt[1])
     param["options"] = {
         "n_iteration": data[0],
@@ -388,7 +426,7 @@ def _read_param(f, fh):
     }
 
     # Record 2
-    line = next(f)
+    line = f.next()
     data = read_record(line, fmt[2])
     param["options"].update(
         {
@@ -408,14 +446,14 @@ def _read_param(f, fh):
     else:
         param["options"]["t_steps"] = []
         for _ in range(-t_steps):
-            line = next(f)
+            line = f.next()
             data = read_record(line, fmt[3])
             param["options"]["t_steps"] += prune_nones_list(data)
         if len(param["options"]["t_steps"]) == 1:
             param["options"]["t_steps"] = param["options"]["t_steps"][0]
 
     # Record 3
-    line = next(f)
+    line = f.next()
     data = read_record(line, fmt[4])
     param["options"].update(
         {
@@ -428,15 +466,15 @@ def _read_param(f, fh):
     )
 
     # Record 4 and record 5 (EOS7R)
-    line = next(f)
+    line = f.next()
     data = read_record(line, fmt[5])
 
-    i = fh.tell()
+    i = f.tell()
     try:
-        line = next(f)
+        line = f.next()
         data += read_record(line, fmt[5])
     except ValueError:
-        fh.seek(i)
+        f.seek(i, increment=-1)
 
     if any(x is not None for x in data):
         data = prune_nones_list(data)
@@ -456,14 +494,14 @@ def _read_selec(f):
     fmt = block_to_format["SELEC"]
     selec = {"selections": {}}
 
-    line = next(f)
+    line = f.next()
     data = read_record(line, fmt[1])
     selec["selections"]["integers"] = {k + 1: v for k, v in enumerate(data)}
 
     if selec["selections"]["integers"][1]:
         selec["selections"]["floats"] = []
         for _ in range(selec["selections"]["integers"][1]):
-            line = next(f)
+            line = f.next()
             data = read_record(line, fmt[2])
             selec["selections"]["floats"].append(prune_nones_list(data))
 
@@ -474,12 +512,12 @@ def _read_selec(f):
     return selec
 
 
-def _read_indom(f, fh):
+def _read_indom(f):
     """Read INDOM block data."""
     fmt = block_to_format["INDOM"]
     indom = {"rocks": {}}
 
-    line = next(f)
+    line = f.next()
     two_lines = True
     while True:
         if line.strip():
@@ -487,29 +525,29 @@ def _read_indom(f, fh):
             rock = read_record(line, fmt[5])[0]
 
             # Record 2
-            line = next(f)
+            line = f.next()
             data = read_record(line, fmt[0])
 
             # Record 3 (EOS7R)
             if two_lines:
-                i = fh.tell()
-                line = next(f)
+                i = f.tell()
+                line = f.next()
 
                 if line.strip():
                     try:
                         data += read_record(line, fmt[0])
                     except ValueError:
                         two_lines = False
-                        fh.seek(i)
+                        f.seek(i, increment=-1)
                 else:
-                    fh.seek(i)
+                    f.seek(i, increment=-1)
 
             data = prune_nones_list(data)
             indom["rocks"][rock] = {"initial_condition": data}
         else:
             break
 
-        line = next(f)
+        line = f.next()
 
     return indom
 
@@ -518,7 +556,7 @@ def _read_momop(f):
     """Read MOMOP block data."""
     fmt = block_to_format["MOMOP"]
 
-    line = next(f)
+    line = f.next()
     data = read_record(line, fmt)
     momop = {
         "more_options": {i + 1: int(x) for i, x in enumerate(data[0]) if x.isdigit()}
@@ -533,13 +571,13 @@ def _read_times(f):
     times = {"times": []}
 
     # Record 1
-    line = next(f)
+    line = f.next()
     data = read_record(line, fmt[1])
     n_times = data[0]
 
     # Record 2
     while len(times["times"]) < n_times:
-        line = next(f)
+        line = f.next()
         data = read_record(line, fmt[2])
         times["times"] += prune_nones_list(data)
 
@@ -554,7 +592,7 @@ def _read_oft(f, oft):
     history = {oft: []}
 
     while True:
-        line = next(f).rstrip()
+        line = f.next().rstrip()
 
         if line:
             history[oft].append(line)
@@ -569,7 +607,7 @@ def _read_gener(f, label_length):
     fmt = block_to_format["GENER"]
     gener = {"generators": []}
 
-    line = next(f)
+    line = f.next()
     if not label_length:
         label_length = get_label_length(line[:9])
 
@@ -595,7 +633,7 @@ def _read_gener(f, label_length):
                     table = []
 
                     while len(table) < ltab:
-                        line = next(f)
+                        line = f.next()
                         data = read_record(line, fmt[0])
                         table += prune_nones_list(data)
 
@@ -611,28 +649,28 @@ def _read_gener(f, label_length):
         else:
             break
 
-        line = next(f)
+        line = f.next()
 
     return {
         "generators": [prune_nones_dict(generator) for generator in gener["generators"]]
     }
 
 
-def _read_diffu(f, fh):
+def _read_diffu(f):
     """Read DIFFU block data."""
     fmt = block_to_format["DIFFU"]
     diffu = {"diffusion": []}
 
     while True:
-        i = fh.tell()
-        line = next(f)
+        i = f.tell()
+        line = f.next()
 
         if line.split():
             try:
                 data = read_record(line, fmt)
                 diffu["diffusion"].append(prune_nones_list(data))
             except ValueError:
-                fh.seek(i)
+                f.seek(i, increment=-1)
                 break
         else:
             break
@@ -646,10 +684,10 @@ def _read_outpu(f):
     outpu = {"output": {}}
 
     # Format
-    line = next(f).strip()
+    line = f.next().strip()
     if line and not line.isdigit():
         outpu["output"]["format"] = line if line else None
-        line = next(f).strip()
+        line = f.next().strip()
 
     # Variables
     if line.isdigit():
@@ -657,7 +695,7 @@ def _read_outpu(f):
         outpu["output"]["variables"] = []
 
         for _ in range(num_vars):
-            line = next(f)
+            line = f.next()
             data = read_record(line, fmt[3])
             name = data[0].lower()
 
@@ -676,7 +714,7 @@ def _read_eleme(f, label_length):
     fmt = block_to_format["ELEME"]
     eleme = {"elements": {}, "elements_order": []}
 
-    line = next(f)
+    line = f.next()
     if not label_length:
         label_length = get_label_length(line[:9])
 
@@ -699,7 +737,7 @@ def _read_eleme(f, label_length):
         else:
             break
 
-        line = next(f)
+        line = f.next()
 
     eleme["elements"] = {k: prune_nones_dict(v) for k, v in eleme["elements"].items()}
 
@@ -711,7 +749,7 @@ def _read_coord(f):
     fmt = block_to_format["COORD"]
     coord = []
 
-    line = next(f)
+    line = f.next()
     while True:
         if line.strip():
             data = read_record(line, fmt)
@@ -719,7 +757,7 @@ def _read_coord(f):
         else:
             break
 
-        line = next(f)
+        line = f.next()
 
     return coord
 
@@ -729,7 +767,7 @@ def _read_conne(f, label_length):
     fmt = block_to_format["CONNE"]
     conne = {"connections": {}, "connections_order": []}
 
-    line = next(f)
+    line = f.next()
     if not label_length:
         label_length = get_label_length(line[:9])
 
@@ -751,7 +789,7 @@ def _read_conne(f, label_length):
         else:
             break
 
-        line = next(f)
+        line = f.next()
 
     conne["connections"] = {
         k: prune_nones_dict(v) for k, v in conne["connections"].items()
@@ -760,12 +798,12 @@ def _read_conne(f, label_length):
     return conne
 
 
-def _read_incon(f, label_length, fh):
+def _read_incon(f, label_length):
     """Read INCON block data."""
     fmt = block_to_format["INCON"]
     incon = {"initial_conditions": {}, "initial_conditions_order": []}
 
-    line = next(f)
+    line = f.next()
     if not label_length:
         label_length = get_label_length(line[:9])
 
@@ -782,29 +820,29 @@ def _read_incon(f, label_length, fh):
             }
 
             # Record 2
-            line = next(f)
+            line = f.next()
             data = read_record(line, fmt[0])
 
             # Record 3 (EOS7R)
             if two_lines:
-                i = fh.tell()
-                line = next(f)
+                i = f.tell()
+                line = f.next()
 
                 if line.strip() and not line.startswith("+++"):
                     try:
                         data += read_record(line, fmt[0])
                     except ValueError:
                         two_lines = False
-                        fh.seek(i)
+                        f.seek(i, increment=-1)
                 else:
-                    fh.seek(i)
+                    f.seek(i, increment=-1)
 
             incon["initial_conditions"][label]["values"] = prune_nones_list(data)
             incon["initial_conditions_order"].append(label)
         else:
             break
 
-        line = next(f)
+        line = f.next()
 
     incon["initial_conditions"] = {
         k: prune_nones_dict(v) for k, v in incon["initial_conditions"].items()
