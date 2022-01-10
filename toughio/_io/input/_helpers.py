@@ -95,12 +95,15 @@ def write(filename, parameters, file_format=None, **kwargs):
 
     Other Parameters
     ----------------
-    block : str {'all', 'gener', 'mesh', 'incon'}, optional, default 'all'
+    block : str {'all', 'gener', 'mesh', 'incon'} or None, optional, default None
         Only if ``file_format = "tough"``. Blocks to be written:
          - 'all': write all blocks,
          - 'gener': only write block GENER,
          - 'mesh': only write blocks ELEME, COORD and CONNE,
-         - 'incon': only write block INCON.
+         - 'incon': only write block INCON,
+         - None: write all blocks except blocks defined in `ignore_blocks`.
+    ignore_blocks : list of str or None, optional, default None
+        Only if ``file_format = "tough"`` and `block` is None. Blocks to ignore.
 
     """
     if not isinstance(filename, str):

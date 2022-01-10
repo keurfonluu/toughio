@@ -1,4 +1,5 @@
 blocks = {
+    "TITLE",
     "ROCKS",
     "RPCAP",
     "FLAC",
