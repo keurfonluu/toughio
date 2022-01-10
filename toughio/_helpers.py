@@ -6,9 +6,11 @@ class FileIterator:
         self.fiter = iter(f.readline, "")
 
     def __iter__(self):
+        """Return iterator."""
         return self
 
     def __next__(self):
+        """Return next item."""
         self.count += 1
         return next(self.fiter)
 
