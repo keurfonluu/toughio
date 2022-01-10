@@ -14,7 +14,7 @@ __all__ = [
 ]
 
 
-def write(filename, parameters, block="all"):
+def write(filename, parameters, block="all", ignore_blocks=None):
     """
     Write TOUGH input file.
 
@@ -24,29 +24,74 @@ def write(filename, parameters, block="all"):
         Output file name.
     parameters : dict
         Parameters to export.
-    block : str {'all', 'gener', 'mesh', 'incon'}, optional, default 'all'
+    block : str {'all', 'gener', 'mesh', 'incon'} or None, optional, default None
         Blocks to be written:
          - 'all': write all blocks,
          - 'gener': only write block GENER,
          - 'mesh': only write blocks ELEME, COORD and CONNE,
-         - 'incon': only write block INCON.
+         - 'incon': only write block INCON,
+         - None: write all blocks except blocks defined in `ignore_blocks`.
+    ignore_blocks : list of str or None, optional, default None
+        Blocks to ignore. Only if `block` is None.
 
     """
-    buffer = write_buffer(parameters, block)
+    # Deprecation error
+    if "generators" in parameters:
+        if isinstance(parameters["generators"], dict):
+            raise ValueError("'generators' must be a list of dicts since v1.7.0.")
+
+    if "output" in parameters:
+        if "variables" in parameters["output"] and isinstance(
+            parameters["output"]["variables"], dict
+        ):
+            raise ValueError("'variables' must be a list of dicts since v1.7.0.")
+
+    buffer = write_buffer(parameters, block, ignore_blocks)
     with open(filename, "w") as f:
         for record in buffer:
             f.write(record)
 
 
 @check_parameters(dtypes["PARAMETERS"])
-def write_buffer(params, block):
+def write_buffer(params, block, ignore_blocks=None):
     """Write TOUGH input file as a list of 80-character long record strings."""
-    from ._common import Parameters, default, eos
+    from ._common import Parameters
+    from ._common import blocks as blocks_
+    from ._common import default, eos
+
+    # Block filters
+    if block is not None:
+        if block == "all":
+            blocks = blocks_.copy()
+
+        elif block == "gener":
+            blocks = {"GENER"}
+
+        elif block == "mesh":
+            blocks = {"ELEME", "COORD", "CONNE"}
+
+        elif block == "incon":
+            blocks = {"INCON"}
+
+        else:
+            raise ValueError()
+
+    else:
+        blocks = blocks_.copy()
+
+        if ignore_blocks is not None:
+            if not isinstance(ignore_blocks, (list, tuple, np.ndarray)):
+                raise TypeError()
+
+            ignore_blocks = set(ignore_blocks)
+            for ignore_block in ignore_blocks:
+                if ignore_block not in blocks_:
+                    raise ValueError("unknown block '{}'.".format(ignore_block))
+
+                else:
+                    blocks.remove(ignore_block)
 
     # Some preprocessing
-    if block not in {"all", "gener", "mesh", "incon"}:
-        raise ValueError()
-
     parameters = deepcopy(Parameters)
     parameters.update(deepcopy(params))
 
@@ -117,60 +162,100 @@ def write_buffer(params, block):
 
     # Define input file contents
     out = []
-    if block == "all":
+    if "TITLE" in blocks:
         out += ["{:80}\n".format(title) for title in parameters["title"]]
+
+    if "ROCKS" in blocks:
         out += _write_rocks(parameters)
+
+    if "RPCAP" in blocks:
         out += _write_rpcap(parameters) if rpcap else []
+
+    if "FLAC" in blocks:
         out += _write_flac(parameters) if parameters["flac"] is not None else []
+
+    if "CHEMP" in blocks:
         out += (
             _write_chemp(parameters)
             if parameters["chemical_properties"] is not None
             else []
         )
+
+    if "NCGAS" in blocks:
         out += (
             _write_ncgas(parameters)
             if parameters["non_condensible_gas"] is not None
             else []
         )
+
+    if "MULTI" in blocks:
         out += _write_multi(parameters) if multi else []
+
+    if "SOLVR" in blocks:
         out += _write_solvr(parameters) if parameters["solver"] else []
+
+    if "START" in blocks:
         out += _write_start() if parameters["start"] else []
+
+    if "PARAM" in blocks:
         out += _write_param(parameters)
+
+    if "SELEC" in blocks:
         out += _write_selec(parameters) if parameters["selections"] else []
+
+    if "INDOM" in blocks:
         out += _write_indom(parameters) if indom else []
+
+    if "MOMOP" in blocks:
         out += _write_momop(parameters) if parameters["more_options"] else []
+
+    if "TIMES" in blocks:
         out += _write_times(parameters) if parameters["times"] is not None else []
+
+    if "FOFT" in blocks:
         out += (
             _write_foft(parameters) if parameters["element_history"] is not None else []
         )
+
+    if "COFT" in blocks:
         out += (
             _write_coft(parameters)
             if parameters["connection_history"] is not None
             else []
         )
+
+    if "GOFT" in blocks:
         out += (
             _write_goft(parameters)
             if parameters["generator_history"] is not None
             else []
         )
 
-    if block in {"all", "gener"}:
+    if "GENER" in blocks:
         out += _write_gener(parameters) if parameters["generators"] else []
 
-    if block == "all":
+    if "DIFFU" in blocks:
         out += _write_diffu(parameters) if parameters["diffusion"] is not None else []
+
+    if "OUTPU" in blocks:
         out += _write_outpu(parameters) if parameters["output"] else []
 
-    if block in {"all", "mesh"}:
+    if "ELEME" in blocks:
         out += _write_eleme(parameters) if parameters["elements"] else []
+
+    if "COORD" in blocks:
         out += _write_coord(parameters) if parameters["coordinates"] else []
+
+    if "CONNE" in blocks:
         out += _write_conne(parameters) if parameters["connections"] else []
 
-    if block in {"all", "incon"}:
+    if "INCON" in blocks:
         out += _write_incon(parameters) if parameters["initial_conditions"] else []
 
-    if block == "all":
+    if "NOVER" in blocks:
         out += _write_nover() if parameters["nover"] else []
+
+    if "ENDCY" in blocks:
         out += _write_endcy()
 
     return out
@@ -794,104 +879,89 @@ def _write_gener(parameters):
     """Write GENER block data."""
     from ._common import generators
 
-    # Handle multicomponent generators
-    generator_data = []
-    keys = [key for key in generators.keys() if key != "type"]
-    for k, v in parameters["generators"].items():
-        # Load data
-        data = deepcopy(generators)
-        data.update(v)
-
-        # Check that data are consistent
-        if not isinstance(data["type"], str):
-            # Number of components
-            num_comps = len(data["type"])
-
-            # Check that values in dict have the same length
-            for key in keys:
-                if data[key] is not None:
-                    if not isinstance(data[key], (list, tuple, np.ndarray)):
-                        raise TypeError()
-                    if len(data[key]) != num_comps:
-                        raise ValueError()
-
-            # Split dict
-            for i in range(num_comps):
-                generator_data.append(
-                    (
-                        k,
-                        {
-                            key: (data[key][i] if data[key] is not None else None)
-                            for key in generators.keys()
-                        },
-                    )
-                )
-        else:
-            # Only one component for this element
-            # Check that values are scalar or 1D array_like
-            for key in keys:
-                if np.ndim(data[key]) not in {0, 1}:
-                    raise ValueError()
-            generator_data.append((k, data))
-
     # Format
-    label_length = max(len(max(parameters["generators"], key=len)), 5)
+    label_length = max(
+        [
+            len(generator["label"]) if "label" in generator else 0
+            for generator in parameters["generators"]
+        ]
+    )
+    label_length = max(label_length, 5)
     fmt = block_to_format["GENER"]
     fmt1 = str2format(fmt[label_length])
     fmt2 = str2format(fmt[0])
 
     out = []
-    for k, v in generator_data:
+    for v in parameters["generators"]:
+        # Load data
+        data = deepcopy(generators)
+        data.update(v)
+
         # Table
-        ltab = None
-        if v["times"] is not None and isinstance(v["times"], (list, tuple, np.ndarray)):
-            ltab = len(v["times"])
+        ltab = 1
+        if data["times"] is not None and isinstance(
+            data["times"], (list, tuple, np.ndarray)
+        ):
+            ltab = len(data["times"])
+
             for key in ["rates", "specific_enthalpy"]:
-                if v[key] is not None:
-                    if not isinstance(v[key], (list, tuple, np.ndarray)):
-                        raise TypeError()
-                    if not (ltab > 1 and ltab == len(v[key])):
-                        raise ValueError()
+                if data[key] is not None:
+                    if ltab == 1 and np.ndim(data[key]) == 1:
+                        if len(data[key]) > 1:
+                            raise ValueError()
+
+                        data[key] = data[key][0]
+
+                    else:
+                        if np.ndim(data[key]) != 1:
+                            raise TypeError()
+
+                        if ltab != len(data[key]):
+                            raise ValueError()
+
         else:
-            # Rates and specific enthalpy tables cannot be written without a
-            # time table
             for key in ["rates", "specific_enthalpy"]:
-                if v[key] is not None and np.ndim(v[key]) != 0:
-                    raise ValueError()
+                if key in data and np.ndim(data[key]) > 0:
+                    if len(data[key]) > 1:
+                        raise ValueError()
+
+                    data[key] = data[key][0]
 
         itab = (
-            1 if isinstance(v["specific_enthalpy"], (list, tuple, np.ndarray)) else None
+            1
+            if isinstance(data["specific_enthalpy"], (list, tuple, np.ndarray))
+            else None
         )
 
         # Record 1
         values = [
-            k,
-            v["name"],
-            v["nseq"],
-            v["nadd"],
-            v["nads"],
-            ltab,
+            data["label"] if "label" in data else "",
+            data["name"],
+            data["nseq"],
+            data["nadd"],
+            data["nads"],
+            ltab if ltab > 1 else None,
             None,
-            v["type"],
+            data["type"],
             itab,
-            None if ltab else v["rates"],
-            None if ltab else v["specific_enthalpy"],
-            v["layer_thickness"],
+            None if ltab > 1 else data["rates"],
+            None if ltab > 1 else data["specific_enthalpy"],
+            data["layer_thickness"],
         ]
         out += write_record(values, fmt1)
 
         # Record 2
-        out += write_record(v["times"], fmt2, multi=True) if ltab else []
+        out += write_record(data["times"], fmt2, multi=True) if ltab > 1 else []
 
         # Record 3
-        out += write_record(v["rates"], fmt2, multi=True) if ltab else []
+        out += write_record(data["rates"], fmt2, multi=True) if ltab > 1 else []
 
         # Record 4
-        if ltab and v["specific_enthalpy"] is not None:
-            if isinstance(v["specific_enthalpy"], (list, tuple, np.ndarray)):
-                specific_enthalpy = v["specific_enthalpy"]
+        if ltab > 1 and data["specific_enthalpy"] is not None:
+            if isinstance(data["specific_enthalpy"], (list, tuple, np.ndarray)):
+                specific_enthalpy = data["specific_enthalpy"]
             else:
-                specific_enthalpy = np.full(ltab, v["specific_enthalpy"])
+                specific_enthalpy = np.full(ltab, data["specific_enthalpy"])
 
             out += write_record(specific_enthalpy, fmt2, multi=True)
 
@@ -936,24 +1006,30 @@ def _write_outpu(parameters):
     # Variables
     if data["variables"]:
         buffer = []
-        num_vars = 0
-        for k, v in data["variables"].items():
-            values = [k.upper()]
+        num_vars = len(data["variables"])
 
-            if np.ndim(v) == 0:
-                values += [v]
-                buffer += write_record(values, fmt3)
-                num_vars += 1
-            else:
-                if np.ndim(v[0]) == 0:
-                    values += list(v)
+        for variable in data["variables"]:
+            values = [variable["name"].upper() if "name" in variable else None]
+
+            if "options" in variable:
+                v = variable["options"]
+
+                if np.ndim(v) == 0:
+                    values += [v]
                     buffer += write_record(values, fmt3)
-                    num_vars += 1
+
                 else:
-                    for vv in v:
-                        values_in = values + list(vv)
-                        buffer += write_record(values_in, fmt3)
-                    num_vars += len(v)
+                    if np.ndim(v[0]) == 0:
+                        values += list(v)
+                        buffer += write_record(values, fmt3)
+
+                    else:
+                        for vv in v:
+                            values_in = values + list(vv)
+                            buffer += write_record(values_in, fmt3)
+
+            else:
+                buffer += write_record(values, fmt3)
 
         out += write_record([str(num_vars)], fmt2)
         out += buffer

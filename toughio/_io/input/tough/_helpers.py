@@ -26,7 +26,7 @@ dtypes = {
         "more_options": "dict",
         "selections": "dict",
         "solver": "dict",
-        "generators": "dict",
+        "generators": "array_like",
         "times": "scalar_array_like",
         "element_history": "array_like",
         "connection_history": "array_like",
@@ -129,17 +129,18 @@ dtypes = {
         "eps": "scalar",
     },
     "GENER": {
-        "name": "str_array_like",
-        "nseq": "scalar_array_like",
-        "nadd": "scalar_array_like",
-        "nads": "scalar_array_like",
-        "type": "str_array_like",
+        "label": "str",
+        "name": "str",
+        "nseq": "scalar",
+        "nadd": "scalar",
+        "nads": "scalar",
+        "type": "str",
         "times": "scalar_array_like",
         "rates": "scalar_array_like",
         "specific_enthalpy": "scalar_array_like",
-        "layer_thickness": "scalar_array_like",
+        "layer_thickness": "scalar",
     },
-    "OUTPU": {"format": "str", "variables": "dict"},
+    "OUTPU": {"format": "str", "variables": "array_like"},
     "ELEME": {
         "nseq": "int",
         "nadd": "int",
@@ -237,24 +238,34 @@ def check_parameters(input_types, keys=None, is_list=False):
         def wrapper(parameters, *args, **kwargs):
             if not keys:
                 _check_parameters(parameters)
+
             else:
                 params = deepcopy(parameters[keys[0]])
                 keys_str = "['{}']".format(keys[0])
                 if is_list:
-                    for k, v in params.items():
-                        tmp = keys_str
-                        tmp += "['{}']".format(k)
-                        try:
-                            for key in keys[1:]:
-                                v = v[key]
-                                tmp += "['{}']".format(key)
-                            _check_parameters(v, tmp)
-                        except KeyError:
-                            continue
+                    if isinstance(params, dict):
+                        for k, v in params.items():
+                            tmp = keys_str
+                            tmp += "['{}']".format(k)
+
+                            try:
+                                for key in keys[1:]:
+                                    v = v[key]
+                                    tmp += "['{}']".format(key)
+                                _check_parameters(v, tmp)
+
+                            except KeyError:
+                                continue
+                    else:
+                        for i, param in enumerate(params):
+                            tmp = "{}[{}]".format(keys_str, i)
+                            _check_parameters(param, tmp)
+
                 else:
                     for key in keys[1:]:
                         params = params[key]
                         keys_str += "['{}']".format(key)
+
                     _check_parameters(params, keys_str)
 
             out = func(parameters, *args, **kwargs)
