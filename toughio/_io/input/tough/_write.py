@@ -14,7 +14,7 @@ __all__ = [
 ]
 
 
-def write(filename, parameters, block="all"):
+def write(filename, parameters, block="all", ignore_blocks=None):
     """
     Write TOUGH input file.
 
@@ -24,12 +24,15 @@ def write(filename, parameters, block="all"):
         Output file name.
     parameters : dict
         Parameters to export.
-    block : str {'all', 'gener', 'mesh', 'incon'}, optional, default 'all'
+    block : str {'all', 'gener', 'mesh', 'incon'} or None, optional, default None
         Blocks to be written:
          - 'all': write all blocks,
          - 'gener': only write block GENER,
          - 'mesh': only write blocks ELEME, COORD and CONNE,
-         - 'incon': only write block INCON.
+         - 'incon': only write block INCON,
+         - None: write all blocks except blocks defined in `ignore_blocks`.
+    ignore_blocks : list of str or None, optional, default None
+        Blocks to ignore. Only if `block` is None.
 
     """
     # Deprecation error
@@ -43,21 +46,51 @@ def write(filename, parameters, block="all"):
         ):
             raise ValueError("'variables' must be a list of dicts since v1.7.0.")
 
-    buffer = write_buffer(parameters, block)
+    buffer = write_buffer(parameters, block, ignore_blocks)
     with open(filename, "w") as f:
         for record in buffer:
             f.write(record)
 
 
 @check_parameters(dtypes["PARAMETERS"])
-def write_buffer(params, block):
+def write_buffer(params, block, ignore_blocks=None):
     """Write TOUGH input file as a list of 80-character long record strings."""
     from ._common import Parameters, default, eos
+    from ._common import blocks as blocks_
+
+    # Block filters
+    if block is not None:
+        if block == "all":
+            blocks = blocks_.copy()
+
+        elif block == "gener":
+            blocks = {"GENER"}
+
+        elif block == "mesh":
+            blocks = {"ELEME", "COORD", "CONNE"}
+
+        elif block == "incon":
+            blocks = {"INCON"}
+
+        else:
+            raise ValueError()
+
+    else:
+        blocks = blocks_.copy()
+
+        if ignore_blocks is not None:
+            if not isinstance(ignore_blocks, (list, tuple, np.ndarray)):
+                raise TypeError()
+
+            ignore_blocks = set(ignore_blocks)
+            for ignore_block in ignore_blocks:
+                if ignore_block not in blocks_:
+                    raise ValueError("unknown block '{}'.".format(ignore_block))
+
+                else:
+                    blocks.remove(ignore_block)
 
     # Some preprocessing
-    if block not in {"all", "gener", "mesh", "incon"}:
-        raise ValueError()
-
     parameters = deepcopy(Parameters)
     parameters.update(deepcopy(params))
 
@@ -128,60 +161,100 @@ def write_buffer(params, block):
 
     # Define input file contents
     out = []
-    if block == "all":
+    if "TITLE" in blocks:
         out += ["{:80}\n".format(title) for title in parameters["title"]]
+
+    if "ROCKS" in blocks:
         out += _write_rocks(parameters)
+
+    if "RPCAP" in blocks:
         out += _write_rpcap(parameters) if rpcap else []
+
+    if "FLAC" in blocks:
         out += _write_flac(parameters) if parameters["flac"] is not None else []
+
+    if "CHEMP" in blocks:
         out += (
             _write_chemp(parameters)
             if parameters["chemical_properties"] is not None
             else []
         )
+
+    if "NCGAS" in blocks:
         out += (
             _write_ncgas(parameters)
             if parameters["non_condensible_gas"] is not None
             else []
         )
+
+    if "MULTI" in blocks:
         out += _write_multi(parameters) if multi else []
+
+    if "SOLVR" in blocks:
         out += _write_solvr(parameters) if parameters["solver"] else []
+
+    if "START" in blocks:
         out += _write_start() if parameters["start"] else []
+
+    if "PARAM" in blocks:
         out += _write_param(parameters)
+
+    if "SELEC" in blocks:
         out += _write_selec(parameters) if parameters["selections"] else []
+
+    if "INDOM" in blocks:
         out += _write_indom(parameters) if indom else []
+
+    if "MOMOP" in blocks:
         out += _write_momop(parameters) if parameters["more_options"] else []
+
+    if "TIMES" in blocks:
         out += _write_times(parameters) if parameters["times"] is not None else []
+
+    if "FOFT" in blocks:
         out += (
             _write_foft(parameters) if parameters["element_history"] is not None else []
         )
+
+    if "COFT" in blocks:
         out += (
             _write_coft(parameters)
             if parameters["connection_history"] is not None
             else []
         )
+
+    if "GOFT" in blocks:
         out += (
             _write_goft(parameters)
             if parameters["generator_history"] is not None
             else []
         )
 
-    if block in {"all", "gener"}:
+    if "GENER" in blocks:
         out += _write_gener(parameters) if parameters["generators"] else []
 
-    if block == "all":
+    if "DIFFU" in blocks:
         out += _write_diffu(parameters) if parameters["diffusion"] is not None else []
+
+    if "OUTPU" in blocks:
         out += _write_outpu(parameters) if parameters["output"] else []
 
-    if block in {"all", "mesh"}:
+    if "ELEME" in blocks:
         out += _write_eleme(parameters) if parameters["elements"] else []
+
+    if "COORD" in blocks:
         out += _write_coord(parameters) if parameters["coordinates"] else []
+
+    if "CONNE" in blocks:
         out += _write_conne(parameters) if parameters["connections"] else []
 
-    if block in {"all", "incon"}:
+    if "INCON" in blocks:
         out += _write_incon(parameters) if parameters["initial_conditions"] else []
 
-    if block == "all":
+    if "NOVER" in blocks:
         out += _write_nover() if parameters["nover"] else []
+
+    if "ENDCY" in blocks:
         out += _write_endcy()
 
     return out
