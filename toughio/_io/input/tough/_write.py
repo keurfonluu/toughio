@@ -7,7 +7,7 @@ import numpy as np
 
 from ...._common import block_to_format, str2format
 from ._common import default
-from ._helpers import block, check_parameters, dtypes, write_record, prune_nones_list
+from ._helpers import block, check_parameters, dtypes, prune_nones_list, write_record
 
 __all__ = [
     "write",
@@ -168,7 +168,12 @@ def write_buffer(params, block, ignore_blocks=None):
                 indom = True
                 break
 
-    multi = parameters["eos"] or parameters["n_component"] or parameters["n_phase"] or parameters["n_component_incon"]
+    multi = (
+        parameters["eos"]
+        or parameters["n_component"]
+        or parameters["n_phase"]
+        or parameters["n_component_incon"]
+    )
 
     output = False
     for key in ["format", "variables"]:
