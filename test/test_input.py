@@ -433,9 +433,7 @@ def test_momop(write_read):
 @pytest.mark.parametrize(
     "write_read, times",
     [
-        (write_read_tough, np.random.rand()),
         (write_read_tough, np.random.rand(np.random.randint(100) + 1)),
-        (write_read_json, np.random.rand()),
         (write_read_json, np.random.rand(np.random.randint(100) + 1)),
     ],
 )
