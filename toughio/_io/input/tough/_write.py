@@ -7,7 +7,7 @@ import numpy as np
 
 from ...._common import block_to_format, str2format
 from ._common import default
-from ._helpers import block, check_parameters, dtypes, write_record
+from ._helpers import block, check_parameters, dtypes, write_record, prune_nones_list
 
 __all__ = [
     "write",
@@ -147,6 +147,20 @@ def write_buffer(params, block, ignore_blocks=None):
     )
     rpcap = cond1 or cond2
 
+    param = False
+    if prune_nones_list(parameters["default"]["initial_condition"]):
+        param = True
+
+    for option in parameters["options"].values():
+        if param:
+            break
+
+        if (isinstance(option, (list, tuple, np.ndarray)) and len(option)) or option:
+            param = True
+
+    if parameters["extra_options"]:
+        param = True
+
     indom = False
     for rock in parameters["rocks"].values():
         if "initial_condition" in rock.keys():
@@ -154,7 +168,13 @@ def write_buffer(params, block, ignore_blocks=None):
                 indom = True
                 break
 
-    multi = parameters["eos"] or (parameters["n_component"] and parameters["n_phase"])
+    multi = parameters["eos"] or parameters["n_component"] or parameters["n_phase"] or parameters["n_component_incon"]
+
+    output = False
+    for key in ["format", "variables"]:
+        if key in parameters["output"] and parameters["output"][key]:
+            output = True
+            break
 
     # Check that start is True if indom is True
     if indom and not parameters["start"]:
@@ -165,95 +185,77 @@ def write_buffer(params, block, ignore_blocks=None):
     if "TITLE" in blocks:
         out += ["{:80}\n".format(title) for title in parameters["title"]]
 
-    if "ROCKS" in blocks:
+    if "ROCKS" in blocks and parameters["rocks"]:
         out += _write_rocks(parameters)
 
-    if "RPCAP" in blocks:
-        out += _write_rpcap(parameters) if rpcap else []
+    if "RPCAP" in blocks and rpcap:
+        out += _write_rpcap(parameters)
 
-    if "FLAC" in blocks:
-        out += _write_flac(parameters) if parameters["flac"] is not None else []
+    if "FLAC" in blocks and parameters["flac"]:
+        out += _write_flac(parameters)
 
-    if "CHEMP" in blocks:
-        out += (
-            _write_chemp(parameters)
-            if parameters["chemical_properties"] is not None
-            else []
-        )
+    if "CHEMP" in blocks and parameters["chemical_properties"]:
+        out += _write_chemp(parameters)
 
-    if "NCGAS" in blocks:
-        out += (
-            _write_ncgas(parameters)
-            if parameters["non_condensible_gas"] is not None
-            else []
-        )
+    if "NCGAS" in blocks and len(parameters["non_condensible_gas"]):
+        out += _write_ncgas(parameters)
 
-    if "MULTI" in blocks:
-        out += _write_multi(parameters) if multi else []
+    if "MULTI" in blocks and multi:
+        out += _write_multi(parameters)
 
-    if "SOLVR" in blocks:
-        out += _write_solvr(parameters) if parameters["solver"] else []
+    if "SOLVR" in blocks and parameters["solver"]:
+        out += _write_solvr(parameters)
 
-    if "START" in blocks:
-        out += _write_start() if parameters["start"] else []
+    if "START" in blocks and parameters["start"]:
+        out += _write_start()
 
-    if "PARAM" in blocks:
+    if "PARAM" in blocks and param:
         out += _write_param(parameters)
 
-    if "SELEC" in blocks:
-        out += _write_selec(parameters) if parameters["selections"] else []
+    if "SELEC" in blocks and parameters["selections"]:
+        out += _write_selec(parameters)
 
-    if "INDOM" in blocks:
-        out += _write_indom(parameters) if indom else []
+    if "INDOM" in blocks and indom:
+        out += _write_indom(parameters)
 
-    if "MOMOP" in blocks:
-        out += _write_momop(parameters) if parameters["more_options"] else []
+    if "MOMOP" in blocks and parameters["more_options"]:
+        out += _write_momop(parameters)
 
-    if "TIMES" in blocks:
-        out += _write_times(parameters) if parameters["times"] is not None else []
+    if "TIMES" in blocks and len(parameters["times"]):
+        out += _write_times(parameters)
 
-    if "FOFT" in blocks:
-        out += (
-            _write_foft(parameters) if parameters["element_history"] is not None else []
-        )
+    if "FOFT" in blocks and len(parameters["element_history"]):
+        out += _write_foft(parameters)
 
-    if "COFT" in blocks:
-        out += (
-            _write_coft(parameters)
-            if parameters["connection_history"] is not None
-            else []
-        )
+    if "COFT" in blocks and len(parameters["connection_history"]):
+        out += _write_coft(parameters)
 
-    if "GOFT" in blocks:
-        out += (
-            _write_goft(parameters)
-            if parameters["generator_history"] is not None
-            else []
-        )
+    if "GOFT" in blocks and len(parameters["generator_history"]):
+        out += _write_goft(parameters)
 
-    if "GENER" in blocks:
-        out += _write_gener(parameters) if parameters["generators"] else []
+    if "GENER" in blocks and parameters["generators"]:
+        out += _write_gener(parameters)
 
-    if "DIFFU" in blocks:
-        out += _write_diffu(parameters) if parameters["diffusion"] is not None else []
+    if "DIFFU" in blocks and len(parameters["diffusion"]):
+        out += _write_diffu(parameters)
 
-    if "OUTPU" in blocks:
-        out += _write_outpu(parameters) if parameters["output"] else []
+    if "OUTPU" in blocks and output:
+        out += _write_outpu(parameters)
 
-    if "ELEME" in blocks:
-        out += _write_eleme(parameters) if parameters["elements"] else []
+    if "ELEME" in blocks and parameters["elements"]:
+        out += _write_eleme(parameters)
 
-    if "COORD" in blocks:
-        out += _write_coord(parameters) if parameters["coordinates"] else []
+    if "COORD" in blocks and parameters["coordinates"]:
+        out += _write_coord(parameters)
 
-    if "CONNE" in blocks:
-        out += _write_conne(parameters) if parameters["connections"] else []
+    if "CONNE" in blocks and parameters["connections"]:
+        out += _write_conne(parameters)
 
-    if "INCON" in blocks:
-        out += _write_incon(parameters) if parameters["initial_conditions"] else []
+    if "INCON" in blocks and parameters["initial_conditions"]:
+        out += _write_incon(parameters)
 
-    if "NOVER" in blocks:
-        out += _write_nover() if parameters["nover"] else []
+    if "NOVER" in blocks and parameters["nover"]:
+        out += _write_nover()
 
     if "ENDCY" in blocks:
         out += _write_endcy()
@@ -575,7 +577,7 @@ def _write_multi(parameters):
     values[2] = parameters["n_phase"] if parameters["n_phase"] else values[2]
 
     # Handle diffusion
-    if parameters["diffusion"]:
+    if len(parameters["diffusion"]):
         values[3] = 8
         parameters["n_phase"] = values[2]  # Save for later check
 
