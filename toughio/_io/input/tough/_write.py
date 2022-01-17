@@ -116,6 +116,22 @@ def write_buffer(params, block, ignore_blocks=None):
             if cond1 and cond2:
                 parameters["rocks"][rock][k] = v
 
+    tmp = parameters["default"]["permeability"]
+    if np.ndim(tmp) == 0:
+        tmp = 3 * [tmp]
+
+    for v in parameters["rocks"].values():
+        if v["permeability"] is None:
+            v["permeability"] = tmp
+
+        elif np.ndim(v["permeability"]):
+            if len(v["permeability"]) != 3:
+                raise ValueError()
+
+            for i, k in enumerate(tmp):
+                if v["permeability"][i] is None:
+                    v["permeability"][i] = k
+
     # Make sure that some keys are integers and not strings
     if "more_options" in parameters:
         parameters["more_options"] = {
