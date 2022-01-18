@@ -155,10 +155,10 @@ parameters["generators"] = [
 
 parameters["times"] = np.arange(1, 13) * 90.0 * 24.0 * 3600.0
 parameters["output"] = {
-    "variables": {
-        "saturation": 1,
-        "coordinate": None,
-    },
+    "variables": [
+        {"name": "saturation", "options": 1},
+        {"name": "coordinate"},
+    ],
 }
 
 ########################################################################################
