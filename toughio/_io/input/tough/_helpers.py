@@ -27,7 +27,7 @@ dtypes = {
         "selections": "dict",
         "solver": "dict",
         "generators": "array_like",
-        "times": "scalar_array_like",
+        "times": "array_like",
         "element_history": "array_like",
         "connection_history": "array_like",
         "generator_history": "array_like",
