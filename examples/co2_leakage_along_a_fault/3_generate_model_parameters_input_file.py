@@ -139,12 +139,13 @@ label = mesh.labels[mesh.near((0.0, 0.0, -1500.0))]
 ########################################################################################
 # Now we can add the generator to the parameters by specifying the type and injection rate (block `GENER`).
 
-parameters["generators"] = {
-    label: {
+parameters["generators"] = [
+    {
+        "label": label,
         "type": "COM3",
         "rates": 0.02,
     },
-}
+]
 
 ########################################################################################
 
@@ -154,10 +155,10 @@ parameters["generators"] = {
 
 parameters["times"] = np.arange(1, 13) * 90.0 * 24.0 * 3600.0
 parameters["output"] = {
-    "variables": {
-        "saturation": 1,
-        "coordinate": None,
-    },
+    "variables": [
+        {"name": "saturation", "options": 1},
+        {"name": "coordinate"},
+    ],
 }
 
 ########################################################################################

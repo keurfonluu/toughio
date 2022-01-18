@@ -10,6 +10,13 @@ __all__ = [
 ]
 
 
+oft_to_key = {
+    "FOFT": "element_history",
+    "COFT": "connection_history",
+    "GOFT": "generator_history",
+}
+
+
 def read(filename, label_length=None):
     """
     Read TOUGH input file.
@@ -131,13 +138,13 @@ def read_buffer(f, label_length):
                 parameters.update(_read_times(fiter))
 
             elif line.startswith("FOFT"):
-                parameters.update(_read_oft(fiter, "element_history"))
+                parameters.update(_read_oft(fiter, "FOFT", label_length))
 
             elif line.startswith("COFT"):
-                parameters.update(_read_oft(fiter, "connection_history"))
+                parameters.update(_read_oft(fiter, "COFT", label_length))
 
             elif line.startswith("GOFT"):
-                parameters.update(_read_oft(fiter, "generator_history"))
+                parameters.update(_read_oft(fiter, "GOFT", label_length))
 
             elif line.startswith("GENER"):
                 parameters.update(_read_gener(fiter, label_length))
@@ -587,17 +594,25 @@ def _read_times(f):
     return times
 
 
-def _read_oft(f, oft):
+def _read_oft(f, oft, label_length):
     """Read FOFT, COFT and GOFT blocks data."""
-    history = {oft: []}
+    key = oft_to_key[oft]
+    fmt = block_to_format[oft]
+    history = {key: []}
+
+    line = f.next()
+    if not label_length:
+        label_length = get_label_length(line[:9])
 
     while True:
-        line = f.next().rstrip()
+        if line.strip():
+            data = read_record(line, fmt[label_length])
+            history[key].append(data[0])
 
-        if line:
-            history[oft].append(line)
         else:
             break
+
+        line = f.next()
 
     return history
 
