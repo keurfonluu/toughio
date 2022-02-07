@@ -36,6 +36,17 @@ class CylindricMesh(Mesh):
         return areas, heights
 
     @property
+    def centers(self):
+        """Return node centers of cell in mesh."""
+        out = super().centers
+
+        # Centers at initial radius are at 0
+        # This will affect nodal distances
+        out[:, 0] = np.where(out[:, 0] < self._dr[0], 0.0, out[:, 0])
+
+        return out
+
+    @property
     def face_areas(self):
         """Areas of faces in mesh."""
         nr, nz = len(self._dr), len(self._dz)
