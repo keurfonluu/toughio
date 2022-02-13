@@ -733,6 +733,90 @@ def test_incon(write_read, label_length, num_pvars, num_items):
             assert np.allclose(vv, parameters["initial_conditions"][k][kk], atol=1.0e-3)
 
 
+def test_meshm_xyz():
+    parameters_ref = {
+        "meshmaker": {
+            "type": "xyz",
+            "parameters": [
+                {
+                    "type": "nx",
+                    "n_increment": np.random.randint(100) + 1,
+                    "sizes": np.random.rand(),
+                },
+                {
+                    "type": "ny",
+                    "sizes": np.random.rand(np.random.randint(100) + 1),
+                },
+                {
+                    "type": "nz",
+                    "sizes": np.random.rand(np.random.randint(100) + 1),
+                },
+                {
+                    "type": "nx",
+                    "sizes": np.random.rand(np.random.randint(100) + 1),
+                },
+
+            ],
+            "angle": np.random.rand(),
+        }
+    }
+    parameters = write_read(parameters_ref)
+
+    assert parameters_ref["meshmaker"]["type"] == parameters["meshmaker"]["type"]
+    assert np.allclose(parameters_ref["meshmaker"]["angle"], parameters["meshmaker"]["angle"], atol=1.0e-4)
+    assert len(parameters_ref["meshmaker"]["parameters"]) == len(parameters_ref["meshmaker"]["parameters"])
+
+    for parameter_ref, parameter in zip(parameters_ref["meshmaker"]["parameters"], parameters["meshmaker"]["parameters"]):
+        for k, v in parameter_ref.items():
+            if isinstance(v, str):
+                assert v == parameter[k]
+
+            else:
+                assert np.allclose(v, parameter[k], atol=1.0e-4)
+
+
+@pytest.mark.parametrize("layer", [True, False])
+def test_meshm_rz2d(layer):
+    parameters_ref = {
+        "meshmaker": {
+            "type": "rz2dl" if layer else "rz2d",
+            "parameters": [
+                {
+                    "type": "radii",
+                    "radii": np.random.rand(np.random.randint(100) + 1),
+                },
+                {
+                    "type": "equid",
+                    "n_increment": np.random.randint(100) + 1,
+                    "size": np.random.rand(),
+                },
+                {
+                    "type": "logar",
+                    "n_increment": np.random.randint(100) + 1,
+                    "radius": np.random.rand(),
+                    "radius_ref": np.random.rand(),
+                },
+                {
+                    "type": "layer",
+                    "thicknesses": np.random.rand(np.random.randint(100) + 1),
+                },
+            ],
+        }
+    }
+    parameters = write_read(parameters_ref)
+
+    assert parameters_ref["meshmaker"]["type"] == parameters["meshmaker"]["type"]
+    assert len(parameters_ref["meshmaker"]["parameters"]) == len(parameters_ref["meshmaker"]["parameters"])
+
+    for parameter_ref, parameter in zip(parameters_ref["meshmaker"]["parameters"], parameters["meshmaker"]["parameters"]):
+        for k, v in parameter_ref.items():
+            if isinstance(v, str):
+                assert v == parameter[k]
+
+            else:
+                assert np.allclose(v, parameter[k], atol=1.0e-4)
+
+
 @pytest.mark.parametrize(
     "write_read, flag, enable",
     [
