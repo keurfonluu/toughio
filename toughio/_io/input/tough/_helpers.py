@@ -40,6 +40,7 @@ dtypes = {
         "connections_order": "array_like",
         "initial_conditions": "dict",
         "initial_conditions_order": "array_like",
+        "meshmaker": "dict",
         "default": "dict",
     },
     "ROCKS": {
@@ -160,6 +161,7 @@ dtypes = {
         "radiant_emittance_factor": "scalar",
     },
     "INCON": {"porosity": "scalar", "userx": "array_like", "values": "array_like"},
+    "MESHM": {"type": "str", "parameters": "array_like", "angle": "scalar"},
 }
 
 

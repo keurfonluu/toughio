@@ -61,6 +61,7 @@ _Parameters = {
     "connections_order": None,
     "initial_conditions": {},
     "initial_conditions_order": None,
+    "meshmaker": {},
     "default": {},
 }
 
@@ -188,6 +189,28 @@ initial_conditions = {
     "porosity": None,
     "userx": [None for _ in range(5)],
     "values": [None for _ in range(4)],
+}
+
+meshmaker = {
+    "type": None,
+    "parameters": [],
+    "angle": None,
+}
+
+xyz = {
+    "type": None,
+    "n_increment": None,
+    "sizes": None,
+}
+
+rz2d = {
+    "type": None,
+    "radii": [],
+    "n_increment": None,
+    "size": None,
+    "radius": None,
+    "radius_ref": None,
+    "thicknesses": [],
 }
 
 default = {

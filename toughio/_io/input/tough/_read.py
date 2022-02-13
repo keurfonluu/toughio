@@ -173,11 +173,15 @@ def read_buffer(f, label_length):
             elif line.startswith("INCON"):
                 parameters.update(_read_incon(fiter, label_length))
 
+            elif line.startswith("MESHM"):
+                parameters.update(_read_meshm(fiter))
+
             elif line.startswith("NOVER"):
                 parameters["nover"] = True
 
             elif line.startswith("ENDCY"):
-                break
+                pass
+
     except:
         raise ReadError("failed to parse line {}.".format(fiter.count))
 
@@ -864,3 +868,133 @@ def _read_incon(f, label_length):
     }
 
     return incon
+
+
+def _read_meshm(f):
+    """Read MESHM block data."""
+    meshm = {"meshmaker": {}}
+    fmt = block_to_format["MESHM"]
+
+    # Mesh type
+    line = f.next().strip()
+    data = read_record(line, fmt[1])
+    mesh_type = data[0].upper()
+
+    # XYZ
+    if mesh_type == "XYZ":
+        meshm["meshmaker"]["type"] = mesh_type.lower()
+        fmt = fmt["XYZ"]
+
+        # Record 1
+        line = f.next().strip()
+        data = read_record(line, fmt[1])
+        meshm["meshmaker"]["angle"] = data[0]
+
+        # Record 2
+        meshm["meshmaker"]["parameters"] = []
+
+        while True:
+            line = f.next()
+
+            if line.strip():
+                data = read_record(line, fmt[2])
+                tmp = {
+                    "type": data[0].lower(),
+                    "n_increment": data[1],
+                }
+
+                if data[2]:
+                    tmp["sizes"] = data[2]
+
+                else:
+                    sizes = []
+                    while len(sizes) < tmp["n_increment"]:
+                        line = f.next()
+                        data = read_record(line, fmt[3])
+                        sizes += prune_nones_list(data)
+
+                    tmp["sizes"] = sizes[:tmp["n_increment"]]
+
+                meshm["meshmaker"]["parameters"].append(tmp)
+
+            else:
+                break
+        
+    # RZ2D
+    elif mesh_type in {"RZ2D", "RZ2DL"}:
+        meshm["meshmaker"]["type"] = mesh_type.lower()
+        fmt = fmt["RZ2D"]
+
+        # Record 1
+        meshm["meshmaker"]["parameters"] = []
+
+        while True:
+            line = f.next()
+
+            if line.strip():
+                data = read_record(line, fmt[1])
+                data_type = data[0].upper()
+
+                if data_type == "RADII":
+                    line = f.next()
+                    data = read_record(line, fmt["RADII"][1])
+                    n = data[0]
+
+                    radii = []
+                    while len(radii) < n:
+                        line = f.next()
+                        data = read_record(line, fmt["RADII"][2])
+                        radii += prune_nones_list(data)
+
+                    tmp = {
+                        "type": data_type.lower(),
+                        "radii": radii[:n],
+                    }
+                    meshm["meshmaker"]["parameters"].append(tmp)
+
+                elif data_type == "EQUID":
+                    line = f.next()
+                    data = read_record(line, fmt["EQUID"])
+
+                    tmp = {
+                        "type": data_type.lower(),
+                        "n_increment": data[0],
+                        "size": data[2],
+                    }
+                    meshm["meshmaker"]["parameters"].append(tmp)
+
+                elif data_type == "LOGAR":
+                    line = f.next()
+                    data = read_record(line, fmt["LOGAR"])
+
+                    tmp = {
+                        "type": data_type.lower(),
+                        "n_increment": data[0],
+                        "radius": data[2],
+                        "radius_ref": data[3],
+                    }
+                    meshm["meshmaker"]["parameters"].append(tmp)
+
+                elif data_type == "LAYER":
+                    # Record 1
+                    line = f.next()
+                    data = read_record(line, fmt["LAYER"][1])
+                    n = data[0]
+
+                    # Record 2
+                    thicknesses = []
+                    while len(thicknesses) < n:
+                        line = f.next()
+                        data = read_record(line, fmt["LAYER"][2])
+                        thicknesses += prune_nones_list(data)
+
+                    tmp = {
+                        "type": data_type.lower(),
+                        "thicknesses": thicknesses[:n]
+                    }
+                    meshm["meshmaker"]["parameters"].append(tmp)
+
+            else:
+                break
+
+    return meshm
