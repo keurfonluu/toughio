@@ -54,6 +54,8 @@ def read(filename, file_format=None, **kwargs):
     ----------------
     label_length : int or None, optional, default None
         Only if ``file_format = "tough"``. Number of characters in cell labels.
+    eos : str or None, optional, default None
+        Only if ``file_format = "tough"``. Equation of State.
 
     Returns
     -------
@@ -104,6 +106,9 @@ def write(filename, parameters, file_format=None, **kwargs):
          - None: write all blocks except blocks defined in `ignore_blocks`.
     ignore_blocks : list of str or None, optional, default None
         Only if ``file_format = "tough"`` and `block` is None. Blocks to ignore.
+    eos : str or None, optional, default None
+        Only if ``file_format = "tough"``. Equation of State.
+        If `eos` is defined in `parameters`, this option will be ignored.
 
     """
     if not isinstance(filename, str):

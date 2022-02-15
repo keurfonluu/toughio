@@ -14,7 +14,7 @@ __all__ = [
 ]
 
 
-def write(filename, parameters, block="all", ignore_blocks=None):
+def write(filename, parameters, block=None, ignore_blocks=None, eos=None):
     """
     Write TOUGH input file.
 
@@ -33,6 +33,8 @@ def write(filename, parameters, block="all", ignore_blocks=None):
          - None: write all blocks except blocks defined in `ignore_blocks`.
     ignore_blocks : list of str or None, optional, default None
         Blocks to ignore. Only if `block` is None.
+    eos : str or None, optional, default None
+        Equation of State. If `eos` is defined in `parameters`, this option will be ignored.
 
     """
     # Deprecation error
@@ -46,14 +48,14 @@ def write(filename, parameters, block="all", ignore_blocks=None):
         ):
             raise ValueError("'variables' must be a list of dicts since v1.7.0.")
 
-    buffer = write_buffer(parameters, block, ignore_blocks)
+    buffer = write_buffer(parameters, block, ignore_blocks, eos)
     with open(filename, "w") as f:
         for record in buffer:
             f.write(record)
 
 
 @check_parameters(dtypes["PARAMETERS"])
-def write_buffer(params, block, ignore_blocks=None):
+def write_buffer(params, block, ignore_blocks=None, eos_=None):
     """Write TOUGH input file as a list of 80-character long record strings."""
     from ._common import Parameters
     from ._common import blocks as blocks_
@@ -152,6 +154,12 @@ def write_buffer(params, block, ignore_blocks=None):
             "EOS '{}' is unknown or not supported.".format(parameters["eos"])
         )
 
+    if parameters["eos"]:
+        eos_ = parameters["eos"]
+
+    else:
+        parameters["eos"] = eos_
+
     # Set some flags
     cond1 = (
         "relative_permeability" in parameters["default"].keys()
@@ -165,6 +173,8 @@ def write_buffer(params, block, ignore_blocks=None):
 
     param = False
     if prune_nones_list(parameters["default"]["initial_condition"]):
+        param = True
+    if eos_ == "tmvoc" and parameters["default"]["phase_composition"] is not None:
         param = True
 
     for option in parameters["options"].values():
@@ -231,13 +241,13 @@ def write_buffer(params, block, ignore_blocks=None):
         out += _write_start()
 
     if "PARAM" in blocks and param:
-        out += _write_param(parameters)
+        out += _write_param(parameters, eos_)
 
     if "SELEC" in blocks and parameters["selections"]:
         out += _write_selec(parameters)
 
     if "INDOM" in blocks and indom:
-        out += _write_indom(parameters)
+        out += _write_indom(parameters, eos_)
 
     if "MOMOP" in blocks and parameters["more_options"]:
         out += _write_momop(parameters)
@@ -273,7 +283,7 @@ def write_buffer(params, block, ignore_blocks=None):
         out += _write_conne(parameters)
 
     if "INCON" in blocks and parameters["initial_conditions"]:
-        out += _write_incon(parameters)
+        out += _write_incon(parameters, eos_)
 
     if "MESHM" in blocks and parameters["meshmaker"]:
         out += _write_meshm(parameters)
@@ -653,7 +663,7 @@ def _write_start():
 @check_parameters(dtypes["PARAM"], keys="options")
 @check_parameters(dtypes["MOP"], keys="extra_options")
 @block("PARAM")
-def _write_param(parameters):
+def _write_param(parameters, eos_=None):
     """Write PARAM block data."""
     # Load data
     from ._common import extra_options, options
@@ -718,6 +728,10 @@ def _write_param(parameters):
         data["derivative_factor"],
     ]
     out += write_record(values, fmt4)
+
+    # Record 4 (TMVOC)
+    if eos_ == "tmvoc":
+        out += write_record([parameters["default"]["phase_composition"]], str2format("5d"))
 
     # Record 4
     n = min(4, len(parameters["default"]["initial_condition"]))
@@ -784,7 +798,7 @@ def _write_selec(parameters):
 
 
 @block("INDOM", multi=True)
-def _write_indom(parameters):
+def _write_indom(parameters, eos_):
     """Write INDOM block data."""
     if parameters["rocks_order"]:
         order = parameters["rocks_order"]
@@ -801,11 +815,22 @@ def _write_indom(parameters):
 
     out = []
     for k in order:
-        if "initial_condition" in parameters["rocks"][k]:
+        cond1 = "initial_condition" in parameters["rocks"][k]
+        cond2 = eos_ == "tmvoc" and parameters["rocks"][k]["phase_composition"] is not None
+
+        if cond1 or cond2:
             data = parameters["rocks"][k]["initial_condition"]
+
             if any(x is not None for x in data):
                 # Record 1
                 values = [k]
+
+                if eos_ == "tmvoc":
+                    values.append(parameters["rocks"][k]["phase_composition"])
+
+                else:
+                    values.append(None)
+
                 out += write_record(values, fmt1)
 
                 # Record 2
@@ -1169,7 +1194,7 @@ def _write_conne(parameters):
 
 @check_parameters(dtypes["INCON"], keys="initial_conditions", is_list=True)
 @block("INCON", multi=True)
-def _write_incon(parameters):
+def _write_incon(parameters, eos_=None):
     """Write INCON block data."""
     from ._common import initial_conditions
 
@@ -1182,7 +1207,7 @@ def _write_incon(parameters):
     # Format
     label_length = len(max(parameters["initial_conditions"], key=len))
     fmt = block_to_format["INCON"]
-    fmt1 = str2format(fmt[label_length])
+    fmt1 = str2format(fmt[eos_][label_length] if eos_ in fmt else fmt["default"][label_length])
     fmt2 = str2format(fmt[0])
 
     out = []
@@ -1197,7 +1222,13 @@ def _write_incon(parameters):
             None,
             data["porosity"],
         ]
-        values += list(data["userx"])
+
+        if eos_ == "tmvoc":
+            values += [data["phase_composition"]]
+
+        else:
+            values += list(data["userx"])
+
         out += write_record(values, fmt1)
 
         # Record 2
