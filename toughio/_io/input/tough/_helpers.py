@@ -61,6 +61,7 @@ dtypes = {
         "capillarity": "dict",
         "permeability_model": "dict",
         "equivalent_pore_pressure": "dict",
+        "phase_composition": "int",
     },
     "FLAC": {"creep": "bool", "porosity_model": "int", "version": "int"},
     "CHEMP": {
@@ -160,7 +161,12 @@ dtypes = {
         "gravity_cosine_angle": "scalar",
         "radiant_emittance_factor": "scalar",
     },
-    "INCON": {"porosity": "scalar", "userx": "array_like", "values": "array_like"},
+    "INCON": {
+        "porosity": "scalar",
+        "userx": "array_like",
+        "values": "array_like",
+        "phase_composition": "int",
+    },
     "MESHM": {"type": "str", "parameters": "array_like", "angle": "scalar"},
 }
 

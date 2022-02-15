@@ -361,11 +361,13 @@ class Mesh(object):
             Move cells to bottom of block 'ELEME' if their materials is in `material_end`.
         incon : bool, optional, default False
             If `True`, initial conditions will be written in file `INCON`.
+        eos : str or None, optional, default None
+            Equation of State.
 
         """
         self.write(filename, file_format="tough", **kwargs)
 
-    def write_incon(self, filename="INCON"):
+    def write_incon(self, filename="INCON", eos=None):
         """
         Write TOUGH `INCON` file.
 
@@ -373,6 +375,8 @@ class Mesh(object):
         ----------
         filename : str, optional, default 'INCON'
             Output file name.
+        eos : str or None, optional, default None
+            Equation of State.
 
         Note
         ----
@@ -382,14 +386,14 @@ class Mesh(object):
         """
         from .tough._tough import check_incon, init_incon, write_incon
 
-        primary_variables, porosities, permeabilities = init_incon(self)
+        primary_variables, porosities, permeabilities, phase_compositions = init_incon(self)
         incon = check_incon(
-            True, primary_variables, porosities, permeabilities, self.n_cells
+            True, primary_variables, porosities, permeabilities, phase_compositions, self.n_cells, eos,
         )
 
         if incon:
             write_incon(
-                filename, self.labels, primary_variables, porosities, permeabilities,
+                filename, self.labels, primary_variables, porosities, permeabilities, phase_compositions, eos,
             )
 
     def read_output(self, file_or_output, time_step=-1, connection=False):

@@ -17,7 +17,7 @@ oft_to_key = {
 }
 
 
-def read(filename, label_length=None):
+def read(filename, label_length=None, eos=None):
     """
     Read TOUGH input file.
 
@@ -27,6 +27,8 @@ def read(filename, label_length=None):
         Input file name.
     label_length : int or None, optional, default None
         Number of characters in cell labels.
+    eos : str or None, optional, default None
+        Equation of State.
 
     Returns
     -------
@@ -40,12 +42,12 @@ def read(filename, label_length=None):
         raise ValueError()
 
     with open(filename, "r") as f:
-        out = read_buffer(f, label_length)
+        out = read_buffer(f, label_length, eos)
 
     return out
 
 
-def read_buffer(f, label_length):
+def read_buffer(f, label_length, eos):
     """Read TOUGH input file."""
     from ._common import blocks
 
@@ -112,7 +114,7 @@ def read_buffer(f, label_length):
                 parameters["start"] = True
 
             elif line.startswith("PARAM"):
-                param = _read_param(fiter)
+                param = _read_param(fiter, eos)
                 parameters["options"] = param["options"]
                 parameters["extra_options"] = param["extra_options"]
 
@@ -126,7 +128,7 @@ def read_buffer(f, label_length):
                 parameters.update(_read_selec(fiter))
 
             elif line.startswith("INDOM"):
-                indom = _read_indom(fiter)
+                indom = _read_indom(fiter, eos)
 
                 for k, v in indom["rocks"].items():
                     parameters["rocks"][k].update(v)
@@ -171,7 +173,7 @@ def read_buffer(f, label_length):
                 parameters.update(_read_conne(fiter, label_length))
 
             elif line.startswith("INCON"):
-                parameters.update(_read_incon(fiter, label_length))
+                parameters.update(_read_incon(fiter, label_length, eos))
 
             elif line.startswith("MESHM"):
                 parameters.update(_read_meshm(fiter))
@@ -415,7 +417,7 @@ def _read_solvr(f):
     return solvr
 
 
-def _read_param(f):
+def _read_param(f, eos=None):
     """Read PARAM block data."""
     fmt = block_to_format["PARAM"]
     param = {}
@@ -476,6 +478,12 @@ def _read_param(f):
         }
     )
 
+    # Record 4 (TMVOC)
+    if eos == "tmvoc":
+        line = f.next()
+        data = read_record(line, "5d")
+        param["default"] = {"phase_composition": data[0]}
+
     # Record 4 and record 5 (EOS7R)
     line = f.next()
     data = read_record(line, fmt[5])
@@ -487,11 +495,12 @@ def _read_param(f):
     except ValueError:
         f.seek(i, increment=-1)
 
+    if "default" not in param:
+        param["default"] = {}
+
     if any(x is not None for x in data):
         data = prune_nones_list(data)
-        param["default"] = {"initial_condition": data}
-    else:
-        param["default"] = {}
+        param["default"]["initial_condition"] = data
 
     # Remove Nones
     param["options"] = prune_nones_dict(param["options"])
@@ -523,7 +532,7 @@ def _read_selec(f):
     return selec
 
 
-def _read_indom(f):
+def _read_indom(f, eos=None):
     """Read INDOM block data."""
     fmt = block_to_format["INDOM"]
     indom = {"rocks": {}}
@@ -533,7 +542,9 @@ def _read_indom(f):
     while True:
         if line.strip():
             # Record 1
-            rock = read_record(line, fmt[5])[0]
+            data = read_record(line, fmt[5])
+            rock = data[0]
+            phase_composition = data[1]  # TMVOC
 
             # Record 2
             line = f.next()
@@ -555,6 +566,10 @@ def _read_indom(f):
 
             data = prune_nones_list(data)
             indom["rocks"][rock] = {"initial_condition": data}
+
+            if eos == "tmvoc":
+                indom["rocks"][rock]["phase_composition"] = phase_composition
+
         else:
             break
 
@@ -591,9 +606,6 @@ def _read_times(f):
         line = f.next()
         data = read_record(line, fmt[2])
         times["times"] += prune_nones_list(data)
-
-    if n_times == 1:
-        times["times"] = times["times"][0]
 
     return times
 
@@ -817,9 +829,10 @@ def _read_conne(f, label_length):
     return conne
 
 
-def _read_incon(f, label_length):
+def _read_incon(f, label_length, eos=None):
     """Read INCON block data."""
     fmt = block_to_format["INCON"]
+    fmt2 = fmt[eos] if eos in fmt else fmt["default"]
     incon = {"initial_conditions": {}, "initial_conditions_order": []}
 
     line = f.next()
@@ -830,13 +843,16 @@ def _read_incon(f, label_length):
     while True:
         if line.strip() and not line.startswith("+++"):
             # Record 1
-            data = read_record(line, fmt[label_length])
+            data = read_record(line, fmt2[label_length])
             label = data[0]
-            userx = prune_nones_list(data[4:9])
-            incon["initial_conditions"][label] = {
-                "porosity": data[3],
-                "userx": userx if userx else None,
-            }
+            incon["initial_conditions"][label] = {"porosity": data[3]}
+
+            if eos == "tmvoc":
+                incon["initial_conditions"][label]["phase_composition"] = data[4]
+
+            else:
+                userx = prune_nones_list(data[4:9])
+                incon["initial_conditions"][label]["userx"] = userx if userx else None
 
             # Record 2
             line = f.next()

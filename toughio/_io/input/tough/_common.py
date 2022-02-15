@@ -231,6 +231,7 @@ default = {
     "capillarity": {"id": None, "parameters": []},
     "permeability_model": {"id": 1, "parameters": []},
     "equivalent_pore_pressure": {"id": 3, "parameters": []},
+    "phase_composition": None,
 }
 
 eos = {
