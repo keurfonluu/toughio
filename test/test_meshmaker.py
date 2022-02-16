@@ -86,3 +86,70 @@ def test_layer():
 
     assert np.allclose(mesh.volumes[i1], mesh_layer.volumes[i2])
     assert np.allclose(mesh.face_areas[i1], mesh_layer.face_areas[i2])
+
+
+def test_from_meshmaker_xyz():
+    parameters = {
+        "meshmaker": {
+            "type": "xyz",
+            "parameters": [
+                {
+                    "type": "nx",
+                    "n_increment": 3,
+                    "sizes": 14.09,
+                },
+                {
+                    "type": "ny",
+                    "n_increment": 10,
+                    "sizes": np.arange(10) + 1.0,
+                },
+                {
+                    "type": "nz",
+                    "n_increment": 3,
+                    "sizes": [14.0, 0.9, 19.91],
+                },
+            ],
+        }
+    }
+    mesh = toughio.meshmaker.from_meshmaker(parameters)
+
+    assert mesh.n_cells == 90
+    assert np.allclose(mesh.points[:, 0].max(), 3 * 14.09)
+    assert np.allclose(mesh.points[:, 1].max(), 55.0)
+    assert np.allclose(mesh.points[:, 2].min(), -14.0 - 0.9 - 19.91)
+
+
+def test_from_meshmaker_rz2d():
+    parameters = {
+        "meshmaker": {
+            "type": "rz2d",
+            "parameters": [
+                {
+                    "type": "radii",
+                    "radii": np.arange(10),
+                },
+                {
+                    "type": "equid",
+                    "n_increment": 3,
+                    "size": 14.09,
+                },
+                {
+                    "type": "logar",
+                    "n_increment": 14,
+                    "radius": 64.0,
+                    "radius_ref": 0.9,
+                },
+                {
+                    "type": "layer",
+                    "thicknesses": [14.0, 0.9, 19.91],
+                },
+            ],
+        }
+    }
+    mesh = toughio.meshmaker.from_meshmaker(parameters)
+
+    assert mesh.n_cells == 26 * 3
+    assert np.allclose(mesh.points[:, 0].max(), 64.0)
+    assert np.allclose(mesh.points[:, 2].min(), -14.0 - 0.9 - 19.91)
+    assert np.allclose(mesh._dr.sum(), 64.0)
+    assert np.allclose(mesh._dz.sum(), 14 + 0.9 + 19.91)
