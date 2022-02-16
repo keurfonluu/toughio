@@ -817,6 +817,46 @@ def test_meshm_rz2d(layer):
                 assert np.allclose(v, parameter[k], atol=1.0e-4)
 
 
+def test_tmvoc():
+    parameters_ref = {
+        "eos": "tmvoc",
+        "n_component": 1,
+        "n_phase": 1,
+        "default": {
+            "phase_composition": np.random.randint(10),
+        },
+        "rocks": {
+            helpers.random_string(5): {
+                "initial_condition": np.random.rand(4),
+                "phase_composition": np.random.randint(10),
+            }
+            for _ in range(np.random.randint(10) + 1)
+        },
+        "initial_conditions": {
+            helpers.random_string(5): {
+                "values": np.random.rand(4),
+                "phase_composition": np.random.randint(10),
+            }
+            for _ in range(np.random.randint(10) + 1)
+        }
+    }
+    parameters = write_read(
+        parameters_ref,
+        writer_kws={"eos": "tmvoc"},
+        reader_kws={"eos": "tmvoc"},
+    )
+    
+    helpers.allclose_dict(parameters_ref["default"], parameters["default"])
+
+    assert sorted(parameters_ref["rocks"].keys()) == sorted(parameters["rocks"].keys())
+    for k, v in parameters_ref["rocks"].items():
+        helpers.allclose_dict(v, parameters["rocks"][k])
+
+    assert sorted(parameters_ref["initial_conditions"].keys()) == sorted(parameters["initial_conditions"].keys())
+    for k, v in parameters_ref["initial_conditions"].items():
+        helpers.allclose_dict(v, parameters["initial_conditions"][k])
+
+
 @pytest.mark.parametrize(
     "write_read, flag, enable",
     [
