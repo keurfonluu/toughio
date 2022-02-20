@@ -363,6 +363,8 @@ class Mesh(object):
             If `True`, initial conditions will be written in file `INCON`.
         eos : str or None, optional, default None
             Equation of State.
+        gravity : array_like or None, optional, default None
+            Gravity direction vector.
 
         """
         self.write(filename, file_format="tough", **kwargs)
