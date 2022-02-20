@@ -1,8 +1,8 @@
 import numpy as np
 
+from .._io.input._helpers import read
 from ._cylindric_grid import cylindric_grid
 from ._structured_grid import structured_grid
-from .._io.input._helpers import read
 
 
 def from_meshmaker(filename_or_dict):
@@ -33,7 +33,7 @@ def from_meshmaker(filename_or_dict):
     # XYZ
     if parameters["meshmaker"]["type"] == "xyz":
         dx_, dy_, dz_ = parse_xyz(parameters["meshmaker"]["parameters"])
-        
+
         dx, dy, dz = [], [], []
         for increment in dx_:
             append(dx, **increment)
@@ -156,12 +156,7 @@ def parse_rz2d(parameters):
 
             rmax += n * size
             dr.append(
-                {
-                    "n_increment": n,
-                    "size": size,
-                    "type": "uniform",
-                    "radius_ref": None,
-                }
+                {"n_increment": n, "size": size, "type": "uniform", "radius_ref": None,}
             )
 
         elif parameter["type"] == "logar":
@@ -256,7 +251,7 @@ def get_factor(n_increment, radius, radius_ref):
     ----
     Solve the equation DR * f + DR * f ** 2 + ... + DR * f ** n = RMAX.
     This polynomial should have only one positive root.
-    
+
     """
     roots = np.roots(np.append(np.ones(n_increment), -radius / radius_ref))
     roots = roots[::-1]  # The real positive root seems to be the last one

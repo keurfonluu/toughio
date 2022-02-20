@@ -81,11 +81,15 @@ def _write_conne(clabels, isot, d1, d2, areas, angles):
         yield record
 
 
-def _write_incon(labels, values, porosity=None, userx=None, phase_composition=None, eos=None):
+def _write_incon(
+    labels, values, porosity=None, userx=None, phase_composition=None, eos=None
+):
     """Return a generator that iterates over the records of block INCON."""
     porosity = porosity if porosity is not None else [None] * len(labels)
     userx = userx if userx is not None else [None] * len(labels)
-    phase_composition = phase_composition if phase_composition is not None else [None] * len(labels)
+    phase_composition = (
+        phase_composition if phase_composition is not None else [None] * len(labels)
+    )
     label_length = len(labels[0])
     fmt = block_to_format["INCON"]
 
@@ -119,7 +123,10 @@ def _write_incon(labels, values, porosity=None, userx=None, phase_composition=No
                     values += 3 * [""]
                     ignore_types += [4, 5, 6]
 
-            fmt1 = str2format(fmt[eos][label_length] if eos in fmt else fmt["default"][label_length], ignore_types=ignore_types)
+            fmt1 = str2format(
+                fmt[eos][label_length] if eos in fmt else fmt["default"][label_length],
+                ignore_types=ignore_types,
+            )
             fmt1 = "{}\n".format("".join(fmt1[: len(values)]))
             record = fmt1.format(*values)
 

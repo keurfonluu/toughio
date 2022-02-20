@@ -70,11 +70,7 @@ def write(
     )
     points = mesh.points
     connections = mesh.connections
-    gravity = (
-        gravity
-        if gravity is not None
-        else np.array([0.0, 0.0, -1.0])
-    )
+    gravity = gravity if gravity is not None else np.array([0.0, 0.0, -1.0])
 
     # Define parameters related to faces
     faces = mesh.faces
@@ -83,7 +79,15 @@ def write(
 
     # Required variables for block INCON
     primary_variables, porosities, permeabilities, phase_compositions = init_incon(mesh)
-    incon = check_incon(incon, primary_variables, porosities, permeabilities, phase_compositions, num_cells, eos)
+    incon = check_incon(
+        incon,
+        primary_variables,
+        porosities,
+        permeabilities,
+        phase_compositions,
+        num_cells,
+        eos,
+    )
 
     # Write MESH file
     write_mesh(
@@ -121,7 +125,13 @@ def write(
 
 
 def check_incon(
-    incon, primary_variables, porosities, permeabilities, phase_compositions, num_cells, eos,
+    incon,
+    primary_variables,
+    porosities,
+    permeabilities,
+    phase_compositions,
+    num_cells,
+    eos,
 ):
     """Check INCON inputs and show warnings if necessary."""
     do_incon = incon
@@ -161,7 +171,9 @@ def check_incon(
         if not incon:
             logging.warning("Phase composition is only exported if incon is provided.")
         else:
-            if not (len(phase_compositions) == num_cells and phase_compositions.ndim == 1):
+            if not (
+                len(phase_compositions) == num_cells and phase_compositions.ndim == 1
+            ):
                 raise ValueError("Inconsistent phase composition array.")
 
     return do_incon
@@ -229,12 +241,24 @@ def write_mesh(
 
 
 def write_incon(
-    filename, labels, primary_variables, porosities, permeabilities, phase_compositions, eos,
+    filename,
+    labels,
+    primary_variables,
+    porosities,
+    permeabilities,
+    phase_compositions,
+    eos,
 ):
     """Write INCON file."""
     with open(filename, "w") as f:
         _write_incon(
-            f, labels, primary_variables, porosities, permeabilities, phase_compositions, eos,
+            f,
+            labels,
+            primary_variables,
+            porosities,
+            permeabilities,
+            phase_compositions,
+            eos,
         )
 
 
@@ -361,7 +385,9 @@ def _write_conne(
 
 
 @block("INCON")
-def _write_incon(f, labels, primary_variables, porosities, permeabilities, phase_compositions, eos):
+def _write_incon(
+    f, labels, primary_variables, porosities, permeabilities, phase_compositions, eos
+):
     """Write INCON block."""
     from ._helpers import _write_incon as writer
 
@@ -371,7 +397,9 @@ def _write_incon(f, labels, primary_variables, porosities, permeabilities, phase
             permeabilities[:, None] if permeabilities.ndim == 1 else permeabilities
         )
 
-    for record in writer(labels, primary_variables, porosities, permeabilities, phase_compositions, eos):
+    for record in writer(
+        labels, primary_variables, porosities, permeabilities, phase_compositions, eos
+    ):
         f.write(record)
 
 

@@ -929,13 +929,13 @@ def _read_meshm(f):
                         data = read_record(line, fmt[3])
                         sizes += prune_nones_list(data)
 
-                    tmp["sizes"] = sizes[:tmp["n_increment"]]
+                    tmp["sizes"] = sizes[: tmp["n_increment"]]
 
                 meshm["meshmaker"]["parameters"].append(tmp)
 
             else:
                 break
-        
+
     # RZ2D
     elif mesh_type in {"RZ2D", "RZ2DL"}:
         meshm["meshmaker"]["type"] = mesh_type.lower()
@@ -1004,10 +1004,7 @@ def _read_meshm(f):
                         data = read_record(line, fmt["LAYER"][2])
                         thicknesses += prune_nones_list(data)
 
-                    tmp = {
-                        "type": data_type.lower(),
-                        "thicknesses": thicknesses[:n]
-                    }
+                    tmp = {"type": data_type.lower(), "thicknesses": thicknesses[:n]}
                     meshm["meshmaker"]["parameters"].append(tmp)
 
             else:
