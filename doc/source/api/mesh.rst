@@ -33,3 +33,5 @@ Basic generators
 .. autofunction:: toughio.meshmaker.structured_grid
 
 .. autofunction:: toughio.meshmaker.triangulate
+
+.. autofunction:: toughio.meshmaker.from_meshmaker
