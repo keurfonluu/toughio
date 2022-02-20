@@ -43,6 +43,7 @@ def write(
     incon=False,
     coord=False,
     eos=None,
+    gravity=None,
 ):
     """Write TOUGH MESH file (and INCON file)."""
     if nodal_distance not in {"line", "orthogonal"}:
@@ -53,6 +54,8 @@ def write(
         raise TypeError()
     if not isinstance(incon, bool):
         raise TypeError()
+    if not (gravity is None or (np.ndim(gravity) == 1 and len(gravity) == 3)):
+        raise ValueError()
 
     # Required variables for blocks ELEME and CONNE
     num_cells = mesh.n_cells
@@ -67,7 +70,11 @@ def write(
     )
     points = mesh.points
     connections = mesh.connections
-    gravity = np.array([0.0, 0.0, -1.0])
+    gravity = (
+        gravity
+        if gravity is not None
+        else np.array([0.0, 0.0, -1.0])
+    )
 
     # Define parameters related to faces
     faces = mesh.faces

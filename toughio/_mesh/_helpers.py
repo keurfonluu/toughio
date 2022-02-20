@@ -154,6 +154,10 @@ def write(filename, mesh, file_format=None, **kwargs):
         Only if ``file_format = "tough"``. Move cells to bottom of block 'ELEME' if their materials is in `material_end`.
     incon : bool, optional, default False
         Only if ``file_format = "tough"``. If `True`, initial conditions will be written in file `INCON`.
+    eos : str or None, optional, default None
+        Only if ``file_format = "tough"``. Equation of State.
+    gravity : array_like or None, optional, default None
+        Only if ``file_format = "tough"``. Gravity direction vector.
     protocol : integer, optional, default `pickle.HIGHEST_PROTOCOL`
         Only if ``file_format = "pickle"``. :mod:`pickle` protocol version.
 
