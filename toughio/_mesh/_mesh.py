@@ -388,14 +388,28 @@ class Mesh(object):
         """
         from .tough._tough import check_incon, init_incon, write_incon
 
-        primary_variables, porosities, permeabilities, phase_compositions = init_incon(self)
+        primary_variables, porosities, permeabilities, phase_compositions = init_incon(
+            self
+        )
         incon = check_incon(
-            True, primary_variables, porosities, permeabilities, phase_compositions, self.n_cells, eos,
+            True,
+            primary_variables,
+            porosities,
+            permeabilities,
+            phase_compositions,
+            self.n_cells,
+            eos,
         )
 
         if incon:
             write_incon(
-                filename, self.labels, primary_variables, porosities, permeabilities, phase_compositions, eos,
+                filename,
+                self.labels,
+                primary_variables,
+                porosities,
+                permeabilities,
+                phase_compositions,
+                eos,
             )
 
     def read_output(self, file_or_output, time_step=-1, connection=False):

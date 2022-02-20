@@ -731,7 +731,9 @@ def _write_param(parameters, eos_=None):
 
     # Record 4 (TMVOC)
     if eos_ == "tmvoc":
-        out += write_record([parameters["default"]["phase_composition"]], str2format("5d"))
+        out += write_record(
+            [parameters["default"]["phase_composition"]], str2format("5d")
+        )
 
     # Record 4
     n = min(4, len(parameters["default"]["initial_condition"]))
@@ -816,7 +818,9 @@ def _write_indom(parameters, eos_):
     out = []
     for k in order:
         cond1 = "initial_condition" in parameters["rocks"][k]
-        cond2 = eos_ == "tmvoc" and parameters["rocks"][k]["phase_composition"] is not None
+        cond2 = (
+            eos_ == "tmvoc" and parameters["rocks"][k]["phase_composition"] is not None
+        )
 
         if cond1 or cond2:
             data = parameters["rocks"][k]["initial_condition"]
@@ -1207,7 +1211,9 @@ def _write_incon(parameters, eos_=None):
     # Format
     label_length = len(max(parameters["initial_conditions"], key=len))
     fmt = block_to_format["INCON"]
-    fmt1 = str2format(fmt[eos_][label_length] if eos_ in fmt else fmt["default"][label_length])
+    fmt1 = str2format(
+        fmt[eos_][label_length] if eos_ in fmt else fmt["default"][label_length]
+    )
     fmt2 = str2format(fmt[0])
 
     out = []
@@ -1246,7 +1252,7 @@ def _write_incon(parameters, eos_=None):
 @block("MESHM", multi=True)
 def _write_meshm(parameters):
     """Write MESHM block data."""
-    from ._common import meshmaker, xyz, rz2d
+    from ._common import meshmaker, rz2d, xyz
 
     data = deepcopy(meshmaker)
     data.update(parameters["meshmaker"])

@@ -211,8 +211,7 @@ def test_near():
 
 @pytest.mark.skipif(sys.version_info < (3, 6), reason="Order of keys in dictionary")
 @pytest.mark.parametrize(
-    "num_pvars, eos",
-    [(4, None), (6, None), (4, "tmvoc")],
+    "num_pvars, eos", [(4, None), (6, None), (4, "tmvoc")],
 )
 def test_write_tough(num_pvars, eos):
     this_dir = os.path.dirname(os.path.abspath(__file__))
@@ -248,5 +247,7 @@ def test_write_tough(num_pvars, eos):
     assert np.allclose(mesh_ref.cell_data["initial_condition"], pvars)
 
     if eos == "tmvoc":
-        indicat0 = [v["phase_composition"] for v in incon["initial_conditions"].values()]
+        indicat0 = [
+            v["phase_composition"] for v in incon["initial_conditions"].values()
+        ]
         assert np.allclose(mesh_ref.cell_data["phase_composition"], indicat0)

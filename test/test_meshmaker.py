@@ -93,21 +93,9 @@ def test_from_meshmaker_xyz():
         "meshmaker": {
             "type": "xyz",
             "parameters": [
-                {
-                    "type": "nx",
-                    "n_increment": 3,
-                    "sizes": 14.09,
-                },
-                {
-                    "type": "ny",
-                    "n_increment": 10,
-                    "sizes": np.arange(10) + 1.0,
-                },
-                {
-                    "type": "nz",
-                    "n_increment": 3,
-                    "sizes": [14.0, 0.9, 19.91],
-                },
+                {"type": "nx", "n_increment": 3, "sizes": 14.09},
+                {"type": "ny", "n_increment": 10, "sizes": np.arange(10) + 1.0},
+                {"type": "nz", "n_increment": 3, "sizes": [14.0, 0.9, 19.91]},
             ],
         }
     }
@@ -124,25 +112,15 @@ def test_from_meshmaker_rz2d():
         "meshmaker": {
             "type": "rz2d",
             "parameters": [
-                {
-                    "type": "radii",
-                    "radii": np.arange(10),
-                },
-                {
-                    "type": "equid",
-                    "n_increment": 3,
-                    "size": 14.09,
-                },
+                {"type": "radii", "radii": np.arange(10)},
+                {"type": "equid", "n_increment": 3, "size": 14.09},
                 {
                     "type": "logar",
                     "n_increment": 14,
                     "radius": 64.0,
                     "radius_ref": 0.9,
                 },
-                {
-                    "type": "layer",
-                    "thicknesses": [14.0, 0.9, 19.91],
-                },
+                {"type": "layer", "thicknesses": [14.0, 0.9, 19.91]},
             ],
         }
     }
