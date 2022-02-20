@@ -6,6 +6,15 @@ from .._io.input._helpers import read
 
 
 def from_meshmaker(filename_or_dict):
+    """
+    Generate a mesh from a block MESHM.
+
+    Parameters
+    ----------
+    filename_or_dict: str or dict
+        Input file name or parameters dict with key "meshmaker".
+
+    """
     if isinstance(filename_or_dict, str):
         parameters = read(filename_or_dict, file_format="tough")
 
@@ -61,6 +70,7 @@ def from_meshmaker(filename_or_dict):
 
 
 def parse_xyz(parameters):
+    """Parse input for XYZ mesh."""
 
     def parse(parameter):
         n = get_value(parameter, "n_increment", 1)
@@ -112,6 +122,7 @@ def parse_xyz(parameters):
 
 
 def parse_rz2d(parameters):
+    """Parse input for RZ2D mesh."""
     rmax = 0.0
     dr, dz = [], []
     for parameter in parameters:
@@ -194,6 +205,7 @@ def parse_rz2d(parameters):
 
 
 def get_value(parameter, key, default):
+    """Helper function to get value in dictionary."""
     return (
         default
         if key not in parameter
@@ -204,6 +216,7 @@ def get_value(parameter, key, default):
 
 
 def squeeze(data):
+    """Squeeze a sequence."""
     count = [1]
     values = [data[0]]
 
@@ -219,6 +232,7 @@ def squeeze(data):
 
 
 def append(sizes, n_increment, size, type="uniform", radius_ref=None):
+    """Append next increment size(s)."""
     if type == "uniform":
         sizes += [size] * n_increment
 
@@ -235,6 +249,15 @@ def append(sizes, n_increment, size, type="uniform", radius_ref=None):
 
 
 def get_factor(n_increment, radius, radius_ref):
+    """
+    Calculate f factor.
+
+    Note
+    ----
+    Solve the equation DR * f + DR * f ** 2 + ... + DR * f ** n = RMAX.
+    This polynomial should have only one positive root.
+    
+    """
     roots = np.roots(np.append(np.ones(n_increment), -radius / radius_ref))
     roots = roots[::-1]  # The real positive root seems to be the last one
 
