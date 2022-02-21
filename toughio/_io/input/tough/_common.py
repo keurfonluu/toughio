@@ -61,6 +61,7 @@ _Parameters = {
     "connections_order": None,
     "initial_conditions": {},
     "initial_conditions_order": None,
+    "meshmaker": {},
     "default": {},
 }
 
@@ -190,6 +191,28 @@ initial_conditions = {
     "values": [None for _ in range(4)],
 }
 
+meshmaker = {
+    "type": None,
+    "parameters": [],
+    "angle": None,
+}
+
+xyz = {
+    "type": None,
+    "n_increment": None,
+    "sizes": None,
+}
+
+rz2d = {
+    "type": None,
+    "radii": [],
+    "n_increment": None,
+    "size": None,
+    "radius": None,
+    "radius_ref": None,
+    "thicknesses": [],
+}
+
 default = {
     "density": None,
     "porosity": None,
@@ -208,6 +231,7 @@ default = {
     "capillarity": {"id": None, "parameters": []},
     "permeability_model": {"id": 1, "parameters": []},
     "equivalent_pore_pressure": {"id": 3, "parameters": []},
+    "phase_composition": None,
 }
 
 eos = {
