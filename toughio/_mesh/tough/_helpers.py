@@ -81,15 +81,20 @@ def _write_conne(clabels, isot, d1, d2, areas, angles):
         yield record
 
 
-def _write_incon(labels, values, porosity=None, userx=None):
+def _write_incon(
+    labels, values, porosity=None, userx=None, phase_composition=None, eos=None
+):
     """Return a generator that iterates over the records of block INCON."""
     porosity = porosity if porosity is not None else [None] * len(labels)
     userx = userx if userx is not None else [None] * len(labels)
+    phase_composition = (
+        phase_composition if phase_composition is not None else [None] * len(labels)
+    )
     label_length = len(labels[0])
     fmt = block_to_format["INCON"]
 
-    iterables = zip(labels, values, porosity, userx)
-    for label, value, phi, usrx in iterables:
+    iterables = zip(labels, values, porosity, userx, phase_composition)
+    for label, value, phi, usrx, indicat0 in iterables:
         cond1 = any(v > -1.0e-9 for v in value)
         cond2 = phi is not None
         cond3 = usrx is not None
@@ -104,13 +109,24 @@ def _write_incon(labels, values, porosity=None, userx=None):
                 values.append("")
                 ignore_types.append(3)
 
-            if usrx is not None:
-                values += list(usrx)
-            else:
-                values += 3 * [""]
-                ignore_types += [4, 5, 6]
+            if eos == "tmvoc":
+                if indicat0 is not None:
+                    values.append(indicat0)
+                else:
+                    values.append("")
+                    ignore_types.append(4)
 
-            fmt1 = str2format(fmt[label_length], ignore_types=ignore_types)
+            else:
+                if usrx is not None:
+                    values += list(usrx)
+                else:
+                    values += 3 * [""]
+                    ignore_types += [4, 5, 6]
+
+            fmt1 = str2format(
+                fmt[eos][label_length] if eos in fmt else fmt["default"][label_length],
+                ignore_types=ignore_types,
+            )
             fmt1 = "{}\n".format("".join(fmt1[: len(values)]))
             record = fmt1.format(*values)
 
