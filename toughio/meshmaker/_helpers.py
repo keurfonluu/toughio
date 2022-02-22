@@ -232,10 +232,12 @@ def append(sizes, n_increment, size, type="uniform", radius_ref=None):
         sizes += [size] * n_increment
 
     elif type == "logarithmic":
-        if not len(sizes):
-            raise ValueError()
+        if not radius_ref:
+            if not len(sizes):
+                raise ValueError()
 
-        radius_ref = radius_ref if radius_ref else sizes[-1]
+            radius_ref = sizes[-1]
+
         f = get_factor(n_increment, size, radius_ref)
 
         sizes.append(f * radius_ref)
