@@ -983,7 +983,7 @@ def _write_gener(parameters):
                     data[key] = data[key][0]
 
         itab = (
-            1
+            "1"
             if isinstance(data["specific_enthalpy"], (list, tuple, np.ndarray))
             else None
         )
