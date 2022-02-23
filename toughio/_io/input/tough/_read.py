@@ -182,7 +182,7 @@ def read_buffer(f, label_length, eos):
                 parameters["nover"] = True
 
             elif line.startswith("ENDCY"):
-                pass
+                break
 
     except:
         raise ReadError("failed to parse line {}.".format(fiter.count))
