@@ -334,7 +334,7 @@ def write_record(data, fmt, multi=False):
 
                     if len(tmp) > n:
                         fmt = "{{:>{}.{}e}}".format(n, n - 7)
-                        
+
                         return fmt.format(x)
 
                     else:
