@@ -626,7 +626,7 @@ def test_eleme(write_read, label_length, coord):
     for k, v in parameters_ref["elements"].items():
         for kk, vv in v.items():
             if not isinstance(vv, str):
-                assert np.allclose(vv, parameters["elements"][k][kk], atol=1.0e-4)
+                assert np.allclose(vv, parameters["elements"][k][kk], atol=1.0e-3)
             else:
                 assert vv == parameters["elements"][k][kk]
 
