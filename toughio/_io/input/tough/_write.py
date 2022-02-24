@@ -114,6 +114,7 @@ def write_buffer(params, block, ignore_blocks=None, eos_=None):
                 "initial_condition",
                 "relative_permeability",
                 "capillarity",
+                "phase_composition",
             }
             if cond1 and cond2:
                 parameters["rocks"][rock][k] = v
@@ -819,23 +820,25 @@ def _write_indom(parameters, eos_):
     for k in order:
         cond1 = "initial_condition" in parameters["rocks"][k]
         cond2 = (
-            eos_ == "tmvoc" and parameters["rocks"][k]["phase_composition"] is not None
+            eos_ == "tmvoc"
+            and "phase_composition" in parameters["rocks"][k]
+            and parameters["rocks"][k]["phase_composition"] is not None
         )
 
         if cond1 or cond2:
-            data = parameters["rocks"][k]["initial_condition"]
+            # Record 1
+            values = [k]
 
-            if any(x is not None for x in data):
-                # Record 1
-                values = [k]
+            if eos_ == "tmvoc":
+                values.append(parameters["rocks"][k]["phase_composition"])
 
-                if eos_ == "tmvoc":
-                    values.append(parameters["rocks"][k]["phase_composition"])
+            else:
+                values.append(None)
 
-                else:
-                    values.append(None)
+            out += write_record(values, fmt1)
 
-                out += write_record(values, fmt1)
+            if cond1:
+                data = parameters["rocks"][k]["initial_condition"]
 
                 # Record 2
                 n = min(4, len(data))
@@ -846,6 +849,9 @@ def _write_indom(parameters, eos_):
                 if len(data) > 4:
                     values = list(data[4:])
                     out += write_record(values, fmt2)
+
+            else:
+                out += ["\n"]
 
     return out
 
