@@ -1,4 +1,5 @@
 from ..._common import block_to_format, str2format
+from ..._io.input.tough._helpers import write_record
 
 
 def block(keyword):
@@ -24,7 +25,7 @@ def _write_eleme(labels, materials, volumes, nodes, material_name=None):
     """Return a generator that iterates over the records of block ELEME."""
     label_length = len(labels[0])
     fmt = block_to_format["ELEME"][label_length]
-    fmt = "{}\n".format("".join(str2format(fmt, ignore_types=[1, 2, 5, 6])))
+    fmt = str2format(fmt)
 
     iterables = zip(labels, materials, volumes, nodes)
     for label, material, volume, node in iterables:
@@ -34,19 +35,22 @@ def _write_eleme(labels, materials, volumes, nodes, material_name=None):
             else material
         )
         mat = mat if isinstance(mat, str) else "{:>5}".format(str(mat))
-        record = fmt.format(
-            label,  # ID
-            "",  # NSEQ
-            "",  # NADD
-            mat,  # MAT
-            volume,  # VOLX
-            "",  # AHTX
-            "",  # PMX
-            node[0],  # X
-            node[1],  # Y
-            node[2],  # Z
+        record = write_record(
+            [
+                label,  # ID
+                None,  # NSEQ
+                None,  # NADD
+                mat,  # MAT
+                volume,  # VOLX
+                None,  # AHTX
+                None,  # PMX
+                node[0],  # X
+                node[1],  # Y
+                node[2],  # Z
+            ],
+            fmt=fmt,
         )
-        yield record
+        yield record[0]
 
 
 def _write_coord(nodes):
@@ -62,23 +66,26 @@ def _write_conne(clabels, isot, d1, d2, areas, angles):
     """Return a generator that iterates over the records of block CONNE."""
     label_length = len(clabels[0][0])
     fmt = block_to_format["CONNE"][label_length]
-    fmt = "{}\n".format("".join(str2format(fmt, ignore_types=[1, 2, 3, 9])))
+    fmt = str2format(fmt)
 
     iterables = zip(clabels, isot, d1, d2, areas, angles)
     for label, isot, d1, d2, area, angle in iterables:
-        record = fmt.format(
-            "".join(label),  # ID1-ID2
-            "",  # NSEQ
-            "",  # NAD1
-            "",  # NAD2
-            isot,  # ISOT
-            d1,  # D1
-            d2,  # D2
-            area,  # AREAX
-            angle,  # BETAX
-            "",  # SIGX
+        record = write_record(
+            [
+                "".join(label),  # ID1-ID2
+                None,  # NSEQ
+                None,  # NAD1
+                None,  # NAD2
+                isot,  # ISOT
+                d1,  # D1
+                d2,  # D2
+                area,  # AREAX
+                angle,  # BETAX
+                None,  # SIGX
+            ],
+            fmt=fmt,
         )
-        yield record
+        yield record[0]
 
 
 def _write_incon(
