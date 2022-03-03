@@ -170,10 +170,18 @@ def read_buffer(f, label_length, eos):
                 parameters["coordinates"] = True
 
             elif line.startswith("CONNE"):
-                parameters.update(_read_conne(fiter, label_length))
+                conne, flag = _read_conne(fiter, label_length)
+                parameters.update(conne)
+
+                if flag:
+                    break
 
             elif line.startswith("INCON"):
-                parameters.update(_read_incon(fiter, label_length, eos))
+                incon, flag = _read_incon(fiter, label_length, eos)
+                parameters.update(incon)
+
+                if flag:
+                    break
 
             elif line.startswith("MESHM"):
                 parameters.update(_read_meshm(fiter))
@@ -802,6 +810,7 @@ def _read_conne(f, label_length):
     if not label_length:
         label_length = get_label_length(line[:9])
 
+    flag = False
     while True:
         if line.strip() and not line.startswith("+++"):
             data = read_record(line, fmt[label_length])
@@ -818,6 +827,7 @@ def _read_conne(f, label_length):
 
             conne["connections_order"].append(label)
         else:
+            flag = line.startswith("+++")
             break
 
         line = f.next()
@@ -826,7 +836,7 @@ def _read_conne(f, label_length):
         k: prune_nones_dict(v) for k, v in conne["connections"].items()
     }
 
-    return conne
+    return conne, flag
 
 
 def _read_incon(f, label_length, eos=None):
@@ -839,6 +849,7 @@ def _read_incon(f, label_length, eos=None):
     if not label_length:
         label_length = get_label_length(line[:9])
 
+    flag = False
     two_lines = True
     while True:
         if line.strip() and not line.startswith("+++"):
@@ -875,6 +886,7 @@ def _read_incon(f, label_length, eos=None):
             incon["initial_conditions"][label]["values"] = prune_nones_list(data)
             incon["initial_conditions_order"].append(label)
         else:
+            flag = line.startswith("+++")
             break
 
         line = f.next()
@@ -883,7 +895,7 @@ def _read_incon(f, label_length, eos=None):
         k: prune_nones_dict(v) for k, v in incon["initial_conditions"].items()
     }
 
-    return incon
+    return incon, flag
 
 
 def _read_meshm(f):
