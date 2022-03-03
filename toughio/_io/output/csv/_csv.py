@@ -11,25 +11,25 @@ __all__ = [
 
 header_to_unit = {
     "ELEM": "",
-    "X": "(M)",
-    "Y": "(M)",
-    "Z": "(M)",
-    "PRES": "(PA)",
-    "P": "(PA)",
-    "TEMP": "(DEC-C)",
-    "T": "(DEC-C)",
-    "PCAP_GL": "(PA)",
-    "PCAP": "(PA)",
-    "DEN_G": "(KG/M**3)",
-    "DG": "(KG/M**3)",
-    "DEN_L": "(KG/M**3)",
-    "DW": "(KG/M**3)",
+    "X": "M",
+    "Y": "M",
+    "Z": "M",
+    "PRES": "PA",
+    "P": "PA",
+    "TEMP": "DEC-C",
+    "T": "DEC-C",
+    "PCAP_GL": "PA",
+    "PCAP": "PA",
+    "DEN_G": "KG/M**3",
+    "DG": "KG/M**3",
+    "DEN_L": "KG/M**3",
+    "DW": "KG/M**3",
     "ELEM1": "",
     "ELEM2": "",
-    "HEAT": "(W)",
-    "FLOW": "(KG/S)",
-    "FLOW_G": "(KG/S)",
-    "FLOW_L": "(KG/S)",
+    "HEAT": "W",
+    "FLOW": "KG/S",
+    "FLOW_G": "KG/S",
+    "FLOW_L": "KG/S",
 }
 
 
@@ -94,8 +94,11 @@ def _read_csv(f, file_type):
     return headers, times, variables
 
 
-def write(filename, output):
+def write(filename, output, unit=None):
     """Write OUTPUT_{ELEME, CONNE}.csv."""
+    if not (unit is None or isinstance(unit, dict)):
+        raise TypeError()
+
     out = output[-1]
     headers = ["ELEM"] if out.type == "element" else ["ELEM1", "ELEM2"]
     headers += ["X"] if "X" in out.data.keys() else []
@@ -104,18 +107,21 @@ def write(filename, output):
     headers += [k for k in out.data.keys() if k not in {"X", "Y", "Z"}]
 
     with open(filename, "w") as f:
-        _write_csv(f, output, headers)
+        _write_csv(f, output, headers, unit)
 
 
-def _write_csv(f, output, headers):
+def _write_csv(f, output, headers, unit=None):
     """Write CSV table."""
+    header_to_unit_ = header_to_unit.copy()
+    header_to_unit_.update(unit)
+
     # Headers
     units = [
-        header_to_unit[header] if header in header_to_unit.keys() else " (-)"
+        header_to_unit_[header] if header in header_to_unit_.keys() else "-"
         for header in headers
     ]
     f.write(",".join('"{:>18}"'.format(header) for header in headers) + "\n")
-    f.write(",".join('"{:>18}"'.format(unit) for unit in units) + "\n")
+    f.write(",".join('"{:>18}"'.format("({})".format(unit)) for unit in units) + "\n")
 
     # Data
     formats = [
