@@ -126,6 +126,11 @@ def write(filename, output, file_format=None, **kwargs):
     file_format : str or None, optional, default None
         Output file format.
 
+    Other Parameters
+    ----------------
+    unit : dict or None, optional, default None
+        Only if ``file_format = "tough"``. Overwrite header unit.
+
     """
     if not isinstance(filename, str):
         raise TypeError()
