@@ -125,7 +125,7 @@ def write(filename, output, file_format=None, **kwargs):
         namedtuple (type, format, time, labels, data) or list of namedtuple for each time step to export.
     file_format : str or None, optional, default None
         Output file format.
-    
+
     Other Parameters
     ----------------
     unit : dict or None, optional, default None

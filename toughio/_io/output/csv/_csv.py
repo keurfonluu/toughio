@@ -113,7 +113,8 @@ def write(filename, output, unit=None):
 def _write_csv(f, output, headers, unit=None):
     """Write CSV table."""
     header_to_unit_ = header_to_unit.copy()
-    header_to_unit_.update(unit)
+    if unit is not None:
+        header_to_unit_.update(unit)
 
     # Headers
     units = [
