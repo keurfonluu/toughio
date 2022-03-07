@@ -128,7 +128,7 @@ def export(argv=None):
             sys.stdout.flush()
 
             mesh = triangulate(points[:, axis])
-            mesh.cell_dada = {}
+            mesh.cell_data = {}
 
             if args.file_format != "xdmf":
                 for label, data in output.data.items():
