@@ -418,8 +418,8 @@ class Mesh(object):
 
         Parameters
         ----------
-        file_or_output : str, namedtuple or list of namedtuple
-            Input file name or output data.
+        file_or_output : str, pathlike, buffer, namedtuple or list of namedtuple
+            Input file name or buffer, or output data.
         time_step : int, optional, default -1
             Data for given time step to import. Default is last time step.
         connection : bool, optional, default False
@@ -429,8 +429,6 @@ class Mesh(object):
         from .. import read_output
         from .._io.output._common import Output, reorder_labels
 
-        if not isinstance(file_or_output, (str, list, tuple, Output)):
-            raise TypeError()
         if not isinstance(time_step, int):
             raise TypeError()
 
