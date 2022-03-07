@@ -3,6 +3,7 @@ from __future__ import with_statement
 import numpy as np
 
 from .._common import to_output
+from ...._common import open_file
 
 __all__ = [
     "read",
@@ -35,7 +36,7 @@ header_to_unit = {
 
 def read(filename, file_type, file_format, labels_order):
     """Read OUTPUT_{ELEME, CONNE}.csv."""
-    with open(filename, "r") as f:
+    with open_file(filename, "r") as f:
         headers, times, variables = _read_csv(f, file_type)
 
         ilab = 1 if file_type == "element" else 2
@@ -106,7 +107,7 @@ def write(filename, output, unit=None):
     headers += ["Z"] if "Z" in out.data.keys() else []
     headers += [k for k in out.data.keys() if k not in {"X", "Y", "Z"}]
 
-    with open(filename, "w") as f:
+    with open_file(filename, "w") as f:
         _write_csv(f, output, headers, unit)
 
 
