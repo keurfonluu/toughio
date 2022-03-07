@@ -5,8 +5,8 @@ import os
 
 import numpy as np
 
-from ._helpers import block
 from ..._common import open_file
+from ._helpers import block
 
 __all__ = [
     "read",

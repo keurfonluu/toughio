@@ -1,5 +1,4 @@
 import os
-
 from contextlib import contextmanager
 
 block_to_format = {
@@ -145,11 +144,9 @@ def filetype_from_filename(filename, ext_to_fmt):
 
 @contextmanager
 def open_file(path_or_buffer, mode):
-
     def is_buffer(obj, mode):
-        return (
-            ("r" in mode and hasattr(obj, "read"))
-            or ("w" in mode and hasattr(obj, "write"))
+        return ("r" in mode and hasattr(obj, "read")) or (
+            "w" in mode and hasattr(obj, "write")
         )
 
     if is_buffer(path_or_buffer, mode):
