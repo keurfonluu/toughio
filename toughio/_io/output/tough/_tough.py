@@ -4,7 +4,7 @@ from functools import partial
 
 import numpy as np
 
-from ...._common import get_label_length
+from ...._common import get_label_length, open_file
 from ...input.tough._helpers import read_record, str2float
 from .._common import to_output
 
@@ -15,7 +15,7 @@ __all__ = [
 
 def read(filename, file_type, file_format, labels_order, label_length=None):
     """Read standard TOUGH OUTPUT."""
-    with open(filename, "r") as f:
+    with open_file(filename, "r") as f:
         headers, times, variables = _read_table(f, file_type, label_length)
 
         ilab = 1 if file_type == "element" else 2

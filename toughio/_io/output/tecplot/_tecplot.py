@@ -4,6 +4,7 @@ import numpy as np
 
 from ...._mesh.tecplot._tecplot import _read_variables, _read_zone
 from .._common import to_output
+from ...._common import open_file
 
 __all__ = [
     "read",
@@ -13,7 +14,7 @@ __all__ = [
 
 def read(filename, file_type, file_format, labels_order):
     """Read OUTPUT_ELEME.tec."""
-    with open(filename, "r") as f:
+    with open_file(filename, "r") as f:
         # Look for header (VARIABLES)
         while True:
             line = f.readline().strip()
@@ -70,7 +71,7 @@ def write(filename, output):
     headers += ["Z"] if "Z" in out.data.keys() else []
     headers += [k for k in out.data.keys() if k not in {"X", "Y", "Z"}]
 
-    with open(filename, "w") as f:
+    with open_file(filename, "w") as f:
         # Headers
         record = "".join("{:>18}".format(header) for header in headers)
         f.write("{}{}\n".format("{:>18}".format("VARIABLES       ="), record))
