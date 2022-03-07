@@ -5,7 +5,7 @@ from copy import deepcopy
 
 import numpy as np
 
-from ...._common import block_to_format, str2format, open_file
+from ...._common import block_to_format, open_file, str2format
 from ._common import default
 from ._helpers import block, check_parameters, dtypes, prune_nones_list, write_record
 

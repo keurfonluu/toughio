@@ -5,9 +5,9 @@ import logging
 import numpy as np
 
 from ...__about__ import __version__ as version
+from ..._common import open_file
 from .._helpers import _materials, get_material_key
 from .._mesh import CellBlock, Mesh
-from ..._common import open_file
 
 __all__ = [
     "read",

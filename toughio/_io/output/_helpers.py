@@ -2,7 +2,7 @@ from __future__ import with_statement
 
 import numpy as np
 
-from ..._common import filetype_from_filename, register_format, open_file
+from ..._common import filetype_from_filename, open_file, register_format
 from ._common import Output
 
 __all__ = [
@@ -75,7 +75,14 @@ def get_output_type(filename):
                 raise ValueError()
 
 
-def read(filename, labels_order=None, connection=False, label_length=None, file_format=None, **kwargs):
+def read(
+    filename,
+    labels_order=None,
+    connection=False,
+    label_length=None,
+    file_format=None,
+    **kwargs
+):
     """
     Read TOUGH SAVE or output file for each time step.
 
@@ -103,7 +110,9 @@ def read(filename, labels_order=None, connection=False, label_length=None, file_
 
     if file_format is None:
         file_type, file_format = get_output_type(filename)
-        file_type = "connection" if (file_format == "tough" and connection) else file_type
+        file_type = (
+            "connection" if (file_format == "tough" and connection) else file_type
+        )
     else:
         if file_format not in _reader_map:
             raise ValueError()
