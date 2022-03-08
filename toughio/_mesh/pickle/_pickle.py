@@ -5,6 +5,8 @@ try:
 except ImportError:
     import pickle
 
+from ..._common import open_file
+
 __all__ = [
     "read",
     "write",
@@ -26,7 +28,7 @@ def read(filename):
         Output mesh.
 
     """
-    with open(filename, "rb") as f:
+    with open_file(filename, "rb") as f:
         mesh = pickle.load(f)
 
     return mesh
@@ -46,5 +48,5 @@ def write(filename, mesh, protocol=pickle.HIGHEST_PROTOCOL):
         :mod:`pickle` protocol version.
 
     """
-    with open(filename, "wb") as f:
+    with open_file(filename, "wb") as f:
         pickle.dump(mesh, f, protocol=protocol)

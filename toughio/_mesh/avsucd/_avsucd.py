@@ -5,6 +5,7 @@ import logging
 import numpy as np
 
 from ...__about__ import __version__ as version
+from ..._common import open_file
 from .._helpers import _materials, get_material_key
 from .._mesh import CellBlock, Mesh
 
@@ -47,7 +48,7 @@ avsucd_to_meshio_order = {
 
 def read(filename):
     """Read AVS-UCD ASCII file."""
-    with open(filename, "r") as f:
+    with open_file(filename, "r") as f:
         out = read_buffer(f)
     return out
 
@@ -164,7 +165,7 @@ def write(filename, mesh):
             [mesh.points[:, 0], mesh.points[:, 1], np.zeros(mesh.points.shape[0])]
         )
 
-    with open(filename, "w") as f:
+    with open_file(filename, "w") as f:
         # Write meshio version
         f.write("# Written by toughio v{}\n".format(version))
 

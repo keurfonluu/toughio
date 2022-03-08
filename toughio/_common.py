@@ -1,4 +1,5 @@
 import os
+from contextlib import contextmanager
 
 block_to_format = {
     "ROCKS": {
@@ -139,3 +140,19 @@ def filetype_from_filename(filename, ext_to_fmt):
     ext = os.path.splitext(filename)[1].lower()
 
     return ext_to_fmt[ext] if ext in ext_to_fmt.keys() else ""
+
+
+@contextmanager
+def open_file(path_or_buffer, mode):
+    """Open file or buffer."""
+    def is_buffer(obj, mode):
+        return ("r" in mode and hasattr(obj, "read")) or (
+            "w" in mode and hasattr(obj, "write")
+        )
+
+    if is_buffer(path_or_buffer, mode):
+        yield path_or_buffer
+
+    else:
+        with open(path_or_buffer, mode) as f:
+            yield f

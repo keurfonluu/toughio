@@ -66,8 +66,8 @@ def read(filename, file_format=None, **kwargs):
 
     Parameters
     ----------
-    filename : str
-        Input file name.
+    filename : str, pathlike or buffer
+        Input file name or buffer.
     file_format : str or None, optional, default None
         Input file format.
 
@@ -83,8 +83,6 @@ def read(filename, file_format=None, **kwargs):
 
     """
     # Check file format
-    if not isinstance(filename, str):
-        raise TypeError()
     fmt = (
         file_format
         if file_format
@@ -135,8 +133,8 @@ def write(filename, mesh, file_format=None, **kwargs):
 
     Parameters
     ----------
-    filename : str
-        Output file name.
+    filename : str, pathlike or buffer
+        Output file name or buffer.
     mesh : toughio.Mesh
         Mesh to export.
     file_format : str or None, optional, default None
@@ -163,8 +161,6 @@ def write(filename, mesh, file_format=None, **kwargs):
 
     """
     # Check file format
-    if not isinstance(filename, str):
-        raise TypeError()
     fmt = (
         file_format
         if file_format

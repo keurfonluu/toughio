@@ -5,7 +5,7 @@ from copy import deepcopy
 
 import numpy as np
 
-from ...._common import block_to_format, str2format
+from ...._common import block_to_format, open_file, str2format
 from ._common import default
 from ._helpers import block, check_parameters, dtypes, prune_nones_list, write_record
 
@@ -49,7 +49,7 @@ def write(filename, parameters, block=None, ignore_blocks=None, eos=None):
             raise ValueError("'variables' must be a list of dicts since v1.7.0.")
 
     buffer = write_buffer(parameters, block, ignore_blocks, eos)
-    with open(filename, "w") as f:
+    with open_file(filename, "w") as f:
         for record in buffer:
             f.write(record)
 

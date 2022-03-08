@@ -45,8 +45,8 @@ def read(filename, file_format=None, **kwargs):
 
     Parameters
     ----------
-    filename : str
-        Input file name.
+    filename : str, pathlike or buffer
+        Input file name or buffer.
     file_format : str ('tough', 'json') or None, optional, default None
         Input file format.
 
@@ -67,8 +67,6 @@ def read(filename, file_format=None, **kwargs):
     If ``file_format == 'tough'``, can also read `MESH`, `INCON` and `GENER` files.
 
     """
-    if not isinstance(filename, str):
-        raise TypeError()
     if not (file_format is None or file_format in {"tough", "json"}):
         raise ValueError()
 
@@ -88,8 +86,8 @@ def write(filename, parameters, file_format=None, **kwargs):
 
     Parameters
     ----------
-    filename : str
-        Output file name.
+    filename : str, pathlike or buffer
+        Output file name or buffer.
     parameters : dict
         Parameters to export.
     file_format : str ('tough', 'json') or None, optional, default None
@@ -111,8 +109,6 @@ def write(filename, parameters, file_format=None, **kwargs):
         If `eos` is defined in `parameters`, this option will be ignored.
 
     """
-    if not isinstance(filename, str):
-        raise TypeError()
     if not isinstance(parameters, dict):
         raise TypeError()
     if not (file_format is None or file_format in {"tough", "json"}):

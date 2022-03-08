@@ -6,6 +6,7 @@ import time
 import numpy as np
 
 from ...__about__ import __version__ as version
+from ..._common import open_file
 from .._helpers import get_material_key
 from .._mesh import Mesh
 
@@ -95,12 +96,12 @@ def read(filename):
     """Read FLAC3D f3grid grid file."""
     # Read a small block of the file to assess its type
     # See <http://code.activestate.com/recipes/173220/>
-    with open(filename, "rb") as f:
+    with open_file(filename, "rb") as f:
         block = f.read(8)
         binary = b"\x00" in block
 
     mode = "rb" if binary else "r"
-    with open(filename, mode) as f:
+    with open_file(filename, mode) as f:
         out = read_buffer(f, binary)
 
     return out
@@ -314,7 +315,7 @@ def write(filename, mesh, float_fmt=".16e", binary=False):
             material = np.concatenate(mesh.cell_data[key])
 
     mode = "wb" if binary else "w"
-    with open(filename, mode) as f:
+    with open_file(filename, mode) as f:
         if binary:
             f.write(
                 struct.pack("<2I", 1375135718, 3)

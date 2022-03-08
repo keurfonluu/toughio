@@ -1,6 +1,6 @@
 from __future__ import division, with_statement
 
-from ...._common import block_to_format, get_label_length
+from ...._common import block_to_format, get_label_length, open_file
 from ...._exceptions import ReadError
 from ...._helpers import FileIterator
 from ._helpers import prune_nones_dict, prune_nones_list, read_record
@@ -41,7 +41,7 @@ def read(filename, label_length=None, eos=None):
     if isinstance(label_length, int) and not 5 <= label_length < 10:
         raise ValueError()
 
-    with open(filename, "r") as f:
+    with open_file(filename, "r") as f:
         out = read_buffer(f, label_length, eos)
 
     return out

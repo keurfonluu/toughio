@@ -329,12 +329,12 @@ class Mesh(object):
             )
 
         # Set point data
-        mesh.point_arrays.update(
+        mesh.point_data.update(
             {k: np.array(v, np.float64) for k, v in self.point_data.items()}
         )
 
         # Set cell data
-        mesh.cell_arrays.update(self.cell_data)
+        mesh.cell_data.update(self.cell_data)
 
         return mesh
 
@@ -418,8 +418,8 @@ class Mesh(object):
 
         Parameters
         ----------
-        file_or_output : str, namedtuple or list of namedtuple
-            Input file name or output data.
+        file_or_output : str, pathlike, buffer, namedtuple or list of namedtuple
+            Input file name or buffer, or output data.
         time_step : int, optional, default -1
             Data for given time step to import. Default is last time step.
         connection : bool, optional, default False
@@ -429,8 +429,6 @@ class Mesh(object):
         from .. import read_output
         from .._io.output._common import Output, reorder_labels
 
-        if not isinstance(file_or_output, (str, list, tuple, Output)):
-            raise TypeError()
         if not isinstance(time_step, int):
             raise TypeError()
 
@@ -1002,10 +1000,10 @@ def from_pyvista(mesh, material="dfalt"):
         cells[k] = (c[0], np.array(c[1]))
 
     # Get point data
-    point_data = {k.replace(" ", "_"): v for k, v in mesh.point_arrays.items()}
+    point_data = {k.replace(" ", "_"): v for k, v in mesh.point_data.items()}
 
     # Get cell data
-    cell_data = {k.replace(" ", "_"): v for k, v in mesh.cell_arrays.items()}
+    cell_data = {k.replace(" ", "_"): v for k, v in mesh.cell_data.items()}
 
     # Create toughio.Mesh
     out = Mesh(
