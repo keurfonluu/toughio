@@ -329,12 +329,12 @@ class Mesh(object):
             )
 
         # Set point data
-        mesh.point_arrays.update(
+        mesh.point_data.update(
             {k: np.array(v, np.float64) for k, v in self.point_data.items()}
         )
 
         # Set cell data
-        mesh.cell_arrays.update(self.cell_data)
+        mesh.cell_data.update(self.cell_data)
 
         return mesh
 
@@ -1000,10 +1000,10 @@ def from_pyvista(mesh, material="dfalt"):
         cells[k] = (c[0], np.array(c[1]))
 
     # Get point data
-    point_data = {k.replace(" ", "_"): v for k, v in mesh.point_arrays.items()}
+    point_data = {k.replace(" ", "_"): v for k, v in mesh.point_data.items()}
 
     # Get cell data
-    cell_data = {k.replace(" ", "_"): v for k, v in mesh.cell_arrays.items()}
+    cell_data = {k.replace(" ", "_"): v for k, v in mesh.cell_data.items()}
 
     # Create toughio.Mesh
     out = Mesh(
