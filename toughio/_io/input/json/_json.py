@@ -4,6 +4,8 @@ import json
 
 import numpy as np
 
+from ...._common import open_file
+
 __all__ = [
     "read",
     "write",
@@ -30,7 +32,7 @@ def read(filename):
         """Return dict with integer keys instead of strings."""
         return {int(k): data[k] for k in sorted(data.keys())}
 
-    with open(filename, "r") as f:
+    with open_file(filename, "r") as f:
         parameters = json.load(f)
 
     if "extra_options" in parameters.keys():
@@ -74,7 +76,7 @@ def write(filename, parameters):
         else:
             return x
 
-    with open(filename, "w") as f:
+    with open_file(filename, "w") as f:
         parameters = deepcopy(parameters)
         parameters = jsonify(parameters)
         json.dump(parameters, f, indent=4)

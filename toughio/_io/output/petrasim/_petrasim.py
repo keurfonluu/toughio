@@ -2,6 +2,7 @@ from __future__ import with_statement
 
 import numpy as np
 
+from ...._common import open_file
 from .._common import to_output
 
 __all__ = [
@@ -12,7 +13,7 @@ __all__ = [
 
 def read(filename, file_type, file_format, labels_order):
     """Read Petrasim OUTPUT_ELEME.csv."""
-    with open(filename, "r") as f:
+    with open_file(filename, "r") as f:
         # Headers
         line = f.readline().strip()
         headers = [header.strip() for header in line.split(",")[3:]]
@@ -55,7 +56,7 @@ def write(filename, output):
     headers += ["Z"] if "Z" in out.data.keys() else []
     headers += [k for k in out.data.keys() if k not in {"X", "Y", "Z"}]
 
-    with open(filename, "w") as f:
+    with open_file(filename, "w") as f:
         # Headers
         record = ",".join(
             "{:>18}".format(header)

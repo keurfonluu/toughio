@@ -3,6 +3,7 @@ import logging
 import numpy as np
 
 from ...__about__ import __version__ as version
+from ..._common import open_file
 from .._mesh import Mesh
 
 __all__ = [
@@ -86,7 +87,7 @@ meshio_type_to_ndim = {
 
 def read(filename):
     """Read Tecplot ASCII file."""
-    with open(filename, "r") as f:
+    with open_file(filename, "r") as f:
         out = read_buffer(f)
     return out
 
@@ -407,7 +408,7 @@ def write(filename, mesh):
             else:
                 logging.warning("Skipping cell data '{}'.".format(k))
 
-    with open(filename, "w") as f:
+    with open_file(filename, "w") as f:
         # Title
         f.write('TITLE = "Written by toughio v{}"\n'.format(version))
 

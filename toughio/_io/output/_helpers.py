@@ -2,7 +2,7 @@ from __future__ import with_statement
 
 import numpy as np
 
-from ..._common import filetype_from_filename, register_format
+from ..._common import filetype_from_filename, open_file, register_format
 from ._common import Output
 
 __all__ = [
@@ -47,7 +47,7 @@ def register(file_format, extensions, reader, writer=None):
 
 def get_output_type(filename):
     """Get output file type and format."""
-    with open(filename, "r") as f:
+    with open_file(filename, "r") as f:
         line = f.readline().strip()
 
         if not line:
@@ -75,14 +75,21 @@ def get_output_type(filename):
                 raise ValueError()
 
 
-def read(filename, labels_order=None, connection=False, label_length=None, **kwargs):
+def read(
+    filename,
+    labels_order=None,
+    connection=False,
+    label_length=None,
+    file_format=None,
+    **kwargs
+):
     """
     Read TOUGH SAVE or output file for each time step.
 
     Parameters
     ----------
-    filename : str
-        Input file name.
+    filename : str, pathlike or buffer
+        Input file name or buffer.
     labels_order : list of array_like or None, optional, default None
         List of labels.
     connection : bool, optional, default False
@@ -96,15 +103,20 @@ def read(filename, labels_order=None, connection=False, label_length=None, **kwa
         namedtuple (type, format, time, labels, data) or list of namedtuple for each time step.
 
     """
-    if not isinstance(filename, str):
-        raise TypeError()
     if not (
         labels_order is None or isinstance(labels_order, (list, tuple, np.ndarray))
     ):
         raise TypeError()
 
-    file_type, file_format = get_output_type(filename)
-    file_type = "connection" if (file_format == "tough" and connection) else file_type
+    if file_format is None:
+        file_type, file_format = get_output_type(filename)
+        file_type = (
+            "connection" if (file_format == "tough" and connection) else file_type
+        )
+    else:
+        if file_format not in _reader_map:
+            raise ValueError()
+        file_type = "connection" if connection else "element"
 
     _kwargs = {"label_length": label_length} if file_format == "tough" else {}
     _kwargs.update(kwargs)
@@ -157,8 +169,8 @@ def read_history(filename):
 
     Parameters
     ----------
-    filename : str
-        Input file name.
+    filename : str, pathlike or buffer
+        Input file name or buffer.
 
     Returns
     -------
@@ -169,7 +181,7 @@ def read_history(filename):
     if not isinstance(filename, str):
         raise TypeError()
 
-    with open(filename, "r") as f:
+    with open_file(filename, "r") as f:
         line = f.readline().strip()
 
         if line.startswith('"'):

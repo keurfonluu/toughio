@@ -5,6 +5,7 @@ import os
 
 import numpy as np
 
+from ..._common import open_file
 from ._helpers import block
 
 __all__ = [
@@ -208,7 +209,7 @@ def write_mesh(
     material_end = material_end if material_end else []
     material_end = [material_end] if isinstance(material_end, str) else material_end
 
-    with open(filename, "w") as f:
+    with open_file(filename, "w") as f:
         _write_eleme(
             f,
             labels,
@@ -250,7 +251,7 @@ def write_incon(
     eos,
 ):
     """Write INCON file."""
-    with open(filename, "w") as f:
+    with open_file(filename, "w") as f:
         _write_incon(
             f,
             labels,
