@@ -144,6 +144,7 @@ def filetype_from_filename(filename, ext_to_fmt):
 
 @contextmanager
 def open_file(path_or_buffer, mode):
+    """Open file or buffer."""
     def is_buffer(obj, mode):
         return ("r" in mode and hasattr(obj, "read")) or (
             "w" in mode and hasattr(obj, "write")
