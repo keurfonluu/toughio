@@ -5,7 +5,7 @@ from ._cylindric_grid import cylindric_grid
 from ._structured_grid import structured_grid
 
 
-def from_meshmaker(filename_or_dict):
+def from_meshmaker(filename_or_dict, material="dfalt"):
     """
     Generate a mesh from a block MESHM.
 
@@ -13,6 +13,8 @@ def from_meshmaker(filename_or_dict):
     ----------
     filename_or_dict: str or dict
         Input file name or parameters dict with key "meshmaker".
+    material : str, optional, default 'dfalt'
+        Default material name.
 
     """
     if isinstance(filename_or_dict, str):
@@ -49,7 +51,7 @@ def from_meshmaker(filename_or_dict):
         if not len(dz):
             dz = [1.0]
 
-        return structured_grid(dx, dy, dz)
+        return structured_grid(dx, dy, dz, material=material)
 
     # RZ2D
     else:
@@ -66,7 +68,7 @@ def from_meshmaker(filename_or_dict):
         if not len(dz):
             dz = [1.0]
 
-        return cylindric_grid(dr, dz, layer=parameters["meshmaker"]["type"] == "rz2dl")
+        return cylindric_grid(dr, dz, layer=parameters["meshmaker"]["type"] == "rz2dl", material=material)
 
 
 def parse_xyz(parameters):
