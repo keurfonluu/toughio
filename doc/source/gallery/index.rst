@@ -7,4 +7,5 @@ This gallery contains different sample problems to demonstrate :mod:`toughio` pr
 .. toctree::
    :titlesonly:
 
+   ../examples/heat_pipe_in_cylindrical_geometry/index
    ../examples/co2_leakage_along_a_fault/index
