@@ -41,7 +41,7 @@ p = pyvista.Plotter(window_size=(800, 800))
 p.add_mesh(
     mesh=mesh.to_pyvista(),
     scalars=mesh.qualities,
-    stitle="Average cell quality",
+    scalar_bar_args={"title": "Average cell quality"},
     clim=(0.0, 1.0),
     cmap="RdBu",
     show_scalar_bar=True,
@@ -85,7 +85,7 @@ mesh.add_cell_data("initial_condition", incon)
 ########################################################################################
 
 ########################################################################################
-# :mod:`toughio` also recognizes the cell data keys `"porosity"` and `"permeability"` in case we want to initialize porosity and/or permeability fields (e.g. if well logs data are available). Like boundary and initial conditions, we only have to associate new cell data arrays to keys `"porosity"` and/or `"permeability"`. The way these arrays are generated does not matter, they can be the results of simple interpolations (e.g. with :mod:`scipy`) or more advanced geostatistical interpolations (e.g. with :mod:`pykrige`).
+# :mod:`toughio` also recognizes the cell data keys `"porosity"` and `"permeability"` in case we want to initialize porosity and/or permeability fields (e.g., if well logs data are available). Like boundary and initial conditions, we only have to associate new cell data arrays to keys `"porosity"` and/or `"permeability"`. The way these arrays are generated does not matter, they can be the results of simple interpolations (e.g., with :mod:`scipy`) or more advanced geostatistical interpolations (e.g., with :mod:`pykrige`).
 
 ########################################################################################
 

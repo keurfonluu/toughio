@@ -314,7 +314,7 @@ p = pyvista.Plotter(window_size=(800, 800))
 p.add_mesh(
     mesh=pyvista.read("mesh.msh"),
     scalars="gmsh:physical",
-    stitle="Materials",
+    scalar_bar_args={"title": "Materials"},
     show_scalar_bar=True,
     show_edges=True,
 )
