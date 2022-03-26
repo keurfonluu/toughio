@@ -30,6 +30,8 @@ def clean(c, bytecode=False):
         "build",
         "dist",
         "toughio.egg-info",
+        "doc/build",
+        "doc/source/examples",
     ]
 
     if bytecode:
