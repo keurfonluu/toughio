@@ -49,7 +49,7 @@ parameters["default"] = {
 ########################################################################################
 
 ########################################################################################
-# Now, we define specific material properties (different than the default ones previously defined) for each material in the mesh (i.e. we write the block `ROCKS`).
+# Now, we define specific material properties (different than the default ones previously defined) for each material in the mesh (i.e., we write the block `ROCKS`).
 
 parameters["rocks"] = {
     "UPPAQ": {
@@ -128,7 +128,7 @@ parameters["selections"] = {
 ########################################################################################
 
 ########################################################################################
-# We also have to define the generator (i.e. the source).
+# We also have to define the generator (i.e., the source).
 # However, we first need to know the name of the cell in which the CO2 is injected. Let's unpickle the mesh back and use the method :meth:`toughio.Mesh.near` to get the name of the injection element.
 
 mesh = toughio.read_mesh("mesh.pickle")
@@ -151,7 +151,7 @@ parameters["generators"] = [
 
 ########################################################################################
 # Let's customize the outputs.
-# For this example, we want TOUGH to save the output every three months (i.e. 4 outputs per year). To reduce the size of the output file, we also want TOUGH to only save the saturation of phase 1 (gas) in addition to the cell coordinates. Note that this option is only available in TOUGH3.
+# For this example, we want TOUGH to save the output every three months (i.e., 4 outputs per year). To reduce the size of the output file, we also want TOUGH to only save the saturation of phase 1 (gas) in addition to the cell coordinates. Note that this option is only available in TOUGH3.
 
 parameters["times"] = np.arange(1, 13) * 90.0 * 24.0 * 3600.0
 parameters["output"] = {
@@ -171,6 +171,6 @@ toughio.write_input("INFILE", parameters)
 ########################################################################################
 
 ########################################################################################
-# At this stage, all the input files required to run the simulation have been generated. We can now simply call TOUGH using EOS ECO2n (e.g. :code:`tough3-eco2n` for TOUGH3).
+# At this stage, all the input files required to run the simulation have been generated. We can now simply call TOUGH using EOS ECO2n (e.g., :code:`tough3-eco2n` for TOUGH3).
 
 ########################################################################################

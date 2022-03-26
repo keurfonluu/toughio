@@ -38,8 +38,8 @@ class Verma(BaseRelativePermeability):
         Shat = (sl - slr) / (sls - slr)
         Shat = max(Shat, 0.0)
         Shat = min(Shat, 1.0)
-        kl = Shat ** 3
-        kg = a + b * Shat + c * Shat ** 2
+        kl = Shat**3
+        kg = a + b * Shat + c * Shat**2
         kg = max(kg, 0.0)
         kg = min(kg, 1.0)
         return kl, kg

@@ -6,6 +6,7 @@ from .__about__ import (
     __version__,
     __website__,
 )
+from ._helpers import convert_labels
 from ._io import (
     Output,
     read_history,
@@ -44,6 +45,7 @@ __all__ = [
     "write_time_series",
     "relative_permeability",
     "capillarity",
+    "convert_labels",
     "_cli",
     "__version__",
     "__author__",

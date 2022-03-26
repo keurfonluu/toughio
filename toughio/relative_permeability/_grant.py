@@ -40,7 +40,7 @@ class Grant(BaseRelativePermeability):
             kg = 1.0
         else:
             Shat = (sl - slr) / (1.0 - slr - sgr)
-            kl = Shat ** 4
+            kl = Shat**4
             kg = 1.0 - kl
         return kl, kg
 
