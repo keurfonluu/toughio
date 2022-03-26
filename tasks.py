@@ -30,6 +30,8 @@ def clean(c, bytecode=False):
         "build",
         "dist",
         "toughio.egg-info",
+        "doc/build",
+        "doc/source/examples",
     ]
 
     if bytecode:
@@ -45,8 +47,8 @@ def clean(c, bytecode=False):
 
 @task
 def black(c):
-    c.run("black -t py27 toughio")
-    c.run("black -t py27 test")
+    c.run("black -t py36 toughio")
+    c.run("black -t py36 test")
 
 
 @task

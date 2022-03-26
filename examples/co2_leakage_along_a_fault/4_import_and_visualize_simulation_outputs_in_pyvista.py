@@ -4,7 +4,7 @@ Import and visualize simulation outputs in PyVista
 
 Once the TOUGH simulation has ended, there is not much things left to do with :mod:`toughio`. We can either:
 
--   Run the command :code:`toughio-export OUTPUT_ELEME.csv -m mesh.pickle` and drag-and-drop the generated VTK file in a compatible visualization software (e.g. ParaView),
+-   Run the command :code:`toughio-export OUTPUT_ELEME.csv -m mesh.pickle` and drag-and-drop the generated VTK file in a compatible visualization software (e.g., ParaView),
 
 .. image:: ../../figures/co2_leakage_along_a_fault_paraview.png
 
@@ -34,16 +34,13 @@ p = pyvista.Plotter(window_size=(1000, 1000))
 p.add_mesh(
     mesh.to_pyvista(),
     scalars="SAT_G",
-    stitle="Gas saturation",
     cmap="viridis_r",
     clim=(0.0, 1.0),
     n_colors=20,
     show_edges=False,
     edge_color=(0.5, 0.5, 0.5),
     scalar_bar_args={
-        "height": 0.1,
-        "width": 0.5,
-        "position_x": 0.75,
+        "title": "Gas saturation",
         "position_y": 0.01,
         "vertical": False,
         "n_labels": 6,

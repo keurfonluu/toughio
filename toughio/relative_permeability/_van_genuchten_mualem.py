@@ -40,7 +40,7 @@ class vanGenuchtenMualem(BaseRelativePermeability):
         else:
             Seff = (sl - slr) / (sls - slr)
             kl = (
-                Seff ** 0.5 * (1.0 - (1.0 - Seff ** (1.0 / m)) ** m) ** 2
+                Seff**0.5 * (1.0 - (1.0 - Seff ** (1.0 / m)) ** m) ** 2
                 if Seff > 0.0
                 else 0.0
             )
@@ -48,7 +48,7 @@ class vanGenuchtenMualem(BaseRelativePermeability):
             Shat = (sl - slr) / (1.0 - slr - sgr)
             Shat = max(Shat, 0.0)
             Shat = min(Shat, 1.0)
-            kg = 1.0 - kl if sgr <= 0.0 else (1.0 - Shat ** 2) * (1.0 - Shat) ** 2
+            kg = 1.0 - kl if sgr <= 0.0 else (1.0 - Shat**2) * (1.0 - Shat) ** 2
 
         return kl, kg
 
