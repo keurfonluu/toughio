@@ -18,6 +18,7 @@ git:
 
 before_install:
   # configure a headless display
+  - git config --global url."https://".insteadOf git://
   - git clone --depth 1 git://github.com/pyvista/gl-ci-helpers.git
   - source ./gl-ci-helpers/travis/setup_headless_display.sh
 
