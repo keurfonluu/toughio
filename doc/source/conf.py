@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.abspath(".../"))
 import toughio
 
 project = "toughio"
-copyright = "2021, Keurfon Luu"
+copyright = "2022, Keurfon Luu"
 author = "Keurfon Luu"
 
 version = toughio.__version__
@@ -51,9 +51,11 @@ from sphinx_gallery.sorting import FileNameSortKey
 
 sphinx_gallery_conf = {
     "examples_dirs": [
+        "../../examples/heat_pipe_in_cylindrical_geometry/",
         "../../examples/co2_leakage_along_a_fault/",
     ],
     "gallery_dirs": [
+        "examples/heat_pipe_in_cylindrical_geometry/",
         "examples/co2_leakage_along_a_fault/",
     ],
     "filename_pattern": r"\.py",
