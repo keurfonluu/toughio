@@ -166,3 +166,17 @@ def allclose_output(output_ref, output):
     assert np.allclose(output_ref.time, output.time)
     assert output_ref.labels.tolist() == output_ref.labels.tolist()
     allclose_dict(output_ref.data, output.data)
+
+
+def convert_outputs_labels(outputs, connection=False):
+    for output in outputs:
+        try:
+            if not connection:
+                output.labels[:] = toughio.convert_labels(output.labels)
+
+            else:
+                labels = toughio.convert_labels(output.labels.ravel())
+                output.labels[:] = labels.reshape((labels.size // 2, 2))
+
+        except TypeError:
+            pass

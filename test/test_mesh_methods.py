@@ -140,7 +140,11 @@ def test_read_output(filename, file_type, time_step):
     mesh_filename = os.path.join(this_dir, "support_files", "outputs", "mesh.pickle")
     mesh = toughio.read_mesh(mesh_filename)
     filename = os.path.join(this_dir, "support_files", "outputs", filename)
-    mesh.read_output(filename, time_step=time_step)
+
+    outputs = toughio.read_output(filename)
+    helpers.convert_outputs_labels(outputs, file_type == "connection")
+    mesh.read_output(outputs, time_step=time_step)
+    # mesh.read_output(filename, time_step=time_step)
 
     for k, v in output_ref[file_type][time_step].items():
         assert np.allclose(v, mesh.cell_data[k].mean())
