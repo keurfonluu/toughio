@@ -68,7 +68,9 @@ def from_meshmaker(filename_or_dict, material="dfalt"):
         if not len(dz):
             dz = [1.0]
 
-        return cylindric_grid(dr, dz, layer=parameters["meshmaker"]["type"] == "rz2dl", material=material)
+        return cylindric_grid(
+            dr, dz, layer=parameters["meshmaker"]["type"] == "rz2dl", material=material
+        )
 
 
 def parse_xyz(parameters):
@@ -158,7 +160,12 @@ def parse_rz2d(parameters):
 
             rmax += n * size
             dr.append(
-                {"n_increment": n, "size": size, "type": "uniform", "radius_ref": None,}
+                {
+                    "n_increment": n,
+                    "size": size,
+                    "type": "uniform",
+                    "radius_ref": None,
+                }
             )
 
         elif parameter["type"] == "logar":

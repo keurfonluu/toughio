@@ -12,7 +12,11 @@ block_to_format = {
         2: "10d,10.3e,10.3e,10.3e,10.3e,10.3e,10.3e,10.3e",
         3: "5d,5s,10.3e,10.3e,10.3e,10.3e,10.3e,10.3e,10.3e",
     },
-    "CHEMP": {1: "5d", 2: "20s", 3: ",".join(5 * ["10.3e"]),},
+    "CHEMP": {
+        1: "5d",
+        2: "20s",
+        3: ",".join(5 * ["10.3e"]),
+    },
     "NCGAS": {1: "5d", 2: "10s"},
     "MULTI": ",".join(5 * ["5d"]),
     "SELEC": {1: ",".join(16 * ["5d"]), 2: ",".join(8 * ["10.3e"])},
@@ -74,13 +78,23 @@ block_to_format = {
     },
     "MESHM": {
         1: "5s",
-        "XYZ": {1: "10.3e", 2: "5s,5d,10.4e", 3: ",".join(8 * ["10.4e"]),},
+        "XYZ": {
+            1: "10.3e",
+            2: "5s,5d,10.4e",
+            3: ",".join(8 * ["10.4e"]),
+        },
         "RZ2D": {
             1: "5s",
-            "RADII": {1: "5d", 2: ",".join(8 * ["10.3e"]),},
+            "RADII": {
+                1: "5d",
+                2: ",".join(8 * ["10.3e"]),
+            },
             "EQUID": "5d,5s,10.4e",
             "LOGAR": "5d,5s,10.4e,10.4e",
-            "LAYER": {1: "5d", 2: ",".join(8 * ["10.4e"]),},
+            "LAYER": {
+                1: "5d",
+                2: ",".join(8 * ["10.4e"]),
+            },
         },
     },
 }
@@ -145,6 +159,7 @@ def filetype_from_filename(filename, ext_to_fmt):
 @contextmanager
 def open_file(path_or_buffer, mode):
     """Open file or buffer."""
+
     def is_buffer(obj, mode):
         return ("r" in mode and hasattr(obj, "read")) or (
             "w" in mode and hasattr(obj, "write")

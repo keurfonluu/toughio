@@ -81,7 +81,7 @@ def read(
     connection=False,
     label_length=None,
     file_format=None,
-    **kwargs
+    **kwargs,
 ):
     """
     Read TOUGH SAVE or output file for each time step.

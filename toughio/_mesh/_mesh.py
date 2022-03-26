@@ -195,7 +195,10 @@ class Mesh(object):
 
         # Prune duplicate points
         unique_points, pind, pinv = np.unique(
-            mesh.points, axis=0, return_index=True, return_inverse=True,
+            mesh.points,
+            axis=0,
+            return_index=True,
+            return_inverse=True,
         )
         if len(unique_points) < len(mesh.points):
             mesh.points = unique_points
@@ -266,7 +269,11 @@ class Mesh(object):
         else:
             cells, cell_data = get_old_meshio_cells(self.cells, cell_data)
             kwargs.update(
-                {"cells": cells, "cell_data": cell_data, "node_sets": self.point_sets,}
+                {
+                    "cells": cells,
+                    "cell_data": cell_data,
+                    "node_sets": self.point_sets,
+                }
             )
 
         return meshio.Mesh(**kwargs)
