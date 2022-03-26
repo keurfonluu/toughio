@@ -134,7 +134,7 @@ def random_label(label_length):
     n = label_length - 3
     fmt = "{{:0{}d}}".format(n)
 
-    return random_string(3) + fmt.format(np.random.randint(10 ** n))
+    return random_string(3) + fmt.format(np.random.randint(10**n))
 
 
 def allclose_dict(a, b, atol=1.0e-8):

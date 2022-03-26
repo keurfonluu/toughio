@@ -213,22 +213,36 @@ def _get_parser():
 
     # Input file
     parser.add_argument(
-        "infile", type=str, help="TOUGH output file",
+        "infile",
+        type=str,
+        help="TOUGH output file",
     )
 
     # Mesh file
     parser.add_argument(
-        "--mesh", "-m", type=str, default=None, help="pickled toughio.Mesh",
+        "--mesh",
+        "-m",
+        type=str,
+        default=None,
+        help="pickled toughio.Mesh",
     )
 
     # Time step
     parser.add_argument(
-        "--time-step", "-t", type=int, default=None, help="time step to export",
+        "--time-step",
+        "-t",
+        type=int,
+        default=None,
+        help="time step to export",
     )
 
     # Output file
     parser.add_argument(
-        "--output-file", "-o", type=str, default=None, help="exported file",
+        "--output-file",
+        "-o",
+        type=str,
+        default=None,
+        help="exported file",
     )
 
     # File format

@@ -10,12 +10,24 @@ import toughio
 
 output_ref = {
     "element": {
-        0: {"PRES": 9641264.130638, "TEMP": 149.62999493,},
-        -1: {"PRES": 635804.12294844, "TEMP": 142.89449866,},
+        0: {
+            "PRES": 9641264.130638,
+            "TEMP": 149.62999493,
+        },
+        -1: {
+            "PRES": 635804.12294844,
+            "TEMP": 142.89449866,
+        },
     },
     "connection": {
-        0: {"HEAT": -1.64908253e-07, "FLOW": -2.85760551e-13,},
-        -1: {"HEAT": -5.54750914e-08, "FLOW": -4.68234504e-14,},
+        0: {
+            "HEAT": -1.64908253e-07,
+            "FLOW": -2.85760551e-13,
+        },
+        -1: {
+            "HEAT": -5.54750914e-08,
+            "FLOW": -4.68234504e-14,
+        },
     },
 }
 
@@ -215,7 +227,8 @@ def test_near():
 
 @pytest.mark.skipif(sys.version_info < (3, 6), reason="Order of keys in dictionary")
 @pytest.mark.parametrize(
-    "num_pvars, eos", [(4, None), (6, None), (4, "tmvoc")],
+    "num_pvars, eos",
+    [(4, None), (6, None), (4, "tmvoc")],
 )
 def test_write_tough(num_pvars, eos):
     this_dir = os.path.dirname(os.path.abspath(__file__))

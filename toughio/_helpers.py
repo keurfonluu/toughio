@@ -45,13 +45,13 @@ def convert_labels(labels, zeros_to_spaces=True):
     Note
     ----
     This function aims to help transitionning to labeling convention introduced in v1.9.0.
-    
+
     """
 
     def convert(label, char_in, char_out):
         prefix, suffix = label[:3], label[3:]
         fmt = "{{:{}>{}}}".format(char_out, len(label) - 3)
-        
+
         label = prefix + fmt.format(suffix.lstrip(char_in))
         if label[-1] == char_out:
             label = label[:-1] + char_in

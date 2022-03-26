@@ -680,7 +680,11 @@ def _read_gener(f, label_length):
 
             else:
                 tmp.update(
-                    {"times": None, "rates": data[9], "specific_enthalpy": data[10],}
+                    {
+                        "times": None,
+                        "rates": data[9],
+                        "specific_enthalpy": data[10],
+                    }
                 )
 
             gener["generators"].append(tmp)

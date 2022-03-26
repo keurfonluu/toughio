@@ -76,7 +76,9 @@ def _get_parser():
 
     # Input file
     parser.add_argument(
-        "infile", type=str, help="TOUGH input file",
+        "infile",
+        type=str,
+        help="TOUGH input file",
     )
 
     # Output file
