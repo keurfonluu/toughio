@@ -208,7 +208,7 @@ def labeler(n_cells, label_length=None):
             logging.warning("Cell labels are {}-character long.".format(label_length))
 
     n = label_length - 3
-    fmt = "{{:0>{}}}".format(n)
+    fmt = "{{: >{}}}".format(n)
     alpha = np.array(list(ascii_uppercase))
     numer = np.array([fmt.format(i) for i in range(10 ** n)])
     nomen = np.concatenate((["{:1}".format(i + 1) for i in range(9)], alpha))
