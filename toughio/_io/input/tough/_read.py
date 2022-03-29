@@ -91,6 +91,9 @@ def read_buffer(f, label_length, eos):
                 else:
                     parameters["default"] = rpcap
 
+            elif line.startswith("REACT"):
+                parameters.update(_read_react(fiter))
+
             elif line.startswith("FLAC"):
                 flac = _read_flac(fiter, parameters["rocks_order"])
                 parameters["flac"] = flac["flac"]
@@ -262,6 +265,19 @@ def _read_rpcap(f):
             }
 
     return rpcap
+
+
+def _read_react(f):
+    """Read REACT block data."""
+    fmt = block_to_format["REACT"]
+
+    line = f.next()
+    data = read_record(line, fmt)
+    react = {
+        "react": {i + 1: int(x) for i, x in enumerate(data[0]) if x.isdigit()}
+    }
+
+    return react
 
 
 def _read_flac(f, rocks_order):
