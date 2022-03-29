@@ -143,6 +143,21 @@ def test_rpcap(write_read, rpcap):
 
 
 @pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
+def test_react(write_read):
+    parameters_ref = {
+        "react": {
+            k + 1: v for k, v in enumerate(np.random.randint(10, size=20))
+        },
+    }
+    parameters = write_read(parameters_ref)
+
+    print(parameters_ref["react"])
+    print(parameters["react"])
+
+    helpers.allclose_dict(parameters_ref["react"], parameters["react"])
+
+
+@pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
 def test_flac(write_read):
     parameters_ref = {
         "flac": {

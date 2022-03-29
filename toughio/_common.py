@@ -97,6 +97,7 @@ block_to_format = {
             },
         },
     },
+    "REACT": "20S",
 }
 
 
