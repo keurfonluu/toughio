@@ -2,6 +2,7 @@ blocks = {
     "TITLE",
     "ROCKS",
     "RPCAP",
+    "REACT",
     "FLAC",
     "CHEMP",
     "NCGAS",
@@ -34,6 +35,7 @@ _Parameters = {
     "n_component": None,
     "n_phase": None,
     "n_component_incon": None,
+    "react": {},
     "flac": {},
     "chemical_properties": {},
     "non_condensible_gas": [],
@@ -66,6 +68,8 @@ _Parameters = {
 }
 
 Parameters = dict(_Parameters)
+
+react = {k + 1: None for k in range(20)}
 
 flac = {
     "creep": False,

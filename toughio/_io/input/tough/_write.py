@@ -2,6 +2,7 @@ from __future__ import division, with_statement
 
 import logging
 from copy import deepcopy
+from inflection import parameterize
 
 import numpy as np
 
@@ -223,6 +224,9 @@ def write_buffer(params, block, ignore_blocks=None, eos_=None):
     if "RPCAP" in blocks and rpcap:
         out += _write_rpcap(parameters)
 
+    if "REACT" in blocks and parameters["react"]:
+        out += _write_react(parameters)
+
     if "FLAC" in blocks and parameters["flac"]:
         out += _write_flac(parameters)
 
@@ -416,6 +420,25 @@ def _write_rpcap(parameters):
             out += write_record(values, fmt)
         else:
             out += write_record([], [])
+
+    return out
+
+
+@check_parameters(dtypes["REACT"], keys="react")
+@block("REACT")
+def _write_react(parameters):
+    """Write REACT block data."""
+    from ._common import react
+
+    # Formats
+    fmt = block_to_format["REACT"]
+    fmt = str2format(fmt)
+
+    _react = deepcopy(react)
+    _react.update(parameters["react"])
+
+    tmp = [" " if _react[k] is None else str(_react[k]) for k in sorted(_react.keys())]
+    out = write_record(["".join(tmp)], fmt)
 
     return out
 
