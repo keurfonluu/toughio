@@ -148,13 +148,15 @@ def test_react(write_read):
         "react": {
             k + 1: v for k, v in enumerate(np.random.randint(10, size=20))
         },
+        "options": {
+            "react_wdata": [helpers.random_string(5) for _ in range(np.random.randint(10) + 1)],
+        },
     }
     parameters = write_read(parameters_ref)
-
-    print(parameters_ref["react"])
-    print(parameters["react"])
+    toughio.write_input("bug.txt", parameters_ref)
 
     helpers.allclose_dict(parameters_ref["react"], parameters["react"])
+    assert parameters_ref["options"]["react_wdata"] == parameters["options"]["react_wdata"]
 
 
 @pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
