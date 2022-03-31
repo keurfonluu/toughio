@@ -137,6 +137,7 @@ options = {
     "w_upstream": None,
     "w_newton": None,
     "derivative_factor": None,
+    "react_wdata": None,
 }
 
 extra_options = {k + 1: None for k in range(24)}
