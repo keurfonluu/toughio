@@ -471,11 +471,12 @@ def _read_param(f, eos=None):
             "t_max": data[1],
             "t_steps": data[2],
             "t_step_max": data[3],
-            "gravity": data[5],
-            "t_reduce_factor": data[6],
-            "mesh_scale_factor": data[7],
+            "gravity": data[6],
+            "t_reduce_factor": data[7],
+            "mesh_scale_factor": data[8],
         }
     )
+    wdata = data[4]
 
     t_steps = int(data[2])
     if t_steps >= 0.0:
@@ -488,6 +489,17 @@ def _read_param(f, eos=None):
             param["options"]["t_steps"] += prune_nones_list(data)
         if len(param["options"]["t_steps"]) == 1:
             param["options"]["t_steps"] = param["options"]["t_steps"][0]
+
+    # TOUGHREACT
+    if wdata == "wdata":
+        line = f.next()
+        n = int(line.strip().split()[0])
+
+        if n:
+            param["options"]["react_wdata"] = []
+            for _ in range(n):
+                line = f.next()
+                param["options"]["react_wdata"].append(line.strip()[:5])
 
     # Record 3
     line = f.next()

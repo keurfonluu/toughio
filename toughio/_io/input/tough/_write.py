@@ -731,6 +731,7 @@ def _write_param(parameters, eos_=None):
         data["t_max"],
         -((len(data["t_steps"]) - 1) // 8 + 1),
         data["t_step_max"],
+        "wdata" if data["react_wdata"] else None,
         None,
         data["gravity"],
         data["t_reduce_factor"],
@@ -741,6 +742,12 @@ def _write_param(parameters, eos_=None):
     # Record 2.1
     values = [x for x in data["t_steps"]]
     out += write_record(values, fmt3, multi=True)
+
+    # TOUGHREACT
+    if data["react_wdata"]:
+        n = len(data["react_wdata"])
+        out += ["{}\n".format(n)]
+        out += ["{}\n".format(x) for x in data["react_wdata"]]
 
     # Record 3
     values = [

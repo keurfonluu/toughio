@@ -121,6 +121,7 @@ dtypes = {
         "w_upstream": "scalar",
         "w_newton": "scalar",
         "derivative_factor": "scalar",
+        "react_wdata": "array_like",
     },
     "MOP": {i + 1: "int" for i in range(24)},
     "MOMOP": {i + 1: "int" for i in range(40)},
