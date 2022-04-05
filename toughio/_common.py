@@ -4,7 +4,10 @@ from contextlib import contextmanager
 block_to_format = {
     "ROCKS": {
         1: "5s,5d,10.4e,10.4e,10.4e,10.4e,10.4e,10.4e,10.4e",
-        2: ",".join(7 * ["10.4e"]),
+        2: ",".join(9 * ["10.4e"]),
+        # TOUGHREACT
+        3: "5d,5s,10.3e,10.3e,10.3e",
+        4: "5d,5s,14.6e,14.6e,14.6e,14.6e",
     },
     "RPCAP": "5d,5s,10.3e,10.3e,10.3e,10.3e,10.3e,10.3e,10.3e",
     "FLAC": {
