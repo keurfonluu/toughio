@@ -324,9 +324,11 @@ def _write_rocks(parameters):
     fmt = block_to_format["ROCKS"]
     fmt1 = str2format(fmt[1])
     fmt2 = str2format(fmt[2])
+    fmt3 = str2format(fmt[3])
+    fmt4 = str2format(fmt[4])
 
     fmt = block_to_format["RPCAP"]
-    fmt3 = str2format(fmt)
+    fmt5 = str2format(fmt)
 
     out = []
     for k in order:
@@ -344,11 +346,15 @@ def _write_rocks(parameters):
                 "klinkenberg_parameter",
                 "distribution_coefficient_3",
                 "distribution_coefficient_4",
+                "tortuosity_exponent",
+                "porosity_crit",
             ]
         )
         nad = (
             2
             if "relative_permeability" in data.keys() or "capillarity" in data.keys()
+            else 3
+            if "react_tp" in data.keys() or "react_hcplaw" in data.keys()
             else int(cond)
         )
 
@@ -382,6 +388,8 @@ def _write_rocks(parameters):
                 data["klinkenberg_parameter"],
                 data["distribution_coefficient_3"],
                 data["distribution_coefficient_4"],
+                data["tortuosity_exponent"],
+                data["porosity_crit"],
             ]
             out += write_record(values, fmt2)
         else:
@@ -393,7 +401,17 @@ def _write_rocks(parameters):
                 if key in data.keys():
                     values = [data[key]["id"], None]
                     values += list(data[key]["parameters"])
-                    out += write_record(values, fmt3)
+                    out += write_record(values, fmt5)
+                else:
+                    out += write_record([], [])
+
+        # TOUGHREACT
+        if nad == 3:
+            for key, fmt_ in zip(["react_tp", "react_hcplaw"], [fmt3, fmt4]):
+                if key in data.keys():
+                    values = [data[key]["id"], None]
+                    values += list(data[key]["parameters"])
+                    out += write_record(values, fmt_)
                 else:
                     out += write_record([], [])
 

@@ -235,10 +235,28 @@ def _read_rocks(f):
                         "klinkenberg_parameter": data[4],
                         "distribution_coefficient_3": data[5],
                         "distribution_coefficient_4": data[6],
+                        "tortuosity_exponent": data[7],
+                        "porosity_crit": data[8],
                     }
                 )
 
             if nad and nad > 1:
+                # TOUGHREACT
+                if nad > 2:
+                    line = f.next()
+                    data = read_record(line, fmt[3])
+                    rocks["rocks"][rock]["react_tp"] = {
+                        "id": data[0],
+                        "parameters": prune_nones_list(data[2:]),
+                    }
+
+                    line = f.next()
+                    data = read_record(line, fmt[4])
+                    rocks["rocks"][rock]["react_hcplaw"] = {
+                        "id": data[0],
+                        "parameters": prune_nones_list(data[2:]),
+                    }
+
                 rocks["rocks"][rock].update(_read_rpcap(f))
 
             rocks["rocks_order"].append(rock)
