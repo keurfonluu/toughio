@@ -3,7 +3,7 @@ from __future__ import division, with_statement
 from ...._common import block_to_format, get_label_length, open_file
 from ...._exceptions import ReadError
 from ...._helpers import FileIterator
-from ._helpers import prune_nones_dict, prune_nones_list, read_record
+from ._helpers import prune_nones_dict, prune_nones_list, read_record, read_model_record
 
 __all__ = [
     "read",
@@ -17,7 +17,7 @@ oft_to_key = {
 }
 
 
-def read(filename, label_length=None, eos=None):
+def read(filename, label_length=None, eos=None, simulator="tough"):
     """
     Read TOUGH input file.
 
@@ -40,14 +40,16 @@ def read(filename, label_length=None, eos=None):
         raise TypeError()
     if isinstance(label_length, int) and not 5 <= label_length < 10:
         raise ValueError()
+    if simulator not in {"tough", "toughreact"}:
+        raise ValueError()
 
     with open_file(filename, "r") as f:
-        out = read_buffer(f, label_length, eos)
+        out = read_buffer(f, label_length, eos, simulator)
 
     return out
 
 
-def read_buffer(f, label_length, eos):
+def read_buffer(f, label_length, eos, simulator="tough"):
     """Read TOUGH input file."""
     from ._common import blocks
 
@@ -80,7 +82,7 @@ def read_buffer(f, label_length, eos):
     try:
         for line in fiter:
             if line.startswith("ROCKS"):
-                parameters.update(_read_rocks(fiter))
+                parameters.update(_read_rocks(fiter, simulator))
 
             elif line.startswith("RPCAP"):
                 rpcap = _read_rpcap(fiter)
@@ -180,7 +182,7 @@ def read_buffer(f, label_length, eos):
                     break
 
             elif line.startswith("INCON"):
-                incon, flag = _read_incon(fiter, label_length, eos)
+                incon, flag = _read_incon(fiter, label_length, eos, simulator)
                 parameters.update(incon)
 
                 if flag:
@@ -201,7 +203,7 @@ def read_buffer(f, label_length, eos):
     return parameters
 
 
-def _read_rocks(f):
+def _read_rocks(f, simulator="tough"):
     """Read ROCKS block data."""
     fmt = block_to_format["ROCKS"]
     rocks = {"rocks": {}, "rocks_order": []}
@@ -221,8 +223,8 @@ def _read_rocks(f):
                 "specific_heat": data[8],
             }
 
-            nad = data[1]
-            if nad is not None:
+            nad = data[1] if data[1] else 0
+            if nad:
                 # Record 2
                 line = f.next()
                 data = read_record(line, fmt[2])
@@ -240,22 +242,16 @@ def _read_rocks(f):
                     }
                 )
 
-            if nad and nad > 1:
+            if nad >= 2:
                 # TOUGHREACT
-                if nad > 2:
+                if simulator == "toughreact" and nad >= 4:
                     line = f.next()
-                    data = read_record(line, fmt[3])
-                    rocks["rocks"][rock]["react_tp"] = {
-                        "id": data[0],
-                        "parameters": prune_nones_list(data[2:]),
-                    }
+                    if line.strip():
+                        rocks["rocks"][rock]["react_tp"] = read_model_record(line, fmt[3])
 
                     line = f.next()
-                    data = read_record(line, fmt[4])
-                    rocks["rocks"][rock]["react_hcplaw"] = {
-                        "id": data[0],
-                        "parameters": prune_nones_list(data[2:]),
-                    }
+                    if line.strip():
+                        rocks["rocks"][rock]["react_hcplaw"] = read_model_record(line, fmt[4])
 
                 rocks["rocks"][rock].update(_read_rpcap(f))
 
@@ -275,12 +271,8 @@ def _read_rpcap(f):
 
     for key in ["relative_permeability", "capillarity"]:
         line = f.next()
-        data = read_record(line, fmt)
-        if data[0] is not None:
-            rpcap[key] = {
-                "id": data[0],
-                "parameters": prune_nones_list(data[2:]),
-            }
+        if line.strip():
+            rpcap[key] = read_model_record(line, fmt)
 
     return rpcap
 
@@ -898,10 +890,16 @@ def _read_conne(f, label_length):
     return conne, flag
 
 
-def _read_incon(f, label_length, eos=None):
+def _read_incon(f, label_length, eos=None, simulator="tough"):
     """Read INCON block data."""
     fmt = block_to_format["INCON"]
-    fmt2 = fmt[eos] if eos in fmt else fmt["default"]
+    fmt2 = (
+        fmt[simulator]
+        if simulator == "toughreact"
+        else fmt[eos]
+        if eos in fmt
+        else fmt["default"]
+    )
     incon = {"initial_conditions": {}, "initial_conditions_order": []}
 
     line = f.next()
@@ -931,7 +929,11 @@ def _read_incon(f, label_length, eos=None):
             label = label_format.format(data[0])
             incon["initial_conditions"][label] = {"porosity": data[3]}
 
-            if eos == "tmvoc":
+            if simulator == "toughreact":
+                permeability = data[4] if len(set(data[4:7])) == 1 else data[4:7]
+                incon["initial_conditions"][label]["permeability"] = permeability if permeability else None
+
+            elif eos == "tmvoc":
                 incon["initial_conditions"][label]["phase_composition"] = data[4]
 
             else:

@@ -4,7 +4,7 @@ from contextlib import contextmanager
 block_to_format = {
     "ROCKS": {
         1: "5s,5d,10.4e,10.4e,10.4e,10.4e,10.4e,10.4e,10.4e",
-        2: ",".join(9 * ["10.4e"]),
+        2: "10.4e,10.4e,10.4e,10.3e,10.4e,10.4e,10.4e,10.4e,10.4e",  # Tortuosity can be <0 in TOUGHREACT
         # TOUGHREACT
         3: "5d,5s,10.3e,10.3e,10.3e",
         4: "5d,5s,14.6e,14.6e,14.6e,14.6e",
@@ -78,6 +78,13 @@ block_to_format = {
             8: "8s,4d,3d,15.9e,2d",
             9: "9s,3d,3d,15.9e,2d",
         },
+        "toughreact": {
+            5: "5s,5d,5d,15.9e,15.9e,15.9e,15.9e",
+            6: "6s,5d,4d,15.9e,15.9e,15.9e,15.9e",
+            7: "7s,4d,4d,15.9e,15.9e,15.9e,15.9e",
+            8: "8s,4d,3d,15.9e,15.9e,15.9e,15.9e",
+            9: "9s,3d,3d,15.9e,15.9e,15.9e,15.9e",
+        }
     },
     "MESHM": {
         1: "5s",
