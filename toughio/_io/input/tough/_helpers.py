@@ -174,6 +174,7 @@ dtypes = {
         "userx": "array_like",
         "values": "array_like",
         "phase_composition": "int",
+        "permeability": "scalar_array_like",
     },
     "MESHM": {"type": "str", "parameters": "array_like", "angle": "scalar"},
 }
@@ -376,6 +377,27 @@ def write_record(data, fmt, multi=False):
             out += ["{:80}\n".format("".join(d))]
 
     return out
+
+
+def read_model_record(line, fmt, i=2):
+    """Read model record defined by 'id' and 'parameters'."""
+    data = read_record(line, fmt)
+
+    return {
+        "id": data[0],
+        "parameters": prune_nones_list(data[i:]),
+    }
+
+
+def write_model_record(data, key, fmt):
+    """Write model record defined by 'id' and 'parameters'."""
+    if key in data.keys():
+        values = [data[key]["id"], None]
+        values += list(data[key]["parameters"])
+        return write_record(values, fmt)
+
+    else:
+        return write_record([], [])
 
 
 def str2float(s):

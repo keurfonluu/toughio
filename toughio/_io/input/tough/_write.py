@@ -8,14 +8,14 @@ import numpy as np
 
 from ...._common import block_to_format, open_file, str2format
 from ._common import default
-from ._helpers import block, check_parameters, dtypes, prune_nones_list, write_record
+from ._helpers import block, check_parameters, dtypes, prune_nones_list, write_record, write_model_record
 
 __all__ = [
     "write",
 ]
 
 
-def write(filename, parameters, block=None, ignore_blocks=None, eos=None):
+def write(filename, parameters, block=None, ignore_blocks=None, eos=None, simulator="tough"):
     """
     Write TOUGH input file.
 
@@ -38,6 +38,9 @@ def write(filename, parameters, block=None, ignore_blocks=None, eos=None):
         Equation of State. If `eos` is defined in `parameters`, this option will be ignored.
 
     """
+    if simulator not in {"tough", "toughreact"}:
+        raise ValueError()
+
     # Deprecation error
     if "generators" in parameters:
         if isinstance(parameters["generators"], dict):
@@ -49,14 +52,14 @@ def write(filename, parameters, block=None, ignore_blocks=None, eos=None):
         ):
             raise ValueError("'variables' must be a list of dicts since v1.7.0.")
 
-    buffer = write_buffer(parameters, block, ignore_blocks, eos)
+    buffer = write_buffer(parameters, block, ignore_blocks, eos, simulator)
     with open_file(filename, "w") as f:
         for record in buffer:
             f.write(record)
 
 
 @check_parameters(dtypes["PARAMETERS"])
-def write_buffer(params, block, ignore_blocks=None, eos_=None):
+def write_buffer(params, block, ignore_blocks=None, eos_=None, simulator="tough"):
     """Write TOUGH input file as a list of 80-character long record strings."""
     from ._common import Parameters
     from ._common import blocks as blocks_
@@ -116,6 +119,8 @@ def write_buffer(params, block, ignore_blocks=None, eos_=None):
                 "relative_permeability",
                 "capillarity",
                 "phase_composition",
+                "react_tp",
+                "react_hcplaw",
             }
             if cond1 and cond2:
                 parameters["rocks"][rock][k] = v
@@ -219,7 +224,7 @@ def write_buffer(params, block, ignore_blocks=None, eos_=None):
         out += ["{:80}\n".format(title) for title in parameters["title"]]
 
     if "ROCKS" in blocks and parameters["rocks"]:
-        out += _write_rocks(parameters)
+        out += _write_rocks(parameters, simulator)
 
     if "RPCAP" in blocks and rpcap:
         out += _write_rpcap(parameters)
@@ -288,7 +293,7 @@ def write_buffer(params, block, ignore_blocks=None, eos_=None):
         out += _write_conne(parameters)
 
     if "INCON" in blocks and parameters["initial_conditions"]:
-        out += _write_incon(parameters, eos_)
+        out += _write_incon(parameters, eos_, simulator)
 
     if "MESHM" in blocks and parameters["meshmaker"]:
         out += _write_meshm(parameters)
@@ -309,7 +314,7 @@ def write_buffer(params, block, ignore_blocks=None, eos_=None):
 )
 @check_parameters(dtypes["MODEL"], keys=("rocks", "capillarity"), is_list=True)
 @block("ROCKS", multi=True)
-def _write_rocks(parameters):
+def _write_rocks(parameters, simulator="tough"):
     """Write ROCKS block data."""
     # Reorder rocks
     if parameters["rocks_order"] is not None:
@@ -353,10 +358,12 @@ def _write_rocks(parameters):
         nad = (
             2
             if "relative_permeability" in data.keys() or "capillarity" in data.keys()
-            else 3
-            if "react_tp" in data.keys() or "react_hcplaw" in data.keys()
             else int(cond)
         )
+
+        if simulator == "toughreact":
+            nad = 4 if "react_tp" in data.keys() else nad
+            nad = 5 if "react_hcplaw" in data.keys() else nad
 
         # Permeability
         per = data["permeability"]
@@ -393,27 +400,17 @@ def _write_rocks(parameters):
             ]
             out += write_record(values, fmt2)
         else:
-            out += write_record([], []) if nad == 2 else []
-
-        # Relative permeability / Capillary pressure
-        if nad == 2:
-            for key in ["relative_permeability", "capillarity"]:
-                if key in data.keys():
-                    values = [data[key]["id"], None]
-                    values += list(data[key]["parameters"])
-                    out += write_record(values, fmt5)
-                else:
-                    out += write_record([], [])
+            out += write_record([], []) if nad >= 2 else []
 
         # TOUGHREACT
-        if nad == 3:
-            for key, fmt_ in zip(["react_tp", "react_hcplaw"], [fmt3, fmt4]):
-                if key in data.keys():
-                    values = [data[key]["id"], None]
-                    values += list(data[key]["parameters"])
-                    out += write_record(values, fmt_)
-                else:
-                    out += write_record([], [])
+        if nad >= 4:
+            out += write_model_record(data, "react_tp", fmt3)
+            out += write_model_record(data, "react_hcplaw", fmt4)
+
+        # Relative permeability / Capillary pressure
+        if nad >= 2:
+            out += write_model_record(data, "relative_permeability", fmt5)
+            out += write_model_record(data, "capillarity", fmt5)
 
     return out
 
@@ -1256,7 +1253,7 @@ def _write_conne(parameters):
 
 @check_parameters(dtypes["INCON"], keys="initial_conditions", is_list=True)
 @block("INCON", multi=True)
-def _write_incon(parameters, eos_=None):
+def _write_incon(parameters, eos_=None, simulator="tough"):
     """Write INCON block data."""
     from ._common import initial_conditions
 
@@ -1268,9 +1265,14 @@ def _write_incon(parameters, eos_=None):
 
     # Format
     label_length = len(max(parameters["initial_conditions"], key=len))
+    label_length = max(label_length, 5)
     fmt = block_to_format["INCON"]
     fmt1 = str2format(
-        fmt[eos_][label_length] if eos_ in fmt else fmt["default"][label_length]
+        fmt[simulator][label_length]
+        if simulator == "toughreact"
+        else fmt[eos_][label_length]
+        if eos_ in fmt
+        else fmt["default"][label_length]
     )
     fmt2 = str2format(fmt[0])
 
@@ -1287,7 +1289,14 @@ def _write_incon(parameters, eos_=None):
             data["porosity"],
         ]
 
-        if eos_ == "tmvoc":
+        if simulator == "toughreact":
+            per = data["permeability"]
+            per = [per] * 3 if not np.ndim(per) else per
+            if not (isinstance(per, (list, tuple, np.ndarray)) and len(per) == 3):
+                raise TypeError()
+            values += [k for k in per]
+
+        elif eos_ == "tmvoc":
             values += [data["phase_composition"]]
 
         else:
