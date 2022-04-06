@@ -194,6 +194,7 @@ initial_conditions = {
     "porosity": None,
     "userx": [None for _ in range(5)],
     "values": [None for _ in range(4)],
+    "permeability": None,
 }
 
 meshmaker = {
