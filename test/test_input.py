@@ -20,6 +20,12 @@ write_read_json = lambda x: write_read(
     reader_kws={"file_format": "json"},
 )
 
+write_read_toughreact = lambda x: write_read(
+    x,
+    writer_kws={"file_format": "tough", "simulator": "toughreact"},
+    reader_kws={"file_format": "tough", "simulator": "toughreact"},
+)
+
 
 @pytest.mark.parametrize(
     "write_read, single",
@@ -108,7 +114,7 @@ def test_rocks(write_read):
     for k, v in parameters_ref["rocks"].items():
         for kk, vv in v.items():
             if not isinstance(vv, dict):
-                assert np.allclose(vv, parameters["rocks"][k][kk], atol=1.0e-5)
+                assert np.allclose(vv, parameters["rocks"][k][kk], atol=1.0e-4)
             else:
                 helpers.allclose_dict(vv, parameters["rocks"][k][kk], atol=1.0e-4)
 
@@ -142,21 +148,124 @@ def test_rpcap(write_read, rpcap):
         helpers.allclose_dict(v, parameters["default"][k], atol=1.0e-4)
 
 
-@pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
+@pytest.mark.parametrize("write_read", [write_read_toughreact, write_read_json])
 def test_react(write_read):
     parameters_ref = {
+        "rocks": {
+            helpers.random_string(5): {
+                "tortuosity": -np.random.rand(),
+                "porosity_crit": np.random.rand(),
+                "tortuosity_exponent": np.random.rand(),
+            },
+            helpers.random_string(5): {
+                "relative_permeability": {
+                    "id": np.random.randint(10),
+                    "parameters": np.random.rand(3),
+                },
+                "capillarity": {
+                    "id": np.random.randint(10),
+                    "parameters": np.random.rand(4),
+                },
+            },
+            helpers.random_string(5): {
+                "react_tp": {
+                    "id": np.random.randint(10),
+                    "parameters": np.random.rand(3),
+                },
+            },
+            helpers.random_string(5): {
+                "react_hcplaw": {
+                    "id": np.random.randint(10),
+                    "parameters": np.random.rand(4),
+                },
+            },
+            helpers.random_string(5): {
+                "react_tp": {
+                    "id": np.random.randint(10),
+                    "parameters": np.random.rand(3),
+                },
+                "react_hcplaw": {
+                    "id": np.random.randint(10),
+                    "parameters": np.random.rand(4),
+                },
+            },
+            helpers.random_string(5): {
+                "relative_permeability": {
+                    "id": np.random.randint(10),
+                    "parameters": np.random.rand(3),
+                },
+                "react_tp": {
+                    "id": np.random.randint(10),
+                    "parameters": np.random.rand(3),
+                },
+            },
+            helpers.random_string(5): {
+                "capillarity": {
+                    "id": np.random.randint(10),
+                    "parameters": np.random.rand(4),
+                },
+                "react_hcplaw": {
+                    "id": np.random.randint(10),
+                    "parameters": np.random.rand(4),
+                },
+            },
+            helpers.random_string(5): {
+                "relative_permeability": {
+                    "id": np.random.randint(10),
+                    "parameters": np.random.rand(3),
+                },
+                "capillarity": {
+                    "id": np.random.randint(10),
+                    "parameters": np.random.rand(4),
+                },
+                "react_tp": {
+                    "id": np.random.randint(10),
+                    "parameters": np.random.rand(3),
+                },
+                "react_hcplaw": {
+                    "id": np.random.randint(10),
+                    "parameters": np.random.rand(4),
+                },
+            },
+        },
         "react": {
             k + 1: v for k, v in enumerate(np.random.randint(10, size=20))
         },
         "options": {
             "react_wdata": [helpers.random_string(5) for _ in range(np.random.randint(10) + 1)],
         },
+        "initial_conditions": {
+            helpers.random_string(5): {
+                "values": np.random.rand(4),
+                "permeability": np.random.rand(3),
+            },
+        }
     }
+    toughio.write_input("bug.txt", parameters_ref, simulator="toughreact")
     parameters = write_read(parameters_ref)
-    toughio.write_input("bug.txt", parameters_ref)
 
+    # Block ROCKS
+    assert sorted(parameters_ref["rocks"].keys()) == sorted(parameters["rocks"].keys())
+
+    for k, v in parameters_ref["rocks"].items():
+        for kk, vv in v.items():
+            if not isinstance(vv, dict):
+                assert np.allclose(vv, parameters["rocks"][k][kk], atol=1.0e-4)
+            else:
+                helpers.allclose_dict(vv, parameters["rocks"][k][kk], atol=1.0e-4)
+
+    # Block REACT
     helpers.allclose_dict(parameters_ref["react"], parameters["react"])
     assert parameters_ref["options"]["react_wdata"] == parameters["options"]["react_wdata"]
+
+    # Block INCON
+    assert sorted(parameters_ref["initial_conditions"].keys()) == sorted(
+        parameters["initial_conditions"].keys()
+    )
+
+    for k, v in parameters_ref["initial_conditions"].items():
+        for kk, vv in v.items():
+            assert np.allclose(vv, parameters["initial_conditions"][k][kk], atol=1.0e-3)
 
 
 @pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
