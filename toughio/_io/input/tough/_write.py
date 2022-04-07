@@ -275,7 +275,7 @@ def write_buffer(params, block, ignore_blocks=None, eos_=None, simulator="tough"
         out += _write_goft(parameters)
 
     if "GENER" in blocks and parameters["generators"]:
-        out += _write_gener(parameters)
+        out += _write_gener(parameters, simulator)
 
     if "DIFFU" in blocks and len(parameters["diffusion"]):
         out += _write_diffu(parameters)
@@ -981,7 +981,7 @@ def _write_goft(parameters):
 
 @check_parameters(dtypes["GENER"], keys="generators", is_list=True)
 @block("GENER", multi=True)
-def _write_gener(parameters):
+def _write_gener(parameters, simulator="tough"):
     """Write GENER block data."""
     from ._common import generators
 
@@ -1039,6 +1039,14 @@ def _write_gener(parameters):
             else None
         )
 
+        # TOUGHREACT
+        ktab = None
+        if data["conductivity_times"] is not None and data["conductivity_factors"] is not None:
+            ktab = len(data["conductivity_times"])
+
+            if len(data["conductivity_factors"]) != ktab:
+                raise ValueError()
+
         # Record 1
         values = [
             data["label"] if "label" in data else "",
@@ -1053,6 +1061,7 @@ def _write_gener(parameters):
             None if ltab > 1 else data["rates"],
             None if ltab > 1 else data["specific_enthalpy"],
             data["layer_thickness"],
+            ktab,
         ]
         out += write_record(values, fmt1)
 
@@ -1070,6 +1079,11 @@ def _write_gener(parameters):
                 specific_enthalpy = np.full(ltab, data["specific_enthalpy"])
 
             out += write_record(specific_enthalpy, fmt2, multi=True)
+
+        # TOUGHREACT
+        if ktab:
+            out += write_record(data["conductivity_times"], fmt2, multi=True)
+            out += write_record(data["conductivity_factors"], fmt2, multi=True)
 
     return out
 

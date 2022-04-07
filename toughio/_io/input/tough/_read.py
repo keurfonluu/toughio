@@ -154,7 +154,7 @@ def read_buffer(f, label_length, eos, simulator="tough"):
                 parameters.update(_read_oft(fiter, "GOFT", label_length))
 
             elif line.startswith("GENER"):
-                parameters.update(_read_gener(fiter, label_length))
+                parameters.update(_read_gener(fiter, label_length, simulator))
 
             elif line.startswith("DIFFU"):
                 parameters.update(_read_diffu(fiter))
@@ -679,8 +679,18 @@ def _read_oft(f, oft, label_length):
     return history
 
 
-def _read_gener(f, label_length):
+def _read_gener(f, label_length, simulator="tough"):
     """Read GENER block data."""
+
+    def read_table(f, n, fmt):
+        table = []
+        while len(table) < n:
+            line = f.next()
+            data = read_record(line, fmt)
+            table += prune_nones_list(data)
+
+        return table
+
     fmt = block_to_format["GENER"]
     gener = {"generators": []}
 
@@ -700,21 +710,15 @@ def _read_gener(f, label_length):
                 "type": data[7],
                 "layer_thickness": data[11],
             }
+            ktab = data[12]  # TOUGHREACT
 
             ltab = data[5]
             if ltab and ltab > 1:
                 itab = data[8]
                 keys = ["times", "rates"]
-                keys += ["specific_enthalpy"] if itab else []
+                keys += ["specific_enthalpy"] if itab else []  # Specific enthalpy must be provided for time dependent injection
                 for key in keys:
-                    table = []
-
-                    while len(table) < ltab:
-                        line = f.next()
-                        data = read_record(line, fmt[0])
-                        table += prune_nones_list(data)
-
-                    tmp[key] = table
+                    tmp[key] = read_table(f, ltab, fmt[0])
 
             else:
                 tmp.update(
@@ -724,6 +728,10 @@ def _read_gener(f, label_length):
                         "specific_enthalpy": data[10],
                     }
                 )
+
+            if simulator == "toughreact" and ktab:
+                tmp["conductivity_times"] = read_table(f, ktab, fmt[0])
+                tmp["conductivity_factors"] = read_table(f, ktab, fmt[0])
 
             gener["generators"].append(tmp)
 
