@@ -149,6 +149,8 @@ dtypes = {
         "specific_enthalpy": "scalar_array_like",
         "layer_thickness": "scalar",
         "n_layer": "int",
+        "conductivity_times": "array_like",
+        "conductivity_factors": "array_like",
     },
     "OUTPU": {"format": "str", "variables": "array_like"},
     "ELEME": {
