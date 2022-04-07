@@ -239,9 +239,36 @@ def test_react(write_read):
                 "values": np.random.rand(4),
                 "permeability": np.random.rand(3),
             },
-        }
+        },
+        "generators": [
+            {
+                "label": helpers.random_string(5),
+                "rates": np.random.rand(),
+                "specific_enthalpy": np.random.rand(),
+            },
+            {
+                "label": helpers.random_string(5),
+                "times": np.random.rand(10),
+                "rates": np.random.rand(10),
+                "specific_enthalpy": np.random.rand(10),
+            },
+            {
+                "label": helpers.random_string(5),
+                "rates": np.random.rand(),
+                "specific_enthalpy": np.random.rand(),
+                "conductivity_times": np.random.rand(5),
+                "conductivity_factors": np.random.rand(5),
+            },
+            {
+                "label": helpers.random_string(5),
+                "times": np.random.rand(10),
+                "rates": np.random.rand(10),
+                "specific_enthalpy": np.random.rand(10),
+                "conductivity_times": np.random.rand(9),
+                "conductivity_factors": np.random.rand(9),
+            },
+        ],
     }
-    toughio.write_input("bug.txt", parameters_ref, simulator="toughreact")
     parameters = write_read(parameters_ref)
 
     # Block ROCKS
@@ -266,6 +293,19 @@ def test_react(write_read):
     for k, v in parameters_ref["initial_conditions"].items():
         for kk, vv in v.items():
             assert np.allclose(vv, parameters["initial_conditions"][k][kk], atol=1.0e-3)
+
+    # Block GENER
+    assert len(parameters_ref["generators"]) == len(parameters["generators"])
+
+    for generator_ref, generator in zip(
+        parameters_ref["generators"], parameters["generators"]
+    ):
+        for k, v in generator_ref.items():
+            if k == "label":
+                assert v == generator[k]
+
+            else:
+                assert np.allclose(v, generator[k], atol=1.0e-4)
 
 
 @pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])

@@ -164,6 +164,8 @@ generators = {
     "specific_enthalpy": None,
     "layer_thickness": None,
     "n_layer": None,
+    "conductivity_times": None,
+    "conductivity_factors": None,
 }
 
 output = {
