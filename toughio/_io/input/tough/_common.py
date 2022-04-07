@@ -163,6 +163,8 @@ generators = {
     "rates": None,
     "specific_enthalpy": None,
     "layer_thickness": None,
+    "conductivity_times": None,
+    "conductivity_factors": None,
 }
 
 output = {
