@@ -180,8 +180,8 @@ This Software was developed under funding from the U.S. Department of Energy and
 .. |Codecov| image:: https://img.shields.io/codecov/c/github/keurfonluu/toughio.svg?style=flat
    :target: https://codecov.io/gh/keurfonluu/toughio
 
-.. |DOI| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.4287673.svg?style=flat
-   :target: https://doi.org/10.5281/zenodo.4287673
+.. |DOI| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.3961278.svg?style=flat
+   :target: https://doi.org/10.5281/zenodo.3961278
 
 .. |Build| image:: https://img.shields.io/github/workflow/status/keurfonluu/toughio/Python%20package
    :target: https://github.com/keurfonluu/toughio
