@@ -69,7 +69,7 @@ _Parameters = {
 
 Parameters = dict(_Parameters)
 
-react = {k + 1: None for k in range(20)}
+react = {k + 1: None for k in range(25)}
 
 flac = {
     "creep": False,
