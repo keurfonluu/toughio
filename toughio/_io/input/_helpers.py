@@ -47,7 +47,7 @@ def read(filename, file_format=None, **kwargs):
     ----------
     filename : str, pathlike or buffer
         Input file name or buffer.
-    file_format : str ('tough', 'json') or None, optional, default None
+    file_format : str ('tough', 'toughreact-flow', 'json') or None, optional, default None
         Input file format.
 
     Other Parameters
@@ -67,7 +67,7 @@ def read(filename, file_format=None, **kwargs):
     If ``file_format == 'tough'``, can also read `MESH`, `INCON` and `GENER` files.
 
     """
-    if not (file_format is None or file_format in {"tough", "json"}):
+    if not (file_format is None or file_format in _reader_map):
         raise ValueError()
 
     fmt = (
@@ -90,7 +90,7 @@ def write(filename, parameters, file_format=None, **kwargs):
         Output file name or buffer.
     parameters : dict
         Parameters to export.
-    file_format : str ('tough', 'json') or None, optional, default None
+    file_format : str ('tough', 'toughreact-flow', 'json') or None, optional, default None
         Output file format.
 
     Other Parameters
@@ -111,7 +111,7 @@ def write(filename, parameters, file_format=None, **kwargs):
     """
     if not isinstance(parameters, dict):
         raise TypeError()
-    if not (file_format is None or file_format in {"tough", "json"}):
+    if not (file_format is None or file_format in _writer_map):
         raise ValueError()
 
     fmt = (
