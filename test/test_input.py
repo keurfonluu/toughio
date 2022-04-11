@@ -229,7 +229,7 @@ def test_react(write_read):
             },
         },
         "react": {
-            k + 1: v for k, v in enumerate(np.random.randint(10, size=20))
+            k + 1: v for k, v in enumerate(np.random.randint(10, size=25))
         },
         "options": {
             "react_wdata": [helpers.random_string(5) for _ in range(np.random.randint(10) + 1)],
