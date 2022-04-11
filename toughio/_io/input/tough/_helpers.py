@@ -68,7 +68,7 @@ dtypes = {
         "equivalent_pore_pressure": "dict",
         "phase_composition": "int",
     },
-    "REACT": {i + 1: "int" for i in range(20)},
+    "REACT": {i + 1: "int" for i in range(25)},
     "FLAC": {"creep": "bool", "porosity_model": "int", "version": "int"},
     "CHEMP": {
         "temperature_crit": "scalar",

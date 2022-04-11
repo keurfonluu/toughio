@@ -108,7 +108,7 @@ block_to_format = {
             },
         },
     },
-    "REACT": "20S",
+    "REACT": "25S",
 }
 
 
