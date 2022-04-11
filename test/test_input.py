@@ -22,8 +22,8 @@ write_read_json = lambda x: write_read(
 
 write_read_toughreact = lambda x: write_read(
     x,
-    writer_kws={"file_format": "tough", "simulator": "toughreact"},
-    reader_kws={"file_format": "tough", "simulator": "toughreact"},
+    writer_kws={"file_format": "toughreact-flow"},
+    reader_kws={"file_format": "toughreact-flow"},
 )
 
 
