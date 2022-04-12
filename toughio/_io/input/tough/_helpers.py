@@ -42,6 +42,7 @@ dtypes = {
         "initial_conditions": "dict",
         "initial_conditions_order": "array_like",
         "meshmaker": "dict",
+        "poiseuille": "dict",
         "default": "dict",
     },
     "ROCKS": {
@@ -180,6 +181,11 @@ dtypes = {
         "permeability": "scalar_array_like",
     },
     "MESHM": {"type": "str", "parameters": "array_like", "angle": "scalar"},
+    "POISE": {
+        "start": "array_like",
+        "end": "array_like",
+        "aperture": "scalar",
+    },
 }
 
 

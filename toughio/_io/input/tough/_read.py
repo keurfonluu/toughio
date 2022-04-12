@@ -202,6 +202,9 @@ def read_buffer(f, label_length, eos, simulator="tough"):
             elif line.startswith("MESHM"):
                 parameters.update(_read_meshm(fiter))
 
+            elif line.startswith("POISE"):
+                parameters.update(_read_poise(fiter))
+
             elif line.startswith("NOVER"):
                 parameters["nover"] = True
 
@@ -1126,3 +1129,20 @@ def _read_meshm(f):
                 break
 
     return meshm
+
+
+def _read_poise(f):
+    """Read POISE block data."""
+    poise = {"poiseuille": {}}
+
+    line = f.next().strip()
+    data = [float(x) for x in line.split()]  # Free-format
+
+    if len(data) < 5:
+        raise ReadError()
+
+    poise["poiseuille"]["start"] = data[:2]
+    poise["poiseuille"]["end"] = data[2:4]
+    poise["poiseuille"]["aperture"] = data[4]
+
+    return poise
