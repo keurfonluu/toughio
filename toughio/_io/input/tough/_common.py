@@ -19,6 +19,7 @@ blocks = {
     "GOFT",
     "GENER",
     "DIFFU",
+    "OUTPT",
     "OUTPU",
     "ELEME",
     "COORD",

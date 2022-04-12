@@ -151,6 +151,7 @@ dtypes = {
         "conductivity_times": "array_like",
         "conductivity_factors": "array_like",
     },
+    "OUTPT": {"format": "int", "shape": "array_like"},
     "OUTPU": {"format": "str", "variables": "array_like"},
     "ELEME": {
         "nseq": "int",

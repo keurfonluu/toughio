@@ -230,6 +230,10 @@ def test_react(write_read):
         },
         "react": {
             "options": {k + 1: v for k, v in enumerate(np.random.randint(10, size=25))},
+            "output": {
+                "format": np.random.randint(10),
+                "shape": np.random.randint(100, size=3),
+            },
         },
         "options": {
             "react_wdata": [helpers.random_string(5) for _ in range(np.random.randint(10) + 1)],
@@ -308,6 +312,10 @@ def test_react(write_read):
 
             else:
                 assert np.allclose(v, generator[k], atol=1.0e-4)
+
+    # Block OUTPT
+    for k, v in parameters_ref["react"]["output"].items():
+        assert np.allclose(v, parameters["react"]["output"][k])
 
 
 @pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
