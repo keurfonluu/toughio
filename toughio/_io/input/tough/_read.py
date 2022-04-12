@@ -94,7 +94,11 @@ def read_buffer(f, label_length, eos, simulator="tough"):
                     parameters["default"] = rpcap
 
             elif line.startswith("REACT"):
-                parameters.update(_read_react(fiter))
+                react = _read_react(fiter)
+                if "react" in parameters:
+                    parameters["react"].update(react["react"])
+                else:
+                    parameters.update(react)
 
             elif line.startswith("FLAC"):
                 flac = _read_flac(fiter, parameters["rocks_order"])
@@ -284,7 +288,9 @@ def _read_react(f):
     line = f.next()
     data = read_record(line, fmt)
     react = {
-        "react": {i + 1: int(x) for i, x in enumerate(data[0]) if x.isdigit()}
+        "react": {
+            "options": {i + 1: int(x) for i, x in enumerate(data[0]) if x.isdigit()}
+        }
     }
 
     return react

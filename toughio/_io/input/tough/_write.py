@@ -214,6 +214,9 @@ def write_buffer(params, block, ignore_blocks=None, eos_=None, simulator="tough"
             output = True
             break
 
+    # TOUGHREACT related flags
+    react = "options" in parameters["react"]
+
     # Check that start is True if indom is True
     if indom and not parameters["start"]:
         logging.warning("Option 'START' is needed to use 'INDOM' conditions.")
@@ -229,7 +232,7 @@ def write_buffer(params, block, ignore_blocks=None, eos_=None, simulator="tough"
     if "RPCAP" in blocks and rpcap:
         out += _write_rpcap(parameters)
 
-    if "REACT" in blocks and parameters["react"]:
+    if "REACT" in blocks and react:
         out += _write_react(parameters)
 
     if "FLAC" in blocks and parameters["flac"]:
@@ -439,18 +442,18 @@ def _write_rpcap(parameters):
     return out
 
 
-@check_parameters(dtypes["REACT"], keys="react")
+@check_parameters(dtypes["MOPR"], keys=("react", "options"))
 @block("REACT")
 def _write_react(parameters):
     """Write REACT block data."""
-    from ._common import react
+    from ._common import react_options
 
     # Formats
     fmt = block_to_format["REACT"]
     fmt = str2format(fmt)
 
-    _react = deepcopy(react)
-    _react.update(parameters["react"])
+    _react = deepcopy(react_options)
+    _react.update(parameters["react"]["options"])
 
     tmp = [" " if _react[k] is None else str(_react[k]) for k in sorted(_react.keys())]
     out = write_record(["".join(tmp)], fmt)

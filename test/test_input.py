@@ -229,7 +229,7 @@ def test_react(write_read):
             },
         },
         "react": {
-            k + 1: v for k, v in enumerate(np.random.randint(10, size=25))
+            "options": {k + 1: v for k, v in enumerate(np.random.randint(10, size=25))},
         },
         "options": {
             "react_wdata": [helpers.random_string(5) for _ in range(np.random.randint(10) + 1)],
@@ -282,7 +282,9 @@ def test_react(write_read):
                 helpers.allclose_dict(vv, parameters["rocks"][k][kk], atol=1.0e-4)
 
     # Block REACT
-    helpers.allclose_dict(parameters_ref["react"], parameters["react"])
+    helpers.allclose_dict(parameters_ref["react"]["options"], parameters["react"]["options"])
+
+    # Block PARAM
     assert parameters_ref["options"]["react_wdata"] == parameters["options"]["react_wdata"]
 
     # Block INCON

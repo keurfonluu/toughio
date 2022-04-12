@@ -69,8 +69,6 @@ _Parameters = {
 
 Parameters = dict(_Parameters)
 
-react = {k + 1: None for k in range(25)}
-
 flac = {
     "creep": False,
     "porosity_model": None,
@@ -143,6 +141,8 @@ options = {
 extra_options = {k + 1: None for k in range(24)}
 
 more_options = {k + 1: None for k in range(40)}
+
+react_options = {k + 1: None for k in range(25)}
 
 solver = {
     "id": 3,
