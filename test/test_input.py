@@ -272,6 +272,11 @@ def test_react(write_read):
                 "conductivity_factors": np.random.rand(9),
             },
         ],
+        "poiseuille": {
+            "start": np.random.rand(2),
+            "end": np.random.rand(2),
+            "aperture": np.random.rand(),
+        }
     }
     parameters = write_read(parameters_ref)
 
@@ -316,6 +321,10 @@ def test_react(write_read):
     # Block OUTPT
     for k, v in parameters_ref["react"]["output"].items():
         assert np.allclose(v, parameters["react"]["output"][k])
+
+    # Block POISE
+    for k, v in parameters_ref["poiseuille"].items():
+        assert np.allclose(v, parameters["poiseuille"][k])
 
 
 @pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
