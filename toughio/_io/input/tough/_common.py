@@ -26,6 +26,7 @@ blocks = {
     "CONNE",
     "INCON",
     "MESHM",
+    "POISE",
     "NOVER",
     "ENDCY",
 }
@@ -65,6 +66,7 @@ _Parameters = {
     "initial_conditions": {},
     "initial_conditions_order": None,
     "meshmaker": {},
+    "poiseuille": {},
     "default": {},
 }
 
