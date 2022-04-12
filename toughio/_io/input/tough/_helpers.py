@@ -68,7 +68,6 @@ dtypes = {
         "equivalent_pore_pressure": "dict",
         "phase_composition": "int",
     },
-    "REACT": {i + 1: "int" for i in range(25)},
     "FLAC": {"creep": "bool", "porosity_model": "int", "version": "int"},
     "CHEMP": {
         "temperature_crit": "scalar",
@@ -128,6 +127,7 @@ dtypes = {
         "react_wdata": "array_like",
     },
     "MOP": {i + 1: "int" for i in range(24)},
+    "MOPR": {i + 1: "int" for i in range(25)},
     "MOMOP": {i + 1: "int" for i in range(40)},
     "SELEC": {"integers": "dict", "floats": "array_like"},
     "SOLVR": {
