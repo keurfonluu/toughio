@@ -66,7 +66,6 @@ _Parameters = {
     "initial_conditions": {},
     "initial_conditions_order": None,
     "meshmaker": {},
-    "poiseuille": {},
     "default": {},
 }
 

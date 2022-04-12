@@ -234,6 +234,11 @@ def test_react(write_read):
                 "format": np.random.randint(10),
                 "shape": np.random.randint(100, size=3),
             },
+            "poiseuille": {
+                "start": np.random.rand(2),
+                "end": np.random.rand(2),
+                "aperture": np.random.rand(),
+            },
         },
         "options": {
             "react_wdata": [helpers.random_string(5) for _ in range(np.random.randint(10) + 1)],
@@ -272,11 +277,6 @@ def test_react(write_read):
                 "conductivity_factors": np.random.rand(9),
             },
         ],
-        "poiseuille": {
-            "start": np.random.rand(2),
-            "end": np.random.rand(2),
-            "aperture": np.random.rand(),
-        }
     }
     parameters = write_read(parameters_ref)
 
@@ -323,8 +323,8 @@ def test_react(write_read):
         assert np.allclose(v, parameters["react"]["output"][k])
 
     # Block POISE
-    for k, v in parameters_ref["poiseuille"].items():
-        assert np.allclose(v, parameters["poiseuille"][k])
+    for k, v in parameters_ref["react"]["poiseuille"].items():
+        assert np.allclose(v, parameters["react"]["poiseuille"][k])
 
 
 @pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
