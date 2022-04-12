@@ -216,7 +216,7 @@ def write_buffer(params, block, ignore_blocks=None, eos_=None, simulator="tough"
     # TOUGHREACT related flags
     react = "options" in parameters["react"] and parameters["react"]["options"]
     outpt = "output" in parameters["react"] and "format" in parameters["react"]["output"]
-    poise = "poiseuille" in parameters and parameters["poiseuille"]
+    poise = "poiseuille" in parameters["react"] and parameters["react"]["poiseuille"]
 
     # Check that start is True if indom is True
     if indom and not parameters["start"]:
@@ -1456,20 +1456,21 @@ def _write_meshm(parameters):
     return out
 
 
-@check_parameters(dtypes["POISE"], keys="poiseuille")
+@check_parameters(dtypes["POISE"], keys=("react", "poiseuille"))
 @block("POISE")
 def _write_poise(parameters):
     """Write POISE block data."""
+    poise = parameters["react"]["poiseuille"]
     for key in ["start", "end", "aperture"]:
-        if key not in parameters["poiseuille"]:
+        if key not in poise:
             raise ValueError()
 
-        if key != "aperture" and len(parameters["poiseuille"][key]) != 2:
+        if key != "aperture" and len(poise[key]) != 2:
             raise ValueError()
 
-    values = [x for x in parameters["poiseuille"]["start"][:2]]
-    values += [x for x in parameters["poiseuille"]["end"][:2]]
-    values += [parameters["poiseuille"]["aperture"]]
+    values = [x for x in poise["start"][:2]]
+    values += [x for x in poise["end"][:2]]
+    values += [poise["aperture"]]
     out = ["{}\n".format(" ".join(str(x) for x in values))]
 
     return out
