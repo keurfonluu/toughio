@@ -216,6 +216,7 @@ def write_buffer(params, block, ignore_blocks=None, eos_=None, simulator="tough"
 
     # TOUGHREACT related flags
     react = "options" in parameters["react"]
+    outpt = "output" in parameters["react"] and "format" in parameters["react"]["output"]
 
     # Check that start is True if indom is True
     if indom and not parameters["start"]:
@@ -282,6 +283,9 @@ def write_buffer(params, block, ignore_blocks=None, eos_=None, simulator="tough"
 
     if "DIFFU" in blocks and len(parameters["diffusion"]):
         out += _write_diffu(parameters)
+
+    if "OUTPT" in blocks and outpt:
+        out += _write_outpt(parameters)
 
     if "OUTPU" in blocks and output:
         out += _write_outpu(parameters)
@@ -1101,6 +1105,19 @@ def _write_diffu(parameters):
     out = []
     for mass in parameters["diffusion"]:
         out += write_record(mass, fmt, multi=True)
+
+    return out
+
+
+@check_parameters(dtypes["OUTPT"], keys=("react", "output"))
+@block("OUTPT")
+def _write_outpt(parameters):
+    """Write OUTPT block data."""
+    outpt = parameters["react"]["output"]
+
+    values = [outpt["format"]]
+    values += [x for x in outpt["shape"][:3]] if "shape" in outpt else []
+    out = ["{}\n".format(" ".join(str(x) for x in values))]
 
     return out
 
