@@ -2,7 +2,6 @@ from __future__ import division, with_statement
 
 import logging
 from copy import deepcopy
-from inflection import parameterize
 
 import numpy as np
 
@@ -215,8 +214,9 @@ def write_buffer(params, block, ignore_blocks=None, eos_=None, simulator="tough"
             break
 
     # TOUGHREACT related flags
-    react = "options" in parameters["react"]
+    react = "options" in parameters["react"] and parameters["react"]["options"]
     outpt = "output" in parameters["react"] and "format" in parameters["react"]["output"]
+    poise = "poiseuille" in parameters and parameters["poiseuille"]
 
     # Check that start is True if indom is True
     if indom and not parameters["start"]:
@@ -304,6 +304,9 @@ def write_buffer(params, block, ignore_blocks=None, eos_=None, simulator="tough"
 
     if "MESHM" in blocks and parameters["meshmaker"]:
         out += _write_meshm(parameters)
+
+    if "POISE" in blocks and poise:
+        out += _write_poise(parameters)
 
     if "NOVER" in blocks and parameters["nover"]:
         out += _write_nover()
@@ -1445,6 +1448,25 @@ def _write_meshm(parameters):
 
                 out += write_record([len(parameter["thicknesses"])], fmt1)
                 out += write_record(parameter["thicknesses"], fmt2, multi=True)
+
+    return out
+
+
+@check_parameters(dtypes["POISE"], keys="poiseuille")
+@block("POISE")
+def _write_poise(parameters):
+    """Write POISE block data."""
+    for key in ["start", "end", "aperture"]:
+        if key not in parameters["poiseuille"]:
+            raise ValueError()
+
+        if key != "aperture" and len(parameters["poiseuille"][key]) != 2:
+            raise ValueError()
+
+    values = [x for x in parameters["poiseuille"]["start"][:2]]
+    values += [x for x in parameters["poiseuille"]["end"][:2]]
+    values += [parameters["poiseuille"]["aperture"]]
+    out = ["{}\n".format(" ".join(str(x) for x in values))]
 
     return out
 
