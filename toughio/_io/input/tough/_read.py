@@ -163,6 +163,13 @@ def read_buffer(f, label_length, eos, simulator="tough"):
             elif line.startswith("DIFFU"):
                 parameters.update(_read_diffu(fiter))
 
+            elif line.startswith("OUTPT"):
+                outpt = _read_outpt(fiter)
+                if "react" in parameters:
+                    parameters["react"].update(outpt["react"])
+                else:
+                    parameters.update(outpt)
+
             elif line.startswith("OUTPU"):
                 parameters.update(_read_outpu(fiter))
 
@@ -778,6 +785,22 @@ def _read_diffu(f):
             break
 
     return diffu
+
+
+def _read_outpt(f):
+    """Read OUTPT block data."""
+    outpt = {"react": {"output": {}}}
+
+    line = f.next().strip()
+    data = [int(x) for x in line.split()]  # Free-format
+
+    if len(data):
+        outpt["react"]["output"]["format"] = data[0]
+
+    if len(data) > 1:
+        outpt["react"]["output"]["shape"] = data[1:]
+
+    return outpt
 
 
 def _read_outpu(f):
