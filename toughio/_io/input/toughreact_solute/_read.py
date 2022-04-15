@@ -111,7 +111,7 @@ def _read_options(f):
 
     # Record 3
     line = f.next(skip_empty=True, comments="#").strip()
-    data = [float(x) for x in line.split()]
+    data = [_float(x) for x in line.split()]
     if len(data) < 4:
         raise ReadError()
 
@@ -142,7 +142,7 @@ def _read_filenames(f):
 def _read_weights_coefficients(f):
     """Read weights and diffusion coefficients."""
     line = f.next(skip_empty=True, comments="#").strip()
-    data = [float(x) for x in line.split()]
+    data = [_float(x) for x in line.split()]
     if len(data) < 4:
         raise ReadError()
 
@@ -165,12 +165,12 @@ def _read_convergence(f):
 
     options = {
         "n_iteration_tr": int(data[0]),
-        "eps_tr": float(data[1]),
+        "eps_tr": _float(data[1]),
         "n_iteration_ch": int(data[2]),
-        "eps_ch": float(data[3]),
-        "eps_mb": float(data[4]),
-        "eps_dc": float(data[5]),
-        "eps_dr": float(data[6]),
+        "eps_ch": _float(data[3]),
+        "eps_mb": _float(data[4]),
+        "eps_dc": _float(data[5]),
+        "eps_dr": _float(data[6]),
     }
 
     return options
@@ -296,7 +296,7 @@ def _read_default(f, mopr_11=0):
             default["default"]["element"] = int(data[9])
 
         else:
-            default["default"]["sedimentation_velocity"] = float(data[9])
+            default["default"]["sedimentation_velocity"] = _float(data[9])
 
     return default
 
@@ -351,7 +351,7 @@ def _read_convergence_bounds(f):
     }
 
     line = f.next(skip_empty=True, comments="#").strip()
-    data = [float(x.lower().replace("d", "e")) for x in line.split()]
+    data = [_float(x) for x in line.split()]
     if len(data) < 6:
         raise ReadError()
 
@@ -365,6 +365,11 @@ def _read_convergence_bounds(f):
     })
 
     return options
+
+
+def _float(x):
+    """Handle Fortran double."""
+    return float(x.lower().replace("d", "e"))
 
 
 def _parse_zones(data, mopr_11):
@@ -386,6 +391,6 @@ def _parse_zones(data, mopr_11):
             out["element"] = int(data[9])
 
         else:
-            out["sedimentation_velocity"] = float(data[9])
+            out["sedimentation_velocity"] = _float(data[9])
 
     return out
