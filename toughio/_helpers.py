@@ -29,6 +29,13 @@ class FileIterator:
 
                 elif line:
                     return line
+
+        elif comments:
+            while True:
+                line = self.__next__().strip()
+
+                if not line.startswith(comments):
+                    return line
         
         else:
             return self.__next__()
