@@ -1,4 +1,3 @@
-from pytest import param
 from ...._common import open_file
 from ...._exceptions import ReadError
 from ...._helpers import FileIterator
@@ -9,7 +8,7 @@ __all__ = [
 ]
 
 
-def read(filename):
+def read(filename, mopr_11=0):
     """
     Read TOUGHREACT solute input file.
 
@@ -17,15 +16,17 @@ def read(filename):
     ----------
     filename : str
         Input file name.
+    mopr_11 : int, optional, default 0
+        MOPR(11) value in file 'flow.inp'.
 
     """
     with open_file(filename, "r") as f:
-        out = read_buffer(f)
+        out = read_buffer(f, mopr_11)
 
     return out
 
 
-def read_buffer(f):
+def read_buffer(f, mopr_11=0):
     """Read TOUGHREACT solute input file."""
     parameters = {}
     fiter = FileIterator(f)
@@ -40,11 +41,38 @@ def read_buffer(f):
         output, numbers = _read_output(fiter)
         parameters["options"].update(output["options"])
         parameters["flags"].update(output["flags"])
-
         parameters["output"] = {}
+
         elements = _read_elements(fiter, numbers["NWNOD"])
         if elements:
             parameters["output"]["elements"] = elements
+
+        components = _read_indices_names(fiter, numbers["NWCOM"])
+        if components:
+            parameters["output"]["components"] = components
+
+        minerals = _read_indices_names(fiter, numbers["NWMIN"])
+        if minerals:
+            parameters["output"]["minerals"] = minerals
+
+        aqueous_species = _read_indices_names(fiter, numbers["NWAQ"])
+        if aqueous_species:
+            parameters["output"]["aqueous_species"] = aqueous_species
+
+        surface_complexes = _read_indices_names(fiter, numbers["NWADS"])
+        if surface_complexes:
+            parameters["output"]["surface_complexes"] = surface_complexes
+
+        exchange_species = _read_indices_names(fiter, numbers["NWEXC"])
+        if exchange_species:
+            parameters["output"]["exchange_species"] = exchange_species
+
+        parameters.update(_read_default(fiter, mopr_11))
+        parameters.update(_read_zones(fiter, mopr_11))
+        
+        convergence_bounds = _read_convergence_bounds(fiter)
+        if convergence_bounds:
+            parameters["options"].update(convergence_bounds)
 
     except:
         raise ReadError("failed to parse line {}.".format(fiter.count))
@@ -197,12 +225,12 @@ def _read_elements(f, n):
 
     elif n < 0:
         line = f.next(skip_empty=True, comments="#").strip()
-        elements.append(line[:5])
+        elements.append(line[:5].strip())
         while True:
             line = f.next().strip()
 
             if line:
-                elements.append(line[:5])
+                elements.append(line[:5].strip())
 
             else:
                 break
@@ -211,3 +239,153 @@ def _read_elements(f, n):
 
     else:
         _ = f.next(comments="#")  # Skip next blank line
+
+
+def _read_indices_names(f, n):
+    """Read indices or names."""
+    if n > 0:
+        line = f.next(comments="#").strip()
+        data = [int(x) for x in line.split()]
+        out = data
+
+        return out[:n]
+
+    elif n < 0:
+        line = f.next(comments="#").strip()
+        out = [line[:20].strip()]
+        while True:
+            line = f.next().strip()
+
+            if line:
+                out.append(line[:20].strip())
+
+            else:
+                break
+
+        return out
+
+    else:
+        _ = f.next(comments="#")  # Skip next blank line
+
+
+def _read_default(f, mopr_11=0):
+    """Read default chemical property zones."""
+    line = f.next(skip_empty=True, comments="#").strip()
+    data = line.split()
+    if len(data) < 9:
+        raise ReadError()
+    if mopr_11 == 1 and len(data) < 10:
+        raise ReadError()
+
+    default = {
+        "default": {
+            "initial_water": int(data[0]),
+            "injection_water": int(data[1]),
+            "mineral": int(data[2]),
+            "gas": int(data[3]),
+            "adsorption": int(data[4]),
+            "ion_exchange": int(data[5]),
+            "porosity_permeability": int(data[6]),
+            "linear_adsorption": int(data[7]),
+            "injection_gas": int(data[8]),
+        }
+    }
+
+    if len(data) == 10:
+        if mopr_11 != 0:
+            default["default"]["element"] = int(data[9])
+
+        else:
+            default["default"]["sedimentation_velocity"] = float(data[9])
+
+    return default
+
+
+def _read_zones(f, mopr_11=0):
+    """Read chemical property zones."""
+    zones = {"zones": {}}
+
+    line = f.next(skip_empty=True, comments="#").rstrip()
+    while True:
+        # Normally, the list should end with a blank record
+        # But some sample files don't yet end with an 'end' statement
+        if not line.strip() or line.startswith("end"):
+            break
+
+        label = line[:5]
+        data = line[5:].split()
+        if len(data) < 11:
+            raise ReadError()
+
+        zones["zones"][label] = _parse_zones(data[2:], mopr_11)
+        line = f.next(comments="#").rstrip()
+
+    return zones
+
+
+def _read_convergence_bounds(f):
+    """Read convergence bounds."""
+    while True:
+        try:
+            line = f.next().rstrip()
+
+            if line.startswith("end"):
+                return
+
+            if line.startswith("CONVP"):
+                break
+
+        except StopIteration:
+            return
+
+    line = f.next(skip_empty=True, comments="#").strip()
+    data = line.split()
+    if len(data) < 4:
+        raise ReadError()
+
+    options = {
+        "n_iteration_1": int(data[0]),
+        "n_iteration_2": int(data[1]),
+        "n_iteration_3": int(data[2]),
+        "n_iteration_4": int(data[3]),
+    }
+
+    line = f.next(skip_empty=True, comments="#").strip()
+    data = [float(x.lower().replace("d", "e")) for x in line.split()]
+    if len(data) < 6:
+        raise ReadError()
+
+    options.update({
+        "t_increase_factor_1": data[0],
+        "t_increase_factor_2": data[1],
+        "t_increase_factor_3": data[2],
+        "t_reduce_factor_1": data[3],
+        "t_reduce_factor_2": data[4],
+        "t_reduce_factor_3": data[5],
+    })
+
+    return options
+
+
+def _parse_zones(data, mopr_11):
+    """Parse zones."""
+    out = {
+        "initial_water": int(data[0]),
+        "injection_water": int(data[1]),
+        "mineral": int(data[2]),
+        "gas": int(data[3]),
+        "adsorption": int(data[4]),
+        "ion_exchange": int(data[5]),
+        "porosity_permeability": int(data[6]),
+        "linear_adsorption": int(data[7]),
+        "injection_gas": int(data[8]),
+    }
+
+    if len(data) == 10:
+        if mopr_11 != 0:
+            out["element"] = int(data[9])
+
+        else:
+            out["sedimentation_velocity"] = float(data[9])
+
+    return out
