@@ -318,6 +318,8 @@ def _read_zones(f, mopr_11=0):
             raise ReadError()
 
         zones["zones"][label] = _parse_zones(data[2:], mopr_11)
+        zones["zones"][label]["nseq"] = int(data[0])
+        zones["zones"][label]["nadd"] = int(data[1])
         line = f.next(comments="#").rstrip()
 
     return zones
