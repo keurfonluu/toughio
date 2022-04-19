@@ -1,4 +1,16 @@
+def to_float(s):
+    """Convert variable string to float."""
+    try:
+        return float(s.replace("d", "e"))
+
+    except ValueError:
+        # It's probably something like "0.0001-001"
+        significand, exponent = s[:-4], s[-4:]
+        return float("{}e{}".format(significand, exponent))
+
+
 def to_str(x, fmt):
+    """Convert variable to string."""
     x = "" if x is None else x
 
     if not isinstance(x, str):

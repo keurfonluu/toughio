@@ -1,6 +1,6 @@
 import logging
 
-from .._common import to_str
+from ..._common import to_str
 from ...._common import open_file
 
 __all__ = [
@@ -9,6 +9,21 @@ __all__ = [
 
 
 def write(filename, parameters, mopr_10=0, mopr_11=0, verbose=True):
+    """
+    Write TOUGHREACT solute input file.
+
+    Parameters
+    ----------
+    filename : str
+        Input file name.
+    mopr_10 : int, optional, default 0
+        MOPR(10) value in file 'flow.inp'.
+    mopr_11 : int, optional, default 0
+        MOPR(11) value in file 'flow.inp'.
+    verbose : bool, optional, default True
+        If True, add description before each record.
+
+    """
     buffer = write_buffer(parameters, mopr_10, mopr_11, verbose)
     with open_file(filename, "w") as f:
         for record in buffer:
@@ -16,6 +31,7 @@ def write(filename, parameters, mopr_10=0, mopr_11=0, verbose=True):
 
 
 def write_buffer(parameters, mopr_10=0, mopr_11=0, verbose=True):
+    """Write TOUGHREACT solute input file."""
     numbers = _generate_numbers(parameters)
 
     # Define input file contents
@@ -41,6 +57,7 @@ def write_buffer(parameters, mopr_10=0, mopr_11=0, verbose=True):
 
 
 def _generate_numbers(parameters):
+    """Generate numbers of outputs."""
     numbers = {
         "NWNOD": -len(_get(parameters, ("output", "elements"), [])),
         "NWCOM": len(_get(parameters, ("output", "components"), [])),
@@ -52,9 +69,10 @@ def _generate_numbers(parameters):
 
     if numbers["NWCOM"]:
         if isinstance(parameters["output"]["components"][0], str):
-            numbers["NWNOD"] *= -1
+            numbers["NWCOM"] *= -1
 
     if numbers["NWMIN"]:
+        parameters["output"]["minerals"][0]
         if isinstance(parameters["output"]["minerals"][0], str):
             numbers["NWMIN"] *= -1
 
@@ -74,6 +92,7 @@ def _generate_numbers(parameters):
 
 
 def _write_title(parameters, verbose):
+    """Write title."""
     out = ["# Title\n"] if verbose else []
     out += [f"{parameters['title']}\n"]
 
@@ -81,6 +100,7 @@ def _write_title(parameters, verbose):
 
 
 def _write_options(parameters, verbose):
+    """Write options."""
     out = []
 
     # Record 2
@@ -136,6 +156,7 @@ def _write_options(parameters, verbose):
 
 
 def _write_filenames(parameters, verbose):
+    """Write file names."""
     out = ["# Input and output file names\n"] if verbose else []
     values = [
         _get(parameters, ("files", "thermodynamic_input"), ""),
@@ -161,6 +182,7 @@ def _write_filenames(parameters, verbose):
 
 
 def _write_weights_coefficients(parameters, verbose):
+    """Write weights and diffusion coefficients."""
     out = ["#    ITIME      WUPC     DFFUN    DFFUNG\n"] if verbose else []
     values = [
         _get(parameters, ("options", "w_time"), 0.0),
@@ -179,6 +201,7 @@ def _write_weights_coefficients(parameters, verbose):
 
 
 def _write_convergence(parameters, verbose):
+    """Write convergence criterion."""
     out = ["# MAXITPTR     TOLTR  MAXITPCH     TOLCH     TOLMB     TOLDC     TOLDR\n"] if verbose else []
     values = [
         _get(parameters, ("options", "n_iteration_tr"), 0),
@@ -212,6 +235,7 @@ def _write_convergence(parameters, verbose):
 
 
 def _write_output(parameters, numbers, verbose):
+    """Write output control variables."""
     out = ["#  NWTI  NWNOD  NWCOM  NWMIN   NWAQ  NWADS  NWEXC   ICON    MIN   IGAS\n"] if verbose else []
     values = [
         _get(parameters, ("options", "n_cycle_print"), 0),
@@ -236,6 +260,7 @@ def _write_output(parameters, numbers, verbose):
 
 
 def _write_elements(parameters, n, verbose):
+    """Write list of grid blocks."""
     out = [f"# {comments['nodes']}\n"] if verbose else []
 
     if n == 0:
@@ -250,6 +275,7 @@ def _write_elements(parameters, n, verbose):
 
 
 def _write_indices_names(parameters, key, n, verbose):
+    """Write indices or names."""
     out = [f"# {comments[key]}\n"] if verbose else []
 
     if n == 0:
@@ -268,6 +294,7 @@ def _write_indices_names(parameters, key, n, verbose):
 
 
 def _write_default(parameters, verbose, mopr_11=0):
+    """Write default chemical property zones."""
     out = [f"#IZIWDF IZBWDF IZMIDF IZGSDF IZADDF IZEXDF IZPPDF IZKDDF IZBGDF\n"] if verbose else []
     values = [
         _get(parameters, ("default", "initial_water"), 0),
@@ -289,7 +316,7 @@ def _write_default(parameters, verbose, mopr_11=0):
         values += [_get(parameters, ("default", "sedimentation_velocity"), 0)]
 
     if verbose:
-        out += " {}\n".format(" ".join(to_str(value, "{:6d}") for value in values))
+        out += " {}\n".format(" ".join(to_str(value, "{:6d}" if isinstance(value, int) else "{{:9f}}") for value in values))
 
     else:
         out += f"{' '.join(str(x) for x in values)}\n"
@@ -298,9 +325,10 @@ def _write_default(parameters, verbose, mopr_11=0):
 
 
 def _write_zones(parameters, verbose, mopr_11=0):
+    """Write chemical property zones."""
     out = ["#ELEM NSEQ NADD IZIW IZBW IZMI IZGS IZAD IZEX IZPP IZKD IZBG\n"] if verbose else []
     
-    if not parameters["zones"]:
+    if "zones" not in parameters or not parameters["zones"]:
         out += ["\n"]
 
         return out
@@ -327,10 +355,10 @@ def _write_zones(parameters, verbose, mopr_11=0):
                 values += [parameters["zones"][zone]["element"]]
 
         else:
-            values += [_get(parameters, ("zones", zone, "sedimentation_velocity"), 0)]
+            values += [_get(parameters, ("zones", zone, "sedimentation_velocity"), 0.0)]
 
         if verbose:
-            out += f"{values[0][:5]} {' '.join(to_str(value, '{:4d}') for value in values[1:])}\n"
+            out += f"{values[0][:5]} {' '.join(to_str(value, '{:4d}' if isinstance(value, int) else '{{:9f}}') for value in values[1:])}\n"
 
         else:
             out += f"{' '.join(str(x) for x in values)}\n"
@@ -341,6 +369,7 @@ def _write_zones(parameters, verbose, mopr_11=0):
 
 
 def _write_convergence_bounds(parameters, verbose, mopr_10=0):
+    """Write convergence bounds."""
     if mopr_10 != 2:
         return []
 
@@ -383,6 +412,7 @@ def _write_convergence_bounds(parameters, verbose, mopr_10=0):
 
 
 def _get(parameters, keys, default):
+    """Get key in parameters dict or return default value."""
     try:
         if isinstance(keys, str):
             return parameters[keys]
