@@ -5,7 +5,7 @@ from functools import partial
 import numpy as np
 
 from ...._common import get_label_length, open_file
-from ...input.tough._helpers import read_record, str2float
+from ..._common import read_record
 from .._common import to_output
 
 __all__ = [
@@ -93,7 +93,7 @@ def _read_table(f, file_type, label_length):
                     if first:
                         try:
                             # Set line parser and try parsing first line
-                            reader = lambda line: [_str2float(x) for x in line.split()]
+                            reader = lambda line: [to_float(x) for x in line.split()]
                             _ = reader(line)
 
                         except ValueError:
@@ -132,10 +132,12 @@ def _read_table(f, file_type, label_length):
     return headers, times, variables
 
 
-def _str2float(x):
+def to_float(x):
     """Return np.nan if x cannot be converted."""
+    from ..._common import to_float as _to_float
+
     try:
-        return str2float(x)
+        return _to_float(x)
 
     except ValueError:
         return np.nan
