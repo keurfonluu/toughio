@@ -3,7 +3,8 @@ from __future__ import division, with_statement
 from ...._common import block_to_format, get_label_length, open_file
 from ...._exceptions import ReadError
 from ...._helpers import FileIterator
-from ._helpers import prune_nones_dict, prune_nones_list, read_record, read_model_record
+from ..._common import prune_nones_dict, prune_nones_list, read_record
+from ._helpers import read_model_record
 
 __all__ = [
     "read",

@@ -6,8 +6,9 @@ from copy import deepcopy
 import numpy as np
 
 from ...._common import block_to_format, open_file, str2format
+from ..._common import prune_nones_list, write_record
 from ._common import default
-from ._helpers import block, check_parameters, dtypes, prune_nones_list, write_record, write_model_record
+from ._helpers import block, check_parameters, dtypes, write_model_record
 
 __all__ = [
     "write",
