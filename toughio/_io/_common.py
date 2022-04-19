@@ -1,3 +1,50 @@
+import numpy as np
+
+
+def read_record(data, fmt):
+    """Parse string to data given format."""
+    token_to_type = {
+        "s": str,
+        "S": str,
+        "d": int,
+        "f": to_float,
+        "e": to_float,
+    }
+
+    i = 0
+    out = []
+    for token in fmt.split(","):
+        n = int(token[:-1].split(".")[0])
+        tmp = data[i : i + n]
+        tmp = tmp if token[-1] == "S" else tmp.strip()
+        out.append(token_to_type[token[-1]](tmp) if tmp else None)
+        i += n
+
+    return out
+
+
+def write_record(data, fmt, multi=False):
+    """Return a list of record strings given format."""
+    if not multi:
+        data = [to_str(d, f) for d, f in zip(data, fmt)]
+        out = ["{:80}\n".format("".join(data))]
+
+    else:
+        n = len(data)
+        ncol = len(fmt)
+        data = [
+            data[ncol * i : min(ncol * i + ncol, n)]
+            for i in range(int(np.ceil(n / ncol)))
+        ]
+
+        out = []
+        for d in data:
+            d = [to_str(dd, f) for dd, f in zip(d, fmt)]
+            out += ["{:80}\n".format("".join(d))]
+
+    return out
+
+
 def to_float(s):
     """Convert variable string to float."""
     try:
@@ -47,3 +94,13 @@ def to_str(x, fmt):
 
     else:
         return fmt.replace("g", "").replace("e", "").replace("f", "").format(x)
+
+
+def prune_nones_dict(data):
+    """Remove None key/value pairs from dict."""
+    return {k: v for k, v in data.items() if v is not None}
+
+
+def prune_nones_list(data):
+    """Remove trailing None values from list."""
+    return [x for i, x in enumerate(data) if any(xx is not None for xx in data[i:])]
