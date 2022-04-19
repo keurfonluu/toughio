@@ -132,7 +132,7 @@ def _read_filenames(f):
     line = f.next(skip_empty=True, comments="#")
     filenames["files"]["thermodynamic_input"] = line[:20].strip()
 
-    for keys in {"iteration", "plot", "solid", "gas", "time"}:
+    for keys in ["iteration", "plot", "solid", "gas", "time"]:
         line = f.next()
         filenames["files"]["{}_output".format(keys)] = line[:20].strip()
 
@@ -292,7 +292,7 @@ def _read_default(f, mopr_11=0):
     }
 
     if len(data) == 10:
-        if mopr_11 != 0:
+        if mopr_11 != 1:
             default["default"]["element"] = int(data[9])
 
         else:
@@ -389,7 +389,7 @@ def _parse_zones(data, mopr_11):
     }
 
     if len(data) == 10:
-        if mopr_11 != 0:
+        if mopr_11 != 1:
             out["element"] = int(data[9])
 
         else:
