@@ -627,11 +627,12 @@ def _read_oft(f, oft, label_length):
     line = f.next()
     if not label_length:
         label_length = get_label_length(line[:9])
+    label_format = "{{:>{}}}".format(label_length if oft != "COFT" else 2 * label_length)
 
     while True:
         if line.strip():
             data = read_record(line, fmt[label_length])
-            history[key].append(data[0])
+            history[key].append(label_format.format(data[0]))
 
         else:
             break
@@ -649,13 +650,14 @@ def _read_gener(f, label_length):
     line = f.next()
     if not label_length:
         label_length = get_label_length(line[:9])
+    label_format = "{{:>{}}}".format(label_length)
 
     while True:
         if line.strip():
             data = read_record(line, fmt[label_length])
             tmp = {
-                "label": data[0],
-                "name": data[1],
+                "label": label_format.format(data[0]),
+                "name": "{:>5}".format(data[1]) if data[1] else data[1],
                 "nseq": data[2],
                 "nadd": data[3],
                 "nads": data[4],
@@ -760,11 +762,12 @@ def _read_eleme(f, label_length):
     line = f.next()
     if not label_length:
         label_length = get_label_length(line[:9])
+    label_format = "{{:>{}}}".format(label_length)
 
     while True:
         if line.strip():
             data = read_record(line, fmt[label_length])
-            label = data[0]
+            label = label_format.format(data[0])
             rock = data[3].strip()
             eleme["elements"][label] = {
                 "nseq": data[1],
@@ -813,12 +816,13 @@ def _read_conne(f, label_length):
     line = f.next()
     if not label_length:
         label_length = get_label_length(line[:9])
+    label_format = "{{:>{}}}".format(2 * label_length)
 
     flag = False
     while True:
         if line.strip() and not line.startswith("+++"):
             data = read_record(line, fmt[label_length])
-            label = data[0]
+            label = label_format.format(data[0])
             conne["connections"][label] = {
                 "nseq": data[1],
                 "nadd": data[2:4],
@@ -852,6 +856,7 @@ def _read_incon(f, label_length, eos=None):
     line = f.next()
     if not label_length:
         label_length = get_label_length(line[:9])
+    label_format = "{{:>{}}}".format(label_length)
 
     # Guess the number of lines to read for primary variables
     i = f.tell()
@@ -872,7 +877,7 @@ def _read_incon(f, label_length, eos=None):
         if line.strip() and not line.startswith("+++"):
             # Record 1
             data = read_record(line, fmt2[label_length])
-            label = data[0]
+            label = label_format.format(data[0])
             incon["initial_conditions"][label] = {"porosity": data[3]}
 
             if eos == "tmvoc":
