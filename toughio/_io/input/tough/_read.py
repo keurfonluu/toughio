@@ -627,7 +627,9 @@ def _read_oft(f, oft, label_length):
     line = f.next()
     if not label_length:
         label_length = get_label_length(line[:9])
-    label_format = "{{:>{}}}".format(label_length if oft != "COFT" else 2 * label_length)
+    label_format = "{{:>{}}}".format(
+        label_length if oft != "COFT" else 2 * label_length
+    )
 
     while True:
         if line.strip():
