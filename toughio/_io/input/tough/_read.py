@@ -853,8 +853,21 @@ def _read_incon(f, label_length, eos=None):
     if not label_length:
         label_length = get_label_length(line[:9])
 
+    # Guess the number of lines to read for primary variables
+    i = f.tell()
+    _ = f.next()  # First line for primary variables
+    tmp = f.next()  # Second line for primary variables or next element
+    f.seek(i, increment=-2)  # Rewind
+
+    # If second line can be parsed as Record 1, only one line for variables
+    try:
+        _ = read_record(tmp, fmt2[label_length])
+        two_lines = False
+
+    except ValueError:
+        two_lines = True
+
     flag = False
-    two_lines = True
     while True:
         if line.strip() and not line.startswith("+++"):
             # Record 1
@@ -875,17 +888,8 @@ def _read_incon(f, label_length, eos=None):
 
             # Record 3 (EOS7R)
             if two_lines:
-                i = f.tell()
                 line = f.next()
-
-                if line.strip() and not line.startswith("+++"):
-                    try:
-                        data += read_record(line, fmt[0])
-                    except ValueError:
-                        two_lines = False
-                        f.seek(i, increment=-1)
-                else:
-                    f.seek(i, increment=-1)
+                data += read_record(line, fmt[0])
 
             incon["initial_conditions"][label]["values"] = prune_nones_list(data)
             incon["initial_conditions_order"].append(label)
