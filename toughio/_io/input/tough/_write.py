@@ -1100,11 +1100,6 @@ def _write_gener(parameters, simulator="tough"):
             out += write_record(data["conductivity_times"], fmt2, multi=True)
             out += write_record(data["conductivity_factors"], fmt2, multi=True)
 
-        # TOUGHREACT
-        if ktab:
-            out += write_record(data["conductivity_times"], fmt2, multi=True)
-            out += write_record(data["conductivity_factors"], fmt2, multi=True)
-
     return out
 
 
