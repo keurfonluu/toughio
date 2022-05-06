@@ -668,7 +668,7 @@ def _read_gener(f, label_length):
             }
 
             ltab = data[5]
-            if ltab and ltab > 1:
+            if ltab and ltab > 1 and tmp["type"] != "DELV":
                 itab = data[8]
                 keys = ["times", "rates"]
                 keys += ["specific_enthalpy"] if itab else []
@@ -690,6 +690,9 @@ def _read_gener(f, label_length):
                         "specific_enthalpy": data[10],
                     }
                 )
+
+            if ltab and tmp["type"] == "DELV":
+                tmp["n_layer"] = ltab
 
             gener["generators"].append(tmp)
 
