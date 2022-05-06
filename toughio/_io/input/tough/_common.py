@@ -158,6 +158,7 @@ generators = {
     "rates": None,
     "specific_enthalpy": None,
     "layer_thickness": None,
+    "n_layer": None,
 }
 
 output = {

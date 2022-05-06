@@ -141,6 +141,7 @@ dtypes = {
         "rates": "scalar_array_like",
         "specific_enthalpy": "scalar_array_like",
         "layer_thickness": "scalar",
+        "n_layer": "int",
     },
     "OUTPU": {"format": "str", "variables": "array_like"},
     "ELEME": {

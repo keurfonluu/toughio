@@ -980,6 +980,9 @@ def _write_gener(parameters):
                         if ltab != len(data[key]):
                             raise ValueError()
 
+        elif data["type"] == "DELV" and data["n_layer"]:
+            ltab = data["n_layer"]
+
         else:
             for key in ["rates", "specific_enthalpy"]:
                 if key in data and np.ndim(data[key]) > 0:
@@ -1005,26 +1008,27 @@ def _write_gener(parameters):
             None,
             data["type"],
             itab,
-            None if ltab > 1 else data["rates"],
-            None if ltab > 1 else data["specific_enthalpy"],
+            None if ltab > 1 and data["type"] != "DELV" else data["rates"],
+            None if ltab > 1 and data["type"] != "DELV" else data["specific_enthalpy"],
             data["layer_thickness"],
         ]
         out += write_record(values, fmt1)
 
-        # Record 2
-        out += write_record(data["times"], fmt2, multi=True) if ltab > 1 else []
+        if ltab > 1 and data["type"] != "DELV":
+            # Record 2
+            out += write_record(data["times"], fmt2, multi=True)
 
-        # Record 3
-        out += write_record(data["rates"], fmt2, multi=True) if ltab > 1 else []
+            # Record 3
+            out += write_record(data["rates"], fmt2, multi=True)
 
-        # Record 4
-        if ltab > 1 and data["specific_enthalpy"] is not None:
-            if isinstance(data["specific_enthalpy"], (list, tuple, np.ndarray)):
-                specific_enthalpy = data["specific_enthalpy"]
-            else:
-                specific_enthalpy = np.full(ltab, data["specific_enthalpy"])
+            # Record 4
+            if data["specific_enthalpy"] is not None:
+                if isinstance(data["specific_enthalpy"], (list, tuple, np.ndarray)):
+                    specific_enthalpy = data["specific_enthalpy"]
+                else:
+                    specific_enthalpy = np.full(ltab, data["specific_enthalpy"])
 
-            out += write_record(specific_enthalpy, fmt2, multi=True)
+                out += write_record(specific_enthalpy, fmt2, multi=True)
 
     return out
 
