@@ -28,7 +28,7 @@ def allclose(x, y, atol=1.0e-8):
     return True
 
 
-def test_react():
+def test_flow():
     def write_read(x):
         writer_kws = {"file_format": "toughreact-flow"}
         reader_kws = {"file_format": "toughreact-flow"}
@@ -144,17 +144,20 @@ def test_react():
         "generators": [
             {
                 "label": helpers.random_string(5),
+                "type": helpers.random_string(4),
                 "rates": np.random.rand(),
                 "specific_enthalpy": np.random.rand(),
             },
             {
                 "label": helpers.random_string(5),
+                "type": helpers.random_string(4),
                 "times": np.random.rand(10),
                 "rates": np.random.rand(10),
                 "specific_enthalpy": np.random.rand(10),
             },
             {
                 "label": helpers.random_string(5),
+                "type": helpers.random_string(4),
                 "rates": np.random.rand(),
                 "specific_enthalpy": np.random.rand(),
                 "conductivity_times": np.random.rand(5),
@@ -162,6 +165,7 @@ def test_react():
             },
             {
                 "label": helpers.random_string(5),
+                "type": helpers.random_string(4),
                 "times": np.random.rand(10),
                 "rates": np.random.rand(10),
                 "specific_enthalpy": np.random.rand(10),
