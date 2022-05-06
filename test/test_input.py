@@ -528,6 +528,41 @@ def test_gener(write_read, specific_enthalpy, label_length):
 
 
 @pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
+def test_gener_delv(write_read):
+    n_rnd = np.random.randint(10) + 2
+    parameters_ref = {
+        "generators": [
+            {
+                "label": helpers.random_label(5),
+                "name": helpers.random_string(5),
+                "nseq": np.random.randint(10),
+                "nadd": np.random.randint(10),
+                "nads": np.random.randint(10),
+                "type": "DELV",
+                "rates": np.random.rand(),
+                "specific_enthalpy": np.random.rand(),
+                "layer_thickness": np.random.rand(),
+            }
+            for _ in range(n_rnd)
+        ],
+    }
+    parameters_ref["generators"][0]["n_layer"] = n_rnd
+    parameters = write_read(parameters_ref)
+
+    assert len(parameters_ref["generators"]) == len(parameters["generators"])
+
+    for generator_ref, generator in zip(
+        parameters_ref["generators"], parameters["generators"]
+    ):
+        for k, v in generator_ref.items():
+            if k in {"label", "name", "type"}:
+                assert v == generator[k]
+
+            else:
+                assert np.allclose(v, generator[k], atol=1.0e-4)
+
+
+@pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
 def test_diffu(write_read):
     n_phase = np.random.randint(8) + 1
     parameters_ref = {
