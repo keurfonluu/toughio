@@ -40,6 +40,12 @@ def read_buffer(f):
         parameters.update(_read_kdde(fiter))
         parameters.update(_read_exch(fiter))
 
+        parameters["zones"] = {}
+        parameters["zones"].update(_read_water(fiter))
+        parameters["zones"].update(_read_imin(fiter))
+        parameters["zones"].update(_read_igas(fiter))
+        parameters["zones"].update(_read_zppr(fiter))
+
     except:
         raise ReadError("failed to parse line {}.".format(fiter.count))
 
@@ -97,13 +103,13 @@ def _read_akin(f):
 
     # Record 2
     ntrx = int(line.strip())
-    akin["aqueous_kinetics"] = [{} for _ in range(ntrx)]
+    akin["aqueous_kinetics"] = []
 
     # Loop ntrx times
     for _ in range(ntrx):
         # Record 3
         line = _nextline(f).strip()
-        irx = int(line.strip())
+        # irx = int(line.strip())
 
         # Record 4
         line = _nextline(f).strip()
@@ -197,7 +203,10 @@ def _read_akin(f):
             for i in range(ncp_rx3)
         ]
         
-        akin["aqueous_kinetics"][irx - 1].update(tmp)
+        akin["aqueous_kinetics"].append(tmp)
+
+    # '*' is not used here to mark the end of the list. Skip it.
+    _ = f.next()
 
     return akin
 
@@ -208,6 +217,9 @@ def _read_aque(f):
 
     # Find next non skip record
     line = _nextline(f, skip_empty=True, comments="#")
+
+    if line.startswith("*"):
+        return {}
 
     # Loop until reading character *
     while not line.startswith("*"):
@@ -225,6 +237,9 @@ def _read_miner(f):
 
     # Find next non skip record
     line = _nextline(f, skip_empty=True, comments="#")
+
+    if line.startswith("*"):
+        return {}
     
     # Loop until reading character *
     while not line.startswith("*"):
@@ -328,6 +343,9 @@ def _read_gas(f):
     # Find next non skip record
     line = _nextline(f, skip_empty=True, comments="#")
 
+    if line.startswith("*"):
+        return {}
+
     # Loop until reading character *
     while not line.startswith("*"):
         data = line.split()
@@ -352,6 +370,9 @@ def _read_surx(f):
     # Find next non skip record
     line = _nextline(f, skip_empty=True, comments="#")
 
+    if line.startswith("*"):
+        return {}
+
     # Loop until reading character *
     while not line.startswith("*"):
         data = line.strip()
@@ -368,6 +389,9 @@ def _read_kdde(f):
 
     # Find next non skip record
     line = _nextline(f, skip_empty=True, comments="#")
+
+    if line.startswith("*"):
+        return {}
 
     # Loop until reading character *
     while not line.startswith("*"):
@@ -428,9 +452,227 @@ def _read_exch(f):
     return exch
 
 
-def _nextline(f, **kwargs):
+def _read_water(f):
+    """Read water zones."""
+    zones = {"initial_waters": [], "injection_waters": []}
+
+    # Find next non skip record
+    line = _nextline(f, skip_empty=True, comments="#")
+
+    if line.startswith("*"):
+        return {}
+
+    # Record 2
+    data = line.split()
+    if len(data) < 2:
+        raise ReadError()
+
+    niwtype = int(data[0])
+    nbwtype = int(data[1])
+
+    # Loop niwtype + nbwtype times
+    for i in range(niwtype + nbwtype):
+        key = "initial_waters" if i < niwtype else "injection_waters"
+
+        # Record 4
+        line = _nextline(f, skip_empty=True, comments="#")
+        data = line.split()
+        iwtype = int(data[0])
+
+        if iwtype >= 0 and len(data) < 3:
+            raise ReadError()
+
+        elif iwtype < 0 and len(data) < 4:
+            raise ReadError()
+
+        tmp = {
+            "temperature": to_float(data[1]),
+            "pressure": to_float(data[2]),
+        }
+        if iwtype < 0:
+            tmp["rock"] = data[3]
+        tmp["species"] = []
+
+        # Record 6
+        line = _nextline(f, remove_quotes=False, skip_empty=True, comments="#")
+        while not line.replace("'", "").startswith("*"):
+            data = _nextsplitline(line, n=6)
+
+            # split() doesn't work in this case as 'nameq' can be ' ' if not needed
+            if data[4].startswith("'") and data[5].endswith("'"):
+                nameq = (data[4] + data[5]).replace("'", "").strip()
+                log_fugacity = data[6]
+
+            else:
+                nameq = data[4].replace("'", "")
+                log_fugacity = data[5]
+
+            tmp2 = {
+                "name": data[0].replace("'", ""),
+                "flag": int(data[1]),
+                "guess": to_float(data[2]),
+                "ctot": to_float(data[3]),
+                "log_fugacity": to_float(log_fugacity),
+            }
+            if nameq:
+                tmp2["nameq"] = nameq
+
+            tmp["species"].append(tmp2)
+            line = _nextline(f, remove_quotes=False).strip()
+
+        zones[key].append(tmp)
+
+    return zones
+
+
+def _read_imin(f):
+    """Read mineral zones."""
+    zones = {"minerals": []}
+
+    # Find next non skip record
+    line = _nextline(f, skip_empty=True, comments="#")
+
+    if line.startswith("*"):
+        return {}
+
+    # Record 3
+    nmtype = int(line.strip())
+
+    # Loop nmtype times
+    for _ in range(nmtype):
+        # Record 4
+        line = _nextline(f, skip_empty=True, comments="#")
+        data = line.split()
+        imtype = int(data[0])
+
+        if imtype >= 0 and len(data) < 1:
+            raise ReadError()
+
+        elif imtype < 0 and len(data) < 2:
+            raise ReadError()
+
+        tmp = {}
+        if imtype < 0:
+            tmp["rock"] = data[1]
+        tmp["minerals"] = []
+
+        # Record 6
+        line = _nextline(f, skip_empty=True, comments="#")
+        while not line.startswith("*"):
+            data = _nextsplitline(line, n=3)
+            tmp2 = {
+                "name": data[0],
+                "volume_fraction_ini": to_float(data[1]),
+                "flag": int(data[2]),
+            }
+
+            # Record 6.1
+            if tmp2["flag"] == 1:
+                data = _nextsplitline(f, n=3)
+                
+                tmp2["radius"] = to_float(data[0])
+                tmp2["area_ini"] = to_float(data[1])
+                tmp2["area_unit"] = int(data[2])
+
+            tmp["minerals"].append(tmp2)
+            line = _nextline(f).strip()
+
+        zones["minerals"].append(tmp)
+
+    return zones
+
+
+def _read_igas(f):
+    """Read gas zones."""
+    zones = {"initial_gases": [], "injection_gases": []}
+
+    # Find next non skip record
+    line = _nextline(f, skip_empty=True, comments="#")
+
+    if line.startswith("*"):
+        return {}
+
+    # Record 3
+    data = _nextsplitline(line, n=2)
+    nigtype = int(data[0])
+    nbgtype = int(data[1])
+
+    # Loop nigtype + nbgtype times
+    for i in range(nigtype + nbgtype):
+        key = "initial_gases" if i < nigtype else "injection_gases"
+
+        # Record 4
+        data = _nextsplitline(f, n=1, skip_empty=True, comments="#")
+        # igtype = int(data[0])
+
+        tmp = {"species": []}
+
+        # Record 6
+        line = _nextline(f, skip_empty=True, comments="#")
+        while not line.replace("'", "").startswith("*"):
+            data = _nextsplitline(line, n=2)
+            tmp2 = {"name": data[0]}
+            if key == "initial_gases":
+                tmp2["partial_pressure"] = to_float(data[1])
+
+            else:
+                tmp2["mole_fraction"] = to_float(data[1])
+
+            tmp["species"].append(tmp2)
+            line = _nextline(f).strip()
+
+        zones[key].append(tmp)
+
+    return zones
+
+
+def _read_zppr(f):
+    """Read permeability-porosity law zones."""
+    zones = {"permeability_porosity": []}
+
+    # Find next non skip record
+    line = _nextline(f, skip_empty=True, comments="#")
+
+    if line.startswith("*"):
+        return {}
+
+    # Record 3
+    nppzone = int(line.strip())
+
+    # Loop nppzone times
+    for _ in range(nppzone):
+        # Record 4
+        data = _nextsplitline(f, n=1, skip_empty=True, comments="#")
+        # ippzone = int(data[0])
+
+        tmp = {"models": []}
+
+        # Record 6
+        # Here, '*' does not mark the end of the list
+        data = _nextsplitline(f, n=3, skip_empty=True, comments="#")
+        tmp2 = {
+            "id": int(data[0]),
+            "a": to_float(data[1]),
+            "b": to_float(data[2]),
+        }
+
+        tmp["models"].append(tmp2)
+
+        zones["permeability_porosity"].append(tmp)
+
+    # '*' is not used here to mark the end of the list. Skip it.
+    _ = f.next()
+
+    return zones
+
+
+def _nextline(f, remove_quotes=True, **kwargs):
     line = f.next(**kwargs)
-    line = line.replace("'", "")  # Remove quotes
+    line = line.replace('"', "'")
+
+    # Remove quotes
+    if remove_quotes:
+        line = line.replace("'", "")
     
     # Remove Fortran comments
     if "!" in line:
