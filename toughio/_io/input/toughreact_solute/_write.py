@@ -300,11 +300,11 @@ def _write_default(parameters, verbose, mopr_11=0):
         _get(parameters, ("default", "initial_water"), 0),
         _get(parameters, ("default", "injection_water"), 0),
         _get(parameters, ("default", "mineral"), 0),
-        _get(parameters, ("default", "gas"), 0),
+        _get(parameters, ("default", "initial_gas"), 0),
         _get(parameters, ("default", "adsorption"), 0),
-        _get(parameters, ("default", "ion_exchange"), 0),
-        _get(parameters, ("default", "porosity_permeability"), 0),
-        _get(parameters, ("default", "linear_adsorption"), 0),
+        _get(parameters, ("default", "cation_exchange"), 0),
+        _get(parameters, ("default", "permeability_porosity"), 0),
+        _get(parameters, ("default", "linear_kd"), 0),
         _get(parameters, ("default", "injection_gas"), 0),
     ]
 
@@ -342,11 +342,11 @@ def _write_zones(parameters, verbose, mopr_11=0):
             _get(parameters, ("zones", zone, "initial_water"), 0),
             _get(parameters, ("zones", zone, "injection_water"), 0),
             _get(parameters, ("zones", zone, "mineral"), 0),
-            _get(parameters, ("zones", zone, "gas"), 0),
+            _get(parameters, ("zones", zone, "initial_gas"), 0),
             _get(parameters, ("zones", zone, "adsorption"), 0),
-            _get(parameters, ("zones", zone, "ion_exchange"), 0),
-            _get(parameters, ("zones", zone, "porosity_permeability"), 0),
-            _get(parameters, ("zones", zone, "linear_adsorption"), 0),
+            _get(parameters, ("zones", zone, "cation_exchange"), 0),
+            _get(parameters, ("zones", zone, "permeability_porosity"), 0),
+            _get(parameters, ("zones", zone, "linear_kd"), 0),
             _get(parameters, ("zones", zone, "injection_gas"), 0),
         ]
 

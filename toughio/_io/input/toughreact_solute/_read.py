@@ -282,11 +282,11 @@ def _read_default(f, mopr_11=0):
             "initial_water": int(data[0]),
             "injection_water": int(data[1]),
             "mineral": int(data[2]),
-            "gas": int(data[3]),
+            "initial_gas": int(data[3]),
             "adsorption": int(data[4]),
-            "ion_exchange": int(data[5]),
-            "porosity_permeability": int(data[6]),
-            "linear_adsorption": int(data[7]),
+            "cation_exchange": int(data[5]),
+            "permeability_porosity": int(data[6]),
+            "linear_kd": int(data[7]),
             "injection_gas": int(data[8]),
         }
     }
@@ -375,11 +375,11 @@ def _parse_zones(data, mopr_11):
         "initial_water": int(data[0]),
         "injection_water": int(data[1]),
         "mineral": int(data[2]),
-        "gas": int(data[3]),
+        "initial_gas": int(data[3]),
         "adsorption": int(data[4]),
-        "ion_exchange": int(data[5]),
-        "porosity_permeability": int(data[6]),
-        "linear_adsorption": int(data[7]),
+        "cation_exchange": int(data[5]),
+        "permeability_porosity": int(data[6]),
+        "linear_kd": int(data[7]),
         "injection_gas": int(data[8]),
     }
 
