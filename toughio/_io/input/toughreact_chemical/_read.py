@@ -1,7 +1,7 @@
 from ...._common import open_file
 from ...._exceptions import ReadError
 from ...._helpers import FileIterator
-from ..._common import read_record, prune_nones_list, to_float
+from ..._common import to_float
 
 __all__ = [
     "read",
@@ -38,13 +38,18 @@ def read_buffer(f):
         parameters.update(_read_gas(fiter))
         parameters.update(_read_surx(fiter))
         parameters.update(_read_kdde(fiter))
-        parameters.update(_read_exch(fiter))
+
+        exch, nxsites = _read_exch(fiter)
+        parameters.update(exch)
 
         parameters["zones"] = {}
         parameters["zones"].update(_read_water(fiter))
         parameters["zones"].update(_read_imin(fiter))
         parameters["zones"].update(_read_igas(fiter))
         parameters["zones"].update(_read_zppr(fiter))
+        parameters["zones"].update(_read_zads(fiter))
+        parameters["zones"].update(_read_zlkd(fiter))
+        parameters["zones"].update(_read_zexc(fiter, nxsites))
 
     except:
         raise ReadError("failed to parse line {}.".format(fiter.count))
@@ -324,11 +329,11 @@ def _read_miner(f):
                         )
 
         # Record 3
-        data = _nextsplitline(f, 3)
-
-        tmp["gap"] = to_float(data[0])
-        tmp["temp1"] = to_float(data[1])
-        tmp["temp2"] = to_float(data[2])
+        if tmp["kinetic_constraint"] != 1:
+            data = _nextsplitline(f, 3)
+            tmp["gap"] = to_float(data[0])
+            tmp["temp1"] = to_float(data[1])
+            tmp["temp2"] = to_float(data[2])
 
         miner["minerals"].append(tmp)
         line = _nextline(f)
@@ -420,7 +425,7 @@ def _read_exch(f):
     line = _nextline(f, skip_empty=True, comments="#")
 
     if line.startswith("*"):
-        return {}
+        return {}, 0
 
     # Record 2
     data = line.split()
@@ -449,7 +454,7 @@ def _read_exch(f):
 
         line = _nextline(f).strip()
 
-    return exch
+    return exch, nxsites
 
 
 def _read_water(f):
@@ -496,7 +501,7 @@ def _read_water(f):
         # Record 6
         line = _nextline(f, remove_quotes=False, skip_empty=True, comments="#")
         while not line.replace("'", "").startswith("*"):
-            data = _nextsplitline(line, n=6)
+            data = _nextsplitline(line, 6)
 
             # split() doesn't work in this case as 'nameq' can be ' ' if not needed
             if data[4].startswith("'") and data[5].endswith("'"):
@@ -554,12 +559,12 @@ def _read_imin(f):
         tmp = {}
         if imtype < 0:
             tmp["rock"] = data[1]
-        tmp["minerals"] = []
+        tmp = []
 
         # Record 6
         line = _nextline(f, skip_empty=True, comments="#")
         while not line.startswith("*"):
-            data = _nextsplitline(line, n=3)
+            data = _nextsplitline(line, 3)
             tmp2 = {
                 "name": data[0],
                 "volume_fraction_ini": to_float(data[1]),
@@ -568,13 +573,13 @@ def _read_imin(f):
 
             # Record 6.1
             if tmp2["flag"] == 1:
-                data = _nextsplitline(f, n=3)
+                data = _nextsplitline(f, 3)
                 
                 tmp2["radius"] = to_float(data[0])
                 tmp2["area_ini"] = to_float(data[1])
                 tmp2["area_unit"] = int(data[2])
 
-            tmp["minerals"].append(tmp2)
+            tmp.append(tmp2)
             line = _nextline(f).strip()
 
         zones["minerals"].append(tmp)
@@ -593,7 +598,7 @@ def _read_igas(f):
         return {}
 
     # Record 3
-    data = _nextsplitline(line, n=2)
+    data = _nextsplitline(line, 2)
     nigtype = int(data[0])
     nbgtype = int(data[1])
 
@@ -602,15 +607,15 @@ def _read_igas(f):
         key = "initial_gases" if i < nigtype else "injection_gases"
 
         # Record 4
-        data = _nextsplitline(f, n=1, skip_empty=True, comments="#")
+        data = _nextsplitline(f, 1, skip_empty=True, comments="#")
         # igtype = int(data[0])
 
-        tmp = {"species": []}
+        tmp = []
 
         # Record 6
         line = _nextline(f, skip_empty=True, comments="#")
         while not line.replace("'", "").startswith("*"):
-            data = _nextsplitline(line, n=2)
+            data = _nextsplitline(line, 2)
             tmp2 = {"name": data[0]}
             if key == "initial_gases":
                 tmp2["partial_pressure"] = to_float(data[1])
@@ -618,7 +623,7 @@ def _read_igas(f):
             else:
                 tmp2["mole_fraction"] = to_float(data[1])
 
-            tmp["species"].append(tmp2)
+            tmp.append(tmp2)
             line = _nextline(f).strip()
 
         zones[key].append(tmp)
@@ -642,21 +647,17 @@ def _read_zppr(f):
     # Loop nppzone times
     for _ in range(nppzone):
         # Record 4
-        data = _nextsplitline(f, n=1, skip_empty=True, comments="#")
+        data = _nextsplitline(f, 1, skip_empty=True, comments="#")
         # ippzone = int(data[0])
-
-        tmp = {"models": []}
 
         # Record 6
         # Here, '*' does not mark the end of the list
-        data = _nextsplitline(f, n=3, skip_empty=True, comments="#")
-        tmp2 = {
+        data = _nextsplitline(f, 3, skip_empty=True, comments="#")
+        tmp = {
             "id": int(data[0]),
             "a": to_float(data[1]),
             "b": to_float(data[2]),
         }
-
-        tmp["models"].append(tmp2)
 
         zones["permeability_porosity"].append(tmp)
 
@@ -666,7 +667,125 @@ def _read_zppr(f):
     return zones
 
 
+def _read_zads(f):
+    """Read surface adsorption zones."""
+    zones = {"adsorption": []}
+
+    # Find next non skip record
+    line = _nextline(f, skip_empty=True, comments="#")
+
+    if line.startswith("*"):
+        return {}
+
+    # Record 3
+    ndtype = int(line.strip())
+
+    # Loop ndtype times
+    for _ in range(ndtype):
+        # Record 5
+        data = _nextsplitline(f, 2, skip_empty=True, comments="#")
+        # idzone = int(data[0])
+
+        tmp = {
+            "flag": int(data[1]),
+            "species": [],
+        }
+
+        # Record 6
+        # Here, '*' does not mark the end of the list
+        data = _nextsplitline(f, 3, skip_empty=True, comments="#")
+        tmp2 = {
+            "name": data[0],
+            "area_unit": int(data[1]),
+            "area": to_float(data[2]),
+        }
+
+        tmp["species"].append(tmp2)
+
+        zones["adsorption"].append(tmp)
+
+    # '*' is not used here to mark the end of the list. Skip it.
+    _ = f.next()
+
+    return zones
+
+
+def _read_zlkd(f):
+    """Read linear Kd zones."""
+    zones = {"linear_kd": []}
+
+    # Find next non skip record
+    line = _nextline(f, skip_empty=True, comments="#")
+
+    if line.startswith("*"):
+        return {}
+
+    # Record 3
+    kdtype = int(line.strip())
+
+    # Loop kdtype times
+    for _ in range(kdtype):
+        # Record 4
+        data = _nextsplitline(f, 1, skip_empty=True, comments="#")
+        # idtype = int(data[0])
+
+        tmp = []
+
+        # Record 6
+        # Here, '*' does not mark the end of the list
+        data = _nextsplitline(f, 3, skip_empty=True, comments="#")
+        tmp2 = {
+            "name": data[0],
+            "solid_density": to_float(data[1]),
+            "value": to_float(data[2]),
+        }
+
+        tmp.append(tmp2)
+
+        zones["linear_kd"].append(tmp)
+
+    # '*' is not used here to mark the end of the list. Skip it.
+    _ = f.next()
+
+    return zones
+
+
+def _read_zexc(f, nxsites):
+    """Read cation exchange zones."""
+    zones = {"cation_exchange": []}
+
+    # Find next non skip record
+    line = _nextline(f, skip_empty=True, comments="#")
+
+    if line.startswith("*"):
+        return {}
+
+    # Record 3
+    nxtype = int(line.strip())
+
+    # Loop nxtype times
+    for _ in range(nxtype):
+        # Record 5
+        data = _nextsplitline(f, nxsites + 1, skip_empty=True, comments="#")
+        # ixtype = int(data[0])
+
+        zones["cation_exchange"].append(data[1:])
+
+    # '*' is not used here to mark the end of the list. Skip it.
+    _ = f.next()
+
+    return zones
+
+
 def _nextline(f, remove_quotes=True, **kwargs):
+    """
+    Go to next line.
+    
+    Note
+    ----
+    Remove trailing Fortran comments.
+
+    """
     line = f.next(**kwargs)
     line = line.replace('"', "'")
 
@@ -682,6 +801,7 @@ def _nextline(f, remove_quotes=True, **kwargs):
 
 
 def _nextsplitline(f_or_line, n=0, **kwargs):
+    """Go to next line and split it."""
     if not isinstance(f_or_line, str):
         line = _nextline(f_or_line, **kwargs).strip()
     else:
