@@ -138,27 +138,31 @@ def _read_akin(f):
         if len(data) > 2 * ncp + 1:
             tmp["reaction_affinity"] = {
                 "id": int(data[2 * ncp + 1]),
-                "cf": int(data[2 * ncp + 2]),
-                "logK": int(data[2 * ncp + 3]),
+                "cf": to_float(data[2 * ncp + 2]),
+                "logK": to_float(data[2 * ncp + 3]),
             }
 
         # Record 5
         line = _nextline(f).strip()
         data = line.split()
-        tmp["kinetic_model_id"] = int(data[0])
+        tmp["id"] = int(data[0])
         tmp["n_mechanism"] = int(data[1])
 
         # Record 6
         line = _nextline(f).strip()
         data = to_float(line.split()[0])
-        tmp["rate"] = {"constant": data}
 
-        # Record 6.1
-        if tmp["rate"]["constant"] == -1.0:
+        if data != -1.0:
+            tmp["rate"] = data
+
+        else:
+            # Record 6.1
             line = _nextline(f).strip()
             data = line.split()
-            tmp["rate"]["k25"] = to_float(data[0])
-            tmp["rate"]["Ea"] = to_float(data[1])
+            tmp["rate"] = {
+                "k25": to_float(data[0]),
+                "Ea": to_float(data[1]),
+            }
 
         # Record 7
         line = _nextline(f).strip()
@@ -289,10 +293,12 @@ def _read_miner(f):
                 tmp[key]["b"] = to_float(data[6])
                 tmp[key]["c"] = to_float(data[7])
 
+                # Record 2.2
                 if key == "precipitation":
                     tmp[key]["volume_fraction_ini"] = to_float(data[8])
                     tmp[key]["id"] = int(data[9])
 
+                # Record 2.1.1
                 if tmp[key]["rate_ph_dependence"] == 1:
                     data = _nextsplitline(f, 4)
 
@@ -301,12 +307,14 @@ def _read_miner(f):
                     tmp[key]["ph2"] = to_float(data[2])
                     tmp[key]["slope2"] = to_float(data[3])
 
+                # Record 2.1.2
                 elif tmp[key]["rate_ph_dependence"] == 2:
                     tmp[key]["extra_mechanisms"] = []
 
                     line = _nextline(f).strip()
                     ndis = int(line.strip())
 
+                    # Record 2.1.2.1
                     for _ in range(ndis):
                         line = _nextline(f).strip()
                         data = line.split()
