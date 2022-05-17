@@ -29,6 +29,9 @@ def write_buffer(parameters, verbose):
     out += _write_surx(parameters)
     out += _write_kdde(parameters, verbose)
     out += _write_exch(parameters, verbose)
+    out += _write_water(parameters, verbose)
+    out += _write_imin(parameters, verbose)
+    out += _write_igas(parameters, verbose)
 
     return "\n".join(out)
 
@@ -36,7 +39,7 @@ def write_buffer(parameters, verbose):
 @section("# Title", f"#{'-' * 79}")
 def _write_title(parameters):
     """Write title."""
-    return [f"{parameters['title']}"]
+    return [parameters["title"] if "title" in parameters else ""]
 
 
 @section("# Primary aqueous species")
@@ -44,7 +47,7 @@ def _write_prim(parameters, verbose):
     """Write primary species."""
     out = []
 
-    if "primary_species" not in parameters:
+    if not ("primary_species" in parameters and parameters["primary_species"]):
         return out
 
     if verbose:
@@ -67,7 +70,7 @@ def _write_prim(parameters, verbose):
             if values[-1] == 1:
                 values += [_get(specie, "capacitance", 0.0)]
 
-        out += _write_ffrecord(values, verbose, str_fmt=fmt)
+        out += _write_ffrecord(values, verbose, str_fmt=fmt if verbose else None)
 
     return out
 
@@ -76,7 +79,7 @@ def _write_prim(parameters, verbose):
 def _write_akin(parameters, verbose):
     out = []
 
-    if "aqueous_kinetics" not in parameters:
+    if not ("aqueous_kinetics" in parameters and parameters["aqueous_kinetics"]):
         return out
 
     # Record 2
@@ -179,7 +182,7 @@ def _write_aque(parameters):
     """Write aqueous species."""
     out = []
 
-    if "aqueous_species" not in parameters:
+    if not ("aqueous_species" in parameters and parameters["aqueous_species"]):
         return out
 
     for specie in parameters["aqueous_species"]:
@@ -192,7 +195,7 @@ def _write_aque(parameters):
 def _write_miner(parameters, verbose):
     out = []
 
-    if "minerals" not in parameters:
+    if not ("minerals" in parameters and parameters["minerals"]):
         return out
 
     if verbose:
@@ -210,7 +213,7 @@ def _write_miner(parameters, verbose):
             _get(mineral, "solid_solution", 0),
             _get(mineral, "precipitation_dry", 0),
         ]
-        out += _write_ffrecord(values, verbose, str_fmt=fmt)
+        out += _write_ffrecord(values, verbose, str_fmt=fmt if verbose else None)
 
         # Records 2.1 and 2.2
         if ikin == 1:
@@ -297,7 +300,7 @@ def _write_gas(parameters, verbose):
     """Write gaseous species."""
     out = []
 
-    if "gaseous_species" not in parameters:
+    if not ("gaseous_species" in parameters and parameters["gaseous_species"]):
         return out
 
     if verbose:
@@ -309,7 +312,7 @@ def _write_gas(parameters, verbose):
             _get(specie, "name", "''"),
             _get(specie, "fugacity", 0),
         ]
-        out += _write_ffrecord(values, verbose, str_fmt=fmt)
+        out += _write_ffrecord(values, verbose, str_fmt=fmt if verbose else None)
 
     return out
 
@@ -319,7 +322,7 @@ def _write_surx(parameters):
     """Write surface complexes."""
     out = []
 
-    if "surface_complexes" not in parameters:
+    if not ("surface_complexes" in parameters and parameters["surface_complexes"]):
         return out
 
     for complex in parameters["surface_complexes"]:
@@ -333,7 +336,7 @@ def _write_kdde(parameters, verbose):
     """Write Kd and decay."""
     out = []
 
-    if "kd_decay" not in parameters:
+    if not ("kd_decay" in parameters and parameters["kd_decay"]):
         return out
 
     if verbose:
@@ -357,7 +360,7 @@ def _write_exch(parameters, verbose):
     """Write exchanges species."""
     out = []
 
-    if "exchanged_species" not in parameters:
+    if not ("exchanged_species" in parameters and parameters["exchanged_species"]):
         return out
 
     # Record 2
@@ -383,6 +386,198 @@ def _write_exch(parameters, verbose):
         out += _write_ffrecord(values, verbose, str_fmt=fmt)
 
     return out
+
+
+@section("# Initial and injection water types")
+def _write_water(parameters, verbose):
+    """Write water zones."""
+    out = []
+
+    if "zones" not in parameters:
+        return out
+
+    nwtypes = {
+        "initial_waters": 0,
+        "injection_waters": 0,
+    }
+    for key in nwtypes:
+        if key in parameters["zones"]:
+            nwtypes[key] = len(parameters["zones"][key])
+
+    if not sum(nwtypes.values()):
+        return out
+
+    values = list(nwtypes.values())
+    out += _write_ffrecord(values)
+
+    for k, v in nwtypes.items():
+        if not v:
+            continue
+
+        for i, zone in enumerate(parameters["zones"][k]):
+            # Record 4
+            if verbose:
+                out += ["# ID      T(C)    P(bar)"]
+
+                if "rock" in zone:
+                    out[-1] = f"{out[-1]}      Rock"
+
+            values = [
+                i + 1 if "rock" not in zone else -1,
+                _get(zone, "temperature", 0.0),
+                _get(zone, "pressure", 0.0),
+            ]
+            values += [_get(zone, "rock", "''")[:5]] if "rock" in zone else []
+            out += _write_ffrecord(values, verbose, str_fmt="{:>9}")
+
+            # Record 6
+            if "species" in zone and zone["species"]:
+                if verbose:
+                    item = max(zone["species"], key=lambda x: len(x["name"]))
+                    n = min(len(item['name']), 20)
+                    fmt1 = f"{{:{n}}}"
+
+                    item = max(zone["species"], key=lambda x: len(x["nameq"]))
+                    fmt2 = f"{{:>{max(len(item['nameq']), 10)}}}"
+
+                    out += [f"# {' ' * (n - 2)} icon     guess      ctot {fmt2.format('constraint')}  log(Q/K)"]
+
+                for specie in zone["species"]:
+                    name = _get(specie, "name", "''")
+                    name = fmt1.format(name) if verbose else name
+                    values = [
+                        _get(specie, "flag", 0),
+                        _get(specie, "guess", 0.0),
+                        _get(specie, "ctot", 0.0),
+                        _get(specie, "nameq", "*"),
+                        _get(specie, "log_fugacity", 0.0),
+                    ]
+                    tmp = _write_ffrecord(values, verbose, str_fmt=fmt2 if verbose else None)
+                    out += [f"{name} {tmp[0]}"]
+
+            # Record 7
+            out += ["*"]
+
+    return out[:-1]
+
+
+@section("# Initial mineral zones")
+def _write_imin(parameters, verbose):
+    """Write mineral zones."""
+    out = []
+
+    if "zones" not in parameters:
+        return out
+
+    nmtype = 0
+    if "minerals" in parameters["zones"]:
+        nmtype = len(parameters["zones"]["minerals"])
+
+    if not nmtype:
+        return out
+
+    values = [nmtype]
+    out += _write_ffrecord(values)
+
+    for i, zone in enumerate(parameters["zones"]["minerals"]):
+        # Record 4
+        values = [i] if "rock" not in zone else [-1, f"'{zone['rock'][:5]}'"]
+        out += _write_ffrecord(values)
+
+        # Record 6
+        if verbose:
+            item = max(zone, key=lambda x: len(x["name"]))
+            fmt = f"{{:{max(len(item['name']), 10)}}}"
+
+        for mineral in zone:
+            name = _get(mineral, "name", "''")
+            name = fmt.format(name) if verbose else name
+            flag = _get(mineral, "flag", 0)
+            values = [
+                _get(mineral, "volume_fraction_ini", 0.0),
+                flag,
+            ]
+            tmp = _write_ffrecord(values, verbose)
+            out += [f"{name} {tmp[0]}"]
+
+            # Record 6.1
+            if flag == 1:
+                values = [
+                    _get(mineral, "radius", 0.0),
+                    _get(mineral, "area_ini", 0.0),
+                    _get(mineral, "area_unit", 0),
+                ]
+                out += _write_ffrecord(values, verbose)
+                out[-1] = out[-1].lstrip()
+                
+        # Record 7
+        out += ["*"]
+
+    return out[:-1]
+
+
+@section("# Initial and injection gas zones")
+def _write_igas(parameters, verbose):
+    """Write gas zones."""
+    out = []
+
+    if "zones" not in parameters:
+        return out
+
+    ngtypes = {
+        "initial_gases": 0,
+        "injection_gases": 0,
+    }
+    for key in ngtypes:
+        if key in parameters["zones"]:
+            ngtypes[key] = len(parameters["zones"][key])
+
+    if not sum(ngtypes.values()):
+        return out
+
+    values = list(ngtypes.values())
+    out += _write_ffrecord(values)
+
+    for k, v in ngtypes.items():
+        if not v:
+            continue
+
+        for i, zone in enumerate(parameters["zones"][k]):
+            # Record 4
+            values = [i + 1]
+            out += _write_ffrecord(values, verbose)
+
+            # Record 6
+            if verbose:
+                item = max(zone, key=lambda x: len(x["name"]))
+                n = min(len(item["name"]), 20)
+                fmt = f"{{:{n}}}"
+
+                out += [
+                    (
+                        f"# {' ' * n} PP(bar)"
+                        if k == "initial_gases"
+                        else f"# {' ' * (n - 1)} PP(%mol)"
+                    )
+                ]
+
+            for specie in zone:
+                name = _get(specie, "name", "''")
+                name = fmt.format(name) if verbose else name
+                values = [
+                    (
+                        _get(specie, "partial_pressure", 0.0)
+                        if k == "initial_gases"
+                        else _get(specie, "mole_fraction", 0.0)
+                    )
+                ]
+                tmp = _write_ffrecord(values, verbose)
+                out += [f"{name} {tmp[0]}"]
+
+            # Record 7
+            out += ["*"]
+
+    return out[:-1]
 
 
 def _write_ffrecord(values, verbose=False, int_fmt="{:4d}", float_fmt="{{:9f}}", str_fmt="{:20}"):
