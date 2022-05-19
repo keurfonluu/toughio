@@ -129,7 +129,7 @@ def _read_akin(f):
         names = data[2:2 * ncp + 2:2]
         coeffs = data[1:2 * ncp + 1:2]
         tmp = {
-            "aqueous_species": [
+            "species": [
                 {
                     "name": name,
                     "stoichiometric_coeff": to_float(coeff),
@@ -329,9 +329,9 @@ def _read_miner(f):
                             {
                                 "ki": to_float(data[0]),
                                 "activation_energy": to_float(data[1]),
-                                "mechanism": [
+                                "species": [
                                     {
-                                        "specie": data[2 * i + 3],
+                                        "name": data[2 * i + 3],
                                         "power": to_float(data[2 * i + 4]),
                                     }
                                     for i in range(nspds)
@@ -570,7 +570,7 @@ def _read_imin(f):
         tmp = {}
         if imtype < 0:
             tmp["rock"] = data[1]
-        tmp["minerals"] = []
+        tmp["species"] = []
 
         # Record 6
         line = _nextline(f, skip_empty=True, comments="#")
@@ -590,7 +590,7 @@ def _read_imin(f):
                 tmp2["area_ini"] = to_float(data[1])
                 tmp2["area_unit"] = int(data[2])
 
-            tmp["minerals"].append(tmp2)
+            tmp["species"].append(tmp2)
             line = _nextline(f).strip()
 
         zones["minerals"].append(tmp)

@@ -95,10 +95,10 @@ def _write_akin(parameters, verbose):
         out += [f"{i + 1}"]
 
         # Record 4
-        n = len(kinetic["aqueous_species"])
+        n = len(kinetic["species"])
         values = [n]
         if n:
-            for specie in kinetic["aqueous_species"]:
+            for specie in kinetic["species"]:
                 values += [
                     _get(specie, "stoichiometric_coeff", 1.0),
                     _get(specie, "name", "''"),
@@ -279,13 +279,13 @@ def _write_miner(parameters, verbose):
                                 _get(mechanism, "activation_energy", 0.0),
                             ]
 
-                            nspds = len(mechanism["mechanism"])
+                            nspds = len(_get(mechanism, "species", []))
                             values += [nspds]
                             if nspds:
-                                for mechanism_ in mechanism["mechanism"]:
+                                for specie in mechanism["species"]:
                                     values += [
-                                        _get(mechanism_, "specie", "''"),
-                                        _get(mechanism_, "power", 0.0),
+                                        _get(specie, "name", "''"),
+                                        _get(specie, "power", 0.0),
                                     ]
                             out += _write_ffrecord(values)
 
@@ -496,12 +496,12 @@ def _write_imin(parameters, verbose):
         out += _write_ffrecord(values)
 
         # Record 6
-        if "minerals" in zone and zone["minerals"]:
+        if "species" in zone and zone["species"]:
             if verbose:
-                item = max(zone["minerals"], key=lambda x: len(x["name"]))
+                item = max(zone["species"], key=lambda x: len(x["name"]))
                 fmt = f"{{:{max(len(item['name']), 10)}}}"
 
-            for mineral in zone["minerals"]:
+            for mineral in zone["species"]:
                 name = _get(mineral, "name", "''")
                 name = fmt.format(name) if verbose else name
                 flag = _get(mineral, "flag", 0)
