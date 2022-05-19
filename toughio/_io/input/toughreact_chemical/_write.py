@@ -42,7 +42,7 @@ def write_buffer(parameters, verbose):
 @section("# Title", f"#{'-' * 79}")
 def _write_title(parameters):
     """Write title."""
-    return [parameters["title"] if "title" in parameters else ""]
+    return [getval(parameters, "title", "")]
 
 
 @section("# Primary aqueous species")
