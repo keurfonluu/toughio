@@ -321,3 +321,358 @@ def test_solute(verbose, mopr_10, mopr_11):
     parameters = write_read(parameters_ref)
 
     assert allclose(parameters_ref, parameters, atol=1.0e-3)
+
+
+def test_chemical():
+    def write_read(x):
+        writer_kws = {
+            "file_format": "toughreact-chemical",
+        }
+        reader_kws = {
+            "file_format": "toughreact-chemical",
+        }
+
+        return helpers.write_read(
+            "chemical.inp",
+            x,
+            toughio.write_input,
+            toughio.read_input,
+            writer_kws,
+            reader_kws,
+        )
+
+    # Number of surface primary species
+    nsurfs = np.random.randint(5) + 1
+
+    parameters_ref = {
+        "title": helpers.random_string(80),
+        "primary_species": [
+            {
+                "name": helpers.random_string(20),
+                "transport": np.random.randint(2),
+            }
+            for _ in range(np.random.randint(5) + 1)
+        ],
+        "aqueous_kinetics": [
+            {
+                "aqueous_species": [
+                    {
+                        "name": helpers.random_string(20),
+                        "stoichiometric_coeff": np.random.rand(),
+                    }
+                    for _ in range(np.random.randint(5) + 1)
+                ],
+                "reaction_affinity": {
+                    "id": np.random.randint(5),
+                    "cf": np.random.rand(),
+                    "logK": np.random.rand(),
+                },
+                "id": np.random.randint(4),
+                "n_mechanism": np.random.randint(10),
+                "product": [
+                    {
+                        "specie": helpers.random_string(20),
+                        "flag": np.random.randint(3),
+                        "power": np.random.rand(),
+                    }
+                    for _ in range(np.random.randint(5) + 1)
+                ],
+                "monod": [
+                    {
+                        "specie": helpers.random_string(20),
+                        "flag": np.random.randint(3),
+                        "half_saturation": np.random.rand(),
+                    }
+                    for _ in range(np.random.randint(5) + 1)
+                ],
+                "inhibition": [
+                    {
+                        "specie": helpers.random_string(20),
+                        "flag": np.random.randint(3),
+                        "constant": np.random.rand(),
+                    }
+                    for _ in range(np.random.randint(5) + 1)
+                ],
+            }
+            for _ in range(2)
+        ],
+        "aqueous_species": [
+            helpers.random_string(20)
+            for _ in range(np.random.randint(5) + 1)
+        ],
+        "minerals": [
+            {
+                "name": helpers.random_string(20),
+                "type": 0,
+                "kinetic_constraint": 0,
+                "solid_solution": np.random.randint(3),
+                "precipitation_dry": np.random.randint(3),
+                "gap": np.random.rand(),
+                "temp1": np.random.rand(),
+                "temp2": np.random.rand(),
+            },
+            {
+                "name": helpers.random_string(20),
+                "type": 1,
+                "kinetic_constraint": 1,
+                "solid_solution": np.random.randint(3),
+                "precipitation_dry": np.random.randint(3),
+                "dissolution": {
+                    "k25": np.random.rand(),
+                    "rate_ph_dependence": 1,
+                    "eta": np.random.rand(),
+                    "theta": np.random.rand(),
+                    "activation_energy": np.random.rand(),
+                    "a": np.random.rand(),
+                    "b": np.random.rand(),
+                    "c": np.random.rand(),
+                    "ph1": np.random.rand(),
+                    "slope1": np.random.rand(),
+                    "ph2": np.random.rand(),
+                    "slope2": np.random.rand(),
+                },
+            },
+            {
+                "name": helpers.random_string(20),
+                "type": 1,
+                "kinetic_constraint": 2,
+                "solid_solution": np.random.randint(3),
+                "precipitation_dry": np.random.randint(3),
+                "precipitation": {
+                    "k25": np.random.rand(),
+                    "rate_ph_dependence": 2,
+                    "eta": np.random.rand(),
+                    "theta": np.random.rand(),
+                    "activation_energy": np.random.rand(),
+                    "a": np.random.rand(),
+                    "b": np.random.rand(),
+                    "c": np.random.rand(),
+                    "volume_fraction_ini": np.random.rand(),
+                    "id": np.random.randint(2),
+                    "extra_mechanisms": [
+                        {
+                            "ki": np.random.rand(),
+                            "activation_energy": np.random.rand(),
+                            "mechanism": [
+                                {
+                                    "specie": helpers.random_string(20),
+                                    "power": np.random.rand(),
+                                }
+                                for _ in range(np.random.randint(5) + 1)
+                            ],
+                        }
+                        for _ in range(np.random.randint(5) + 1)
+                    ],
+                },
+                "gap": np.random.rand(),
+                "temp1": np.random.rand(),
+                "temp2": np.random.rand(),
+            },
+            {
+                "name": helpers.random_string(20),
+                "type": 1,
+                "kinetic_constraint": 3,
+                "solid_solution": np.random.randint(3),
+                "precipitation_dry": np.random.randint(3),
+                "dissolution": {
+                    "k25": np.random.rand(),
+                    "rate_ph_dependence": 0,
+                    "eta": np.random.rand(),
+                    "theta": np.random.rand(),
+                    "activation_energy": np.random.rand(),
+                    "a": np.random.rand(),
+                    "b": np.random.rand(),
+                    "c": np.random.rand(),
+                },
+                "precipitation": {
+                    "k25": np.random.rand(),
+                    "rate_ph_dependence": 0,
+                    "eta": np.random.rand(),
+                    "theta": np.random.rand(),
+                    "activation_energy": np.random.rand(),
+                    "a": np.random.rand(),
+                    "b": np.random.rand(),
+                    "c": np.random.rand(),
+                    "volume_fraction_ini": np.random.rand(),
+                    "id": np.random.randint(2),
+                },
+                "gap": np.random.rand(),
+                "temp1": np.random.rand(),
+                "temp2": np.random.rand(),
+            },
+        ],
+        "gaseous_species": [
+            {
+                "name": helpers.random_string(20),
+                "fugacity": np.random.randint(2),
+            }
+            for _ in range(np.random.randint(5) + 1)
+        ],
+        "surface_complexes": [
+            helpers.random_string(20)
+            for _ in range(np.random.randint(5) + 1)
+        ],
+        "kd_decay": [
+            {
+                "name": helpers.random_string(20),
+                "decay_constant": np.random.rand(),
+                "a": np.random.rand(),
+                "b": np.random.rand(),
+            }
+            for _ in range(np.random.randint(5) + 1)
+        ],
+        "exchanged_species": [
+            {
+                "name": helpers.random_string(20),
+                "reference": bool(np.random.randint(2)),
+                "type": np.random.randint(4),
+                "site_coeffs": np.random.rand(3),
+            }
+            for _ in range(np.random.randint(5) + 1)
+        ],
+        "exchange_sites_id": np.random.randint(3),
+        "zones": {
+            "minerals": [
+                {
+                    "minerals": [
+                        {
+                            "name": helpers.random_string(20),
+                            "volume_fraction_ini": np.random.rand(),
+                            "flag": 0,
+                        },
+                        {
+                            "name": helpers.random_string(20),
+                            "volume_fraction_ini": np.random.rand(),
+                            "flag": 1,
+                            "radius": np.random.rand(),
+                            "area_ini": np.random.rand(),
+                            "area_unit": np.random.randint(5),
+                        },
+                    ],
+                },
+                {
+                    "rock": helpers.random_string(5),
+                    "minerals": [
+                        {
+                            "name": helpers.random_string(20),
+                            "volume_fraction_ini": np.random.rand(),
+                            "flag": 0,
+                        }
+                        for _ in range(np.random.randint(5) + 1)
+                    ],
+                },
+            ],
+            "permeability_porosity": [
+                {
+                    "id": np.random.randint(7),
+                    "a": np.random.rand(),
+                    "b": np.random.rand(),
+                }
+                for _ in range(np.random.randint(5) + 1)
+            ],
+            "adsorption": [
+                {
+                    "flag": np.random.randint(2),
+                    "species": [
+                        {
+                            "name": helpers.random_string(20),
+                            "area_unit": np.random.randint(3),
+                            "area": np.random.rand(),
+                        }
+                        for _ in range(nsurfs)
+                    ],
+                }
+                for _ in range(np.random.randint(5) + 1)
+            ],
+            "linear_kd": [
+                {
+                    "name": helpers.random_string(20),
+                    "solid_density": np.random.rand(),
+                    "value": np.random.rand(),
+                }
+                for _ in range(np.random.randint(5) + 1)
+            ],
+            "cation_exchange": [
+                np.random.rand(5)
+                for _ in range(np.random.randint(5) + 1)
+            ],
+        },
+    }
+
+    # Primary species
+    for _ in range(nsurfs):
+        tmp = {
+            "name": helpers.random_string(20),
+            "transport": 2,
+            "mineral_name": helpers.random_string(20),
+            "sorption_density": np.random.rand(),
+            "adsorption_id": np.random.randint(5),
+        }
+        if tmp["adsorption_id"] == 1:
+            tmp["capacitance"] = np.random.rand()
+
+        parameters_ref["primary_species"].append(tmp)
+
+    # Aqueous kinetics
+    parameters_ref["aqueous_kinetics"][0]["rate"] = np.random.rand()
+    parameters_ref["aqueous_kinetics"][1]["rate"] = {
+        "k25": np.random.rand(),
+        "Ea": np.random.rand(),
+    }
+
+    # Initial and injection water zones
+    for key in ["initial_waters", "injection_waters"]:
+        parameters_ref["zones"][key] = [
+            {
+                "temperature": np.random.rand(),
+                "pressure": np.random.rand(),
+                "species": [
+                    {
+                        "name": helpers.random_string(20),
+                        "flag": np.random.randint(5),
+                        "guess": np.random.rand(),
+                        "ctot": np.random.rand(),
+                        "log_fugacity": np.random.rand(),
+                        "nameq": helpers.random_string(10),
+                    }
+                    for _ in range(np.random.randint(5) + 1)
+                ],
+            },
+            {
+                "temperature": np.random.rand(),
+                "pressure": np.random.rand(),
+                "rock": helpers.random_string(5),
+                "species": [
+                    {
+                        "name": helpers.random_string(20),
+                        "flag": np.random.randint(5),
+                        "guess": np.random.rand(),
+                        "ctot": np.random.rand(),
+                        "log_fugacity": np.random.rand(),
+                        "nameq": helpers.random_string(10),
+                    }
+                    for _ in range(np.random.randint(5) + 1)
+                ],
+            },
+        ]
+
+    # Initial and injection gas zones
+    for key in ["initial_gases", "injection_gases"]:
+        pp = "partial_pressure" if key == "initial_gases" else "mole_fraction"
+        parameters_ref["zones"][key] = [
+            [
+                {
+                    "name": helpers.random_string(20),
+                    pp: np.random.rand(),
+                }
+                for _ in range(np.random.randint(5) + 1)
+            ]
+            for _ in range(np.random.randint(5) + 1)
+        ]
+
+
+    toughio.write_input("bug.txt", parameters_ref, file_format="toughreact-chemical")
+    toughio.write_input("bug.json", parameters_ref, file_format="json")
+    parameters = write_read(parameters_ref)
+
+    assert allclose(parameters_ref, parameters, atol=1.0e-3)
