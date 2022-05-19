@@ -47,7 +47,7 @@ def read(filename, file_format=None, **kwargs):
     ----------
     filename : str, pathlike or buffer
         Input file name or buffer.
-    file_format : str ('tough', 'toughreact-flow', 'json') or None, optional, default None
+    file_format : str ('tough', 'toughreact-flow', 'toughreact-solute', 'toughreact-chemical', 'json') or None, optional, default None
         Input file format.
 
     Other Parameters
@@ -56,6 +56,8 @@ def read(filename, file_format=None, **kwargs):
         Only if ``file_format = "tough"``. Number of characters in cell labels.
     eos : str or None, optional, default None
         Only if ``file_format = "tough"``. Equation of State.
+    mopr_11 : int, optional, default 0
+        Only if ``file_format = "toughreact-solute"``. MOPR(11) value in file 'flow.inp'.
 
     Returns
     -------
@@ -90,7 +92,7 @@ def write(filename, parameters, file_format=None, **kwargs):
         Output file name or buffer.
     parameters : dict
         Parameters to export.
-    file_format : str ('tough', 'toughreact-flow', 'json') or None, optional, default None
+    file_format : str ('tough', 'toughreact-flow', 'toughreact-solute', 'toughreact-chemical', 'json') or None, optional, default None
         Output file format.
 
     Other Parameters
@@ -107,6 +109,12 @@ def write(filename, parameters, file_format=None, **kwargs):
     eos : str or None, optional, default None
         Only if ``file_format = "tough"``. Equation of State.
         If `eos` is defined in `parameters`, this option will be ignored.
+    mopr_10 : int, optional, default 0
+        Only if ``file_format = "toughreact-solute"``. MOPR(10) value in file 'flow.inp'.
+    mopr_11 : int, optional, default 0
+        Only if ``file_format = "toughreact-solute"``. MOPR(11) value in file 'flow.inp'.
+    verbose : bool, optional, default True
+        Only if ``file_format`` in {"toughreact-solute", "toughreact-chemical"}. If `True`, add comments to describe content of file.
 
     """
     if not isinstance(parameters, dict):

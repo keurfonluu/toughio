@@ -8,6 +8,17 @@ __all__ = [
 
 
 def write(filename, parameters, verbose=True):
+    """
+    Write TOUGHREACT chemical input file.
+
+    Parameters
+    ----------
+    filename : str
+        Input file name.
+    verbose : bool, optional, default True
+        If `True`, add comments to describe content of file.
+
+    """
     buffer = write_buffer(parameters, verbose)
     with open_file(filename, "w") as f:
         for record in buffer:
@@ -15,6 +26,7 @@ def write(filename, parameters, verbose=True):
 
 
 def write_buffer(parameters, verbose):
+    """Write TOUGHREACT chemical input file."""
     # Define input file contents
     out = []
     out += _write_title(parameters)
@@ -80,6 +92,7 @@ def _write_prim(parameters, verbose):
 
 @section("# Aqueous kinetics")
 def _write_akin(parameters, verbose):
+    """Write aqueous kinetics."""
     out = []
 
     if not ("aqueous_kinetics" in parameters and parameters["aqueous_kinetics"]):
@@ -197,6 +210,7 @@ def _write_aque(parameters):
 
 @section("# Minerals")
 def _write_miner(parameters, verbose):
+    """Write minerals."""
     out = []
 
     if not ("minerals" in parameters and parameters["minerals"]):

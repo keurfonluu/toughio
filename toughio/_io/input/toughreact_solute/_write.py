@@ -19,7 +19,7 @@ def write(filename, parameters, mopr_10=0, mopr_11=0, verbose=True):
     mopr_11 : int, optional, default 0
         MOPR(11) value in file 'flow.inp'.
     verbose : bool, optional, default True
-        If True, add description before each record.
+        If `True`, add comments to describe content of file.
 
     """
     buffer = write_buffer(parameters, mopr_10, mopr_11, verbose)
