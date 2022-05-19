@@ -1,5 +1,4 @@
-from .._common import getval
-from ..._common import to_str
+from .._common import getval, write_ffrecord
 from ...._common import open_file
 
 __all__ = [
@@ -50,9 +49,9 @@ def write_buffer(parameters, mopr_10=0, mopr_11=0, verbose=True):
     out += _write_default(parameters, verbose, mopr_11)
     out += _write_zones(parameters, verbose, mopr_11)
     out += _write_convergence_bounds(parameters, verbose, mopr_10)
-    out += ["end\n"]
+    out += ["end"]
 
-    return out
+    return "\n".join(out)
 
 
 def _generate_numbers(parameters):
@@ -92,8 +91,8 @@ def _generate_numbers(parameters):
 
 def _write_title(parameters, verbose):
     """Write title."""
-    out = ["# Title\n"] if verbose else []
-    out += [f"{parameters['title']}\n"]
+    out = ["# Title"] if verbose else []
+    out += [f"{parameters['title']}"]
 
     return out
 
@@ -115,26 +114,9 @@ def _write_options(parameters, verbose):
         0,
     ]
 
-    if verbose:
-        out += ["# ISPIA ITERSFA  ISOLVC   NGAMM   NGAS1 ICHDUMP    KCPL ICO2H2O iTDS_REACT\n"]
-        out += "{}\n".format(
-            " ".join(
-                [
-                    to_str(values[0], "{:7d}"),
-                    to_str(values[1], "{:7d}"),
-                    to_str(values[2], "{:7d}"),
-                    to_str(values[3], "{:7d}"),
-                    to_str(values[4], "{:7d}"),
-                    to_str(values[5], "{:7d}"),
-                    to_str(values[6], "{:7d}"),
-                    to_str(values[7], "{:7d}"),
-                    to_str(values[8], "{:10d}"),
-                ]
-            )
-        )
-
-    else:
-        out += f"{' '.join(str(x) for x in values)}\n"
+    out += ["# ISPIA ITERSFA  ISOLVC   NGAMM   NGAS1 ICHDUMP    KCPL ICO2H2O iTDS_REACT"] if verbose else []
+    fmt = ["{:7d}"] * 8 + ["{:10d}"]
+    out += write_ffrecord(values, verbose, fmt)
 
     # Record 3
     values = [
@@ -144,19 +126,15 @@ def _write_options(parameters, verbose):
         getval(parameters, ("options", "mineral_gas_factor"), 0.0),
     ]
 
-    if verbose:
-        out += ["#   SL1MIN     RCOUR    STIMAX    CNFACT\n"]
-        out += " {}\n".format(" ".join(to_str(value, "{{:9f}}") for value in values))
-
-    else:
-        out += f"{' '.join(str(x) for x in values)}\n"
+    out += ["#   SL1MIN     RCOUR    STIMAX    CNFACT"] if verbose else []
+    out += write_ffrecord(values, verbose, float_fmt="{{:9f}}")
 
     return out
 
 
 def _write_filenames(parameters, verbose):
     """Write file names."""
-    out = ["# Input and output file names\n"] if verbose else []
+    out = ["# Input and output file names"] if verbose else []
     values = [
         getval(parameters, ("files", "thermodynamic_input"), ""),
         getval(parameters, ("files", "iteration_output"), ""),
@@ -167,22 +145,22 @@ def _write_filenames(parameters, verbose):
     ]
 
     if verbose:
-        out += [f"{values[0]:<20}  ! Thermodynamic database\n"]
-        out += [f"{values[1]:<20}  ! Iteration information\n"]
-        out += [f"{values[2]:<20}  ! Aqueous concentrations in Tecplot form\n"]
-        out += [f"{values[3]:<20}  ! Mineral data in Tecplot form\n"]
-        out += [f"{values[4]:<20}  ! Gas data in Tecplot form\n"]
-        out += [f"{values[5]:<20}  ! Concentrations at specific elements over time\n"]
+        out += [f"{values[0]:<20}  ! Thermodynamic database"]
+        out += [f"{values[1]:<20}  ! Iteration information"]
+        out += [f"{values[2]:<20}  ! Aqueous concentrations in Tecplot form"]
+        out += [f"{values[3]:<20}  ! Mineral data in Tecplot form"]
+        out += [f"{values[4]:<20}  ! Gas data in Tecplot form"]
+        out += [f"{values[5]:<20}  ! Concentrations at specific elements over time"]
 
     else:
-        out += [f"{value}\n" for value in values]
+        out += [f"{value}" for value in values]
 
     return out
 
 
 def _write_weights_coefficients(parameters, verbose):
     """Write weights and diffusion coefficients."""
-    out = ["#    ITIME      WUPC     DFFUN    DFFUNG\n"] if verbose else []
+    out = ["#    ITIME      WUPC     DFFUN    DFFUNG"] if verbose else []
     values = [
         getval(parameters, ("options", "w_time"), 0.0),
         getval(parameters, ("options", "w_upstream"), 0.0),
@@ -190,18 +168,14 @@ def _write_weights_coefficients(parameters, verbose):
         getval(parameters, ("options", "molecular_diffusion_coefficient"), 0.0),
     ]
 
-    if verbose:
-        out += " {}\n".format(" ".join(to_str(value, "{{:9f}}") for value in values))
-
-    else:
-        out += f"{' '.join(str(x) for x in values)}\n"
+    out += write_ffrecord(values, verbose, float_fmt="{{:9f}}")
 
     return out
 
 
 def _write_convergence(parameters, verbose):
     """Write convergence criterion."""
-    out = ["# MAXITPTR     TOLTR  MAXITPCH     TOLCH     TOLMB     TOLDC     TOLDR\n"] if verbose else []
+    out = ["# MAXITPTR     TOLTR  MAXITPCH     TOLCH     TOLMB     TOLDC     TOLDR"] if verbose else []
     values = [
         getval(parameters, ("options", "n_iteration_tr"), 0),
         getval(parameters, ("options", "eps_tr"), 0.0),
@@ -212,30 +186,14 @@ def _write_convergence(parameters, verbose):
         getval(parameters, ("options", "eps_dr"), 0.0),
     ]
 
-    if verbose:
-        out += " {}\n".format(
-            " ".join(
-                [
-                    to_str(values[0], "{:9d}"),
-                    to_str(values[1], "{{:9f}}"),
-                    to_str(values[2], "{:9d}"),
-                    to_str(values[3], "{{:9f}}"),
-                    to_str(values[4], "{{:9f}}"),
-                    to_str(values[5], "{{:9f}}"),
-                    to_str(values[6], "{{:9f}}"),
-                ]
-            )
-        )
-
-    else:
-        out += f"{' '.join(str(x) for x in values)}\n"
+    out += write_ffrecord(values, verbose, int_fmt="{:9d}", float_fmt="{{:9f}}")
 
     return out
 
 
 def _write_output(parameters, numbers, verbose):
     """Write output control variables."""
-    out = ["#  NWTI  NWNOD  NWCOM  NWMIN   NWAQ  NWADS  NWEXC   ICON    MIN   IGAS\n"] if verbose else []
+    out = ["#  NWTI  NWNOD  NWCOM  NWMIN   NWAQ  NWADS  NWEXC   ICON    MIN   IGAS"] if verbose else []
     values = [
         getval(parameters, ("options", "n_cycle_print"), 0),
         numbers["NWNOD"],
@@ -249,52 +207,48 @@ def _write_output(parameters, numbers, verbose):
         getval(parameters, ("flags", "gas_concentration_unit"), 0),
     ]
 
-    if verbose:
-        out += " {}\n".format(" ".join(to_str(value, "{:6d}") for value in values))
-
-    else:
-        out += f"{' '.join(str(x) for x in values)}\n"
+    out += write_ffrecord(values, verbose, int_fmt="{:6d}")
 
     return out
 
 
 def _write_elements(parameters, n, verbose):
     """Write list of grid blocks."""
-    out = [f"# {comments['nodes']}\n"] if verbose else []
+    out = [f"# {comments['nodes']}"] if verbose else []
 
     if n == 0:
-        out += ["\n"]
+        out += [""]
 
         return out
     
-    out += [f"{x[:5]}\n" for x in parameters["output"]["elements"]]
-    out += ["\n"]
+    out += [f"{x[:5]}" for x in parameters["output"]["elements"]]
+    out += [""]
 
     return out
 
 
 def _write_indices_names(parameters, key, n, verbose):
     """Write indices or names."""
-    out = [f"# {comments[key]}\n"] if verbose else []
+    out = [f"# {comments[key]}"] if verbose else []
 
     if n == 0:
-        out += ["\n"]
+        out += [""]
 
         return out
 
     if n > 0:
-        out += f"{' '.join(str(x) for x in parameters['output'][key])}\n"
+        out += [f"{' '.join(str(x) for x in parameters['output'][key])}"]
 
     else:
-        out += [f"{x[:20]}\n" for x in parameters["output"][key]]
-        out += ["\n"]
+        out += [f"{x[:20]}" for x in parameters["output"][key]]
+        out += [""]
 
     return out
 
 
 def _write_default(parameters, verbose, mopr_11=0):
     """Write default chemical property zones."""
-    out = [f"#IZIWDF IZBWDF IZMIDF IZGSDF IZADDF IZEXDF IZPPDF IZKDDF IZBGDF\n"] if verbose else []
+    out = [f"#IZIWDF IZBWDF IZMIDF IZGSDF IZADDF IZEXDF IZPPDF IZKDDF IZBGDF"] if verbose else []
     values = [
         getval(parameters, ("default", "initial_water"), 0),
         getval(parameters, ("default", "injection_water"), 0),
@@ -314,21 +268,17 @@ def _write_default(parameters, verbose, mopr_11=0):
     else:
         values += [getval(parameters, ("default", "sedimentation_velocity"), 0)]
 
-    if verbose:
-        out += " {}\n".format(" ".join(to_str(value, "{:6d}" if isinstance(value, int) else "{{:9f}}") for value in values))
-
-    else:
-        out += f"{' '.join(str(x) for x in values)}\n"
+    out += write_ffrecord(values, verbose, int_fmt="{:6d}", float_fmt="{{:9f}}")
 
     return out
 
 
 def _write_zones(parameters, verbose, mopr_11=0):
     """Write chemical property zones."""
-    out = ["#ELEM NSEQ NADD IZIW IZBW IZMI IZGS IZAD IZEX IZPP IZKD IZBG\n"] if verbose else []
+    out = ["#ELEM NSEQ NADD IZIW IZBW IZMI IZGS IZAD IZEX IZPP IZKD IZBG"] if verbose else []
     
     if "zones" not in parameters or not parameters["zones"]:
-        out += ["\n"]
+        out += [""]
 
         return out
     
@@ -356,13 +306,9 @@ def _write_zones(parameters, verbose, mopr_11=0):
         else:
             values += [getval(parameters, ("zones", zone, "sedimentation_velocity"), 0.0)]
 
-        if verbose:
-            out += f"{values[0][:5]} {' '.join(to_str(value, '{:4d}' if isinstance(value, int) else '{{:9f}}') for value in values[1:])}\n"
+        out += write_ffrecord(values, verbose, int_fmt="{:4d}", float_fmt="{{:9f}}")
 
-        else:
-            out += f"{' '.join(str(x) for x in values)}\n"
-
-    out += ["\n"]
+    out += [""]
 
     return out
 
@@ -372,8 +318,8 @@ def _write_convergence_bounds(parameters, verbose, mopr_10=0):
     if mopr_10 != 2:
         return []
 
-    out = ["CONVP\n"]
-    out += ["# Read in chemical convergence limits if MOPR(10)=2\n"] if verbose else []
+    out = ["CONVP"]
+    out += ["# Read in chemical convergence limits if MOPR(10)=2"] if verbose else []
 
     # Numbers of iterations
     values = [
@@ -383,12 +329,8 @@ def _write_convergence_bounds(parameters, verbose, mopr_10=0):
         getval(parameters, ("options", "n_iteration_4"), 100),
     ]
 
-    if verbose:
-        out += ["# MAXCHEM1  MAXCHEM2  MAXCHEM3  MAXCHEM4\n"]
-        out += " {}\n".format(" ".join(to_str(value, "{:9d}") for value in values))
-
-    else:
-        out += f"{' '.join(str(x) for x in values)}\n"
+    out += ["# MAXCHEM1  MAXCHEM2  MAXCHEM3  MAXCHEM4"] if verbose else []
+    out += write_ffrecord(values, verbose, int_fmt="{:9d}")
 
     # Increase/reduce factors
     values = [
@@ -400,12 +342,8 @@ def _write_convergence_bounds(parameters, verbose, mopr_10=0):
         getval(parameters, ("options", "t_reduce_factor_3"), 0.5),
     ]
 
-    if verbose:
-        out += ["#  DTINCR1   DTINCR2   DTINCR3   DTDECR1   DTDECR2   DTDECR3\n"]
-        out += " {}\n".format(" ".join(to_str(value, "{{:9f}}") for value in values))
-
-    else:
-        out += f"{' '.join(str(x) for x in values)}\n"
+    out += ["#  DTINCR1   DTINCR2   DTINCR3   DTDECR1   DTDECR2   DTDECR3"] if verbose else []
+    out += write_ffrecord(values, verbose, float_fmt="{{:9f}}")
 
     return out
         
