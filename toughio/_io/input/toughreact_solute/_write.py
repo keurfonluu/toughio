@@ -92,7 +92,7 @@ def _generate_numbers(parameters):
 def _write_title(parameters, verbose):
     """Write title."""
     out = ["# Title"] if verbose else []
-    out += [f"{parameters['title']}"]
+    out += [getval(parameters, "title", "")]
 
     return out
 
@@ -221,7 +221,7 @@ def _write_elements(parameters, n, verbose):
 
         return out
     
-    out += [f"{x[:5]}" for x in parameters["output"]["elements"]]
+    out += [f"{x[:5]}" for x in getval(parameters, ("output", "elements"), [])]
     out += [""]
 
     return out
@@ -237,10 +237,10 @@ def _write_indices_names(parameters, key, n, verbose):
         return out
 
     if n > 0:
-        out += [f"{' '.join(str(x) for x in parameters['output'][key])}"]
+        out += [f"{' '.join(str(x) for x in getval(parameters, ('output', key), []))}"]
 
     else:
-        out += [f"{x[:20]}" for x in parameters["output"][key]]
+        out += [f"{x[:20]}" for x in getval(parameters, ('output', key), [])]
         out += [""]
 
     return out
