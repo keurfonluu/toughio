@@ -355,7 +355,7 @@ def test_chemical():
         ],
         "aqueous_kinetics": [
             {
-                "aqueous_species": [
+                "species": [
                     {
                         "name": helpers.random_string(20),
                         "stoichiometric_coeff": np.random.rand(),
@@ -453,9 +453,9 @@ def test_chemical():
                         {
                             "ki": np.random.rand(),
                             "activation_energy": np.random.rand(),
-                            "mechanism": [
+                            "species": [
                                 {
-                                    "specie": helpers.random_string(20),
+                                    "name": helpers.random_string(20),
                                     "power": np.random.rand(),
                                 }
                                 for _ in range(np.random.randint(5) + 1)
@@ -534,7 +534,7 @@ def test_chemical():
         "zones": {
             "minerals": [
                 {
-                    "minerals": [
+                    "species": [
                         {
                             "name": helpers.random_string(20),
                             "volume_fraction_ini": np.random.rand(),
@@ -552,7 +552,7 @@ def test_chemical():
                 },
                 {
                     "rock": helpers.random_string(5),
-                    "minerals": [
+                    "species": [
                         {
                             "name": helpers.random_string(20),
                             "volume_fraction_ini": np.random.rand(),
@@ -670,9 +670,6 @@ def test_chemical():
             for _ in range(np.random.randint(5) + 1)
         ]
 
-
-    toughio.write_input("bug.txt", parameters_ref, file_format="toughreact-chemical")
-    toughio.write_input("bug.json", parameters_ref, file_format="json")
     parameters = write_read(parameters_ref)
 
     assert allclose(parameters_ref, parameters, atol=1.0e-3)
