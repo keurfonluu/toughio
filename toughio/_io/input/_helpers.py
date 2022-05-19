@@ -10,6 +10,13 @@ __all__ = [
 _extension_to_filetype = {}
 _reader_map = {}
 _writer_map = {}
+_file_formats = {
+    "INFILE": "tough",
+    "MESH": "tough",
+    "flow.inp": "toughreact-flow",
+    "solute.inp": "toughreact-solute",
+    "chemical.inp": "toughreact-chemical",
+}
 
 
 def register(file_format, extensions, reader, writer=None):
@@ -72,14 +79,8 @@ def read(filename, file_format=None, **kwargs):
     if not (file_format is None or file_format in _reader_map):
         raise ValueError()
 
-    fmt = (
-        file_format
-        if file_format
-        else filetype_from_filename(filename, _extension_to_filetype)
-    )
-    fmt = fmt if fmt else "tough"
-
-    return _reader_map[fmt](filename, **kwargs)
+    file_format = _get_file_format(filename, file_format)
+    return _reader_map[file_format](filename, **kwargs)
 
 
 def write(filename, parameters, file_format=None, **kwargs):
@@ -122,11 +123,32 @@ def write(filename, parameters, file_format=None, **kwargs):
     if not (file_format is None or file_format in _writer_map):
         raise ValueError()
 
-    fmt = (
-        file_format
-        if file_format
-        else filetype_from_filename(filename, _extension_to_filetype)
-    )
-    fmt = fmt if fmt else "tough"
+    file_format = _get_file_format(filename, file_format)
+    _writer_map[file_format](filename, parameters, **kwargs)
 
-    _writer_map[fmt](filename, parameters, **kwargs)
+
+def _get_file_format(filename, file_format):
+    """Get file format."""
+    if not file_format:
+        file_format = _file_format_from_filename(filename)
+
+    if not file_format:
+        file_format = filetype_from_filename(filename, _extension_to_filetype)
+
+    if not file_format:
+        file_format = "tough"
+
+    return file_format
+
+
+def _file_format_from_filename(filename):
+    """Determine file format from its name."""
+    import pathlib
+
+    filename = pathlib.Path(filename).name
+
+    return (
+        _file_formats[filename]
+        if filename in _file_formats
+        else ""
+    )
