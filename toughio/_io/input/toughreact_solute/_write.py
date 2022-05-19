@@ -1,5 +1,4 @@
-import logging
-
+from .._common import getval
 from ..._common import to_str
 from ...._common import open_file
 
@@ -59,12 +58,12 @@ def write_buffer(parameters, mopr_10=0, mopr_11=0, verbose=True):
 def _generate_numbers(parameters):
     """Generate numbers of outputs."""
     numbers = {
-        "NWNOD": -len(_get(parameters, ("output", "elements"), [])),
-        "NWCOM": len(_get(parameters, ("output", "components"), [])),
-        "NWMIN": len(_get(parameters, ("output", "minerals"), [])),
-        "NWAQ": len(_get(parameters, ("output", "aqueous_species"), [])),
-        "NWADS": len(_get(parameters, ("output", "surface_complexes"), [])),
-        "NWEXC": len(_get(parameters, ("output", "exchange_species"), [])),
+        "NWNOD": -len(getval(parameters, ("output", "elements"), [])),
+        "NWCOM": len(getval(parameters, ("output", "components"), [])),
+        "NWMIN": len(getval(parameters, ("output", "minerals"), [])),
+        "NWAQ": len(getval(parameters, ("output", "aqueous_species"), [])),
+        "NWADS": len(getval(parameters, ("output", "surface_complexes"), [])),
+        "NWEXC": len(getval(parameters, ("output", "exchange_species"), [])),
     }
 
     if numbers["NWCOM"]:
@@ -105,14 +104,14 @@ def _write_options(parameters, verbose):
 
     # Record 2
     values = [
-        _get(parameters, ("flags", "iteration_scheme"), 0),
-        _get(parameters, ("flags", "reactive_surface_area"), 0),
-        _get(parameters, ("flags", "solver"), 0),
-        _get(parameters, ("flags", "n_subiteration"), 0),
-        _get(parameters, ("flags", "gas_transport"), 0),
-        _get(parameters, ("flags", "verbosity"), 0),
-        _get(parameters, ("flags", "feedback"), 0),
-        _get(parameters, ("flags", "coupling"), 0),
+        getval(parameters, ("flags", "iteration_scheme"), 0),
+        getval(parameters, ("flags", "reactive_surface_area"), 0),
+        getval(parameters, ("flags", "solver"), 0),
+        getval(parameters, ("flags", "n_subiteration"), 0),
+        getval(parameters, ("flags", "gas_transport"), 0),
+        getval(parameters, ("flags", "verbosity"), 0),
+        getval(parameters, ("flags", "feedback"), 0),
+        getval(parameters, ("flags", "coupling"), 0),
         0,
     ]
 
@@ -139,10 +138,10 @@ def _write_options(parameters, verbose):
 
     # Record 3
     values = [
-        _get(parameters, ("options", "sl_min"), 0.0),
-        _get(parameters, ("options", "rcour"), 0.0),
-        _get(parameters, ("options", "ionic_strength_max"), 0.0),
-        _get(parameters, ("options", "mineral_gas_factor"), 0.0),
+        getval(parameters, ("options", "sl_min"), 0.0),
+        getval(parameters, ("options", "rcour"), 0.0),
+        getval(parameters, ("options", "ionic_strength_max"), 0.0),
+        getval(parameters, ("options", "mineral_gas_factor"), 0.0),
     ]
 
     if verbose:
@@ -159,12 +158,12 @@ def _write_filenames(parameters, verbose):
     """Write file names."""
     out = ["# Input and output file names\n"] if verbose else []
     values = [
-        _get(parameters, ("files", "thermodynamic_input"), ""),
-        _get(parameters, ("files", "iteration_output"), ""),
-        _get(parameters, ("files", "plot_output"), ""),
-        _get(parameters, ("files", "solid_output"), ""),
-        _get(parameters, ("files", "gas_output"), ""),
-        _get(parameters, ("files", "time_output"), ""),
+        getval(parameters, ("files", "thermodynamic_input"), ""),
+        getval(parameters, ("files", "iteration_output"), ""),
+        getval(parameters, ("files", "plot_output"), ""),
+        getval(parameters, ("files", "solid_output"), ""),
+        getval(parameters, ("files", "gas_output"), ""),
+        getval(parameters, ("files", "time_output"), ""),
     ]
 
     if verbose:
@@ -185,10 +184,10 @@ def _write_weights_coefficients(parameters, verbose):
     """Write weights and diffusion coefficients."""
     out = ["#    ITIME      WUPC     DFFUN    DFFUNG\n"] if verbose else []
     values = [
-        _get(parameters, ("options", "w_time"), 0.0),
-        _get(parameters, ("options", "w_upstream"), 0.0),
-        _get(parameters, ("options", "aqueous_diffusion_coefficient"), 0.0),
-        _get(parameters, ("options", "molecular_diffusion_coefficient"), 0.0),
+        getval(parameters, ("options", "w_time"), 0.0),
+        getval(parameters, ("options", "w_upstream"), 0.0),
+        getval(parameters, ("options", "aqueous_diffusion_coefficient"), 0.0),
+        getval(parameters, ("options", "molecular_diffusion_coefficient"), 0.0),
     ]
 
     if verbose:
@@ -204,13 +203,13 @@ def _write_convergence(parameters, verbose):
     """Write convergence criterion."""
     out = ["# MAXITPTR     TOLTR  MAXITPCH     TOLCH     TOLMB     TOLDC     TOLDR\n"] if verbose else []
     values = [
-        _get(parameters, ("options", "n_iteration_tr"), 0),
-        _get(parameters, ("options", "eps_tr"), 0.0),
-        _get(parameters, ("options", "n_iteration_ch"), 0),
-        _get(parameters, ("options", "eps_ch"), 0.0),
-        _get(parameters, ("options", "eps_mb"), 0.0),
-        _get(parameters, ("options", "eps_dc"), 0.0),
-        _get(parameters, ("options", "eps_dr"), 0.0),
+        getval(parameters, ("options", "n_iteration_tr"), 0),
+        getval(parameters, ("options", "eps_tr"), 0.0),
+        getval(parameters, ("options", "n_iteration_ch"), 0),
+        getval(parameters, ("options", "eps_ch"), 0.0),
+        getval(parameters, ("options", "eps_mb"), 0.0),
+        getval(parameters, ("options", "eps_dc"), 0.0),
+        getval(parameters, ("options", "eps_dr"), 0.0),
     ]
 
     if verbose:
@@ -238,16 +237,16 @@ def _write_output(parameters, numbers, verbose):
     """Write output control variables."""
     out = ["#  NWTI  NWNOD  NWCOM  NWMIN   NWAQ  NWADS  NWEXC   ICON    MIN   IGAS\n"] if verbose else []
     values = [
-        _get(parameters, ("options", "n_cycle_print"), 0),
+        getval(parameters, ("options", "n_cycle_print"), 0),
         numbers["NWNOD"],
         numbers["NWCOM"],
         numbers["NWMIN"],
         numbers["NWAQ"],
         numbers["NWADS"],
         numbers["NWEXC"],
-        _get(parameters, ("flags", "aqueous_concentration_unit"), 0),
-        _get(parameters, ("flags", "mineral_unit"), 0),
-        _get(parameters, ("flags", "gas_concentration_unit"), 0),
+        getval(parameters, ("flags", "aqueous_concentration_unit"), 0),
+        getval(parameters, ("flags", "mineral_unit"), 0),
+        getval(parameters, ("flags", "gas_concentration_unit"), 0),
     ]
 
     if verbose:
@@ -297,15 +296,15 @@ def _write_default(parameters, verbose, mopr_11=0):
     """Write default chemical property zones."""
     out = [f"#IZIWDF IZBWDF IZMIDF IZGSDF IZADDF IZEXDF IZPPDF IZKDDF IZBGDF\n"] if verbose else []
     values = [
-        _get(parameters, ("default", "initial_water"), 0),
-        _get(parameters, ("default", "injection_water"), 0),
-        _get(parameters, ("default", "mineral"), 0),
-        _get(parameters, ("default", "initial_gas"), 0),
-        _get(parameters, ("default", "adsorption"), 0),
-        _get(parameters, ("default", "cation_exchange"), 0),
-        _get(parameters, ("default", "permeability_porosity"), 0),
-        _get(parameters, ("default", "linear_kd"), 0),
-        _get(parameters, ("default", "injection_gas"), 0),
+        getval(parameters, ("default", "initial_water"), 0),
+        getval(parameters, ("default", "injection_water"), 0),
+        getval(parameters, ("default", "mineral"), 0),
+        getval(parameters, ("default", "initial_gas"), 0),
+        getval(parameters, ("default", "adsorption"), 0),
+        getval(parameters, ("default", "cation_exchange"), 0),
+        getval(parameters, ("default", "permeability_porosity"), 0),
+        getval(parameters, ("default", "linear_kd"), 0),
+        getval(parameters, ("default", "injection_gas"), 0),
     ]
 
     if mopr_11 != 1:
@@ -313,7 +312,7 @@ def _write_default(parameters, verbose, mopr_11=0):
             values += [parameters["default"]["element"]]
 
     else:
-        values += [_get(parameters, ("default", "sedimentation_velocity"), 0)]
+        values += [getval(parameters, ("default", "sedimentation_velocity"), 0)]
 
     if verbose:
         out += " {}\n".format(" ".join(to_str(value, "{:6d}" if isinstance(value, int) else "{{:9f}}") for value in values))
@@ -333,21 +332,21 @@ def _write_zones(parameters, verbose, mopr_11=0):
 
         return out
     
-    # Do not use items() for better warning logging in function _get
+    # Do not use items() for better warning logging in function getval
     for zone in parameters["zones"]:
         values = [
             zone,
-            _get(parameters, ("zones", zone, "nseq"), 0),
-            _get(parameters, ("zones", zone, "nadd"), 0),
-            _get(parameters, ("zones", zone, "initial_water"), 0),
-            _get(parameters, ("zones", zone, "injection_water"), 0),
-            _get(parameters, ("zones", zone, "mineral"), 0),
-            _get(parameters, ("zones", zone, "initial_gas"), 0),
-            _get(parameters, ("zones", zone, "adsorption"), 0),
-            _get(parameters, ("zones", zone, "cation_exchange"), 0),
-            _get(parameters, ("zones", zone, "permeability_porosity"), 0),
-            _get(parameters, ("zones", zone, "linear_kd"), 0),
-            _get(parameters, ("zones", zone, "injection_gas"), 0),
+            getval(parameters, ("zones", zone, "nseq"), 0),
+            getval(parameters, ("zones", zone, "nadd"), 0),
+            getval(parameters, ("zones", zone, "initial_water"), 0),
+            getval(parameters, ("zones", zone, "injection_water"), 0),
+            getval(parameters, ("zones", zone, "mineral"), 0),
+            getval(parameters, ("zones", zone, "initial_gas"), 0),
+            getval(parameters, ("zones", zone, "adsorption"), 0),
+            getval(parameters, ("zones", zone, "cation_exchange"), 0),
+            getval(parameters, ("zones", zone, "permeability_porosity"), 0),
+            getval(parameters, ("zones", zone, "linear_kd"), 0),
+            getval(parameters, ("zones", zone, "injection_gas"), 0),
         ]
 
         if mopr_11 != 1:
@@ -355,7 +354,7 @@ def _write_zones(parameters, verbose, mopr_11=0):
                 values += [parameters["zones"][zone]["element"]]
 
         else:
-            values += [_get(parameters, ("zones", zone, "sedimentation_velocity"), 0.0)]
+            values += [getval(parameters, ("zones", zone, "sedimentation_velocity"), 0.0)]
 
         if verbose:
             out += f"{values[0][:5]} {' '.join(to_str(value, '{:4d}' if isinstance(value, int) else '{{:9f}}') for value in values[1:])}\n"
@@ -378,10 +377,10 @@ def _write_convergence_bounds(parameters, verbose, mopr_10=0):
 
     # Numbers of iterations
     values = [
-        _get(parameters, ("options", "n_iteration_1"), 30),
-        _get(parameters, ("options", "n_iteration_2"), 50),
-        _get(parameters, ("options", "n_iteration_3"), 75),
-        _get(parameters, ("options", "n_iteration_4"), 100),
+        getval(parameters, ("options", "n_iteration_1"), 30),
+        getval(parameters, ("options", "n_iteration_2"), 50),
+        getval(parameters, ("options", "n_iteration_3"), 75),
+        getval(parameters, ("options", "n_iteration_4"), 100),
     ]
 
     if verbose:
@@ -393,12 +392,12 @@ def _write_convergence_bounds(parameters, verbose, mopr_10=0):
 
     # Increase/reduce factors
     values = [
-        _get(parameters, ("options", "t_increase_factor_1"), 2.0),
-        _get(parameters, ("options", "t_increase_factor_2"), 1.5),
-        _get(parameters, ("options", "t_increase_factor_3"), 1.0),
-        _get(parameters, ("options", "t_reduce_factor_1"), 0.8),
-        _get(parameters, ("options", "t_reduce_factor_2"), 0.6),
-        _get(parameters, ("options", "t_reduce_factor_3"), 0.5),
+        getval(parameters, ("options", "t_increase_factor_1"), 2.0),
+        getval(parameters, ("options", "t_increase_factor_2"), 1.5),
+        getval(parameters, ("options", "t_increase_factor_3"), 1.0),
+        getval(parameters, ("options", "t_reduce_factor_1"), 0.8),
+        getval(parameters, ("options", "t_reduce_factor_2"), 0.6),
+        getval(parameters, ("options", "t_reduce_factor_3"), 0.5),
     ]
 
     if verbose:
@@ -409,30 +408,6 @@ def _write_convergence_bounds(parameters, verbose, mopr_10=0):
         out += f"{' '.join(str(x) for x in values)}\n"
 
     return out
-
-
-def _get(parameters, keys, default):
-    """Get key in parameters dict or return default value."""
-    try:
-        if isinstance(keys, str):
-            return parameters[keys]
-
-        else:
-            value = parameters
-            for key in keys:
-                value = value[key]
-
-            return value
-
-    except KeyError:
-        key_str = (
-            "'{}'".format(keys)
-            if isinstance(keys, str)
-            else "".join(f"['{key}']" for key in keys)
-        )
-        logging.warning(f"Key {key_str} is not defined. Setting to {default}.")
-
-        return default
         
 
 comments = {
