@@ -47,7 +47,10 @@ def read_buffer(f):
         parameters["zones"].update(_read_imin(fiter))
         parameters["zones"].update(_read_igas(fiter))
         parameters["zones"].update(_read_zppr(fiter))
-        parameters["zones"].update(_read_zads(fiter))
+
+        nsurfs = sum(specie["transport"] == 2 for specie in parameters["primary_species"])
+        parameters["zones"].update(_read_zads(fiter, nsurfs))
+
         parameters["zones"].update(_read_zlkd(fiter))
         parameters["zones"].update(_read_zexc(fiter, nxsites))
 
@@ -129,7 +132,7 @@ def _read_akin(f):
             "aqueous_species": [
                 {
                     "name": name,
-                    "stoichiometric_coeff": coeff,
+                    "stoichiometric_coeff": to_float(coeff),
                 }
                 for name, coeff in zip(names, coeffs)
             ]
@@ -454,7 +457,7 @@ def _read_exch(f):
 
         tmp = {
             "name": data[0],
-            "reference": bool(data[1]),
+            "reference": bool(int(data[1])),
             "type": int(data[2]),
             "site_coeffs": [to_float(x) for x in data[3:]],
         }
@@ -567,7 +570,7 @@ def _read_imin(f):
         tmp = {}
         if imtype < 0:
             tmp["rock"] = data[1]
-        tmp = []
+        tmp["minerals"] = []
 
         # Record 6
         line = _nextline(f, skip_empty=True, comments="#")
@@ -587,7 +590,7 @@ def _read_imin(f):
                 tmp2["area_ini"] = to_float(data[1])
                 tmp2["area_unit"] = int(data[2])
 
-            tmp.append(tmp2)
+            tmp["minerals"].append(tmp2)
             line = _nextline(f).strip()
 
         zones["minerals"].append(tmp)
@@ -675,7 +678,7 @@ def _read_zppr(f):
     return zones
 
 
-def _read_zads(f):
+def _read_zads(f, nsurfs):
     """Read surface adsorption zones."""
     zones = {"adsorption": []}
 
@@ -701,14 +704,15 @@ def _read_zads(f):
 
         # Record 6
         # Here, '*' does not mark the end of the list
-        data = _nextsplitline(f, 3, skip_empty=True, comments="#")
-        tmp2 = {
-            "name": data[0],
-            "area_unit": int(data[1]),
-            "area": to_float(data[2]),
-        }
+        for _ in range(nsurfs):
+            data = _nextsplitline(f, 3, skip_empty=True, comments="#")
+            tmp2 = {
+                "name": data[0],
+                "area_unit": int(data[1]),
+                "area": to_float(data[2]),
+            }
 
-        tmp["species"].append(tmp2)
+            tmp["species"].append(tmp2)
 
         zones["adsorption"].append(tmp)
 
@@ -737,18 +741,14 @@ def _read_zlkd(f):
         data = _nextsplitline(f, 1, skip_empty=True, comments="#")
         # idtype = int(data[0])
 
-        tmp = []
-
         # Record 6
         # Here, '*' does not mark the end of the list
         data = _nextsplitline(f, 3, skip_empty=True, comments="#")
-        tmp2 = {
+        tmp = {
             "name": data[0],
             "solid_density": to_float(data[1]),
             "value": to_float(data[2]),
         }
-
-        tmp.append(tmp2)
 
         zones["linear_kd"].append(tmp)
 
@@ -777,7 +777,8 @@ def _read_zexc(f, nxsites):
         data = _nextsplitline(f, nxsites + 1, skip_empty=True, comments="#")
         # ixtype = int(data[0])
 
-        zones["cation_exchange"].append(data[1:])
+        tmp = [to_float(x) for x in data[1:]]
+        zones["cation_exchange"].append(tmp)
 
     # '*' is not used here to mark the end of the list. Skip it.
     _ = f.next()
