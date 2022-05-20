@@ -387,12 +387,15 @@ def _write_exch(parameters, verbose):
         nxsites,
         getval(parameters, "exchange_sites_id", 0),
     ]
-    out += write_ffrecord(values, verbose)
+    out += write_ffrecord(values, verbose, int_fmt="{:<4d}")
 
     # Record 3
     if verbose:
         item = max(parameters["exchanged_species"], key=lambda x: len(x["name"]))
-        fmt = f"{{:{min(len(item['name']), 20)}}}"
+        n = min(len(item["name"]), 20)
+        fmt = f"{{:{n}}}"
+
+        out += [f"# {' ' * (n - 2)} ref. type    coeff."]
 
     for specie in parameters["exchanged_species"]:
         values = [
@@ -426,7 +429,7 @@ def _write_water(parameters, verbose):
         return out
 
     values = list(nwtypes.values())
-    out += write_ffrecord(values)
+    out += write_ffrecord(values, verbose, int_fmt="{:<4d}")
 
     for k, v in nwtypes.items():
         if not v:
@@ -435,7 +438,7 @@ def _write_water(parameters, verbose):
         for i, zone in enumerate(parameters["zones"][k]):
             # Record 4
             if verbose:
-                out += ["# ID      T(C)    P(bar)"]
+                out += ["#         T(C)    P(bar)"]
 
                 if "rock" in zone:
                     out[-1] = f"{out[-1]}      Rock"
@@ -446,7 +449,7 @@ def _write_water(parameters, verbose):
                 getval(zone, "pressure", 0.0),
             ]
             values += [getval(zone, "rock", "''")[:5]] if "rock" in zone else []
-            out += write_ffrecord(values, verbose, str_fmt="{:>9}")
+            out += write_ffrecord(values, verbose, int_fmt="{:<4d}", str_fmt="{:>9}")
 
             # Record 6
             if "species" in zone and zone["species"]:
@@ -560,7 +563,7 @@ def _write_igas(parameters, verbose):
         return out
 
     values = list(ngtypes.values())
-    out += write_ffrecord(values)
+    out += write_ffrecord(values, verbose, int_fmt="{:<4d}")
 
     for k, v in ngtypes.items():
         if not v:
@@ -569,7 +572,7 @@ def _write_igas(parameters, verbose):
         for i, zone in enumerate(parameters["zones"][k]):
             # Record 4
             values = [i + 1]
-            out += write_ffrecord(values, verbose)
+            out += write_ffrecord(values, verbose, int_fmt="{:<4d}")
 
             # Record 6
             if verbose:
@@ -629,14 +632,14 @@ def _write_zppr(parameters, verbose):
 
         # Record 6
         if verbose:
-            out += ["# ID     a-par     b-par"]
+            out += ["#        a-par     b-par"]
 
         values = [
             getval(zone, "id", 0),
             getval(zone, "a", 0.0),
             getval(zone, "b", 0.0),
         ]
-        out += write_ffrecord(values, verbose)
+        out += write_ffrecord(values, verbose, int_fmt="{:<4d}")
 
     return out
 
@@ -659,9 +662,6 @@ def _write_zads(parameters, verbose):
     values = [ndtype]
     out += write_ffrecord(values)
 
-    # Number of surface primary species
-    nsurfs = sum(specie["transport"] == 2 for specie in parameters["primary_species"])
-
     for i, zone in enumerate(parameters["zones"]["adsorption"]):
         # Record 5
         values = [
@@ -671,13 +671,7 @@ def _write_zads(parameters, verbose):
         out += write_ffrecord(values)
 
         # Record 6
-        if nsurfs:
-            if "species" not in zone:
-                raise ValueError()
-
-            elif len(zone["species"]) != nsurfs:
-                raise ValueError()
-
+        if "species" in zone and zone["species"]:
             if verbose:
                 item = max(zone["species"], key=lambda x: len(x["name"]))
                 n = max(len(item["name"]), 10)
@@ -695,7 +689,10 @@ def _write_zads(parameters, verbose):
                 tmp = write_ffrecord(values, verbose)
                 out += [f"{name} {tmp[0]}"]
 
-    return out
+        # Record 7
+        out += ["*"]
+
+    return out[:-1]
 
 
 @section("# Initial linear equilibrium Kd zones")
@@ -722,14 +719,27 @@ def _write_zlkd(parameters, verbose):
         out += write_ffrecord(values)
 
         # Record 6
-        values = [
-            getval(zone, "name", 0),
-            getval(zone, "solid_density", 0.0),
-            getval(zone, "value", 0.0),
-        ]
-        out += write_ffrecord(values)
+        if verbose:
+            item = max(zone, key=lambda x: len(x["name"]))
+            n = min(len(item["name"]), 10)
+            fmt = f"{{:{n}}}"
 
-    return out
+            out += [f"# {' ' * n} density        Kd"]
+
+        for specie in zone:
+            name = getval(specie, "name", "''")
+            name = fmt.format(name) if verbose else name
+            values = [
+                getval(specie, "solid_density", 0.0),
+                getval(specie, "value", 0.0),
+            ]
+            tmp = write_ffrecord(values, verbose)
+            out += [f"{name} {tmp[0]}"]
+
+        # Record 7
+        out += ["*"]
+
+    return out[:-1]
 
 
 @section("# Initial zones of cation exchange")
@@ -750,8 +760,11 @@ def _write_zexc(parameters, verbose):
     values = [nxtype]
     out += write_ffrecord(values)
 
+    if verbose:
+        out += ["#     capacity"]
+
     for i, zone in enumerate(parameters["zones"]["cation_exchange"]):
-        values = [i, *zone]
-        out += write_ffrecord(values)
+        values = [i + 1, *zone]
+        out += write_ffrecord(values, verbose, int_fmt="{:<4d}")
 
     return out
