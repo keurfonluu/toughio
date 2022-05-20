@@ -13,6 +13,8 @@ _writer_map = {}
 _file_formats = {
     "INFILE": "tough",
     "MESH": "tough",
+    "INCON": "tough",
+    "GENER": "tough",
     "flow.inp": "toughreact-flow",
     "solute.inp": "toughreact-solute",
     "chemical.inp": "toughreact-chemical",
