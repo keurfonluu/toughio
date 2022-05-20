@@ -47,10 +47,7 @@ def read_buffer(f):
         parameters["zones"].update(_read_imin(fiter))
         parameters["zones"].update(_read_igas(fiter))
         parameters["zones"].update(_read_zppr(fiter))
-
-        nsurfs = sum(specie["transport"] == 2 for specie in parameters["primary_species"])
-        parameters["zones"].update(_read_zads(fiter, nsurfs))
-
+        parameters["zones"].update(_read_zads(fiter))
         parameters["zones"].update(_read_zlkd(fiter))
         parameters["zones"].update(_read_zexc(fiter, nxsites))
 
@@ -678,7 +675,7 @@ def _read_zppr(f):
     return zones
 
 
-def _read_zads(f, nsurfs):
+def _read_zads(f):
     """Read surface adsorption zones."""
     zones = {"adsorption": []}
 
@@ -703,9 +700,13 @@ def _read_zads(f, nsurfs):
         }
 
         # Record 6
-        # Here, '*' does not mark the end of the list
-        for _ in range(nsurfs):
-            data = _nextsplitline(f, 3, skip_empty=True, comments="#")
+        # Not sure about the parsing, the manual states that '*' is only
+        # written once in record 7 at the end of the zone list
+        # If it's the case, it's unclear how the code knows how many
+        # records to read per zone
+        line = _nextline(f, skip_empty=True, comments="#")
+        while not line.replace("'", "").startswith("*"):
+            data = _nextsplitline(line, 3)
             tmp2 = {
                 "name": data[0],
                 "area_unit": int(data[1]),
@@ -713,11 +714,12 @@ def _read_zads(f, nsurfs):
             }
 
             tmp["species"].append(tmp2)
+            line = _nextline(f).strip()
 
         zones["adsorption"].append(tmp)
 
     # '*' is not used here to mark the end of the list. Skip it.
-    _ = f.next()
+    # _ = f.next()
 
     return zones
 
@@ -741,19 +743,29 @@ def _read_zlkd(f):
         data = _nextsplitline(f, 1, skip_empty=True, comments="#")
         # idtype = int(data[0])
 
+        tmp = []
+
         # Record 6
-        # Here, '*' does not mark the end of the list
-        data = _nextsplitline(f, 3, skip_empty=True, comments="#")
-        tmp = {
-            "name": data[0],
-            "solid_density": to_float(data[1]),
-            "value": to_float(data[2]),
-        }
+        # Not sure about the parsing, the manual states that '*' is only
+        # written once in record 7 at the end of the zone list
+        # If it's the case, it's unclear how the code knows how many
+        # records to read per zone
+        line = _nextline(f, skip_empty=True, comments="#")
+        while not line.replace("'", "").startswith("*"):
+            data = _nextsplitline(line, 3)
+            tmp2 = {
+                "name": data[0],
+                "solid_density": to_float(data[1]),
+                "value": to_float(data[2]),
+            }
+
+            tmp.append(tmp2)
+            line = _nextline(f).strip()
 
         zones["linear_kd"].append(tmp)
 
     # '*' is not used here to mark the end of the list. Skip it.
-    _ = f.next()
+    # _ = f.next()
 
     return zones
 
