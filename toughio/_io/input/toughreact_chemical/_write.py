@@ -368,7 +368,7 @@ def _write_kdde(parameters, verbose):
             getval(specie, "a", 0.0),
             getval(specie, "b", 0.0),
         ]
-        out += write_ffrecord(values, verbose, str_fmt=fmt)
+        out += write_ffrecord(values, verbose, str_fmt=fmt if verbose else None)
 
     return out
 
@@ -404,7 +404,7 @@ def _write_exch(parameters, verbose):
             getval(specie, "type", 1),
         ]
         values += [*getval(specie, "site_coeffs", [])]
-        out += write_ffrecord(values, verbose, str_fmt=fmt)
+        out += write_ffrecord(values, verbose, str_fmt=fmt if verbose else None)
 
     return out
 

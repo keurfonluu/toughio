@@ -323,9 +323,11 @@ def test_solute(verbose, mopr_10, mopr_11):
     assert allclose(parameters_ref, parameters, atol=1.0e-3)
 
 
-def test_chemical():
+@pytest.mark.parametrize("verbose", [True, False])
+def test_chemical(verbose):
     def write_read(x):
         writer_kws = {
+            "verbose": verbose,
             "file_format": "toughreact-chemical",
         }
         reader_kws = {
@@ -585,11 +587,14 @@ def test_chemical():
                 for _ in range(np.random.randint(5) + 1)
             ],
             "linear_kd": [
-                {
-                    "name": helpers.random_string(20),
-                    "solid_density": np.random.rand(),
-                    "value": np.random.rand(),
-                }
+                [
+                    {
+                        "name": helpers.random_string(20),
+                        "solid_density": np.random.rand(),
+                        "value": np.random.rand(),
+                    }
+                    for _ in range(np.random.randint(5) + 1)
+                ]
                 for _ in range(np.random.randint(5) + 1)
             ],
             "cation_exchange": [
