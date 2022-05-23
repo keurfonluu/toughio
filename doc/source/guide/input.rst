@@ -426,7 +426,6 @@ In particular, a new keyword ``"react"`` is used to define options specific to T
                 "end": list[float],
                 "aperture": float,
             },
-            "wdata": list[str],
         },
     }
 
@@ -455,10 +454,22 @@ Additional properties are available in ``"rocks"``. For a rock called ``"rock1"`
     }
 
 
+Options
+*******
+
+An additional keyword ``"react_wdata"`` can be used in ``"options"`` to write out flow data at selected elements.
+
+.. code-block::
+
+    {
+        "wdata": list[str],
+    }
+
+
 Sources and sinks
 *****************
 
-Two additional parameters can be defined for each generator to set up time-dependent thermal conductivity:
+Two additional parameters can be defined in ``"generators"`` for each generator to set up time-dependent thermal conductivity:
 
 .. code-block::
 
@@ -473,7 +484,7 @@ The two lists must have the same length.
 Initial conditions
 ******************
 
-An additional keyword ``"permeability"`` can be used to define elementwise permeability.
+An additional keyword ``"permeability"`` can be used in ``"initial_conditions"`` to define elementwise permeability.
 The permeability of an element called ``"AAA00"`` is defined as follows:
 
 .. code-block::
