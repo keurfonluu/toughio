@@ -60,7 +60,7 @@ def read_buffer(f):
 def _read_title(f):
     """Read title."""
     line = f.next(skip_empty=True, comments="#").strip()
-    
+
     return {"title": line}
 
 
@@ -77,10 +77,7 @@ def _read_prim(f):
         if len(data) < 2:
             raise ReadError()
 
-        tmp = {
-            "name": data[0],
-            "transport": int(data[1])
-        }
+        tmp = {"name": data[0], "transport": int(data[1])}
         if len(data) >= 3:
             tmp["mineral_name"] = data[2]
         if len(data) >= 4:
@@ -122,9 +119,9 @@ def _read_akin(f):
         ncp = int(data[0])
         if len(data) < 2 * ncp + 1:
             raise ReadError()
-        
-        names = data[2:2 * ncp + 2:2]
-        coeffs = data[1:2 * ncp + 1:2]
+
+        names = data[2 : 2 * ncp + 2 : 2]
+        coeffs = data[1 : 2 * ncp + 1 : 2]
         tmp = {
             "species": [
                 {
@@ -211,7 +208,7 @@ def _read_akin(f):
             }
             for i in range(ncp_rx3)
         ]
-        
+
         akin["aqueous_kinetics"].append(tmp)
 
     # '*' is not used here to mark the end of the list. Skip it.
@@ -249,7 +246,7 @@ def _read_miner(f):
 
     if line.startswith("*"):
         return {}
-    
+
     # Loop until reading character *
     while not line.startswith("*"):
         # Record 2
@@ -332,7 +329,7 @@ def _read_miner(f):
                                         "power": to_float(data[2 * i + 4]),
                                     }
                                     for i in range(nspds)
-                                ]
+                                ],
                             }
                         )
 
@@ -582,7 +579,7 @@ def _read_imin(f):
             # Record 6.1
             if tmp2["flag"] == 1:
                 data = _nextsplitline(f, 3)
-                
+
                 tmp2["radius"] = to_float(data[0])
                 tmp2["area_ini"] = to_float(data[1])
                 tmp2["area_unit"] = int(data[2])
@@ -801,7 +798,7 @@ def _read_zexc(f, nxsites):
 def _nextline(f, remove_quotes=True, **kwargs):
     """
     Go to next line.
-    
+
     Note
     ----
     Remove trailing Fortran comments.
@@ -813,10 +810,10 @@ def _nextline(f, remove_quotes=True, **kwargs):
     # Remove quotes
     if remove_quotes:
         line = line.replace("'", "")
-    
+
     # Remove Fortran comments
     if "!" in line:
-        line = line[:line.index("!")]
+        line = line[: line.index("!")]
 
     return line
 

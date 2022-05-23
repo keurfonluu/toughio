@@ -266,11 +266,15 @@ def _read_rocks(f, simulator="tough"):
                 if simulator == "toughreact" and nad >= 4:
                     line = f.next()
                     if line.strip():
-                        rocks["rocks"][rock]["react_tp"] = read_model_record(line, fmt[3])
+                        rocks["rocks"][rock]["react_tp"] = read_model_record(
+                            line, fmt[3]
+                        )
 
                     line = f.next()
                     if line.strip():
-                        rocks["rocks"][rock]["react_hcplaw"] = read_model_record(line, fmt[4])
+                        rocks["rocks"][rock]["react_hcplaw"] = read_model_record(
+                            line, fmt[4]
+                        )
 
                 rocks["rocks"][rock].update(_read_rpcap(f))
 
@@ -741,7 +745,9 @@ def _read_gener(f, label_length, simulator="tough"):
             if ltab and ltab > 1 and tmp["type"] != "DELV":
                 itab = data[8]
                 keys = ["times", "rates"]
-                keys += ["specific_enthalpy"] if itab else []  # Specific enthalpy must be provided for time dependent injection
+                keys += (
+                    ["specific_enthalpy"] if itab else []
+                )  # Specific enthalpy must be provided for time dependent injection
                 for key in keys:
                     tmp[key] = read_table(f, ltab, fmt[0])
 
@@ -976,7 +982,9 @@ def _read_incon(f, label_length, eos=None, simulator="tough"):
 
             if simulator == "toughreact":
                 permeability = data[4] if len(set(data[4:7])) == 1 else data[4:7]
-                incon["initial_conditions"][label]["permeability"] = permeability if permeability else None
+                incon["initial_conditions"][label]["permeability"] = (
+                    permeability if permeability else None
+                )
 
             elif eos == "tmvoc":
                 incon["initial_conditions"][label]["phase_composition"] = data[4]

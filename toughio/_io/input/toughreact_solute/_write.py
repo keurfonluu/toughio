@@ -1,5 +1,5 @@
-from .._common import getval, write_ffrecord
 from ...._common import open_file
+from .._common import getval, write_ffrecord
 
 __all__ = [
     "write",
@@ -44,8 +44,12 @@ def write_buffer(parameters, mopr_10=0, mopr_11=0, verbose=True):
     out += _write_indices_names(parameters, "components", numbers["NWCOM"], verbose)
     out += _write_indices_names(parameters, "minerals", numbers["NWMIN"], verbose)
     out += _write_indices_names(parameters, "aqueous_species", numbers["NWAQ"], verbose)
-    out += _write_indices_names(parameters, "surface_complexes", numbers["NWADS"], verbose)
-    out += _write_indices_names(parameters, "exchange_species", numbers["NWEXC"], verbose)
+    out += _write_indices_names(
+        parameters, "surface_complexes", numbers["NWADS"], verbose
+    )
+    out += _write_indices_names(
+        parameters, "exchange_species", numbers["NWEXC"], verbose
+    )
     out += _write_default(parameters, verbose, mopr_11)
     out += _write_zones(parameters, verbose, mopr_11)
     out += _write_convergence_bounds(parameters, verbose, mopr_10)
@@ -114,7 +118,11 @@ def _write_options(parameters, verbose):
         0,
     ]
 
-    out += ["# ISPIA ITERSFA  ISOLVC   NGAMM   NGAS1 ICHDUMP    KCPL ICO2H2O iTDS_REACT"] if verbose else []
+    out += (
+        ["# ISPIA ITERSFA  ISOLVC   NGAMM   NGAS1 ICHDUMP    KCPL ICO2H2O iTDS_REACT"]
+        if verbose
+        else []
+    )
     fmt = ["{:7d}"] * 8 + ["{:10d}"]
     out += write_ffrecord(values, verbose, fmt)
 
@@ -175,7 +183,11 @@ def _write_weights_coefficients(parameters, verbose):
 
 def _write_convergence(parameters, verbose):
     """Write convergence criterion."""
-    out = ["# MAXITPTR     TOLTR  MAXITPCH     TOLCH     TOLMB     TOLDC     TOLDR"] if verbose else []
+    out = (
+        ["# MAXITPTR     TOLTR  MAXITPCH     TOLCH     TOLMB     TOLDC     TOLDR"]
+        if verbose
+        else []
+    )
     values = [
         getval(parameters, ("options", "n_iteration_tr"), 0),
         getval(parameters, ("options", "eps_tr"), 0.0),
@@ -193,7 +205,11 @@ def _write_convergence(parameters, verbose):
 
 def _write_output(parameters, numbers, verbose):
     """Write output control variables."""
-    out = ["#  NWTI  NWNOD  NWCOM  NWMIN   NWAQ  NWADS  NWEXC   ICON    MIN   IGAS"] if verbose else []
+    out = (
+        ["#  NWTI  NWNOD  NWCOM  NWMIN   NWAQ  NWADS  NWEXC   ICON    MIN   IGAS"]
+        if verbose
+        else []
+    )
     values = [
         getval(parameters, ("options", "n_cycle_print"), 0),
         numbers["NWNOD"],
@@ -220,7 +236,7 @@ def _write_elements(parameters, n, verbose):
         out += [""]
 
         return out
-    
+
     out += [f"{x[:5]}" for x in getval(parameters, ("output", "elements"), [])]
     out += [""]
 
@@ -240,7 +256,7 @@ def _write_indices_names(parameters, key, n, verbose):
         out += [f"{' '.join(str(x) for x in getval(parameters, ('output', key), []))}"]
 
     else:
-        out += [f"{x[:20]}" for x in getval(parameters, ('output', key), [])]
+        out += [f"{x[:20]}" for x in getval(parameters, ("output", key), [])]
         out += [""]
 
     return out
@@ -248,7 +264,11 @@ def _write_indices_names(parameters, key, n, verbose):
 
 def _write_default(parameters, verbose, mopr_11=0):
     """Write default chemical property zones."""
-    out = [f"#IZIWDF IZBWDF IZMIDF IZGSDF IZADDF IZEXDF IZPPDF IZKDDF IZBGDF"] if verbose else []
+    out = (
+        [f"#IZIWDF IZBWDF IZMIDF IZGSDF IZADDF IZEXDF IZPPDF IZKDDF IZBGDF"]
+        if verbose
+        else []
+    )
     values = [
         getval(parameters, ("default", "initial_water"), 0),
         getval(parameters, ("default", "injection_water"), 0),
@@ -275,13 +295,17 @@ def _write_default(parameters, verbose, mopr_11=0):
 
 def _write_zones(parameters, verbose, mopr_11=0):
     """Write chemical property zones."""
-    out = ["#ELEM NSEQ NADD IZIW IZBW IZMI IZGS IZAD IZEX IZPP IZKD IZBG"] if verbose else []
-    
+    out = (
+        ["#ELEM NSEQ NADD IZIW IZBW IZMI IZGS IZAD IZEX IZPP IZKD IZBG"]
+        if verbose
+        else []
+    )
+
     if "zones" not in parameters or not parameters["zones"]:
         out += [""]
 
         return out
-    
+
     # Do not use items() for better warning logging in function getval
     for zone in parameters["zones"]:
         values = [
@@ -304,7 +328,9 @@ def _write_zones(parameters, verbose, mopr_11=0):
                 values += [parameters["zones"][zone]["element"]]
 
         else:
-            values += [getval(parameters, ("zones", zone, "sedimentation_velocity"), 0.0)]
+            values += [
+                getval(parameters, ("zones", zone, "sedimentation_velocity"), 0.0)
+            ]
 
         out += write_ffrecord(values, verbose, int_fmt="{:4d}", float_fmt="{{:9f}}")
 
@@ -342,11 +368,15 @@ def _write_convergence_bounds(parameters, verbose, mopr_10=0):
         getval(parameters, ("options", "t_reduce_factor_3"), 0.5),
     ]
 
-    out += ["#  DTINCR1   DTINCR2   DTINCR3   DTDECR1   DTDECR2   DTDECR3"] if verbose else []
+    out += (
+        ["#  DTINCR1   DTINCR2   DTINCR3   DTDECR1   DTDECR2   DTDECR3"]
+        if verbose
+        else []
+    )
     out += write_ffrecord(values, verbose, float_fmt="{{:9f}}")
 
     return out
-        
+
 
 comments = {
     "nodes": "Nodes",

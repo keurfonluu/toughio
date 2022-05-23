@@ -1,7 +1,7 @@
 from ...._common import open_file
 from ...._exceptions import ReadError
 from ...._helpers import FileIterator
-from ..._common import read_record, prune_nones_list, to_float
+from ..._common import prune_nones_list, read_record, to_float
 
 __all__ = [
     "read",
@@ -69,7 +69,7 @@ def read_buffer(f, mopr_11=0):
 
         parameters.update(_read_default(fiter, mopr_11))
         parameters.update(_read_zones(fiter, mopr_11))
-        
+
         convergence_bounds = _read_convergence_bounds(fiter)
         if convergence_bounds:
             parameters["options"].update(convergence_bounds)
@@ -83,7 +83,7 @@ def read_buffer(f, mopr_11=0):
 def _read_title(f):
     """Read title."""
     line = f.next(skip_empty=True, comments="#").strip()
-    
+
     return {"title": line}
 
 
@@ -357,14 +357,16 @@ def _read_convergence_bounds(f):
     if len(data) < 6:
         raise ReadError()
 
-    options.update({
-        "t_increase_factor_1": data[0],
-        "t_increase_factor_2": data[1],
-        "t_increase_factor_3": data[2],
-        "t_reduce_factor_1": data[3],
-        "t_reduce_factor_2": data[4],
-        "t_reduce_factor_3": data[5],
-    })
+    options.update(
+        {
+            "t_increase_factor_1": data[0],
+            "t_increase_factor_2": data[1],
+            "t_increase_factor_3": data[2],
+            "t_reduce_factor_1": data[3],
+            "t_reduce_factor_2": data[4],
+            "t_reduce_factor_3": data[5],
+        }
+    )
 
     return options
 

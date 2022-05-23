@@ -15,7 +15,9 @@ __all__ = [
 ]
 
 
-def write(filename, parameters, block=None, ignore_blocks=None, eos=None, simulator="tough"):
+def write(
+    filename, parameters, block=None, ignore_blocks=None, eos=None, simulator="tough"
+):
     """
     Write TOUGH input file.
 
@@ -216,7 +218,9 @@ def write_buffer(params, block, ignore_blocks=None, eos_=None, simulator="tough"
 
     # TOUGHREACT related flags
     react = "options" in parameters["react"] and parameters["react"]["options"]
-    outpt = "output" in parameters["react"] and "format" in parameters["react"]["output"]
+    outpt = (
+        "output" in parameters["react"] and "format" in parameters["react"]["output"]
+    )
     poise = "poiseuille" in parameters["react"] and parameters["react"]["poiseuille"]
 
     # Check that start is True if indom is True
@@ -1055,7 +1059,10 @@ def _write_gener(parameters, simulator="tough"):
 
         # TOUGHREACT
         ktab = None
-        if data["conductivity_times"] is not None and data["conductivity_factors"] is not None:
+        if (
+            data["conductivity_times"] is not None
+            and data["conductivity_factors"] is not None
+        ):
             ktab = len(data["conductivity_times"])
 
             if len(data["conductivity_factors"]) != ktab:

@@ -6,7 +6,7 @@ from functools import wraps
 
 import numpy as np
 
-from ..._common import read_record, write_record, prune_nones_list
+from ..._common import prune_nones_list, read_record, write_record
 
 dtypes = {
     "PARAMETERS": {

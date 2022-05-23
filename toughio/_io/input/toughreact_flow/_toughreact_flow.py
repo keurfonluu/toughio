@@ -44,4 +44,6 @@ def write(filename, parameters, block=None, ignore_blocks=None, eos=None):
         Equation of State. If `eos` is defined in `parameters`, this option will be ignored.
 
     """
-    return tough.write(filename, parameters, block, ignore_blocks, eos, simulator="toughreact")
+    return tough.write(
+        filename, parameters, block, ignore_blocks, eos, simulator="toughreact"
+    )
