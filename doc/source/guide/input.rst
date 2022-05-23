@@ -67,7 +67,7 @@ A TOUGH input file is defined as follows:
         "diffusion": list[list],
         "chemical_properties": dict,
         "non_condensible_gas": list[str],
-        "times": list[int],
+        "times": list[float],
         "element_history": list[str],
         "connection_history": list[str],
         "generator_history": list[str],
@@ -79,6 +79,282 @@ A TOUGH input file is defined as follows:
         "start": bool,
         "nover": bool,
     }
+
+The equation-of-state (EOS, block MULTI) is defined by the keyword ``"eos"`` which accepts any of these values:
+
+ - ``"eos1"``
+ - ``"eos2"``
+ - ``"eos3"``
+ - ``"eos4"``
+ - ``"eos5"``
+ - ``"eos7"``
+ - ``"eos8"``
+ - ``"eos9"``
+ - ``"ewasg"``
+ - ``"eco2n"``
+ - ``"eco2n_v2"``
+ - ``"eco2m"``
+ - ``"tmvoc"``
+
+:func:`toughio.write_input` will use the default EOS parameters (i.e., number of components and phases).
+Alternatively, the number of components and phases can be set individually by the keywords ``"n_component"`` and ``"n_phase"``, respectively. These keywords supersede the values set by ``"eos"``.
+Isothermal simulations can be carried out by setting ``"isothermal"`` to ``True``. In that case, the number of equations is equal to the number of components.
+
+
+Rock properties
+***************
+
+Rock properties (block ROCKS) are defined using the keyword ``"rocks"`` as a dictionary where keys refer to the names of the rocks and the values to their properties.
+Domainwise initial conditions (block INDOM) can also be defined by providing the keyword ``"initial_condition"``.
+For instance, for a rock called ``"rock1"``, its properties are defined as follows:
+
+.. code-block::
+
+    "rock1": {
+        "density": float,
+        "porosity": float,
+        "permeability": float, list[float],
+        "conductivity": float,
+        "specific_heat": float,
+        "compressibility": float,
+        "expansivity": float,
+        "conductivity_dry": float,
+        "tortuosity": float,
+        "klinkenberg_parameter": float,
+        "distribution_coefficient_3": float,
+        "distribution_coefficient_4": float,
+        "initial_condition": list[float],
+        "relative_permeability": {
+            "id": int,
+            "parameters": list[float],
+        },
+        "capillarity": {
+            "id": int,
+            "parameters": list[float],
+        },
+    }
+
+Default rock parameters can be set using the keyword ``"default"``. In that case, the default rock properties are used if they are not defined for a given rock.
+Default relative permeability and capillary pressure models (block RPCAP) can also be defined in ``"default"`` using the keywords ``"relative_permeability"`` and ``"capillarity"``, respectively.
+Note that the default initial conditions for all grid blocks correspond to the last record of block PARAM.
+
+
+Options
+*******
+
+Computational parameters are simply defined in ``"options"`` as a dictionary organized as follows:
+
+.. code-block::
+
+    {
+        "n_iteration": int,
+        "n_cycle": int,
+        "n_second": int,
+        "n_cycle_print": int,
+        "verbosity": int,
+        "temperature_dependence_gas": float,
+        "effective_strength_vapor": float,
+        "t_ini": float,
+        "t_max": float,
+        "t_steps": float, list[float],
+        "t_step_max": float,
+        "t_reduce_factor": float,
+        "gravity": "float",
+        "mesh_scale_factor": "float",
+        "eps1": "float",
+        "eps2": "float",
+        "w_upstream": "float",
+        "w_newton": "float",
+        "derivative_factor": "float",
+    }
+
+Additional options can be defined in ``"extra_options"`` (MOP) and ``"more_options"`` (block MOMOP) as dictionaries as well:
+
+.. code-block::
+
+    {
+        1: int,
+        2: int,
+        ...
+        N: int,
+    }
+
+where ``N`` denotes the maximum number of additional options in either ``"extra_options"`` or ``"more_options"``.
+
+For some EOS, the keyword ``"selections"`` can be used to define integer and floating point options specific to an EOS:
+
+.. code-block::
+
+    {
+        "integers": dict,
+        "floats": list[float],
+    }
+
+where ``"integers"`` is defined as above (with ``N = 16``).
+
+
+Sources and sinks
+*****************
+
+Sources and sinks (generators, block GENER) are defined in ``"generators"`` as a list of dictionaries repeated for each generator. A generator is defined as follows:
+
+.. code-block::
+
+    {
+        "label": str,
+        "name": str,
+        "nseq": int,
+        "nadd": int,
+        "nads": int,
+        "type": str,
+        "times": list[float],
+        "rates": float, list[float],
+        "specific_enthalpy": float, list[float],
+        "layer_thickness": float,
+        "n_layer": int,
+    }
+
+If ``"times"`` is provided, ``"rates"`` and ``"specific_enthalpy"`` must be provided as well as lists of equal length.
+
+
+Diffusion
+*********
+
+Diffusion is enabled when the keyword ``"diffusion"`` is defined as an array (i.e., list of lists) of shape ``(n_component, n_phase)``.
+In that case, the number of secondary parameters in block MULTI is automatically set to 8 (6 otherwise).
+
+
+History
+*******
+
+Outputs can be generated at specific time steps in ``"times"`` (block TIMES) defined as a list where each value corresponds to a time step at which an output is desired.
+Time-dependent outputs at specific element, connection or generator can be requested in ``"element_history"``, ``"connection_history"`` and ``"generator_history"`` as a list where each value is the label associated to the desired elements/connections.
+
+
+Output
+******
+
+For TOUGH3/iTOUGH2, outputs can be customized in ``"output"`` (block OUTPU):
+
+.. code-block::
+
+    {
+        "format": str,
+        "variables": list[dict],
+    }
+
+where the desired variables to output are defined a list of dictionaries repeated for each variable. An output variable is defined as follows:
+
+.. code-block::
+
+    {
+        "name": str,
+        "options": int, list[int],
+    }
+
+
+Elements
+********
+
+Elements (block ELEME) are defined by keyword ``"elements"`` as a dictionary where keys refer to the labels of the elements and the values to their parameters.
+For instance, for an element called ``"AAA00"``, its parameters are defined as follows:
+
+.. code-block::
+
+    "AAA00": {
+        "nseq": int,
+        "nadd": int,
+        "material": str, int,
+        "volume": float,
+        "heat_exchange_area": float,
+        "permeability_modifier": float,
+        "center": list[float],
+    }
+
+
+Connections
+***********
+
+Connections (block CONNE) are defined by keyword ``"connections"`` as a dictionary where keys refer to the labels of the connections and the values to their parameters.
+For instance, for a connection called ``"AAA00AAA01"``, its parameters are defined as follows:
+
+.. code-block::
+
+    "AAA00AAA01": {
+        "nseq": int,
+        "nadd": int,
+        "permeability_direction": int,
+        "nodal_distances": list[float],
+        "interface_area": float,
+        "gravity_cosine_angle": float,
+        "radiant_emittance_factor": float,
+    }
+
+
+Initial conditions
+******************
+
+Elementwise initial conditions (block INCON) are defined by keyword ``"initial_conditions"`` as a dictionary where keys refer to the labels of the elements and the values to their parameters.
+For instance, for an element called ``"AAA00"``, its initial conditions are defined as follows:
+
+.. code-block::
+
+    "AAA00": {
+        "porosity": float,
+        "userx": list[float],
+        "values": list[float],
+    }
+
+
+Meshmaker
+*********
+
+Meshmaker parameters (block MESHM) are simply defined in ``"meshmaker"`` as a dictionary:
+
+.. code-block::
+
+    {
+        "type": str,
+        "parameters": list[dict],
+        "angle": float,
+    }
+
+The keyword ``"type"`` denotes the type of mesh to generate. The following values are accepted:
+
+ - ``"xyz"``
+ - ``"rz2d"``
+ - ``"rz2dl"``
+
+If ``"type"`` is set to ``"xyz"``, each dictionary in ``"parameters"`` is defined as follows:
+
+.. code-block::
+
+    {
+        "type": str,
+        "n_increment": int,
+        "sizes": float, list[float],
+    }
+
+Otherwise, for ``"rz2d"`` and ``"rz2dl"``:
+
+.. code-block::
+
+    {
+        "type": str,
+        "radii": list[float],
+        "n_increment": int,
+        "size": float,
+        "radius": float,
+        "radius_ref": float,
+        "thicknesses": list[float],
+    }
+
+The keyword ``"type"`` denotes here the type of increments to generate. The following values are accepted:
+
+ - ``"radii"``: keyword ``"radii"`` is required
+ - ``"equid"``: keywords ``"n_increment"`` and ``"size"`` are required
+ - ``"logar"``: keywords ``"n_increment"`` and ``"radius"`` are required, ``"radius_ref"`` is optional
+ - ``"layer"``: keyword ``"thicknesses"`` is required
 
 
 TOUGHREACT (flow.inp)
