@@ -9,6 +9,14 @@ toughio's documentation
    :hidden:
    :caption: Getting started
 
+   guide/index
+
+
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: Examples
+
    gallery/index
 
 
