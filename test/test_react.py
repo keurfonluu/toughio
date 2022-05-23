@@ -133,7 +133,9 @@ def test_flow():
             },
         },
         "options": {
-            "react_wdata": [helpers.random_string(5) for _ in range(np.random.randint(10) + 1)],
+            "react_wdata": [
+                helpers.random_string(5) for _ in range(np.random.randint(10) + 1)
+            ],
         },
         "initial_conditions": {
             helpers.random_string(5): {
@@ -256,12 +258,20 @@ def test_solute(verbose, mopr_10, mopr_11):
             "time_output": helpers.random_string(20),
         },
         "output": {
-            "elements": [helpers.random_string(5) for _ in range(np.random.randint(10) + 1)],
-            "components": [helpers.random_string(20) for _ in range(np.random.randint(10) + 1)],
+            "elements": [
+                helpers.random_string(5) for _ in range(np.random.randint(10) + 1)
+            ],
+            "components": [
+                helpers.random_string(20) for _ in range(np.random.randint(10) + 1)
+            ],
             "minerals": np.random.randint(10, size=np.random.randint(10) + 1),
-            "aqueous_species": [helpers.random_string(20) for _ in range(np.random.randint(10) + 1)],
+            "aqueous_species": [
+                helpers.random_string(20) for _ in range(np.random.randint(10) + 1)
+            ],
             "surface_complexes": np.random.randint(10, size=np.random.randint(10) + 1),
-            "exchange_species": [helpers.random_string(20) for _ in range(np.random.randint(10) + 1)],
+            "exchange_species": [
+                helpers.random_string(20) for _ in range(np.random.randint(10) + 1)
+            ],
         },
         "default": {
             "initial_water": np.random.randint(10),
@@ -399,8 +409,7 @@ def test_chemical(verbose):
             for _ in range(2)
         ],
         "aqueous_species": [
-            helpers.random_string(20)
-            for _ in range(np.random.randint(5) + 1)
+            helpers.random_string(20) for _ in range(np.random.randint(5) + 1)
         ],
         "minerals": [
             {
@@ -511,8 +520,7 @@ def test_chemical(verbose):
             for _ in range(np.random.randint(5) + 1)
         ],
         "surface_complexes": [
-            helpers.random_string(20)
-            for _ in range(np.random.randint(5) + 1)
+            helpers.random_string(20) for _ in range(np.random.randint(5) + 1)
         ],
         "kd_decay": [
             {
@@ -598,8 +606,7 @@ def test_chemical(verbose):
                 for _ in range(np.random.randint(5) + 1)
             ],
             "cation_exchange": [
-                np.random.rand(5)
-                for _ in range(np.random.randint(5) + 1)
+                np.random.rand(5) for _ in range(np.random.randint(5) + 1)
             ],
         },
     }

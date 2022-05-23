@@ -1,6 +1,6 @@
-from ._helpers import section
-from .._common import getval, write_ffrecord
 from ...._common import open_file
+from .._common import getval, write_ffrecord
+from ._helpers import section
 
 __all__ = [
     "write",
@@ -100,7 +100,7 @@ def _write_akin(parameters, verbose):
 
     # Record 2
     out += [f"{len(parameters['aqueous_kinetics'])}"]
-    
+
     for i, kinetic in enumerate(parameters["aqueous_kinetics"]):
         # Record 3
         out += [f"{i + 1}"]
@@ -264,7 +264,7 @@ def _write_miner(parameters, verbose):
                         getval(mineral, (key, "volume_fraction_ini"), 0.0),
                         getval(mineral, (key, "id"), 0),
                     ]
-                
+
                 out += write_ffrecord(values)
 
                 # Record 2.1.1
@@ -276,10 +276,14 @@ def _write_miner(parameters, verbose):
                         getval(mineral, (key, "slope2"), 0.0),
                     ]
                     out += write_ffrecord(values)
-                
+
                 # Record 2.1.2
                 elif idep == 2:
-                    ndis = len(mineral[key]["extra_mechanisms"]) if "extra_mechanisms" in mineral[key] else 0
+                    ndis = (
+                        len(mineral[key]["extra_mechanisms"])
+                        if "extra_mechanisms" in mineral[key]
+                        else 0
+                    )
                     values = [ndis]
                     out += write_ffrecord(values)
 
@@ -465,7 +469,9 @@ def _write_water(parameters, verbose):
                     except KeyError:
                         fmt2 = "{:>10}"
 
-                    out += [f"# {' ' * (n - 2)} icon     guess      ctot {fmt2.format('constraint')}  log(Q/K)"]
+                    out += [
+                        f"# {' ' * (n - 2)} icon     guess      ctot {fmt2.format('constraint')}  log(Q/K)"
+                    ]
 
                 for specie in zone["species"]:
                     name = getval(specie, "name", "''")
@@ -478,7 +484,9 @@ def _write_water(parameters, verbose):
                         nameq,  # nameq is optional
                         getval(specie, "log_fugacity", 0.0),
                     ]
-                    tmp = write_ffrecord(values, verbose, str_fmt=fmt2 if verbose else None)
+                    tmp = write_ffrecord(
+                        values, verbose, str_fmt=fmt2 if verbose else None
+                    )
                     out += [f"{name} {tmp[0]}"]
 
             # Record 7
@@ -536,7 +544,7 @@ def _write_imin(parameters, verbose):
                     ]
                     out += write_ffrecord(values, verbose)
                     out[-1] = out[-1].lstrip()
-                
+
         # Record 7
         out += ["*"]
 
@@ -645,7 +653,7 @@ def _write_zppr(parameters, verbose):
 
 
 @section("# Initial surface adsorption zones")
-def _write_zads(parameters, verbose): 
+def _write_zads(parameters, verbose):
     """Write surface adsorption zones."""
     out = []
 

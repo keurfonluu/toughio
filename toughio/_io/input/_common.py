@@ -27,7 +27,14 @@ def getval(parameters, keys, default):
         return default
 
 
-def write_ffrecord(values, verbose=False, fmt=None, int_fmt="{:4d}", float_fmt="{{:9f}}", str_fmt="{:20}"):
+def write_ffrecord(
+    values,
+    verbose=False,
+    fmt=None,
+    int_fmt="{:4d}",
+    float_fmt="{{:9f}}",
+    str_fmt="{:20}",
+):
     """Write free-format record."""
     if verbose:
         if fmt:
@@ -35,7 +42,9 @@ def write_ffrecord(values, verbose=False, fmt=None, int_fmt="{:4d}", float_fmt="
             return [f"{' '.join(values)}"]
 
         else:
-            return [f"{' '.join(to_str(value, int_fmt if isinstance(value, int) else float_fmt if isinstance(value, float) else str_fmt) for value in values)}"]
+            return [
+                f"{' '.join(to_str(value, int_fmt if isinstance(value, int) else float_fmt if isinstance(value, float) else str_fmt) for value in values)}"
+            ]
 
     else:
         return [f"{' '.join(str(x) for x in values)}"]

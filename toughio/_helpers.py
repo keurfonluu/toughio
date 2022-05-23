@@ -36,7 +36,7 @@ class FileIterator:
 
                 if not line.startswith(comments):
                     return line
-        
+
         else:
             return self.__next__()
 
