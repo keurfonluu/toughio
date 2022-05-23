@@ -65,8 +65,6 @@ A TOUGH input file is defined as follows:
         "selections": dict,
         "generators": list[dict],
         "diffusion": list[list],
-        "chemical_properties": dict,
-        "non_condensible_gas": list[str],
         "times": list[float],
         "element_history": list[str],
         "connection_history": list[str],
@@ -76,6 +74,8 @@ A TOUGH input file is defined as follows:
         "connections": dict,
         "initial_conditions": dict,
         "meshmaker": dict,
+        "chemical_properties": dict,
+        "non_condensible_gas": list[str],
         "start": bool,
         "nover": bool,
     }
@@ -196,7 +196,8 @@ where ``"integers"`` is defined as above (with ``N = 16``).
 Sources and sinks
 *****************
 
-Sources and sinks (generators, block GENER) are defined in ``"generators"`` as a list of dictionaries repeated for each generator. A generator is defined as follows:
+Sources and sinks (generators, block GENER) are defined in ``"generators"`` as a list of dictionaries repeated for each generator.
+A generator is defined as follows:
 
 .. code-block::
 
@@ -357,26 +358,277 @@ The keyword ``"type"`` denotes here the type of increments to generate. The foll
  - ``"layer"``: keyword ``"thicknesses"`` is required
 
 
+TMVOC
+*****
+
+Two additional keywords can be set to define parameters specific to TMVOC.
+
+Chemical properties (block CHEMP) are defined using the keyword ``"chemical_properties"`` as a dictionary where keys refer to the names of the chemical species and the values to their properties.
+For instance, for a chemical specie called ``"my_chemical"``, its properties are defined as follows:
+
+.. code-block::
+
+    "my_chemical": {
+        "temperature_crit": float,
+        "pressure_crit": float,
+        "compressibility_crit": float,
+        "pitzer_factor": float,
+        "dipole_moment": float,
+        "boiling_point": float,
+        "vapor_pressure_a": float,
+        "vapor_pressure_b": float,
+        "vapor_pressure_c": float,
+        "vapor_pressure_d": float,
+        "molecular_weight": float,
+        "heat_capacity_a": float,
+        "heat_capacity_b": float,
+        "heat_capacity_c": float,
+        "heat_capacity_d": float,
+        "napl_density_ref": float,
+        "napl_temperature_ref": float,
+        "gas_diffusivity_ref": float,
+        "gas_temperature_ref": float,
+        "exponent": float,
+        "napl_viscosity_a": float,
+        "napl_viscosity_b": float,
+        "napl_viscosity_c": float,
+        "napl_viscosity_d": float,
+        "volume_crit": float,
+        "solubility_a": float,
+        "solubility_b": float,
+        "solubility_c": float,
+        "solubility_d": float,
+        "oc_coeff": float,
+        "oc_fraction": float,
+        "oc_decay": float,
+    }
+
+Non-condensible gases (block NCGAS) can be listed using keyword ``"non_condensible_gas"`` as a list where each value is the name of a non-condensible gas.
+
+
 TOUGHREACT (flow.inp)
 ---------------------
 
-TOUGHREACT flow input file is similar to TOUGH main input file but with the following additional parameters:
+TOUGHREACT flow input file is similar to TOUGH main input file but with additional keywords.
+In particular, a new keyword ``"react"`` is used to define options specific to TOUGHREACT.
 
 .. code-block::
 
     {
+        "react": {
+            "options": dict,
+            "output": {
+                "format": int,
+                "shape": list[int],
+            },
+            "poiseuille": {
+                "start": list[float],
+                "end": list[float],
+                "aperture": float,
+            },
+            "wdata": list[str],
+        },
+    }
 
+where ``"options"`` represents the block REACT and is comparable to ``"more_options"`` (i.e., dictionary with integers as keys).
+Note that ``"output"`` and ``"poiseuille"`` represent the blocks OUTPT and POISE, while ``"wdata"`` is written in block PARAM.
+
+
+Rock properties
+****************
+
+Additional properties are available in ``"rocks"``. For a rock called ``"rock1"``, the new properties are defined as follows:
+
+.. code-block::
+
+    "rock1": {
+        "porosity_crit": float,
+        "tortuosity_exponent": float,
+        "react_tp": {
+            "id": int,
+            "parameters": list[float],
+        },
+        "react_hcplaw": {
+            "id": int,
+            "parameters": list[float],
+        },
+    }
+
+
+Sources and sinks
+*****************
+
+Two additional parameters can be defined for each generator to set up time-dependent thermal conductivity:
+
+.. code-block::
+
+    {
+        "conductivity_times": list[float],
+        "conductivity_factors": list[float],
+    }
+
+The two lists must have the same length.
+
+
+Initial conditions
+******************
+
+An additional keyword ``"permeability"`` can be used to define elementwise permeability.
+The permeability of an element called ``"AAA00"`` is defined as follows:
+
+.. code-block::
+
+    "AAA00": {
+        "permeability": list[float],
     }
 
 
 TOUGHREACT (solute.inp)
 -----------------------
 
+A TOUGHREACT solute input file is defined as follows:
+
 .. code-block::
 
     {
         "title": str,
+        "options": dict,
+        "flags": dict,
+        "files": dict,
+        "output": dict,
+        "default": dict,
+        "zones": dict,
     }
+
+The functions :func:`toughio.read_input` and :func:`toughio.write_input` require ``MOPR(10)`` and ``MOPR(11)`` (defined in flow.inp) to correctly parse the file.
+
+
+Options
+*******
+
+Options are simply defined in ``"options"`` as a dictionary organized as follows:
+
+.. code-block::
+
+    {
+        "sl_min": float,
+        "rcour": float,
+        "ionic_strength_max": float,
+        "mineral_gas_factor": float,
+        "w_time": float,
+        "w_upstream": float,
+        "aqueous_diffusion_coefficient": float,
+        "molecular_diffusion_coefficient": float,
+        "n_iteration_tr": int,
+        "eps_tr": float,
+        "n_iteration_ch": int,
+        "eps_ch": float,
+        "eps_mb": float,
+        "eps_dc": float,
+        "eps_dr": float,
+        "n_cycle_print": int,
+    }
+
+If ``MOPR(10) == 2``, additional keywords can be set to define convergence bounds:
+
+.. code-block::
+
+    {
+        "n_iteration_1": int,
+        "n_iteration_2": int,
+        "n_iteration_3": int,
+        "n_iteration_4": int,
+        "t_increase_factor_1": float,
+        "t_increase_factor_2": float,
+        "t_increase_factor_3": float,
+        "t_reduce_factor_1": float,
+        "t_reduce_factor_2": float,
+        "t_reduce_factor_3": float,
+    }
+
+
+Flags
+*****
+
+Flag options (i.e., chosen among a finite number of integer values) are defined using the keyword ``"flags"`` as a dictionary:
+
+.. code-block::
+
+    {
+        "iteration_scheme": int,
+        "reactive_surface_area": int,
+        "solver": int,
+        "n_subiteration": int,
+        "gas_transport": int,
+        "verbosity": int,
+        "feedback": int,
+        "coupling": int,
+        "aqueous_concentration_unit": int,
+        "mineral_unit": int,
+        "gas_concentration_unit": int,
+    }
+
+
+Files
+*****
+
+Simulation input and output files are defined in ``"files"`` as a dictionary organized as follows:
+
+.. code-block::
+
+    {
+        "thermodynamic_input": str,
+        "iteration_output": str,
+        "plot_output": str,
+        "solid_output": str,
+        "gas_output": str,
+        "time_output": str,
+    }
+
+
+Output
+******
+
+The list of names or indices of the chemical species for which to output results can be provided using keyword ``"output"`` as a dictionary:
+
+.. code-block::
+
+    {
+        "elements": list[str], list[int],
+        "components": list[str], list[int],
+        "minerals": list[str], list[int],
+        "aqueous_species": list[str], list[int],
+        "surface_complexes": list[str], list[int],
+        "exchange_species": list[str], list[int],
+    }
+
+
+Zones
+*****
+
+Indices of chemical property zones are defined using the keyword ``"zones"`` as a dictionary where keys refer to the labels of the elements and the values to the zone indices associated.
+For instance, for an element called ``"AAA00"``, its indices are defined as follows:
+
+.. code-block::
+
+    "AAA00": {
+        "initial_water": int,
+        "injection_water": int,
+        "mineral": int,
+        "initial_gas": int,
+        "adsorption": int,
+        "cation_exchange": int,
+        "permeability_porosity": int,
+        "linear_kd": int,
+        "injection_gas": int,
+        "element": int,  # Optional
+        "sedimentation_velocity": float,
+    }
+
+If ``MOPR(11) == 2``, keyword ``"element"`` can be optionally used to set the water composition of this element to be recirculated as an injection water into the element specified by ``"injection_water"``.
+If ``MOPR(11) == 1``, keyword ``"sedimentation_velocity"`` must be set.
+
+Default zone indices are defined in a similar dictionary in ``"default"``.
 
 
 TOUGHREACT (chemical.inp)
