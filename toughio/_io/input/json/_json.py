@@ -35,6 +35,9 @@ def read(filename):
     with open_file(filename, "r") as f:
         parameters = json.load(f)
 
+    if "react" in parameters.keys() and "options" in parameters["react"].keys():
+        parameters["react"]["options"] = to_int(parameters["react"]["options"])
+
     if "extra_options" in parameters.keys():
         parameters["extra_options"] = to_int(parameters["extra_options"])
 

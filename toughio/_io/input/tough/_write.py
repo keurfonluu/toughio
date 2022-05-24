@@ -6,15 +6,18 @@ from copy import deepcopy
 import numpy as np
 
 from ...._common import block_to_format, open_file, str2format
+from ..._common import prune_nones_list, write_record
 from ._common import default
-from ._helpers import block, check_parameters, dtypes, prune_nones_list, write_record
+from ._helpers import block, check_parameters, dtypes, write_model_record
 
 __all__ = [
     "write",
 ]
 
 
-def write(filename, parameters, block=None, ignore_blocks=None, eos=None):
+def write(
+    filename, parameters, block=None, ignore_blocks=None, eos=None, simulator="tough"
+):
     """
     Write TOUGH input file.
 
@@ -37,6 +40,9 @@ def write(filename, parameters, block=None, ignore_blocks=None, eos=None):
         Equation of State. If `eos` is defined in `parameters`, this option will be ignored.
 
     """
+    if simulator not in {"tough", "toughreact"}:
+        raise ValueError()
+
     # Deprecation error
     if "generators" in parameters:
         if isinstance(parameters["generators"], dict):
@@ -48,14 +54,14 @@ def write(filename, parameters, block=None, ignore_blocks=None, eos=None):
         ):
             raise ValueError("'variables' must be a list of dicts since v1.7.0.")
 
-    buffer = write_buffer(parameters, block, ignore_blocks, eos)
+    buffer = write_buffer(parameters, block, ignore_blocks, eos, simulator)
     with open_file(filename, "w") as f:
         for record in buffer:
             f.write(record)
 
 
 @check_parameters(dtypes["PARAMETERS"])
-def write_buffer(params, block, ignore_blocks=None, eos_=None):
+def write_buffer(params, block, ignore_blocks=None, eos_=None, simulator="tough"):
     """Write TOUGH input file as a list of 80-character long record strings."""
     from ._common import Parameters
     from ._common import blocks as blocks_
@@ -115,6 +121,8 @@ def write_buffer(params, block, ignore_blocks=None, eos_=None):
                 "relative_permeability",
                 "capillarity",
                 "phase_composition",
+                "react_tp",
+                "react_hcplaw",
             }
             if cond1 and cond2:
                 parameters["rocks"][rock][k] = v
@@ -208,6 +216,13 @@ def write_buffer(params, block, ignore_blocks=None, eos_=None):
             output = True
             break
 
+    # TOUGHREACT related flags
+    react = "options" in parameters["react"] and parameters["react"]["options"]
+    outpt = (
+        "output" in parameters["react"] and "format" in parameters["react"]["output"]
+    )
+    poise = "poiseuille" in parameters["react"] and parameters["react"]["poiseuille"]
+
     # Check that start is True if indom is True
     if indom and not parameters["start"]:
         logging.warning("Option 'START' is needed to use 'INDOM' conditions.")
@@ -218,10 +233,13 @@ def write_buffer(params, block, ignore_blocks=None, eos_=None):
         out += ["{:80}\n".format(title) for title in parameters["title"]]
 
     if "ROCKS" in blocks and parameters["rocks"]:
-        out += _write_rocks(parameters)
+        out += _write_rocks(parameters, simulator)
 
     if "RPCAP" in blocks and rpcap:
         out += _write_rpcap(parameters)
+
+    if "REACT" in blocks and react:
+        out += _write_react(parameters)
 
     if "FLAC" in blocks and parameters["flac"]:
         out += _write_flac(parameters)
@@ -266,10 +284,13 @@ def write_buffer(params, block, ignore_blocks=None, eos_=None):
         out += _write_goft(parameters)
 
     if "GENER" in blocks and parameters["generators"]:
-        out += _write_gener(parameters)
+        out += _write_gener(parameters, simulator)
 
     if "DIFFU" in blocks and len(parameters["diffusion"]):
         out += _write_diffu(parameters)
+
+    if "OUTPT" in blocks and outpt:
+        out += _write_outpt(parameters)
 
     if "OUTPU" in blocks and output:
         out += _write_outpu(parameters)
@@ -284,10 +305,13 @@ def write_buffer(params, block, ignore_blocks=None, eos_=None):
         out += _write_conne(parameters)
 
     if "INCON" in blocks and parameters["initial_conditions"]:
-        out += _write_incon(parameters, eos_)
+        out += _write_incon(parameters, eos_, simulator)
 
     if "MESHM" in blocks and parameters["meshmaker"]:
         out += _write_meshm(parameters)
+
+    if "POISE" in blocks and poise:
+        out += _write_poise(parameters)
 
     if "NOVER" in blocks and parameters["nover"]:
         out += _write_nover()
@@ -305,7 +329,7 @@ def write_buffer(params, block, ignore_blocks=None, eos_=None):
 )
 @check_parameters(dtypes["MODEL"], keys=("rocks", "capillarity"), is_list=True)
 @block("ROCKS", multi=True)
-def _write_rocks(parameters):
+def _write_rocks(parameters, simulator="tough"):
     """Write ROCKS block data."""
     # Reorder rocks
     if parameters["rocks_order"] is not None:
@@ -320,9 +344,11 @@ def _write_rocks(parameters):
     fmt = block_to_format["ROCKS"]
     fmt1 = str2format(fmt[1])
     fmt2 = str2format(fmt[2])
+    fmt3 = str2format(fmt[3])
+    fmt4 = str2format(fmt[4])
 
     fmt = block_to_format["RPCAP"]
-    fmt3 = str2format(fmt)
+    fmt5 = str2format(fmt)
 
     out = []
     for k in order:
@@ -340,6 +366,8 @@ def _write_rocks(parameters):
                 "klinkenberg_parameter",
                 "distribution_coefficient_3",
                 "distribution_coefficient_4",
+                "tortuosity_exponent",
+                "porosity_crit",
             ]
         )
         nad = (
@@ -347,6 +375,10 @@ def _write_rocks(parameters):
             if "relative_permeability" in data.keys() or "capillarity" in data.keys()
             else int(cond)
         )
+
+        if simulator == "toughreact":
+            nad = 4 if "react_tp" in data.keys() else nad
+            nad = 5 if "react_hcplaw" in data.keys() else nad
 
         # Permeability
         per = data["permeability"]
@@ -378,20 +410,22 @@ def _write_rocks(parameters):
                 data["klinkenberg_parameter"],
                 data["distribution_coefficient_3"],
                 data["distribution_coefficient_4"],
+                data["tortuosity_exponent"],
+                data["porosity_crit"],
             ]
             out += write_record(values, fmt2)
         else:
-            out += write_record([], []) if nad == 2 else []
+            out += write_record([], []) if nad >= 2 else []
+
+        # TOUGHREACT
+        if nad >= 4:
+            out += write_model_record(data, "react_tp", fmt3)
+            out += write_model_record(data, "react_hcplaw", fmt4)
 
         # Relative permeability / Capillary pressure
-        if nad == 2:
-            for key in ["relative_permeability", "capillarity"]:
-                if key in data.keys():
-                    values = [data[key]["id"], None]
-                    values += list(data[key]["parameters"])
-                    out += write_record(values, fmt3)
-                else:
-                    out += write_record([], [])
+        if nad >= 2:
+            out += write_model_record(data, "relative_permeability", fmt5)
+            out += write_model_record(data, "capillarity", fmt5)
 
     return out
 
@@ -416,6 +450,25 @@ def _write_rpcap(parameters):
             out += write_record(values, fmt)
         else:
             out += write_record([], [])
+
+    return out
+
+
+@check_parameters(dtypes["MOPR"], keys=("react", "options"))
+@block("REACT")
+def _write_react(parameters):
+    """Write REACT block data."""
+    from ._common import react_options
+
+    # Formats
+    fmt = block_to_format["REACT"]
+    fmt = str2format(fmt)
+
+    _react = deepcopy(react_options)
+    _react.update(parameters["react"]["options"])
+
+    tmp = [" " if _react[k] is None else str(_react[k]) for k in sorted(_react.keys())]
+    out = write_record(["".join(tmp)], fmt)
 
     return out
 
@@ -708,6 +761,7 @@ def _write_param(parameters, eos_=None):
         data["t_max"],
         -((len(data["t_steps"]) - 1) // 8 + 1),
         data["t_step_max"],
+        "wdata" if data["react_wdata"] else None,
         None,
         data["gravity"],
         data["t_reduce_factor"],
@@ -718,6 +772,12 @@ def _write_param(parameters, eos_=None):
     # Record 2.1
     values = [x for x in data["t_steps"]]
     out += write_record(values, fmt3, multi=True)
+
+    # TOUGHREACT
+    if data["react_wdata"]:
+        n = len(data["react_wdata"])
+        out += ["{}\n".format(n)]
+        out += ["{}\n".format(x) for x in data["react_wdata"]]
 
     # Record 3
     values = [
@@ -936,7 +996,7 @@ def _write_goft(parameters):
 
 @check_parameters(dtypes["GENER"], keys="generators", is_list=True)
 @block("GENER", multi=True)
-def _write_gener(parameters):
+def _write_gener(parameters, simulator="tough"):
     """Write GENER block data."""
     from ._common import generators
 
@@ -997,6 +1057,17 @@ def _write_gener(parameters):
             else None
         )
 
+        # TOUGHREACT
+        ktab = None
+        if (
+            data["conductivity_times"] is not None
+            and data["conductivity_factors"] is not None
+        ):
+            ktab = len(data["conductivity_times"])
+
+            if len(data["conductivity_factors"]) != ktab:
+                raise ValueError()
+
         # Record 1
         values = [
             data["label"] if "label" in data else "",
@@ -1011,6 +1082,7 @@ def _write_gener(parameters):
             None if ltab > 1 and data["type"] != "DELV" else data["rates"],
             None if ltab > 1 and data["type"] != "DELV" else data["specific_enthalpy"],
             data["layer_thickness"],
+            ktab,
         ]
         out += write_record(values, fmt1)
 
@@ -1030,6 +1102,11 @@ def _write_gener(parameters):
 
                 out += write_record(specific_enthalpy, fmt2, multi=True)
 
+        # TOUGHREACT
+        if ktab:
+            out += write_record(data["conductivity_times"], fmt2, multi=True)
+            out += write_record(data["conductivity_factors"], fmt2, multi=True)
+
     return out
 
 
@@ -1043,6 +1120,19 @@ def _write_diffu(parameters):
     out = []
     for mass in parameters["diffusion"]:
         out += write_record(mass, fmt, multi=True)
+
+    return out
+
+
+@check_parameters(dtypes["OUTPT"], keys=("react", "output"))
+@block("OUTPT")
+def _write_outpt(parameters):
+    """Write OUTPT block data."""
+    outpt = parameters["react"]["output"]
+
+    values = [outpt["format"]]
+    values += [x for x in outpt["shape"][:3]] if "shape" in outpt else []
+    out = ["{}\n".format(" ".join(str(x) for x in values))]
 
     return out
 
@@ -1208,7 +1298,7 @@ def _write_conne(parameters):
 
 @check_parameters(dtypes["INCON"], keys="initial_conditions", is_list=True)
 @block("INCON", multi=True)
-def _write_incon(parameters, eos_=None):
+def _write_incon(parameters, eos_=None, simulator="tough"):
     """Write INCON block data."""
     from ._common import initial_conditions
 
@@ -1220,9 +1310,14 @@ def _write_incon(parameters, eos_=None):
 
     # Format
     label_length = len(max(parameters["initial_conditions"], key=len))
+    label_length = max(label_length, 5)
     fmt = block_to_format["INCON"]
     fmt1 = str2format(
-        fmt[eos_][label_length] if eos_ in fmt else fmt["default"][label_length]
+        fmt[simulator][label_length]
+        if simulator == "toughreact"
+        else fmt[eos_][label_length]
+        if eos_ in fmt
+        else fmt["default"][label_length]
     )
     fmt2 = str2format(fmt[0])
 
@@ -1239,7 +1334,14 @@ def _write_incon(parameters, eos_=None):
             data["porosity"],
         ]
 
-        if eos_ == "tmvoc":
+        if simulator == "toughreact":
+            per = data["permeability"]
+            per = [per] * 3 if not np.ndim(per) else per
+            if not (isinstance(per, (list, tuple, np.ndarray)) and len(per) == 3):
+                raise TypeError()
+            values += [k for k in per]
+
+        elif eos_ == "tmvoc":
             values += [data["phase_composition"]]
 
         else:
@@ -1358,6 +1460,26 @@ def _write_meshm(parameters):
 
                 out += write_record([len(parameter["thicknesses"])], fmt1)
                 out += write_record(parameter["thicknesses"], fmt2, multi=True)
+
+    return out
+
+
+@check_parameters(dtypes["POISE"], keys=("react", "poiseuille"))
+@block("POISE")
+def _write_poise(parameters):
+    """Write POISE block data."""
+    poise = parameters["react"]["poiseuille"]
+    for key in ["start", "end", "aperture"]:
+        if key not in poise:
+            raise ValueError()
+
+        if key != "aperture" and len(poise[key]) != 2:
+            raise ValueError()
+
+    values = [x for x in poise["start"][:2]]
+    values += [x for x in poise["end"][:2]]
+    values += [poise["aperture"]]
+    out = ["{}\n".format(" ".join(str(x) for x in values))]
 
     return out
 

@@ -108,7 +108,7 @@ def test_rocks(write_read):
     for k, v in parameters_ref["rocks"].items():
         for kk, vv in v.items():
             if not isinstance(vv, dict):
-                assert np.allclose(vv, parameters["rocks"][k][kk], atol=1.0e-5)
+                assert np.allclose(vv, parameters["rocks"][k][kk], atol=1.0e-4)
             else:
                 helpers.allclose_dict(vv, parameters["rocks"][k][kk], atol=1.0e-4)
 

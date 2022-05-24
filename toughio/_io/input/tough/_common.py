@@ -2,6 +2,7 @@ blocks = {
     "TITLE",
     "ROCKS",
     "RPCAP",
+    "REACT",
     "FLAC",
     "CHEMP",
     "NCGAS",
@@ -18,12 +19,14 @@ blocks = {
     "GOFT",
     "GENER",
     "DIFFU",
+    "OUTPT",
     "OUTPU",
     "ELEME",
     "COORD",
     "CONNE",
     "INCON",
     "MESHM",
+    "POISE",
     "NOVER",
     "ENDCY",
 }
@@ -34,6 +37,7 @@ _Parameters = {
     "n_component": None,
     "n_phase": None,
     "n_component_incon": None,
+    "react": {},
     "flac": {},
     "chemical_properties": {},
     "non_condensible_gas": [],
@@ -133,11 +137,14 @@ options = {
     "w_upstream": None,
     "w_newton": None,
     "derivative_factor": None,
+    "react_wdata": None,
 }
 
 extra_options = {k + 1: None for k in range(24)}
 
 more_options = {k + 1: None for k in range(40)}
+
+react_options = {k + 1: None for k in range(25)}
 
 solver = {
     "id": 3,
@@ -159,6 +166,8 @@ generators = {
     "specific_enthalpy": None,
     "layer_thickness": None,
     "n_layer": None,
+    "conductivity_times": None,
+    "conductivity_factors": None,
 }
 
 output = {
@@ -190,6 +199,7 @@ initial_conditions = {
     "porosity": None,
     "userx": [None for _ in range(5)],
     "values": [None for _ in range(4)],
+    "permeability": None,
 }
 
 meshmaker = {
@@ -227,9 +237,13 @@ default = {
     "klinkenberg_parameter": None,
     "distribution_coefficient_3": None,
     "distribution_coefficient_4": None,
+    "tortuosity_exponent": None,
+    "porosity_crit": None,
     "initial_condition": [None for _ in range(6)],
     "relative_permeability": {"id": None, "parameters": []},
     "capillarity": {"id": None, "parameters": []},
+    "react_tp": {"id": None, "parameters": []},
+    "react_hcplaw": {"id": None, "parameters": []},
     "permeability_model": {"id": 1, "parameters": []},
     "equivalent_pore_pressure": {"id": 3, "parameters": []},
     "phase_composition": None,

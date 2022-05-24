@@ -10,6 +10,15 @@ __all__ = [
 _extension_to_filetype = {}
 _reader_map = {}
 _writer_map = {}
+_file_formats = {
+    "INFILE": "tough",
+    "MESH": "tough",
+    "INCON": "tough",
+    "GENER": "tough",
+    "flow.inp": "toughreact-flow",
+    "solute.inp": "toughreact-solute",
+    "chemical.inp": "toughreact-chemical",
+}
 
 
 def register(file_format, extensions, reader, writer=None):
@@ -47,7 +56,7 @@ def read(filename, file_format=None, **kwargs):
     ----------
     filename : str, pathlike or buffer
         Input file name or buffer.
-    file_format : str ('tough', 'json') or None, optional, default None
+    file_format : str ('tough', 'toughreact-flow', 'toughreact-solute', 'toughreact-chemical', 'json') or None, optional, default None
         Input file format.
 
     Other Parameters
@@ -56,6 +65,8 @@ def read(filename, file_format=None, **kwargs):
         Only if ``file_format = "tough"``. Number of characters in cell labels.
     eos : str or None, optional, default None
         Only if ``file_format = "tough"``. Equation of State.
+    mopr_11 : int, optional, default 0
+        Only if ``file_format = "toughreact-solute"``. MOPR(11) value in file 'flow.inp'.
 
     Returns
     -------
@@ -67,17 +78,11 @@ def read(filename, file_format=None, **kwargs):
     If ``file_format == 'tough'``, can also read `MESH`, `INCON` and `GENER` files.
 
     """
-    if not (file_format is None or file_format in {"tough", "json"}):
+    if not (file_format is None or file_format in _reader_map):
         raise ValueError()
 
-    fmt = (
-        file_format
-        if file_format
-        else filetype_from_filename(filename, _extension_to_filetype)
-    )
-    fmt = fmt if fmt else "tough"
-
-    return _reader_map[fmt](filename, **kwargs)
+    file_format = _get_file_format(filename, file_format)
+    return _reader_map[file_format](filename, **kwargs)
 
 
 def write(filename, parameters, file_format=None, **kwargs):
@@ -90,7 +95,7 @@ def write(filename, parameters, file_format=None, **kwargs):
         Output file name or buffer.
     parameters : dict
         Parameters to export.
-    file_format : str ('tough', 'json') or None, optional, default None
+    file_format : str ('tough', 'toughreact-flow', 'toughreact-solute', 'toughreact-chemical', 'json') or None, optional, default None
         Output file format.
 
     Other Parameters
@@ -107,18 +112,41 @@ def write(filename, parameters, file_format=None, **kwargs):
     eos : str or None, optional, default None
         Only if ``file_format = "tough"``. Equation of State.
         If `eos` is defined in `parameters`, this option will be ignored.
+    mopr_10 : int, optional, default 0
+        Only if ``file_format = "toughreact-solute"``. MOPR(10) value in file 'flow.inp'.
+    mopr_11 : int, optional, default 0
+        Only if ``file_format = "toughreact-solute"``. MOPR(11) value in file 'flow.inp'.
+    verbose : bool, optional, default True
+        Only if ``file_format`` in {"toughreact-solute", "toughreact-chemical"}. If `True`, add comments to describe content of file.
 
     """
     if not isinstance(parameters, dict):
         raise TypeError()
-    if not (file_format is None or file_format in {"tough", "json"}):
+    if not (file_format is None or file_format in _writer_map):
         raise ValueError()
 
-    fmt = (
-        file_format
-        if file_format
-        else filetype_from_filename(filename, _extension_to_filetype)
-    )
-    fmt = fmt if fmt else "tough"
+    file_format = _get_file_format(filename, file_format)
+    _writer_map[file_format](filename, parameters, **kwargs)
 
-    _writer_map[fmt](filename, parameters, **kwargs)
+
+def _get_file_format(filename, file_format):
+    """Get file format."""
+    if not file_format:
+        file_format = _file_format_from_filename(filename)
+
+    if not file_format:
+        file_format = filetype_from_filename(filename, _extension_to_filetype)
+
+    if not file_format:
+        file_format = "tough"
+
+    return file_format
+
+
+def _file_format_from_filename(filename):
+    """Determine file format from its name."""
+    import pathlib
+
+    filename = pathlib.Path(filename).name
+
+    return _file_formats[filename] if filename in _file_formats else ""

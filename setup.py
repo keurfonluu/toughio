@@ -18,7 +18,6 @@ AUTHOR_EMAIL = about["__author_email__"]
 URL = about["__website__"]
 LICENSE = about["__license__"]
 CLASSIFIERS = [
-    "Programming Language :: Python :: 2.7",
     "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
@@ -33,25 +32,19 @@ CLASSIFIERS = [
     "Topic :: Scientific/Engineering",
 ]
 
-# TODO: use new environment markers when dropping support for python < 3
-# REQUIREMENTS = [
-#     "meshio == 2.3.10; python_version <= '2.7'",
-#     "meshio >= 3.0.0; python_version > '2.7'",
-# ]
-# EXTRA_REQUIREMENTS = {
-#     "full": [
-#         "pyvista == 0.22.4; python_version <= '2.7'",
-#         "pyvista >= 0.23.1; python_version > '2.7'",
-#     ],
-# }
-if sys.version_info < (3,):
-    REQUIREMENTS = ["meshio == 2.3.10"]
-    EXTRA_REQUIREMENTS = {"full": ["imageio == 2.6.1", "lxml", "pyvista == 0.22.4", "netcdf4 == 1.5.3", "scooby == 0.5.6"]}
-else:
-    REQUIREMENTS = ["meshio >= 4.0.11, < 5.0"]
-    EXTRA_REQUIREMENTS = {"full": ["pyvista >= 0.32, < 0.33", "netcdf4"]}
-REQUIREMENTS += ["numpy >= 1.13.0"]
-EXTRA_REQUIREMENTS["full"] += ["matplotlib", "h5py", "scipy >= 0.9"]
+REQUIREMENTS = [
+    "meshio >= 4.0.11, < 5.0",
+    "numpy >= 1.13.0"
+]
+EXTRA_REQUIREMENTS = {
+    "full": [
+        "pyvista >= 0.32, < 0.33",
+        "netcdf4",
+        "matplotlib",
+        "h5py",
+        "scipy >= 0.9"
+    ],
+}
 
 
 PACKAGE_DATA = {
@@ -81,7 +74,7 @@ if __name__ == "__main__":
         license=LICENSE,
         install_requires=REQUIREMENTS,
         extras_require=EXTRA_REQUIREMENTS,
-        python_requires=">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*",
+        python_requires="!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*",
         classifiers=CLASSIFIERS,
         version=about["__version__"],
         packages=find_packages() + ["toughio.data"],
