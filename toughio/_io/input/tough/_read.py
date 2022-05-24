@@ -3,7 +3,8 @@ from __future__ import division, with_statement
 from ...._common import block_to_format, get_label_length, open_file
 from ...._exceptions import ReadError
 from ...._helpers import FileIterator
-from ._helpers import prune_nones_dict, prune_nones_list, read_record
+from ..._common import prune_nones_dict, prune_nones_list, read_record
+from ._helpers import read_model_record
 
 __all__ = [
     "read",
@@ -17,7 +18,7 @@ oft_to_key = {
 }
 
 
-def read(filename, label_length=None, eos=None):
+def read(filename, label_length=None, eos=None, simulator="tough"):
     """
     Read TOUGH input file.
 
@@ -40,14 +41,16 @@ def read(filename, label_length=None, eos=None):
         raise TypeError()
     if isinstance(label_length, int) and not 5 <= label_length < 10:
         raise ValueError()
+    if simulator not in {"tough", "toughreact"}:
+        raise ValueError()
 
     with open_file(filename, "r") as f:
-        out = read_buffer(f, label_length, eos)
+        out = read_buffer(f, label_length, eos, simulator)
 
     return out
 
 
-def read_buffer(f, label_length, eos):
+def read_buffer(f, label_length, eos, simulator="tough"):
     """Read TOUGH input file."""
     from ._common import blocks
 
@@ -80,7 +83,7 @@ def read_buffer(f, label_length, eos):
     try:
         for line in fiter:
             if line.startswith("ROCKS"):
-                parameters.update(_read_rocks(fiter))
+                parameters.update(_read_rocks(fiter, simulator))
 
             elif line.startswith("RPCAP"):
                 rpcap = _read_rpcap(fiter)
@@ -90,6 +93,13 @@ def read_buffer(f, label_length, eos):
 
                 else:
                     parameters["default"] = rpcap
+
+            elif line.startswith("REACT"):
+                react = _read_react(fiter)
+                if "react" in parameters:
+                    parameters["react"].update(react["react"])
+                else:
+                    parameters.update(react)
 
             elif line.startswith("FLAC"):
                 flac = _read_flac(fiter, parameters["rocks_order"])
@@ -149,10 +159,17 @@ def read_buffer(f, label_length, eos):
                 parameters.update(_read_oft(fiter, "GOFT", label_length))
 
             elif line.startswith("GENER"):
-                parameters.update(_read_gener(fiter, label_length))
+                parameters.update(_read_gener(fiter, label_length, simulator))
 
             elif line.startswith("DIFFU"):
                 parameters.update(_read_diffu(fiter))
+
+            elif line.startswith("OUTPT"):
+                outpt = _read_outpt(fiter)
+                if "react" in parameters:
+                    parameters["react"].update(outpt["react"])
+                else:
+                    parameters.update(outpt)
 
             elif line.startswith("OUTPU"):
                 parameters.update(_read_outpu(fiter))
@@ -177,7 +194,7 @@ def read_buffer(f, label_length, eos):
                     break
 
             elif line.startswith("INCON"):
-                incon, flag = _read_incon(fiter, label_length, eos)
+                incon, flag = _read_incon(fiter, label_length, eos, simulator)
                 parameters.update(incon)
 
                 if flag:
@@ -185,6 +202,13 @@ def read_buffer(f, label_length, eos):
 
             elif line.startswith("MESHM"):
                 parameters.update(_read_meshm(fiter))
+
+            elif line.startswith("POISE"):
+                poise = _read_poise(fiter)
+                if "react" in parameters:
+                    parameters["react"].update(poise["react"])
+                else:
+                    parameters.update(poise)
 
             elif line.startswith("NOVER"):
                 parameters["nover"] = True
@@ -198,7 +222,7 @@ def read_buffer(f, label_length, eos):
     return parameters
 
 
-def _read_rocks(f):
+def _read_rocks(f, simulator="tough"):
     """Read ROCKS block data."""
     fmt = block_to_format["ROCKS"]
     rocks = {"rocks": {}, "rocks_order": []}
@@ -218,8 +242,8 @@ def _read_rocks(f):
                 "specific_heat": data[8],
             }
 
-            nad = data[1]
-            if nad is not None:
+            nad = data[1] if data[1] else 0
+            if nad:
                 # Record 2
                 line = f.next()
                 data = read_record(line, fmt[2])
@@ -232,10 +256,26 @@ def _read_rocks(f):
                         "klinkenberg_parameter": data[4],
                         "distribution_coefficient_3": data[5],
                         "distribution_coefficient_4": data[6],
+                        "tortuosity_exponent": data[7],
+                        "porosity_crit": data[8],
                     }
                 )
 
-            if nad and nad > 1:
+            if nad >= 2:
+                # TOUGHREACT
+                if simulator == "toughreact" and nad >= 4:
+                    line = f.next()
+                    if line.strip():
+                        rocks["rocks"][rock]["react_tp"] = read_model_record(
+                            line, fmt[3]
+                        )
+
+                    line = f.next()
+                    if line.strip():
+                        rocks["rocks"][rock]["react_hcplaw"] = read_model_record(
+                            line, fmt[4]
+                        )
+
                 rocks["rocks"][rock].update(_read_rpcap(f))
 
             rocks["rocks_order"].append(rock)
@@ -254,14 +294,25 @@ def _read_rpcap(f):
 
     for key in ["relative_permeability", "capillarity"]:
         line = f.next()
-        data = read_record(line, fmt)
-        if data[0] is not None:
-            rpcap[key] = {
-                "id": data[0],
-                "parameters": prune_nones_list(data[2:]),
-            }
+        if line.strip():
+            rpcap[key] = read_model_record(line, fmt)
 
     return rpcap
+
+
+def _read_react(f):
+    """Read REACT block data."""
+    fmt = block_to_format["REACT"]
+
+    line = f.next()
+    data = read_record(line, fmt)
+    react = {
+        "react": {
+            "options": {i + 1: int(x) for i, x in enumerate(data[0]) if x.isdigit()}
+        }
+    }
+
+    return react
 
 
 def _read_flac(f, rocks_order):
@@ -455,11 +506,12 @@ def _read_param(f, eos=None):
             "t_max": data[1],
             "t_steps": data[2],
             "t_step_max": data[3],
-            "gravity": data[5],
-            "t_reduce_factor": data[6],
-            "mesh_scale_factor": data[7],
+            "gravity": data[6],
+            "t_reduce_factor": data[7],
+            "mesh_scale_factor": data[8],
         }
     )
+    wdata = data[4]
 
     t_steps = int(data[2])
     if t_steps >= 0.0:
@@ -472,6 +524,17 @@ def _read_param(f, eos=None):
             param["options"]["t_steps"] += prune_nones_list(data)
         if len(param["options"]["t_steps"]) == 1:
             param["options"]["t_steps"] = param["options"]["t_steps"][0]
+
+    # TOUGHREACT
+    if wdata == "wdata":
+        line = f.next()
+        n = int(line.strip().split()[0])
+
+        if n:
+            param["options"]["react_wdata"] = []
+            for _ in range(n):
+                line = f.next()
+                param["options"]["react_wdata"].append(line.strip()[:5])
 
     # Record 3
     line = f.next()
@@ -644,8 +707,18 @@ def _read_oft(f, oft, label_length):
     return history
 
 
-def _read_gener(f, label_length):
+def _read_gener(f, label_length, simulator="tough"):
     """Read GENER block data."""
+
+    def read_table(f, n, fmt):
+        table = []
+        while len(table) < n:
+            line = f.next()
+            data = read_record(line, fmt)
+            table += prune_nones_list(data)
+
+        return table
+
     fmt = block_to_format["GENER"]
     gener = {"generators": []}
 
@@ -666,21 +739,17 @@ def _read_gener(f, label_length):
                 "type": data[7],
                 "layer_thickness": data[11],
             }
+            ktab = data[12]  # TOUGHREACT
 
             ltab = data[5]
             if ltab and ltab > 1 and tmp["type"] != "DELV":
                 itab = data[8]
                 keys = ["times", "rates"]
-                keys += ["specific_enthalpy"] if itab else []
+                keys += (
+                    ["specific_enthalpy"] if itab else []
+                )  # Specific enthalpy must be provided for time dependent injection
                 for key in keys:
-                    table = []
-
-                    while len(table) < ltab:
-                        line = f.next()
-                        data = read_record(line, fmt[0])
-                        table += prune_nones_list(data)
-
-                    tmp[key] = table
+                    tmp[key] = read_table(f, ltab, fmt[0])
 
             else:
                 tmp.update(
@@ -693,6 +762,10 @@ def _read_gener(f, label_length):
 
             if ltab and tmp["type"] == "DELV":
                 tmp["n_layer"] = ltab
+
+            if simulator == "toughreact" and ktab:
+                tmp["conductivity_times"] = read_table(f, ktab, fmt[0])
+                tmp["conductivity_factors"] = read_table(f, ktab, fmt[0])
 
             gener["generators"].append(tmp)
 
@@ -726,6 +799,22 @@ def _read_diffu(f):
             break
 
     return diffu
+
+
+def _read_outpt(f):
+    """Read OUTPT block data."""
+    outpt = {"react": {"output": {}}}
+
+    line = f.next().strip()
+    data = [int(x) for x in line.split()]  # Free-format
+
+    if len(data):
+        outpt["react"]["output"]["format"] = data[0]
+
+    if len(data) > 1:
+        outpt["react"]["output"]["shape"] = data[1:]
+
+    return outpt
 
 
 def _read_outpu(f):
@@ -852,10 +941,16 @@ def _read_conne(f, label_length):
     return conne, flag
 
 
-def _read_incon(f, label_length, eos=None):
+def _read_incon(f, label_length, eos=None, simulator="tough"):
     """Read INCON block data."""
     fmt = block_to_format["INCON"]
-    fmt2 = fmt[eos] if eos in fmt else fmt["default"]
+    fmt2 = (
+        fmt[simulator]
+        if simulator == "toughreact"
+        else fmt[eos]
+        if eos in fmt
+        else fmt["default"]
+    )
     incon = {"initial_conditions": {}, "initial_conditions_order": []}
 
     line = f.next()
@@ -885,7 +980,13 @@ def _read_incon(f, label_length, eos=None):
             label = label_format.format(data[0])
             incon["initial_conditions"][label] = {"porosity": data[3]}
 
-            if eos == "tmvoc":
+            if simulator == "toughreact":
+                permeability = data[4] if len(set(data[4:7])) == 1 else data[4:7]
+                incon["initial_conditions"][label]["permeability"] = (
+                    permeability if permeability else None
+                )
+
+            elif eos == "tmvoc":
                 incon["initial_conditions"][label]["phase_composition"] = data[4]
 
             else:
@@ -1041,3 +1142,20 @@ def _read_meshm(f):
                 break
 
     return meshm
+
+
+def _read_poise(f):
+    """Read POISE block data."""
+    poise = {"react": {"poiseuille": {}}}
+
+    line = f.next().strip()
+    data = [float(x) for x in line.split()]  # Free-format
+
+    if len(data) < 5:
+        raise ReadError()
+
+    poise["react"]["poiseuille"]["start"] = data[:2]
+    poise["react"]["poiseuille"]["end"] = data[2:4]
+    poise["react"]["poiseuille"]["aperture"] = data[4]
+
+    return poise

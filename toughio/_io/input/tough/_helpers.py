@@ -6,6 +6,8 @@ from functools import wraps
 
 import numpy as np
 
+from ..._common import prune_nones_list, read_record, write_record
+
 dtypes = {
     "PARAMETERS": {
         "title": "str_array_like",
@@ -13,6 +15,7 @@ dtypes = {
         "n_component": "int",
         "n_phase": "int",
         "n_component_incon": "int",
+        "react": "dict",
         "flac": "dict",
         "chemical_properties": "dict",
         "non_condensible_gas": "str_array_like",
@@ -41,6 +44,7 @@ dtypes = {
         "initial_conditions": "dict",
         "initial_conditions_order": "array_like",
         "meshmaker": "dict",
+        "poiseuille": "dict",
         "default": "dict",
     },
     "ROCKS": {
@@ -56,9 +60,13 @@ dtypes = {
         "klinkenberg_parameter": "scalar",
         "distribution_coefficient_3": "scalar",
         "distribution_coefficient_4": "scalar",
+        "tortuosity_exponent": "scalar",
+        "porosity_crit": "scalar",
         "initial_condition": "array_like",
         "relative_permeability": "dict",
         "capillarity": "dict",
+        "react_tp": "dict",
+        "react_hcplaw": "dict",
         "permeability_model": "dict",
         "equivalent_pore_pressure": "dict",
         "phase_composition": "int",
@@ -119,8 +127,10 @@ dtypes = {
         "w_upstream": "scalar",
         "w_newton": "scalar",
         "derivative_factor": "scalar",
+        "react_wdata": "array_like",
     },
     "MOP": {i + 1: "int" for i in range(24)},
+    "MOPR": {i + 1: "int" for i in range(25)},
     "MOMOP": {i + 1: "int" for i in range(40)},
     "SELEC": {"integers": "dict", "floats": "array_like"},
     "SOLVR": {
@@ -142,7 +152,10 @@ dtypes = {
         "specific_enthalpy": "scalar_array_like",
         "layer_thickness": "scalar",
         "n_layer": "int",
+        "conductivity_times": "array_like",
+        "conductivity_factors": "array_like",
     },
+    "OUTPT": {"format": "int", "shape": "array_like"},
     "OUTPU": {"format": "str", "variables": "array_like"},
     "ELEME": {
         "nseq": "int",
@@ -167,8 +180,14 @@ dtypes = {
         "userx": "array_like",
         "values": "array_like",
         "phase_composition": "int",
+        "permeability": "scalar_array_like",
     },
     "MESHM": {"type": "str", "parameters": "array_like", "angle": "scalar"},
+    "POISE": {
+        "start": "array_like",
+        "end": "array_like",
+        "aperture": "scalar",
+    },
 }
 
 
@@ -288,104 +307,22 @@ def check_parameters(input_types, keys=None, is_list=False):
     return decorator
 
 
-def read_record(data, fmt):
-    """Parse string to data given format."""
-    token_to_type = {
-        "s": str,
-        "S": str,
-        "d": int,
-        "f": str2float,
-        "e": str2float,
+def read_model_record(line, fmt, i=2):
+    """Read model record defined by 'id' and 'parameters'."""
+    data = read_record(line, fmt)
+
+    return {
+        "id": data[0],
+        "parameters": prune_nones_list(data[i:]),
     }
 
-    i = 0
-    out = []
-    for token in fmt.split(","):
-        n = int(token[:-1].split(".")[0])
-        tmp = data[i : i + n]
-        tmp = tmp if token[-1] == "S" else tmp.strip()
-        out.append(token_to_type[token[-1]](tmp) if tmp else None)
-        i += n
 
-    return out
-
-
-def write_record(data, fmt, multi=False):
-    """Return a list of record strings given format."""
-
-    def to_str(x, fmt):
-        x = "" if x is None else x
-
-        if not isinstance(x, str):
-            # Special handling for floating point numbers
-            if "f" in fmt:
-                # Number of decimals is specified
-                if "." in fmt:
-                    n = int(fmt[3:].split(".")[0])
-                    tmp = fmt.format(x)
-
-                    if len(tmp) > n:
-                        return fmt.replace("f", "e").format(x)
-
-                    else:
-                        return tmp
-
-                # Let Python decides the format
-                else:
-                    n = int(fmt[3:].split("f")[0])
-                    tmp = str(float(x))
-
-                    if len(tmp) > n:
-                        fmt = "{{:>{}.{}e}}".format(n, n - 7)
-
-                        return fmt.format(x)
-
-                    else:
-                        fmt = "{{:>{}}}".format(n)
-
-                        return fmt.format(tmp)
-
-            else:
-                return fmt.format(x)
-
-        else:
-            return fmt.replace("g", "").replace("e", "").replace("f", "").format(x)
-
-    if not multi:
-        data = [to_str(d, f) for d, f in zip(data, fmt)]
-        out = ["{:80}\n".format("".join(data))]
+def write_model_record(data, key, fmt):
+    """Write model record defined by 'id' and 'parameters'."""
+    if key in data.keys():
+        values = [data[key]["id"], None]
+        values += list(data[key]["parameters"])
+        return write_record(values, fmt)
 
     else:
-        n = len(data)
-        ncol = len(fmt)
-        data = [
-            data[ncol * i : min(ncol * i + ncol, n)]
-            for i in range(int(np.ceil(n / ncol)))
-        ]
-
-        out = []
-        for d in data:
-            d = [to_str(dd, f) for dd, f in zip(d, fmt)]
-            out += ["{:80}\n".format("".join(d))]
-
-    return out
-
-
-def str2float(s):
-    """Convert variable string to float."""
-    try:
-        return float(s)
-    except ValueError:
-        # It's probably something like "0.0001-001"
-        significand, exponent = s[:-4], s[-4:]
-        return float("{}e{}".format(significand, exponent))
-
-
-def prune_nones_dict(data):
-    """Remove None key/value pairs from dict."""
-    return {k: v for k, v in data.items() if v is not None}
-
-
-def prune_nones_list(data):
-    """Remove trailing None values from list."""
-    return [x for i, x in enumerate(data) if any(xx is not None for xx in data[i:])]
+        return write_record([], [])
