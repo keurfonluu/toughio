@@ -15,6 +15,8 @@ def write(filename, parameters, verbose=True):
     ----------
     filename : str
         Input file name.
+    parameters : dict
+        Parameters to export.
     verbose : bool, optional, default True
         If `True`, add comments to describe content of file.
 
@@ -347,8 +349,8 @@ def _write_surx(parameters):
     if not ("surface_complexes" in parameters and parameters["surface_complexes"]):
         return out
 
-    for complex in parameters["surface_complexes"]:
-        out += [f"{complex:<20}"]
+    for complex_ in parameters["surface_complexes"]:
+        out += [f"{complex_:<20}"]
 
     return out
 
