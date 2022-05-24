@@ -14,6 +14,8 @@ def write(filename, parameters, mopr_10=0, mopr_11=0, verbose=True):
     ----------
     filename : str
         Input file name.
+    parameters : dict
+        Parameters to export.
     mopr_10 : int, optional, default 0
         MOPR(10) value in file 'flow.inp'.
     mopr_11 : int, optional, default 0
@@ -74,7 +76,6 @@ def _generate_numbers(parameters):
             numbers["NWCOM"] *= -1
 
     if numbers["NWMIN"]:
-        parameters["output"]["minerals"][0]
         if isinstance(parameters["output"]["minerals"][0], str):
             numbers["NWMIN"] *= -1
 
@@ -265,7 +266,7 @@ def _write_indices_names(parameters, key, n, verbose):
 def _write_default(parameters, verbose, mopr_11=0):
     """Write default chemical property zones."""
     out = (
-        [f"#IZIWDF IZBWDF IZMIDF IZGSDF IZADDF IZEXDF IZPPDF IZKDDF IZBGDF"]
+        ["#IZIWDF IZBWDF IZMIDF IZGSDF IZADDF IZEXDF IZPPDF IZKDDF IZBGDF"]
         if verbose
         else []
     )
