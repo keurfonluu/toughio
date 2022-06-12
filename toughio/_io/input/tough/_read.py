@@ -862,11 +862,14 @@ def _read_eleme(f, label_length):
         if line.strip():
             data = read_record(line, fmt[label_length])
             label = label_format.format(data[0])
-            rock = data[3].strip()
+            rock = data[3]
+            if rock:
+                rock = data[3].strip()
+                rock = int(rock) if rock.isdigit() else rock
             eleme["elements"][label] = {
                 "nseq": data[1],
                 "nadd": data[2],
-                "material": int(rock) if all(r.isdigit() for r in rock) else rock,
+                "material": rock,
                 "volume": data[4],
                 "heat_exchange_area": data[5],
                 "permeability_modifier": data[6],
