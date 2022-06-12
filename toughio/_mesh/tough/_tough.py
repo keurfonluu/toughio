@@ -141,8 +141,7 @@ def check_incon(
         do_incon = False
 
     cond = np.logical_and(
-        primary_variables[:, 0] > -1.0e9,
-        primary_variables[:, 0] < 0.0,
+        primary_variables[:, 0] > -1.0e9, primary_variables[:, 0] < 0.0,
     )
     if cond.any():
         logging.warning("Negative pore pressures found in 'INCON'.")
@@ -224,10 +223,7 @@ def write_mesh(
 
         if coord:
             _write_coord(
-                f,
-                nodes,
-                materials,
-                material_end,
+                f, nodes, materials, material_end,
             )
 
         _write_conne(
@@ -301,10 +297,7 @@ def _write_eleme(
 
 @block("COORD")
 def _write_coord(
-    f,
-    nodes,
-    materials,
-    material_end,
+    f, nodes, materials, material_end,
 ):
     """Write COORD block."""
     from ._helpers import _write_coord as writer

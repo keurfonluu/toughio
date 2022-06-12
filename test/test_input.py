@@ -9,15 +9,11 @@ write_read = lambda x, **kwargs: helpers.write_read(
 )
 
 write_read_tough = lambda x: write_read(
-    x,
-    writer_kws={"file_format": "tough"},
-    reader_kws={"file_format": "tough"},
+    x, writer_kws={"file_format": "tough"}, reader_kws={"file_format": "tough"},
 )
 
 write_read_json = lambda x: write_read(
-    x,
-    writer_kws={"file_format": "json"},
-    reader_kws={"file_format": "json"},
+    x, writer_kws={"file_format": "json"}, reader_kws={"file_format": "json"},
 )
 
 
@@ -244,8 +240,7 @@ def test_ncgas(write_read):
 
 
 @pytest.mark.parametrize(
-    "write_read, isothermal",
-    [(write_read_tough, True), (write_read_tough, False)],
+    "write_read, isothermal", [(write_read_tough, True), (write_read_tough, False)],
 )
 def test_multi(write_read, isothermal):
     import random
@@ -409,9 +404,7 @@ def test_indom(write_read, num_pvars, num_items):
     num_items = num_items if num_items else np.random.randint(10) + 1
     parameters_ref = {
         "rocks": {
-            helpers.random_string(5): {
-                "initial_condition": np.random.rand(num_pvars),
-            }
+            helpers.random_string(5): {"initial_condition": np.random.rand(num_pvars),}
             for _ in range(num_items)
         },
     }
@@ -785,18 +778,9 @@ def test_meshm_xyz():
                     "n_increment": np.random.randint(100) + 1,
                     "sizes": np.random.rand(),
                 },
-                {
-                    "type": "ny",
-                    "sizes": np.random.rand(np.random.randint(100) + 1),
-                },
-                {
-                    "type": "nz",
-                    "sizes": np.random.rand(np.random.randint(100) + 1),
-                },
-                {
-                    "type": "nx",
-                    "sizes": np.random.rand(np.random.randint(100) + 1),
-                },
+                {"type": "ny", "sizes": np.random.rand(np.random.randint(100) + 1),},
+                {"type": "nz", "sizes": np.random.rand(np.random.randint(100) + 1),},
+                {"type": "nx", "sizes": np.random.rand(np.random.randint(100) + 1),},
             ],
             "angle": np.random.rand(),
         }
@@ -830,10 +814,7 @@ def test_meshm_rz2d(layer):
         "meshmaker": {
             "type": "rz2dl" if layer else "rz2d",
             "parameters": [
-                {
-                    "type": "radii",
-                    "radii": np.random.rand(np.random.randint(100) + 1),
-                },
+                {"type": "radii", "radii": np.random.rand(np.random.randint(100) + 1),},
                 {
                     "type": "equid",
                     "n_increment": np.random.randint(100) + 1,
@@ -875,9 +856,7 @@ def test_tmvoc():
         "eos": "tmvoc",
         "n_component": 1,
         "n_phase": 1,
-        "default": {
-            "phase_composition": np.random.randint(10),
-        },
+        "default": {"phase_composition": np.random.randint(10),},
         "rocks": {
             helpers.random_string(5): {
                 "initial_condition": np.random.rand(4),
@@ -894,9 +873,7 @@ def test_tmvoc():
         },
     }
     parameters = write_read(
-        parameters_ref,
-        writer_kws={"eos": "tmvoc"},
-        reader_kws={"eos": "tmvoc"},
+        parameters_ref, writer_kws={"eos": "tmvoc"}, reader_kws={"eos": "tmvoc"},
     )
 
     helpers.allclose_dict(parameters_ref["default"], parameters["default"])

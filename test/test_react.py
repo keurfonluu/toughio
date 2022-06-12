@@ -359,10 +359,7 @@ def test_chemical(verbose):
     parameters_ref = {
         "title": helpers.random_string(80),
         "primary_species": [
-            {
-                "name": helpers.random_string(20),
-                "transport": np.random.randint(2),
-            }
+            {"name": helpers.random_string(20), "transport": np.random.randint(2),}
             for _ in range(np.random.randint(5) + 1)
         ],
         "aqueous_kinetics": [
@@ -513,10 +510,7 @@ def test_chemical(verbose):
             },
         ],
         "gaseous_species": [
-            {
-                "name": helpers.random_string(20),
-                "fugacity": np.random.randint(2),
-            }
+            {"name": helpers.random_string(20), "fugacity": np.random.randint(2),}
             for _ in range(np.random.randint(5) + 1)
         ],
         "surface_complexes": [
@@ -673,10 +667,7 @@ def test_chemical(verbose):
         pp = "partial_pressure" if key == "initial_gases" else "mole_fraction"
         parameters_ref["zones"][key] = [
             [
-                {
-                    "name": helpers.random_string(20),
-                    pp: np.random.rand(),
-                }
+                {"name": helpers.random_string(20), pp: np.random.rand(),}
                 for _ in range(np.random.randint(5) + 1)
             ]
             for _ in range(np.random.randint(5) + 1)
