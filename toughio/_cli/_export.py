@@ -59,8 +59,10 @@ def export(argv=None):
         else:
             output = output[-1]
         input_format = output.format
+        labels = output.labels
     else:
         input_format = output[-1].format
+        labels = output[-1].labels
     print(" Done!")
 
     # Display warning if mesh is provided but input file format is 'tecplot'
@@ -81,9 +83,17 @@ def export(argv=None):
     if not with_mesh:
         print("{} ...".format(msg), end="")
         sys.stdout.flush()
-        points, axis = _get_points(output if args.file_format != "xdmf" else output[0])
+        points, axis = _get_points(
+            output if args.file_format != "xdmf" else output[0],
+            args.ignore_elements,
+        )
         ndim = len(axis)
         print(" Done!")
+
+        if args.ignore_elements:
+            mask = np.ones(len(labels), dtype=bool)
+            for element in args.ignore_elements:
+                mask = np.logical_and(mask, labels != element)
 
         if args.voxelize or ndim == 1:
             if ndim == 1:
@@ -116,8 +126,13 @@ def export(argv=None):
 
             if args.file_format != "xdmf":
                 for label, data in output.data.items():
-                    if label not in {"X", "Y", "Z"}:
-                        mesh.add_cell_data(label, data[idx])
+                    if label in {"X", "Y", "Z"}:
+                        continue
+
+                    if args.ignore_elements:
+                        data = data[mask]
+                    
+                    mesh.add_cell_data(label, data[idx])
 
             voxelized = True
 
@@ -132,8 +147,13 @@ def export(argv=None):
 
             if args.file_format != "xdmf":
                 for label, data in output.data.items():
-                    if label not in {"X", "Y", "Z"}:
-                        mesh.add_point_data(label, data)
+                    if label in {"X", "Y", "Z"}:
+                        continue
+                    
+                    if args.ignore_elements:
+                        data = data[mask]
+
+                    mesh.add_point_data(label, data)
 
     else:
         print("Reading mesh file '{}' ...".format(args.mesh), end="")
@@ -255,6 +275,14 @@ def _get_parser():
         help="exported file format",
     )
 
+    # Ignore elements
+    parser.add_argument(
+        "--ignore-elements",
+        nargs="+",
+        type=str,
+        help="list of elements to ignore (only if mesh is not provided)",
+    )
+
     # Voxelize
     parser.add_argument(
         "--voxelize",
@@ -284,7 +312,7 @@ def _get_parser():
     return parser
 
 
-def _get_points(output):
+def _get_points(output, ignore_elements):
     # Number of data points
     n_points = len(next(iter(output.data.values())))
 
@@ -311,6 +339,17 @@ def _get_points(output):
 
     if count == 0:
         raise ValueError("No coordinate array ('X', 'Y', 'Z') found.")
+
+    # Ignore elements
+    if ignore_elements:
+        mask = np.ones(n_points, dtype=bool)
+        for element in ignore_elements:
+            mask = np.logical_and(mask, output.labels != element)
+
+        X = X[mask]
+        Y = Y[mask]
+        Z = Z[mask]
+        n_points = mask.sum()
 
     # Assert dimension of the problem
     nx = len(np.unique(X))
