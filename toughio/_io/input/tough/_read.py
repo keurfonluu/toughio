@@ -864,7 +864,7 @@ def _read_eleme(f, label_length):
             label = label_format.format(data[0])
             rock = data[3]
             if rock:
-                rock = data[3].strip()
+                rock = rock.strip()
                 rock = int(rock) if rock.isdigit() else rock
             eleme["elements"][label] = {
                 "nseq": data[1],
