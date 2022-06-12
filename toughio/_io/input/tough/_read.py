@@ -753,11 +753,7 @@ def _read_gener(f, label_length, simulator="tough"):
 
             else:
                 tmp.update(
-                    {
-                        "times": None,
-                        "rates": data[9],
-                        "specific_enthalpy": data[10],
-                    }
+                    {"times": None, "rates": data[9], "specific_enthalpy": data[10],}
                 )
 
             if ltab and tmp["type"] == "DELV":
