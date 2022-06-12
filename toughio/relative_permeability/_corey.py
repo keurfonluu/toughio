@@ -40,8 +40,8 @@ class Corey(BaseRelativePermeability):
             kg = 1.0
         else:
             Shat = (sl - slr) / (1.0 - slr - sgr)
-            kl = Shat**4
-            kg = (1.0 - Shat**2) * (1.0 - Shat) ** 2
+            kl = Shat ** 4
+            kg = (1.0 - Shat ** 2) * (1.0 - Shat) ** 2
         return kl, kg
 
     @property
