@@ -101,16 +101,12 @@ def _get_parser():
 
     # Input file
     parser.add_argument(
-        "infile",
-        type=str,
-        help="TOUGH output file",
+        "infile", type=str, help="TOUGH output file",
     )
 
     # Mesh file
     parser.add_argument(
-        "mesh",
-        type=str,
-        help="TOUGH MESH file (can be INFILE)",
+        "mesh", type=str, help="TOUGH MESH file (can be INFILE)",
     )
 
     # Output file

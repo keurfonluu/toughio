@@ -25,7 +25,7 @@ class Pickens(BaseRelativePermeability):
     def _eval(self, sl, *args):
         """Gas perfect mobile function."""
         (x,) = args
-        return sl**x, 1.0
+        return sl ** x, 1.0
 
     @property
     def parameters(self):
