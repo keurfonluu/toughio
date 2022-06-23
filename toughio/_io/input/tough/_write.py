@@ -148,13 +148,20 @@ def write_buffer(params, block, ignore_blocks=None, eos_=None, simulator="tough"
         parameters["more_options"] = {
             int(k): v for k, v in parameters["more_options"].items()
         }
+
     if "extra_options" in parameters:
         parameters["extra_options"] = {
             int(k): v for k, v in parameters["extra_options"].items()
         }
+
     if "selections" in parameters and "integers" in parameters["selections"]:
         parameters["selections"]["integers"] = {
             int(k): v for k, v in parameters["selections"]["integers"].items()
+        }
+
+    if "react" in parameters and "options" in parameters["react"]:
+        parameters["react"]["options"] = {
+            int(k): v for k, v in parameters["react"]["options"].items()
         }
 
     # Check that EOS is defined (for block MULTI)
