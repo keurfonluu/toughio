@@ -1075,6 +1075,8 @@ def _write_gener(parameters, simulator="tough"):
             if len(data["conductivity_factors"]) != ktab:
                 raise ValueError()
 
+            ktab = ktab if ktab else None
+
         # Record 1
         values = [
             data["label"] if "label" in data else "",
