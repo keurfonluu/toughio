@@ -226,7 +226,9 @@ def write_buffer(params, block, ignore_blocks=None, eos_=None, simulator="tough"
     # TOUGHREACT related flags
     react = "options" in parameters["react"] and parameters["react"]["options"]
     outpt = (
-        "output" in parameters["react"] and "format" in parameters["react"]["output"]
+        "output" in parameters["react"]
+        and "format" in parameters["react"]["output"]
+        and parameters["react"]["output"]["format"] is not None
     )
     poise = "poiseuille" in parameters["react"] and parameters["react"]["poiseuille"]
 
@@ -245,7 +247,7 @@ def write_buffer(params, block, ignore_blocks=None, eos_=None, simulator="tough"
     if "RPCAP" in blocks and rpcap:
         out += _write_rpcap(parameters)
 
-    if "REACT" in blocks and react:
+    if "REACT" in blocks and react and simulator == "toughreact":
         out += _write_react(parameters)
 
     if "FLAC" in blocks and parameters["flac"]:
@@ -267,7 +269,7 @@ def write_buffer(params, block, ignore_blocks=None, eos_=None, simulator="tough"
         out += _write_start()
 
     if "PARAM" in blocks and param:
-        out += _write_param(parameters, eos_)
+        out += _write_param(parameters, eos_, simulator)
 
     if "SELEC" in blocks and parameters["selections"]:
         out += _write_selec(parameters)
@@ -296,7 +298,7 @@ def write_buffer(params, block, ignore_blocks=None, eos_=None, simulator="tough"
     if "DIFFU" in blocks and len(parameters["diffusion"]):
         out += _write_diffu(parameters)
 
-    if "OUTPT" in blocks and outpt:
+    if "OUTPT" in blocks and outpt and simulator == "toughreact":
         out += _write_outpt(parameters)
 
     if "OUTPU" in blocks and output:
@@ -317,7 +319,7 @@ def write_buffer(params, block, ignore_blocks=None, eos_=None, simulator="tough"
     if "MESHM" in blocks and parameters["meshmaker"]:
         out += _write_meshm(parameters)
 
-    if "POISE" in blocks and poise:
+    if "POISE" in blocks and poise and simulator == "toughreact":
         out += _write_poise(parameters)
 
     if "NOVER" in blocks and parameters["nover"]:
@@ -724,7 +726,7 @@ def _write_start():
 @check_parameters(dtypes["PARAM"], keys="options")
 @check_parameters(dtypes["MOP"], keys="extra_options")
 @block("PARAM")
-def _write_param(parameters, eos_=None):
+def _write_param(parameters, eos_=None, simulator="tough"):
     """Write PARAM block data."""
     # Load data
     from ._common import extra_options, options
@@ -768,7 +770,7 @@ def _write_param(parameters, eos_=None):
         data["t_max"],
         -((len(data["t_steps"]) - 1) // 8 + 1),
         data["t_step_max"],
-        "wdata" if data["react_wdata"] else None,
+        "wdata" if data["react_wdata"] and simulator == "toughreact" else None,
         None,
         data["gravity"],
         data["t_reduce_factor"],
@@ -781,7 +783,7 @@ def _write_param(parameters, eos_=None):
     out += write_record(values, fmt3, multi=True)
 
     # TOUGHREACT
-    if data["react_wdata"]:
+    if data["react_wdata"] and simulator == "toughreact":
         n = len(data["react_wdata"])
         out += ["{}\n".format(n)]
         out += ["{}\n".format(x) for x in data["react_wdata"]]
@@ -1067,7 +1069,8 @@ def _write_gener(parameters, simulator="tough"):
         # TOUGHREACT
         ktab = None
         if (
-            data["conductivity_times"] is not None
+            simulator == "toughreact"
+            and data["conductivity_times"] is not None
             and data["conductivity_factors"] is not None
         ):
             ktab = len(data["conductivity_times"])
