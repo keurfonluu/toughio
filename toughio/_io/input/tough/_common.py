@@ -42,7 +42,7 @@ _Parameters = {
     "chemical_properties": {},
     "non_condensible_gas": [],
     "isothermal": False,
-    "start": True,
+    "start": False,
     "nover": False,
     "rocks": {},
     "rocks_order": None,
