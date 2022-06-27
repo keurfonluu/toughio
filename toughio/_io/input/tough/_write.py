@@ -764,11 +764,24 @@ def _write_param(parameters, eos_=None, simulator="tough"):
     ]
     out = write_record(values, fmt1)
 
+    # Time steps
+    t_steps = data["t_steps"]
+    ndlt = len(t_steps)
+    if ndlt < 2:
+        delten = t_steps[0] if ndlt else None
+
+        # Patch record format
+        fmt2 = block_to_format["PARAM"][2].replace("10.1f", "10.4e")
+        fmt2 = str2format(fmt2)
+
+    else:
+        delten = -((ndlt - 1) // 8 + 1)
+
     # Record 2
     values = [
         data["t_ini"],
         data["t_max"],
-        -((len(data["t_steps"]) - 1) // 8 + 1),
+        delten,
         data["t_step_max"],
         "wdata" if data["react_wdata"] and simulator == "toughreact" else None,
         None,
@@ -779,8 +792,9 @@ def _write_param(parameters, eos_=None, simulator="tough"):
     out += write_record(values, fmt2)
 
     # Record 2.1
-    values = [x for x in data["t_steps"]]
-    out += write_record(values, fmt3, multi=True)
+    if ndlt > 1:
+        values = [x for x in t_steps]
+        out += write_record(values, fmt3, multi=True)
 
     # TOUGHREACT
     if data["react_wdata"] and simulator == "toughreact":
