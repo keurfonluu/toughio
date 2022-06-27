@@ -513,17 +513,22 @@ def _read_param(f, eos=None):
     )
     wdata = data[4]
 
-    t_steps = int(data[2])
-    if t_steps >= 0.0:
-        param["options"]["t_steps"] = t_steps
-    else:
-        param["options"]["t_steps"] = []
-        for _ in range(-t_steps):
-            line = f.next()
-            data = read_record(line, fmt[3])
-            param["options"]["t_steps"] += prune_nones_list(data)
-        if len(param["options"]["t_steps"]) == 1:
-            param["options"]["t_steps"] = param["options"]["t_steps"][0]
+    t_steps = data[2]
+    if t_steps:
+        if t_steps >= 0.0:
+            param["options"]["t_steps"] = t_steps
+
+        else:
+            t_steps = int(-t_steps)
+            param["options"]["t_steps"] = []
+
+            for _ in range(t_steps):
+                line = f.next()
+                data = read_record(line, fmt[3])
+                param["options"]["t_steps"] += prune_nones_list(data)
+                
+            if len(param["options"]["t_steps"]) == 1:
+                param["options"]["t_steps"] = param["options"]["t_steps"][0]
 
     # TOUGHREACT
     if wdata == "wdata":
