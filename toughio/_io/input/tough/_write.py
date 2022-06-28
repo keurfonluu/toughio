@@ -112,7 +112,9 @@ def write_buffer(params, block, ignore_blocks=None, space_between_blocks=False, 
     )
 
     parameters["end_comments"] = (
-        [parameters["end_comments"]]
+        None
+        if not parameters["end_comments"]
+        else [parameters["end_comments"]]
         if isinstance(parameters["end_comments"], str)
         else parameters["end_comments"]
     )
@@ -283,6 +285,7 @@ def write_buffer(params, block, ignore_blocks=None, space_between_blocks=False, 
 
     if "START" in blocks and parameters["start"]:
         out += _write_start()
+        out += ["\n"] if space_between_blocks else []
 
     if "PARAM" in blocks and param:
         out += _write_param(parameters, eos_, simulator)
@@ -325,6 +328,7 @@ def write_buffer(params, block, ignore_blocks=None, space_between_blocks=False, 
 
     if "OUTPT" in blocks and outpt and simulator == "toughreact":
         out += _write_outpt(parameters)
+        out += ["\n"] if space_between_blocks else []
 
     if "ELEME" in blocks and parameters["elements"]:
         out += _write_eleme(parameters)
@@ -351,9 +355,9 @@ def write_buffer(params, block, ignore_blocks=None, space_between_blocks=False, 
 
     if "ENDCY" in blocks:
         out += _write_endcy()
-        out += ["\n"] if space_between_blocks else []
 
     if "END COMMENTS" in blocks and parameters["end_comments"]:
+        out += ["\n"] if space_between_blocks else []
         out += [f"{comment}\n" for comment in parameters["end_comments"]]
 
     return out
