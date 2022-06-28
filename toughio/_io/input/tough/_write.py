@@ -319,12 +319,12 @@ def write_buffer(params, block, ignore_blocks=None, space_between_blocks=False, 
         out += _write_diffu(parameters)
         out += ["\n"] if space_between_blocks else []
 
-    if "OUTPT" in blocks and outpt and simulator == "toughreact":
-        out += _write_outpt(parameters)
-
     if "OUTPU" in blocks and output:
         out += _write_outpu(parameters)
         out += ["\n"] if space_between_blocks else []
+
+    if "OUTPT" in blocks and outpt and simulator == "toughreact":
+        out += _write_outpt(parameters)
 
     if "ELEME" in blocks and parameters["elements"]:
         out += _write_eleme(parameters)
