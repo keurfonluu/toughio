@@ -16,7 +16,7 @@ __all__ = [
 
 
 def write(
-    filename, parameters, block=None, ignore_blocks=None, eos=None, simulator="tough"
+    filename, parameters, block=None, ignore_blocks=None, eos=None, space_between_blocks=False, simulator="tough",
 ):
     """
     Write TOUGH input file.
@@ -36,6 +36,8 @@ def write(
          - None: write all blocks except blocks defined in `ignore_blocks`.
     ignore_blocks : list of str or None, optional, default None
         Blocks to ignore. Only if `block` is None.
+    space_between_blocks : bool, optional, default False
+        Add an empty record between blocks.
     eos : str or None, optional, default None
         Equation of State. If `eos` is defined in `parameters`, this option will be ignored.
 
@@ -54,14 +56,14 @@ def write(
         ):
             raise ValueError("'variables' must be a list of dicts since v1.7.0.")
 
-    buffer = write_buffer(parameters, block, ignore_blocks, eos, simulator)
+    buffer = write_buffer(parameters, block, ignore_blocks, space_between_blocks, eos, simulator)
     with open_file(filename, "w") as f:
         for record in buffer:
             f.write(record)
 
 
 @check_parameters(dtypes["PARAMETERS"])
-def write_buffer(params, block, ignore_blocks=None, eos_=None, simulator="tough"):
+def write_buffer(params, block, ignore_blocks=None, space_between_blocks=False, eos_=None, simulator="tough"):
     """Write TOUGH input file as a list of 80-character long record strings."""
     from ._common import Parameters
     from ._common import blocks as blocks_
@@ -246,48 +248,60 @@ def write_buffer(params, block, ignore_blocks=None, eos_=None, simulator="tough"
     out = []
     if "TITLE" in blocks:
         out += ["{:80}\n".format(title) for title in parameters["title"]]
+        out += ["\n"] if space_between_blocks else []
 
     if "ROCKS" in blocks and parameters["rocks"]:
         out += _write_rocks(parameters, simulator)
 
     if "RPCAP" in blocks and rpcap:
         out += _write_rpcap(parameters)
+        out += ["\n"] if space_between_blocks else []
 
     if "REACT" in blocks and react and simulator == "toughreact":
         out += _write_react(parameters)
+        out += ["\n"] if space_between_blocks else []
 
     if "FLAC" in blocks and parameters["flac"]:
         out += _write_flac(parameters)
+        out += ["\n"] if space_between_blocks else []
 
     if "CHEMP" in blocks and parameters["chemical_properties"]:
         out += _write_chemp(parameters)
+        out += ["\n"] if space_between_blocks else []
 
     if "NCGAS" in blocks and len(parameters["non_condensible_gas"]):
         out += _write_ncgas(parameters)
+        out += ["\n"] if space_between_blocks else []
 
     if "MULTI" in blocks and multi:
         out += _write_multi(parameters)
+        out += ["\n"] if space_between_blocks else []
 
     if "SOLVR" in blocks and parameters["solver"]:
         out += _write_solvr(parameters)
+        out += ["\n"] if space_between_blocks else []
 
     if "START" in blocks and parameters["start"]:
         out += _write_start()
 
     if "PARAM" in blocks and param:
         out += _write_param(parameters, eos_, simulator)
+        out += ["\n"] if space_between_blocks else []
 
     if "SELEC" in blocks and parameters["selections"]:
         out += _write_selec(parameters)
+        out += ["\n"] if space_between_blocks else []
 
     if "INDOM" in blocks and indom:
         out += _write_indom(parameters, eos_)
 
     if "MOMOP" in blocks and parameters["more_options"]:
         out += _write_momop(parameters)
+        out += ["\n"] if space_between_blocks else []
 
     if "TIMES" in blocks and len(parameters["times"]):
         out += _write_times(parameters)
+        out += ["\n"] if space_between_blocks else []
 
     if "FOFT" in blocks and len(parameters["element_history"]):
         out += _write_foft(parameters)
@@ -303,12 +317,14 @@ def write_buffer(params, block, ignore_blocks=None, eos_=None, simulator="tough"
 
     if "DIFFU" in blocks and len(parameters["diffusion"]):
         out += _write_diffu(parameters)
+        out += ["\n"] if space_between_blocks else []
 
     if "OUTPT" in blocks and outpt and simulator == "toughreact":
         out += _write_outpt(parameters)
 
     if "OUTPU" in blocks and output:
         out += _write_outpu(parameters)
+        out += ["\n"] if space_between_blocks else []
 
     if "ELEME" in blocks and parameters["elements"]:
         out += _write_eleme(parameters)
@@ -327,12 +343,15 @@ def write_buffer(params, block, ignore_blocks=None, eos_=None, simulator="tough"
 
     if "POISE" in blocks and poise and simulator == "toughreact":
         out += _write_poise(parameters)
+        out += ["\n"] if space_between_blocks else []
 
     if "NOVER" in blocks and parameters["nover"]:
         out += _write_nover()
+        out += ["\n"] if space_between_blocks else []
 
     if "ENDCY" in blocks:
         out += _write_endcy()
+        out += ["\n"] if space_between_blocks else []
 
     if "END COMMENTS" in blocks and parameters["end_comments"]:
         out += [f"{comment}\n" for comment in parameters["end_comments"]]
