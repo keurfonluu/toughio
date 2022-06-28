@@ -749,22 +749,22 @@ def _write_solvr(parameters):
 @block("START")
 def _write_start():
     """Write START block data."""
-    from ._common import header
-
-    out = "{:5}{}\n".format("----*", header)
-    return [out[:11] + "MOP: 123456789*123456789*1234" + out[40:]]
+    return []
 
 
 @check_parameters(dtypes["PARAM"], keys="options")
 @check_parameters(dtypes["MOP"], keys="extra_options")
-@block("PARAM")
 def _write_param(parameters, eos_=None, simulator="tough"):
     """Write PARAM block data."""
     # Load data
-    from ._common import extra_options, options
+    from ._common import header, extra_options, options
 
     data = deepcopy(options)
     data.update(parameters["options"])
+
+    # Special header
+    out = "{:5}{}\n".format("PARAM", header)
+    out = [out[:11] + "MOP: 123456789*123456789*1234" + out[40:]]
 
     # Table
     if not isinstance(data["t_steps"], (list, tuple, np.ndarray)):
@@ -794,7 +794,7 @@ def _write_param(parameters, eos_=None, simulator="tough"):
         data["temperature_dependence_gas"],
         data["effective_strength_vapor"],
     ]
-    out = write_record(values, fmt1)
+    out += write_record(values, fmt1)
 
     # Time steps
     t_steps = data["t_steps"]
