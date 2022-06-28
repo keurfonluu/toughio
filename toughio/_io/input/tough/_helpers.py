@@ -46,6 +46,7 @@ dtypes = {
         "meshmaker": "dict",
         "poiseuille": "dict",
         "default": "dict",
+        "end_comments": "str_array_like",
     },
     "ROCKS": {
         "density": "scalar",

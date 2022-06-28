@@ -214,7 +214,24 @@ def read_buffer(f, label_length, eos, simulator="tough"):
                 parameters["nover"] = True
 
             elif line.startswith("ENDCY"):
-                break
+                # Save end comments
+                end_comments = []
+                while True:
+                    try:
+                        end_comments.append(fiter.next().rstrip())
+
+                    except StopIteration:
+                        break
+
+                # Remove trailing empty records
+                end_comments = [comment if comment else None for comment in end_comments]
+                end_comments = prune_nones_list(end_comments)
+                if end_comments:
+                    parameters["end_comments"] = (
+                        end_comments[0]
+                        if len(end_comments) == 1
+                        else [comment if comment else "" for comment in end_comments]
+                    )
 
     except:
         raise ReadError("failed to parse line {}.".format(fiter.count))
