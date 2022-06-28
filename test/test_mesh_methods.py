@@ -184,6 +184,15 @@ def test_set_material(bool_cells):
     assert (mesh.materials == "test").sum() == 8
 
 
+def test_set_cell_labels():
+    mesh = deepcopy(helpers.hybrid_mesh)
+    labels = [helpers.random_label(5) for _ in range(mesh.n_cells)]
+    mesh.set_cell_labels(labels)
+
+    for label, label_ref in zip(mesh.labels, labels):
+        assert label == label_ref
+
+
 def test_cell_data_to_point_data():
     mesh = deepcopy(helpers.hybrid_mesh)
     data = np.ones(mesh.n_cells)
