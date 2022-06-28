@@ -109,6 +109,12 @@ def write_buffer(params, block, ignore_blocks=None, eos_=None, simulator="tough"
         else parameters["title"]
     )
 
+    parameters["end_comments"] = (
+        [parameters["end_comments"]]
+        if isinstance(parameters["end_comments"], str)
+        else parameters["end_comments"]
+    )
+
     for k, v in default.items():
         if k not in parameters["default"].keys():
             parameters["default"][k] = v
@@ -327,6 +333,9 @@ def write_buffer(params, block, ignore_blocks=None, eos_=None, simulator="tough"
 
     if "ENDCY" in blocks:
         out += _write_endcy()
+
+    if "END COMMENTS" in blocks and parameters["end_comments"]:
+        out += [f"{comment}\n" for comment in parameters["end_comments"]]
 
     return out
 
@@ -1516,7 +1525,7 @@ def _write_nover():
     return []
 
 
-@block("ENDCY", noend=True)
+@block("ENDCY")
 def _write_endcy():
     """Write ENDCY block data."""
     return []

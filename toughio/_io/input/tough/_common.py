@@ -29,6 +29,7 @@ blocks = {
     "POISE",
     "NOVER",
     "ENDCY",
+    "END COMMENTS",
 }
 
 _Parameters = {
@@ -67,6 +68,7 @@ _Parameters = {
     "initial_conditions_order": None,
     "meshmaker": {},
     "default": {},
+    "end_comments": "",
 }
 
 Parameters = dict(_Parameters)
