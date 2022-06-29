@@ -16,7 +16,13 @@ __all__ = [
 
 
 def write(
-    filename, parameters, block=None, ignore_blocks=None, eos=None, space_between_blocks=False, simulator="tough",
+    filename,
+    parameters,
+    block=None,
+    ignore_blocks=None,
+    eos=None,
+    space_between_blocks=False,
+    simulator="tough",
 ):
     """
     Write TOUGH input file.
@@ -56,14 +62,23 @@ def write(
         ):
             raise ValueError("'variables' must be a list of dicts since v1.7.0.")
 
-    buffer = write_buffer(parameters, block, ignore_blocks, space_between_blocks, eos, simulator)
+    buffer = write_buffer(
+        parameters, block, ignore_blocks, space_between_blocks, eos, simulator
+    )
     with open_file(filename, "w") as f:
         for record in buffer:
             f.write(record)
 
 
 @check_parameters(dtypes["PARAMETERS"])
-def write_buffer(params, block, ignore_blocks=None, space_between_blocks=False, eos_=None, simulator="tough"):
+def write_buffer(
+    params,
+    block,
+    ignore_blocks=None,
+    space_between_blocks=False,
+    eos_=None,
+    simulator="tough",
+):
     """Write TOUGH input file as a list of 80-character long record strings."""
     from ._common import Parameters
     from ._common import blocks as blocks_
@@ -757,7 +772,7 @@ def _write_start():
 def _write_param(parameters, eos_=None, simulator="tough"):
     """Write PARAM block data."""
     # Load data
-    from ._common import header, extra_options, options
+    from ._common import extra_options, header, options
 
     data = deepcopy(options)
     data.update(parameters["options"])
