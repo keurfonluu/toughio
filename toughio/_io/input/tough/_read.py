@@ -224,7 +224,9 @@ def read_buffer(f, label_length, eos, simulator="tough"):
                         break
 
                 # Remove trailing empty records
-                end_comments = [comment if comment else None for comment in end_comments]
+                end_comments = [
+                    comment if comment else None for comment in end_comments
+                ]
                 end_comments = prune_nones_list(end_comments)
                 if end_comments:
                     parameters["end_comments"] = (
@@ -543,7 +545,7 @@ def _read_param(f, eos=None):
                 line = f.next()
                 data = read_record(line, fmt[3])
                 param["options"]["t_steps"] += prune_nones_list(data)
-                
+
             if len(param["options"]["t_steps"]) == 1:
                 param["options"]["t_steps"] = param["options"]["t_steps"][0]
 
