@@ -109,6 +109,8 @@ def write(filename, parameters, file_format=None, **kwargs):
          - None: write all blocks except blocks defined in `ignore_blocks`.
     ignore_blocks : list of str or None, optional, default None
         Only if ``file_format = "tough"`` and `block` is None. Blocks to ignore.
+    space_between_blocks : bool, optional, default False
+        Only if ``file_format = "tough"``. Add an empty record between blocks.
     eos : str or None, optional, default None
         Only if ``file_format = "tough"``. Equation of State.
         If `eos` is defined in `parameters`, this option will be ignored.

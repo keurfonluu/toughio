@@ -14,7 +14,8 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      # uses: actions/checkout@v2
+      uses: nschloe/action-cached-lfs-checkout@v1
     # Cache for LFS to limit usage of GitHub LFS monthly bandwidth
     # See <https://github.com/actions/checkout/issues/165>
     - name: Create LFS file list
