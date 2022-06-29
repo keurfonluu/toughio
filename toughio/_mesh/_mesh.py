@@ -552,6 +552,29 @@ class Mesh(object):
             raise ValueError()
         self.cell_data[label] = np.asarray(data)
 
+    def set_cell_labels(self, labels):
+        """
+        Set labels to cells.
+
+        Parameters
+        ----------
+        labels : array_like
+            Cell labels.
+
+        Note
+        ----
+        If labels are not set, a custom labeler with a naming convention different that of TOUGH is used.
+
+        """
+        if not isinstance(labels, (list, tuple, np.ndarray)):
+            raise TypeError()
+        if len(labels) != self.n_cells:
+            raise ValueError()
+        if not all(isinstance(label, str) for label in labels):
+            raise ValueError()
+
+        self._labels = labels
+
     def set_material(self, material, cells):
         """
         Set material to cells.
@@ -757,7 +780,11 @@ class Mesh(object):
         """Return labels of cell in mesh."""
         from ._common import labeler
 
-        return labeler(self.n_cells, self.label_length)
+        return (
+            self._labels
+            if hasattr(self, "_labels") and self._labels
+            else labeler(self.n_cells, self.label_length)
+        )
 
     @property
     def centers(self):

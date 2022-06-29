@@ -910,3 +910,25 @@ def test_flag(write_read, flag, enable):
         assert parameters_ref[flag] == parameters[flag]
     else:
         assert not enable
+
+
+@pytest.mark.parametrize(
+    "write_read, single",
+    [
+        (write_read_tough, True),
+        (write_read_tough, False),
+        (write_read_json, True),
+        (write_read_json, False),
+    ],
+)
+def test_end_comments(write_read, single):
+    parameters_ref = {
+        "end_comments": (
+            helpers.random_string(80)
+            if single
+            else [helpers.random_string(80) for _ in range(np.random.randint(5) + 2)]
+        ),
+    }
+    parameters = write_read(parameters_ref)
+
+    assert parameters_ref["end_comments"] == parameters["end_comments"]
