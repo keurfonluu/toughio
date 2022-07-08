@@ -406,7 +406,7 @@ def _write_convergence_bounds(parameters, verbose, mopr_10=0):
         int(getval(parameters, ("options", "n_iteration_4"), 100)),
     ]
 
-    out += ["# MAXCHEM1  MAXCHEM2  MAXCHEM3  MAXCHEM4"] if verbose else []
+    out += ["#MAXCHEM1  MAXCHEM2  MAXCHEM3  MAXCHEM4"] if verbose else []
     out += write_ffrecord(values, verbose, int_fmt="{:9d}")
 
     # Increase/reduce factors
@@ -420,7 +420,7 @@ def _write_convergence_bounds(parameters, verbose, mopr_10=0):
     ]
 
     out += (
-        ["#  DTINCR1   DTINCR2   DTINCR3   DTDECR1   DTDECR2   DTDECR3"]
+        ["# DTINCR1   DTINCR2   DTINCR3   DTDECR1   DTDECR2   DTDECR3"]
         if verbose
         else []
     )
