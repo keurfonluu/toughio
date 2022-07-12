@@ -1,6 +1,6 @@
 import logging
 
-from .._common import to_str
+from .._common import prune_nones_list, to_str
 
 
 def getval(parameters, keys, default):
@@ -48,3 +48,27 @@ def write_ffrecord(
 
     else:
         return [f"{' '.join(str(x) for x in values)}"]
+
+
+def read_end_comments(fiter):
+    # Save end comments
+    end_comments = []
+    while True:
+        try:
+            end_comments.append(fiter.next().rstrip())
+
+        except StopIteration:
+            break
+
+    # Remove trailing empty records
+    end_comments = [comment if comment else None for comment in end_comments]
+    end_comments = prune_nones_list(end_comments)
+    if end_comments:
+        return (
+            end_comments[0]
+            if len(end_comments) == 1
+            else [comment if comment else "" for comment in end_comments]
+        )
+
+    else:
+        return None

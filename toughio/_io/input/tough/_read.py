@@ -4,6 +4,7 @@ from ...._common import block_to_format, get_label_length, open_file
 from ...._exceptions import ReadError
 from ...._helpers import FileIterator
 from ..._common import prune_nones_dict, prune_nones_list, read_record
+from .._common import read_end_comments
 from ._helpers import read_model_record
 
 __all__ = [
@@ -214,26 +215,9 @@ def read_buffer(f, label_length, eos, simulator="tough"):
                 parameters["nover"] = True
 
             elif line.startswith("ENDCY"):
-                # Save end comments
-                end_comments = []
-                while True:
-                    try:
-                        end_comments.append(fiter.next().rstrip())
-
-                    except StopIteration:
-                        break
-
-                # Remove trailing empty records
-                end_comments = [
-                    comment if comment else None for comment in end_comments
-                ]
-                end_comments = prune_nones_list(end_comments)
+                end_comments = read_end_comments(fiter)
                 if end_comments:
-                    parameters["end_comments"] = (
-                        end_comments[0]
-                        if len(end_comments) == 1
-                        else [comment if comment else "" for comment in end_comments]
-                    )
+                    parameters["end_comments"] = end_comments
 
     except:
         raise ReadError("failed to parse line {}.".format(fiter.count))

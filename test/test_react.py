@@ -300,6 +300,9 @@ def test_solute(verbose, mopr_10, mopr_11):
             }
             for _ in range(np.random.randint(10) + 1)
         },
+        "end_comments": [
+            helpers.random_string(80) for _ in range(np.random.randint(5) + 2)
+        ],
     }
 
     if mopr_10 == 2:
@@ -603,6 +606,9 @@ def test_chemical(verbose):
                 np.random.rand(5) for _ in range(np.random.randint(5) + 1)
             ],
         },
+        "end_comments": [
+            helpers.random_string(80) for _ in range(np.random.randint(5) + 2)
+        ],
     }
 
     # Primary species
