@@ -15,7 +15,8 @@ class FileIterator:
     def __next__(self):
         """Return next item."""
         self.count += 1
-        return next(self.fiter)
+        self.line = next(self.fiter)
+        return self.line
 
     def next(self, skip_empty=False, comments=None):
         """Return next line."""
@@ -25,9 +26,11 @@ class FileIterator:
 
                 if comments:
                     if line and not line.startswith(comments):
+                        self.line = line
                         return line
 
                 elif line:
+                    self.line = line
                     return line
 
         elif comments:
@@ -35,10 +38,12 @@ class FileIterator:
                 line = self.__next__().strip()
 
                 if not line.startswith(comments):
+                    self.line = line
                     return line
 
         else:
-            return self.__next__()
+            self.line = self.__next__()
+            return self.line
 
     def seek(self, i, increment):
         """Set file's position."""

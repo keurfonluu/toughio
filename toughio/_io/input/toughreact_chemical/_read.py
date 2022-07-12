@@ -2,6 +2,7 @@ from ...._common import open_file
 from ...._exceptions import ReadError
 from ...._helpers import FileIterator
 from ..._common import to_float
+from .._common import read_end_comments
 
 __all__ = [
     "read",
@@ -50,6 +51,11 @@ def read_buffer(f):
         parameters["zones"].update(_read_zads(fiter))
         parameters["zones"].update(_read_zlkd(fiter))
         parameters["zones"].update(_read_zexc(fiter, nxsites))
+
+        # End comments
+        end_comments = read_end_comments(fiter)
+        if end_comments:
+            parameters["end_comments"] = end_comments
 
     except:
         raise ReadError("failed to parse line {}.".format(fiter.count))

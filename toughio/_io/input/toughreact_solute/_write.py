@@ -98,6 +98,9 @@ def write_buffer(parameters, mopr_10=0, mopr_11=0, verbose=True, sections=None):
     if "end" in sections:
         out += ["end"]
 
+    if "end_comments" in sections and "end_comments" in parameters:
+        out += _write_end_comments(parameters)
+
     return "\n".join(out)
 
 
@@ -427,6 +430,17 @@ def _write_convergence_bounds(parameters, verbose, mopr_10=0):
     out += write_ffrecord(values, verbose, float_fmt="{{:9f}}")
 
     return out
+
+
+def _write_end_comments(parameters):
+    """Write end comments."""
+    end_comments = getval(parameters, "end_comments", "")
+
+    return (
+        [end_comments]
+        if isinstance(end_comments, str)
+        else end_comments
+    )
 
 
 def to_int(x, default=0):
