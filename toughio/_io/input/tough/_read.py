@@ -218,7 +218,7 @@ def read_buffer(f, label_length, eos, simulator="tough"):
                 end_comments = read_end_comments(fiter)
                 if end_comments:
                     parameters["end_comments"] = end_comments
-                
+
     except:
         raise ReadError("failed to parse line {}.".format(fiter.count))
 

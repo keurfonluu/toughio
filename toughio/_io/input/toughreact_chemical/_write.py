@@ -784,8 +784,4 @@ def _write_end_comments(parameters):
     """Write end comments."""
     end_comments = getval(parameters, "end_comments", "")
 
-    return (
-        [end_comments]
-        if isinstance(end_comments, str)
-        else end_comments
-    )
+    return [end_comments] if isinstance(end_comments, str) else end_comments

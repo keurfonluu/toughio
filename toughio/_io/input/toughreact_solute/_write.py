@@ -40,7 +40,17 @@ def write_buffer(parameters, mopr_10=0, mopr_11=0, verbose=True, sections=None):
 
     sections = set(sections)
 
-    if sections.intersection(["output", "elements", "components", "minerals", "aqueous_species", "surface_complexes", "exchange_species"]):
+    if sections.intersection(
+        [
+            "output",
+            "elements",
+            "components",
+            "minerals",
+            "aqueous_species",
+            "surface_complexes",
+            "exchange_species",
+        ]
+    ):
         numbers = _generate_numbers(parameters)
 
     # Define input file contents
@@ -51,7 +61,7 @@ def write_buffer(parameters, mopr_10=0, mopr_11=0, verbose=True, sections=None):
 
     if "options" in sections:
         out += _write_options(parameters, verbose)
-    
+
     if "filenames" in sections:
         out += _write_filenames(parameters, verbose)
 
@@ -60,41 +70,43 @@ def write_buffer(parameters, mopr_10=0, mopr_11=0, verbose=True, sections=None):
 
     if "convergence" in sections:
         out += _write_convergence(parameters, verbose)
-        
+
     if "output" in sections:
         out += _write_output(parameters, numbers, verbose)
-        
+
     if "elements" in sections:
         out += _write_elements(parameters, numbers["NWNOD"], verbose)
-        
+
     if "components" in sections:
         out += _write_indices_names(parameters, "components", numbers["NWCOM"], verbose)
-        
+
     if "minerals" in sections:
         out += _write_indices_names(parameters, "minerals", numbers["NWMIN"], verbose)
-        
+
     if "aqueous_species" in sections:
-        out += _write_indices_names(parameters, "aqueous_species", numbers["NWAQ"], verbose)
-        
+        out += _write_indices_names(
+            parameters, "aqueous_species", numbers["NWAQ"], verbose
+        )
+
     if "surface_complexes" in sections:
         out += _write_indices_names(
             parameters, "surface_complexes", numbers["NWADS"], verbose
         )
-        
+
     if "exchange_species" in sections:
         out += _write_indices_names(
             parameters, "exchange_species", numbers["NWEXC"], verbose
         )
-        
-    if "default" in sections: 
+
+    if "default" in sections:
         out += _write_default(parameters, verbose, mopr_11)
-        
+
     if "zones" in sections:
         out += _write_zones(parameters, verbose, mopr_11)
-        
+
     if "convergence_bounds" in sections:
         out += _write_convergence_bounds(parameters, verbose, mopr_10)
-        
+
     if "end" in sections:
         out += ["end"]
 
@@ -113,7 +125,7 @@ def _generate_numbers(parameters):
     nwaq = len(output["aqueous_species"]) if "aqueous_species" in output else 0
     nwads = len(output["surface_complexes"]) if "surface_complexes" in output else 0
     nwexc = len(output["exchange_species"]) if "exchange_species" in output else 0
-    
+
     numbers = {
         "NWNOD": -nwnod,
         "NWCOM": nwcom,
@@ -226,7 +238,9 @@ def _write_weights_coefficients(parameters, verbose):
         to_float(getval(parameters, ("options", "w_time"), 0.0)),
         to_float(getval(parameters, ("options", "w_upstream"), 0.0)),
         to_float(getval(parameters, ("options", "aqueous_diffusion_coefficient"), 0.0)),
-        to_float(getval(parameters, ("options", "molecular_diffusion_coefficient"), 0.0)),
+        to_float(
+            getval(parameters, ("options", "molecular_diffusion_coefficient"), 0.0)
+        ),
     ]
 
     out += write_ffrecord(values, verbose, float_fmt="{{:9f}}")
@@ -386,7 +400,9 @@ def _write_zones(parameters, verbose, mopr_11=0):
                 getval(parameters, ("zones", zone, "sedimentation_velocity"), 0.0)
             ]
 
-        out += write_ffrecord(values, verbose, int_fmt="{:4d}", float_fmt="{{:9f}}", str_fmt="{:5}")
+        out += write_ffrecord(
+            values, verbose, int_fmt="{:4d}", float_fmt="{{:9f}}", str_fmt="{:5}"
+        )
 
     out += [""]
 
@@ -436,11 +452,7 @@ def _write_end_comments(parameters):
     """Write end comments."""
     end_comments = getval(parameters, "end_comments", "")
 
-    return (
-        [end_comments]
-        if isinstance(end_comments, str)
-        else end_comments
-    )
+    return [end_comments] if isinstance(end_comments, str) else end_comments
 
 
 def to_int(x, default=0):
