@@ -48,7 +48,7 @@ def write_buffer(parameters, verbose):
     out += _write_zads(parameters, verbose)
     out += _write_zlkd(parameters, verbose)
     out += _write_zexc(parameters, verbose)
-    out += ["# end"]
+    out += _write_end_comments(parameters) if "end_comments" in parameters else []
 
     return "\n".join(out)
 
@@ -778,3 +778,10 @@ def _write_zexc(parameters, verbose):
         out += write_ffrecord(values, verbose, int_fmt="{:<4d}")
 
     return out
+
+
+def _write_end_comments(parameters):
+    """Write end comments."""
+    end_comments = getval(parameters, "end_comments", "")
+
+    return [end_comments] if isinstance(end_comments, str) else end_comments

@@ -2,6 +2,7 @@ from ...._common import open_file
 from ...._exceptions import ReadError
 from ...._helpers import FileIterator
 from ..._common import prune_nones_list, read_record, to_float
+from .._common import read_end_comments
 
 __all__ = [
     "read",
@@ -73,6 +74,19 @@ def read_buffer(f, mopr_11=0):
         convergence_bounds = _read_convergence_bounds(fiter)
         if convergence_bounds:
             parameters["options"].update(convergence_bounds)
+
+        # Look for file ending
+        while fiter.line.strip() != "end":
+            try:
+                _ = fiter.next()
+
+            except StopIteration:
+                break
+
+        # End comments
+        end_comments = read_end_comments(fiter)
+        if end_comments:
+            parameters["end_comments"] = end_comments
 
     except:
         raise ReadError("failed to parse line {}.".format(fiter.count))
