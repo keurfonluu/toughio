@@ -15,4 +15,5 @@ sections = [
     "zones",
     "convergence_bounds",
     "end",
+    "end_comments",
 ]
