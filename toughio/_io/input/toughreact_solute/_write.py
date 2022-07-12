@@ -157,14 +157,14 @@ def _write_options(parameters, verbose):
 
     # Record 2
     values = [
-        int(getval(parameters, ("flags", "iteration_scheme"), 0)),
-        int(getval(parameters, ("flags", "reactive_surface_area"), 0)),
-        int(getval(parameters, ("flags", "solver"), 0)),
-        int(getval(parameters, ("flags", "n_subiteration"), 0)),
-        int(getval(parameters, ("flags", "gas_transport"), 0)),
-        int(getval(parameters, ("flags", "verbosity"), 0)),
-        int(getval(parameters, ("flags", "feedback"), 0)),
-        int(getval(parameters, ("flags", "coupling"), 0)),
+        to_int(getval(parameters, ("flags", "iteration_scheme"), 0)),
+        to_int(getval(parameters, ("flags", "reactive_surface_area"), 0)),
+        to_int(getval(parameters, ("flags", "solver"), 0)),
+        to_int(getval(parameters, ("flags", "n_subiteration"), 0)),
+        to_int(getval(parameters, ("flags", "gas_transport"), 0)),
+        to_int(getval(parameters, ("flags", "verbosity"), 0)),
+        to_int(getval(parameters, ("flags", "feedback"), 0)),
+        to_int(getval(parameters, ("flags", "coupling"), 0)),
         0,
     ]
 
@@ -178,10 +178,10 @@ def _write_options(parameters, verbose):
 
     # Record 3
     values = [
-        float(getval(parameters, ("options", "sl_min"), 0.0)),
-        float(getval(parameters, ("options", "rcour"), 0.0)),
-        float(getval(parameters, ("options", "ionic_strength_max"), 0.0)),
-        float(getval(parameters, ("options", "mineral_gas_factor"), 0.0)),
+        to_float(getval(parameters, ("options", "sl_min"), 0.0)),
+        to_float(getval(parameters, ("options", "rcour"), 0.0)),
+        to_float(getval(parameters, ("options", "ionic_strength_max"), 0.0)),
+        to_float(getval(parameters, ("options", "mineral_gas_factor"), 0.0)),
     ]
 
     out += ["#  SL1MIN     RCOUR    STIMAX    CNFACT"] if verbose else []
@@ -220,10 +220,10 @@ def _write_weights_coefficients(parameters, verbose):
     """Write weights and diffusion coefficients."""
     out = ["#   ITIME      WUPC     DFFUN    DFFUNG"] if verbose else []
     values = [
-        float(getval(parameters, ("options", "w_time"), 0.0)),
-        float(getval(parameters, ("options", "w_upstream"), 0.0)),
-        float(getval(parameters, ("options", "aqueous_diffusion_coefficient"), 0.0)),
-        float(getval(parameters, ("options", "molecular_diffusion_coefficient"), 0.0)),
+        to_float(getval(parameters, ("options", "w_time"), 0.0)),
+        to_float(getval(parameters, ("options", "w_upstream"), 0.0)),
+        to_float(getval(parameters, ("options", "aqueous_diffusion_coefficient"), 0.0)),
+        to_float(getval(parameters, ("options", "molecular_diffusion_coefficient"), 0.0)),
     ]
 
     out += write_ffrecord(values, verbose, float_fmt="{{:9f}}")
@@ -239,13 +239,13 @@ def _write_convergence(parameters, verbose):
         else []
     )
     values = [
-        int(getval(parameters, ("options", "n_iteration_tr"), 0)),
-        float(getval(parameters, ("options", "eps_tr"), 0.0)),
-        int(getval(parameters, ("options", "n_iteration_ch"), 0)),
-        float(getval(parameters, ("options", "eps_ch"), 0.0)),
-        float(getval(parameters, ("options", "eps_mb"), 0.0)),
-        float(getval(parameters, ("options", "eps_dc"), 0.0)),
-        float(getval(parameters, ("options", "eps_dr"), 0.0)),
+        to_int(getval(parameters, ("options", "n_iteration_tr"), 0)),
+        to_float(getval(parameters, ("options", "eps_tr"), 0.0)),
+        to_int(getval(parameters, ("options", "n_iteration_ch"), 0)),
+        to_float(getval(parameters, ("options", "eps_ch"), 0.0)),
+        to_float(getval(parameters, ("options", "eps_mb"), 0.0)),
+        to_float(getval(parameters, ("options", "eps_dc"), 0.0)),
+        to_float(getval(parameters, ("options", "eps_dr"), 0.0)),
     ]
 
     out += write_ffrecord(values, verbose, int_fmt="{:9d}", float_fmt="{{:9f}}")
@@ -261,16 +261,16 @@ def _write_output(parameters, numbers, verbose):
         else []
     )
     values = [
-        int(getval(parameters, ("options", "n_cycle_print"), 0)),
-        int(numbers["NWNOD"]),
-        int(numbers["NWCOM"]),
-        int(numbers["NWMIN"]),
-        int(numbers["NWAQ"]),
-        int(numbers["NWADS"]),
-        int(numbers["NWEXC"]),
-        int(getval(parameters, ("flags", "aqueous_concentration_unit"), 0)),
-        int(getval(parameters, ("flags", "mineral_unit"), 0)),
-        int(getval(parameters, ("flags", "gas_concentration_unit"), 0)),
+        to_int(getval(parameters, ("options", "n_cycle_print"), 0)),
+        to_int(numbers["NWNOD"]),
+        to_int(numbers["NWCOM"]),
+        to_int(numbers["NWMIN"]),
+        to_int(numbers["NWAQ"]),
+        to_int(numbers["NWADS"]),
+        to_int(numbers["NWEXC"]),
+        to_int(getval(parameters, ("flags", "aqueous_concentration_unit"), 0)),
+        to_int(getval(parameters, ("flags", "mineral_unit"), 0)),
+        to_int(getval(parameters, ("flags", "gas_concentration_unit"), 0)),
     ]
 
     out += write_ffrecord(values, verbose, int_fmt="{:6d}")
@@ -320,15 +320,15 @@ def _write_default(parameters, verbose, mopr_11=0):
         else []
     )
     values = [
-        int(getval(parameters, ("default", "initial_water"), 0)),
-        int(getval(parameters, ("default", "injection_water"), 0)),
-        int(getval(parameters, ("default", "mineral"), 0)),
-        int(getval(parameters, ("default", "initial_gas"), 0)),
-        int(getval(parameters, ("default", "adsorption"), 0)),
-        int(getval(parameters, ("default", "cation_exchange"), 0)),
-        int(getval(parameters, ("default", "permeability_porosity"), 0)),
-        int(getval(parameters, ("default", "linear_kd"), 0)),
-        int(getval(parameters, ("default", "injection_gas"), 0)),
+        to_int(getval(parameters, ("default", "initial_water"), 0)),
+        to_int(getval(parameters, ("default", "injection_water"), 0)),
+        to_int(getval(parameters, ("default", "mineral"), 0)),
+        to_int(getval(parameters, ("default", "initial_gas"), 0)),
+        to_int(getval(parameters, ("default", "adsorption"), 0)),
+        to_int(getval(parameters, ("default", "cation_exchange"), 0)),
+        to_int(getval(parameters, ("default", "permeability_porosity"), 0)),
+        to_int(getval(parameters, ("default", "linear_kd"), 0)),
+        to_int(getval(parameters, ("default", "injection_gas"), 0)),
     ]
 
     if mopr_11 != 1:
@@ -361,17 +361,17 @@ def _write_zones(parameters, verbose, mopr_11=0):
     for zone in parameters["zones"]:
         values = [
             zone,
-            int(getval(parameters, ("zones", zone, "nseq"), 0)),
-            int(getval(parameters, ("zones", zone, "nadd"), 0)),
-            int(getval(parameters, ("zones", zone, "initial_water"), 0)),
-            int(getval(parameters, ("zones", zone, "injection_water"), 0)),
-            int(getval(parameters, ("zones", zone, "mineral"), 0)),
-            int(getval(parameters, ("zones", zone, "initial_gas"), 0)),
-            int(getval(parameters, ("zones", zone, "adsorption"), 0)),
-            int(getval(parameters, ("zones", zone, "cation_exchange"), 0)),
-            int(getval(parameters, ("zones", zone, "permeability_porosity"), 0)),
-            int(getval(parameters, ("zones", zone, "linear_kd"), 0)),
-            int(getval(parameters, ("zones", zone, "injection_gas"), 0)),
+            to_int(getval(parameters, ("zones", zone, "nseq"), 0)),
+            to_int(getval(parameters, ("zones", zone, "nadd"), 0)),
+            to_int(getval(parameters, ("zones", zone, "initial_water"), 0)),
+            to_int(getval(parameters, ("zones", zone, "injection_water"), 0)),
+            to_int(getval(parameters, ("zones", zone, "mineral"), 0)),
+            to_int(getval(parameters, ("zones", zone, "initial_gas"), 0)),
+            to_int(getval(parameters, ("zones", zone, "adsorption"), 0)),
+            to_int(getval(parameters, ("zones", zone, "cation_exchange"), 0)),
+            to_int(getval(parameters, ("zones", zone, "permeability_porosity"), 0)),
+            to_int(getval(parameters, ("zones", zone, "linear_kd"), 0)),
+            to_int(getval(parameters, ("zones", zone, "injection_gas"), 0)),
         ]
 
         if mopr_11 != 1:
@@ -400,10 +400,10 @@ def _write_convergence_bounds(parameters, verbose, mopr_10=0):
 
     # Numbers of iterations
     values = [
-        int(getval(parameters, ("options", "n_iteration_1"), 30)),
-        int(getval(parameters, ("options", "n_iteration_2"), 50)),
-        int(getval(parameters, ("options", "n_iteration_3"), 75)),
-        int(getval(parameters, ("options", "n_iteration_4"), 100)),
+        to_int(getval(parameters, ("options", "n_iteration_1"), 30), 30),
+        to_int(getval(parameters, ("options", "n_iteration_2"), 50), 50),
+        to_int(getval(parameters, ("options", "n_iteration_3"), 75), 75),
+        to_int(getval(parameters, ("options", "n_iteration_4"), 100), 100),
     ]
 
     out += ["#MAXCHEM1  MAXCHEM2  MAXCHEM3  MAXCHEM4"] if verbose else []
@@ -411,12 +411,12 @@ def _write_convergence_bounds(parameters, verbose, mopr_10=0):
 
     # Increase/reduce factors
     values = [
-        float(getval(parameters, ("options", "t_increase_factor_1"), 2.0)),
-        float(getval(parameters, ("options", "t_increase_factor_2"), 1.5)),
-        float(getval(parameters, ("options", "t_increase_factor_3"), 1.0)),
-        float(getval(parameters, ("options", "t_reduce_factor_1"), 0.8)),
-        float(getval(parameters, ("options", "t_reduce_factor_2"), 0.6)),
-        float(getval(parameters, ("options", "t_reduce_factor_3"), 0.5)),
+        to_float(getval(parameters, ("options", "t_increase_factor_1"), 2.0), 2.0),
+        to_float(getval(parameters, ("options", "t_increase_factor_2"), 1.5), 1.5),
+        to_float(getval(parameters, ("options", "t_increase_factor_3"), 1.0), 1.0),
+        to_float(getval(parameters, ("options", "t_reduce_factor_1"), 0.8), 0.8),
+        to_float(getval(parameters, ("options", "t_reduce_factor_2"), 0.6), 0.6),
+        to_float(getval(parameters, ("options", "t_reduce_factor_3"), 0.5), 0.5),
     ]
 
     out += (
@@ -427,6 +427,16 @@ def _write_convergence_bounds(parameters, verbose, mopr_10=0):
     out += write_ffrecord(values, verbose, float_fmt="{{:9f}}")
 
     return out
+
+
+def to_int(x, default=0):
+    """Handle nones in integer conversion."""
+    return int(x) if x is not None else default
+
+
+def to_float(x, default=0.0):
+    """Handle nones in floating point conversion."""
+    return float(x) if x is not None else default
 
 
 comments = {
