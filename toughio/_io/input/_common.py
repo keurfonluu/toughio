@@ -1,6 +1,6 @@
 import logging
 
-from .._common import to_str, prune_nones_list
+from .._common import prune_nones_list, to_str
 
 
 def getval(parameters, keys, default):
@@ -59,11 +59,9 @@ def read_end_comments(fiter):
 
         except StopIteration:
             break
-    
+
     # Remove trailing empty records
-    end_comments = [
-        comment if comment else None for comment in end_comments
-    ]
+    end_comments = [comment if comment else None for comment in end_comments]
     end_comments = prune_nones_list(end_comments)
     if end_comments:
         return (
