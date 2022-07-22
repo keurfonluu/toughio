@@ -587,6 +587,17 @@ def _read_imin(f):
                 tmp2["area_ini"] = to_float(data[1])
                 tmp2["area_unit"] = int(data[2])
 
+                # TODO: investigate what is the next record when IMFLG2 < 0
+                # This record is not documented in the user guide (p. 65)
+                if tmp2["area_unit"] < 0:
+                    data = _nextsplitline(f, 4)
+                    tmp2["unknown"] = [
+                        int(data[0]),
+                        to_float(data[1]),
+                        int(data[2]),
+                        to_float(data[3]),
+                    ]
+
             tmp["species"].append(tmp2)
             line = _nextline(f).strip()
 
