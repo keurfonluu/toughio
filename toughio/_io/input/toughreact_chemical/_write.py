@@ -517,7 +517,7 @@ def _write_imin(parameters, verbose):
 
     for i, zone in enumerate(parameters["zones"]["minerals"]):
         # Record 4
-        values = [i + 1] if "rock" not in zone else [-1, f"'{zone['rock'][:5]}'"]
+        values = [i + 1] if "rock" not in zone else [-(i + 1), f"'{zone['rock'][:5]}'"]
         out += write_ffrecord(values)
 
         # Record 6
@@ -539,13 +539,20 @@ def _write_imin(parameters, verbose):
 
                 # Record 6.1
                 if flag == 1:
+                    area_unit = getval(mineral, "area_unit", 0)
                     values = [
                         getval(mineral, "radius", 0.0),
                         getval(mineral, "area_ini", 0.0),
-                        getval(mineral, "area_unit", 0),
+                        area_unit,
                     ]
                     out += write_ffrecord(values, verbose)
                     out[-1] = out[-1].lstrip()
+
+                    # TODO: investigate what is the next record when IMFLG2 < 0
+                    # This record is not documented in the user guide (p. 65)
+                    if area_unit < 0:
+                        values = getval(mineral, "unknown", [])
+                        out += write_ffrecord(values, verbose)
 
         # Record 7
         out += ["*"]
