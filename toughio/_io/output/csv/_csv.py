@@ -120,8 +120,8 @@ def _write_csv(f, output, headers, unit=None):
         header_to_unit_[header] if header in header_to_unit_ else "-"
         for header in headers
     ]
-    f.write(",".join('"{:>18}"'.format(header) for header in headers) + "\n")
-    f.write(",".join('"{:>18}"'.format("({})".format(unit)) for unit in units) + "\n")
+    f.write(",".join(f'"{header:>18}"' for header in headers) + "\n")
+    f.write(",".join(f'"{f"({unit})":>18}"' for unit in units) + "\n")
 
     # Data
     formats = [
@@ -129,7 +129,7 @@ def _write_csv(f, output, headers, unit=None):
     ]
     for out in output:
         # Time step
-        f.write('"TIME [sec]  {:.8e}"\n'.format(out.time))
+        f.write(f'"TIME [sec]  {out.time:.8e}"\n')
 
         # Table
         for i, label in enumerate(out.labels):

@@ -15,7 +15,7 @@ def merge(argv=None):
     incon_filename = head + ("/" if head else "") + "INCON"
 
     if not os.path.isfile(args.infile):
-        raise ValueError("File '{}' not found.".format(args.infile))
+        raise ValueError(f"File '{args.infile}' not found.")
     if not os.path.isfile(mesh_filename):
         raise ValueError("MESH file not found.")
     incon_exists = os.path.isfile(incon_filename)
@@ -29,7 +29,7 @@ def merge(argv=None):
     for line in input_file:
         count += int(line.upper()[:5] in {"ROCKS", "PARAM", "ENDFI", "ENDCY"})
     if count < 3:
-        raise ValueError("Invalid input file '{}'.".format(args.infile))
+        raise ValueError(f"Invalid input file '{args.infile}'.")
 
     # Buffer MESH
     with open(mesh_filename, "r") as f:

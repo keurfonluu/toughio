@@ -11,7 +11,7 @@ def save2incon(argv=None):
 
     # Check that SAVE file exists
     if not os.path.isfile(args.infile):
-        raise ValueError("SAVE file '{}' not found.".format(args.infile))
+        raise ValueError(f"SAVE file '{args.infile}' not found.")
 
     # Write INCON file
     with open(args.outfile, "w") as f:

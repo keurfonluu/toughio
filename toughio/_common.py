@@ -117,9 +117,9 @@ def str2format(fmt, ignore_types=None):
         if i in ignore_types:
             out.append(base_fmt.format(n.split(".")[0]))
         elif token[-1].lower() == "s":
-            out.append(base_fmt.format("{}.{}".format(n, n)))
+            out.append(base_fmt.format(f"{n}.{n}"))
         else:
-            out.append(base_fmt.format(">{}{}".format(n, token_to_format[token[-1]])))
+            out.append(base_fmt.format(f">{n}{token_to_format[token[-1]]}"))
 
     return out
 

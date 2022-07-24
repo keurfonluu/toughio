@@ -27,11 +27,9 @@ class BaseRelativePermeability(ABC):
 
     def __repr__(self):
         """Display relative permeability model informations."""
-        out = [
-            "{} relative permeability model (IRP = {}):".format(self._name, self._id)
-        ]
+        out = [f"{self._name} relative permeability model (IRP = {self._id}):"]
         out += [
-            "    RP({}) = {}".format(i + 1, parameter)
+            f"    RP({i + 1}) = {parameter}"
             for i, parameter in enumerate(self.parameters)
         ]
         return "\n".join(out)

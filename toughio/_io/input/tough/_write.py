@@ -98,7 +98,7 @@ def write_buffer(
             ignore_blocks = set(ignore_blocks)
             for ignore_block in ignore_blocks:
                 if ignore_block not in blocks_:
-                    raise ValueError("unknown block '{}'.".format(ignore_block))
+                    raise ValueError(f"unknown block '{ignore_block}'.")
 
                 else:
                     blocks.remove(ignore_block)
@@ -178,9 +178,7 @@ def write_buffer(
 
     # Check that EOS is defined (for block MULTI)
     if parameters["eos"] and parameters["eos"] not in eos:
-        raise ValueError(
-            "EOS '{}' is unknown or not supported.".format(parameters["eos"])
-        )
+        raise ValueError(f"EOS '{parameters['eos']}' is unknown or not supported.")
 
     if parameters["eos"]:
         eos_ = parameters["eos"]
@@ -251,7 +249,7 @@ def write_buffer(
     # Define input file contents
     out = []
     if "TITLE" in blocks:
-        out += ["{:80}\n".format(title) for title in parameters["title"]]
+        out += [f"{title:80}\n" for title in parameters["title"]]
         out += ["\n"] if space_between_blocks else []
 
     if "ROCKS" in blocks and parameters["rocks"]:
@@ -765,7 +763,7 @@ def _write_param(parameters, eos_=None, simulator="tough"):
     data.update(parameters["options"])
 
     # Special header
-    out = "{:5}{}\n".format("PARAM", header)
+    out = f"PARAM{header}\n"
     out = [out[:11] + "MOP: 123456789*123456789*1234" + out[40:]]
 
     # Table
@@ -791,7 +789,7 @@ def _write_param(parameters, eos_=None, simulator="tough"):
         data["n_cycle"],
         data["n_second"],
         data["n_cycle_print"],
-        "{}".format("".join(mop)),
+        f"{''.join(mop)}",
         None,
         data["temperature_dependence_gas"],
         data["effective_strength_vapor"],
@@ -833,8 +831,8 @@ def _write_param(parameters, eos_=None, simulator="tough"):
     # TOUGHREACT
     if data["react_wdata"] and simulator == "toughreact":
         n = len(data["react_wdata"])
-        out += ["{}\n".format(n)]
-        out += ["{}\n".format(x) for x in data["react_wdata"]]
+        out += [f"{n}\n"]
+        out += [f"{x}\n" for x in data["react_wdata"]]
 
     # Record 3
     values = [
@@ -1192,7 +1190,7 @@ def _write_outpt(parameters):
 
     values = [outpt["format"]]
     values += [x for x in outpt["shape"][:3]] if "shape" in outpt else []
-    out = ["{}\n".format(" ".join(str(x) for x in values))]
+    out = [f"{' '.join(str(x) for x in values)}\n"]
 
     return out
 
@@ -1275,7 +1273,7 @@ def _write_eleme(parameters):
         data.update(parameters["elements"][k])
 
         material = (
-            "{:>5}".format(data["material"])
+            f"{data['material']:>5}"
             if isinstance(data["material"], int)
             else data["material"]
         )
@@ -1539,7 +1537,7 @@ def _write_poise(parameters):
     values = [x for x in poise["start"][:2]]
     values += [x for x in poise["end"][:2]]
     values += [poise["aperture"]]
-    out = ["{}\n".format(" ".join(str(x) for x in values))]
+    out = [f"{' '.join(str(x) for x in values)}\n"]
 
     return out
 

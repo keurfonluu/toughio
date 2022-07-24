@@ -162,7 +162,7 @@ def write(filename, mesh):
 
     with open_file(filename, "w") as f:
         # Write meshio version
-        f.write("# Written by toughio v{}\n".format(version))
+        f.write(f"# Written by toughio v{version}\n")
 
         # Write first line
         num_nodes = len(mesh.points)

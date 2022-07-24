@@ -44,7 +44,7 @@ def test_export(filename, mesh, voxelize, ext):
 
     outputs = toughio.read_output(filename)
 
-    output_filename = "{}.{}".format(helpers.tempdir(helpers.random_string(10)), ext)
+    output_filename = f"{helpers.tempdir(helpers.random_string(10))}.{ext}"
     argv = [
         filename,
         "-o",
@@ -148,7 +148,7 @@ def test_extract(file_format, split, connection):
     base_filename = "OUTPUT_ELEME" if not connection else "OUTPUT_CONNE"
 
     tempdir = helpers.tempdir()
-    output_filename = os.path.join(tempdir, "{}.csv".format(base_filename))
+    output_filename = os.path.join(tempdir, f"{base_filename}.csv")
 
     argv = [
         filename,
@@ -163,7 +163,7 @@ def test_extract(file_format, split, connection):
     toughio._cli.extract(argv)
 
     filename_ref = os.path.join(
-        this_dir, "support_files", "outputs", "{}.csv".format(base_filename)
+        this_dir, "support_files", "outputs", f"{base_filename}.csv"
     )
     outputs_ref = toughio.read_output(filename_ref)
 
@@ -175,7 +175,7 @@ def test_extract(file_format, split, connection):
             for k, v in output_ref.data.items():
                 assert np.allclose(v.mean(), output.data[k].mean(), atol=1.0e-2)
     else:
-        filenames = glob.glob(os.path.join(tempdir, "{}_*.csv".format(base_filename)))
+        filenames = glob.glob(os.path.join(tempdir, f"{base_filename}_*.csv"))
         for i, output_filename in enumerate(sorted(filenames)):
             outputs = toughio.read_output(output_filename)
 
@@ -201,12 +201,12 @@ def test_merge(incon):
 
         f.write("ROCKS\n")
         for _ in range(n_lines_rocks):
-            f.write("{}\n".format(helpers.random_string(80)))
+            f.write(f"{helpers.random_string(80)}\n")
         f.write("\n")
 
         f.write("PARAM\n")
         for _ in range(n_lines_param):
-            f.write("{}\n".format(helpers.random_string(80)))
+            f.write(f"{helpers.random_string(80)}\n")
 
         f.write("ENDCY\n")
 
@@ -215,12 +215,12 @@ def test_merge(incon):
 
         f.write("ELEME\n")
         for _ in range(n_lines_eleme):
-            f.write("{}\n".format(helpers.random_string(80)))
+            f.write(f"{helpers.random_string(80)}\n")
         f.write("\n")
 
         f.write("CONNE\n")
         for _ in range(n_lines_conne):
-            f.write("{}\n".format(helpers.random_string(80)))
+            f.write(f"{helpers.random_string(80)}\n")
         f.write("\n")
 
     if incon:
@@ -231,7 +231,7 @@ def test_merge(incon):
 
             f.write("INCON\n")
             for _ in range(n_lines_incon):
-                f.write("{}\n".format(helpers.random_string(80)))
+                f.write(f"{helpers.random_string(80)}\n")
             f.write("\n")
 
     argv = [filename, output_filename]

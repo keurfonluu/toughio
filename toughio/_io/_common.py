@@ -27,7 +27,7 @@ def write_record(data, fmt, multi=False):
     """Return a list of record strings given format."""
     if not multi:
         data = [to_str(d, f) for d, f in zip(data, fmt)]
-        out = ["{:80}\n".format("".join(data))]
+        out = [f"{''.join(data):80}\n"]
 
     else:
         n = len(data)
@@ -40,7 +40,7 @@ def write_record(data, fmt, multi=False):
         out = []
         for d in data:
             d = [to_str(dd, f) for dd, f in zip(d, fmt)]
-            out += ["{:80}\n".format("".join(d))]
+            out += [f"{''.join(d):80}\n"]
 
     return out
 
@@ -53,7 +53,7 @@ def to_float(s):
     except ValueError:
         # It's probably something like "0.0001-001"
         significand, exponent = s[:-4], s[-4:]
-        return float("{}e{}".format(significand, exponent))
+        return float(f"{significand}e{exponent}")
 
 
 def to_str(x, fmt):
@@ -80,7 +80,7 @@ def to_str(x, fmt):
                 tmp = str(float(x))
 
                 if len(tmp) > n:
-                    fmt = "{{:>{}.{}e}}".format(n, n - 7)
+                    fmt = f"{{:>{n}.{n -7}e}}"
 
                     return fmt.format(x)
 

@@ -27,9 +27,9 @@ class BaseCapillarity(ABC):
 
     def __repr__(self):
         """Display capillarity model informations."""
-        out = ["{} capillarity model (ICP = {}):".format(self._name, self._id)]
+        out = [f"{self._name} capillarity model (ICP = {self._id}):"]
         out += [
-            "    CP({}) = {}".format(i + 1, parameter)
+            f"    CP({i + 1}) = {parameter}"
             for i, parameter in enumerate(self.parameters)
         ]
         return "\n".join(out)

@@ -88,22 +88,20 @@ def write(filename, output):
 
     with open_file(filename, "w") as f:
         # Headers
-        record = "".join("{:>18}".format(header) for header in headers)
-        f.write("{}{}\n".format("{:>18}".format("VARIABLES       ="), record))
+        record = "".join(f"{header:>18}" for header in headers)
+        f.write(f" VARIABLES       ={record}\n")
 
         # Data
         for out in output:
             # Zone
-            record = ' ZONE T="{:14.7e} SEC"  I = {:8d}'.format(
-                out.time, len(out.data["X"])
-            )
-            f.write("{}\n".format(record))
+            record = f' ZONE T="{out.time:14.7e} SEC"  I = {len(out.data["X"]):8d}'
+            f.write(f"{record}\n")
 
             # Table
             data = np.transpose([out.data[k] for k in headers])
             for d in data:
-                record = "".join("{:20.12e}".format(x) for x in d)
-                f.write("{}{}\n".format("{:18}".format(""), record))
+                record = "".join(f"{x:20.12e}" for x in d)
+                f.write(f"{' ' * 18}{record}\n")
 
 
 def _read_variables(line):
@@ -115,7 +113,7 @@ def _read_variables(line):
     i = 0
     while i < len(line):
         if '"' in line[i] and not (line[i].startswith('"') and line[i].endswith('"')):
-            var = "{}_{}".format(line[i], line[i + 1])
+            var = f"{line[i]}_{line[i + 1]}"
             i += 1
         else:
             var = line[i]

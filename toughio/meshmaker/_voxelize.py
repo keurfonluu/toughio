@@ -37,9 +37,7 @@ def voxelize(points, origin, layer=False, material="dfalt"):
             x = np.sort(x)
             if x0 >= x[0]:
                 raise ValueError(
-                    "{}-coordinate of origin must be lower than {:.3f}, got {:.3f}".format(
-                        xstr, x[0], x0
-                    )
+                    f"{xstr}-coordinate of origin must be lower than {x[0]:.3f}, got {x0:.3f}"
                 )
 
             vor = [x0]
