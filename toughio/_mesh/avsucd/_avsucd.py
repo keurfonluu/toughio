@@ -1,4 +1,5 @@
-from __future__ import division, unicode_literals, with_statement
+# Bug at L81 in meshio v5
+# Keeping this version until fixed in meshio
 
 import logging
 
@@ -6,7 +7,7 @@ import numpy as np
 
 from ...__about__ import __version__ as version
 from ..._common import open_file
-from .._helpers import _materials, get_material_key
+from .._helpers import get_material_key
 from .._mesh import CellBlock, Mesh
 
 __all__ = [
@@ -55,13 +56,9 @@ def read(filename):
 
 def read_buffer(f):
     # Skip comments and unpack first line
-    while True:
-        line = f.readline().strip()
-        if not line.startswith("#"):
-            break
-    num_nodes, num_cells, num_node_data, num_cell_data = [
-        int(i) for i in line.split()[:4]
-    ]
+    num_nodes, num_cells, num_node_data, num_cell_data, _ = np.genfromtxt(
+        f, max_rows=1, dtype=int, comments="#"
+    )
 
     # Read nodes
     point_ids, points = _read_nodes(f, num_nodes)
@@ -78,7 +75,8 @@ def read_buffer(f):
     # Read cell data
     if num_cell_data:
         cdata = _read_data(f, num_cells, cell_ids)
-        sections = np.cumsum([len(c[1]) for c in cells[:-1]])
+        # sections = np.cumsum([len(c[1]) for c in cells[:-1]])
+        sections = np.cumsum([len(c.data) for c in cells[:-1]])
         for k, v in cdata.items():
             cell_data[k] = np.split(v, sections)
 
@@ -86,11 +84,10 @@ def read_buffer(f):
 
 
 def _read_nodes(f, num_nodes):
-    data = []
-    for _ in range(num_nodes):
-        line = f.readline().strip()
-        data += [[float(x) for x in line.split()]]
-    data = np.array(data)
+    if num_nodes > 0:
+        data = np.genfromtxt(f, max_rows=num_nodes)
+    else:
+        data = np.empty((0, 3))
     points_ids = {int(pid): i for i, pid in enumerate(data[:, 0])}
     return points_ids, data[:, 1:]
 
@@ -107,20 +104,20 @@ def _read_cells(f, num_cells, point_ids):
         cell_type = avsucd_to_meshio_type[line[2]]
         corner = [point_ids[int(pid)] for pid in line[3:]]
 
-        if len(cells) > 0 and cells[-1].type == cell_type:
-            cells[-1].data.append(corner)
+        if len(cells) > 0 and cells[-1][0] == cell_type:
+            cells[-1][1].append(corner)
             cell_data["avsucd:material"][-1].append(cell_mat)
         else:
-            cells.append(CellBlock(cell_type, [corner]))
+            cells.append((cell_type, [corner]))
             cell_data["avsucd:material"].append([cell_mat])
 
         cell_ids[cell_id] = count
         count += 1
 
     # Convert to numpy arrays
-    for k, c in enumerate(cells):
+    for k, (cell_type, cdata) in enumerate(cells):
         cells[k] = CellBlock(
-            c.type, np.array(c.data)[:, avsucd_to_meshio_order[c.type]]
+            cell_type, np.array(cdata)[:, avsucd_to_meshio_order[cell_type]]
         )
         cell_data["avsucd:material"][k] = np.array(cell_data["avsucd:material"][k])
     return cell_ids, cells, cell_data
@@ -161,9 +158,7 @@ def write(filename, mesh):
             "AVS-UCD requires 3D points, but 2D points given. "
             "Appending 0 third component."
         )
-        mesh.points = np.column_stack(
-            [mesh.points[:, 0], mesh.points[:, 1], np.zeros(mesh.points.shape[0])]
-        )
+        mesh.points = np.column_stack([mesh.points, np.zeros_like(mesh.points[:, 0])])
 
     with open_file(filename, "w") as f:
         # Write meshio version
@@ -172,27 +167,32 @@ def write(filename, mesh):
         # Write first line
         num_nodes = len(mesh.points)
         num_cells = sum(len(c.data) for c in mesh.cells)
+
+        # Try to find an appropriate materials array
+        key = get_material_key(mesh.cell_data)
+        material = (
+            np.concatenate(mesh.cell_data[key])
+            if key
+            else np.zeros(num_cells, dtype=int)
+        )
+        
         num_node_data = [
             1 if v.ndim == 1 else v.shape[1] for v in mesh.point_data.values()
         ]
         num_cell_data = [
             1 if np.concatenate(v).ndim == 1 else np.concatenate(v).shape[1]
             for k, v in mesh.cell_data.items()
-            if k not in _materials
+            if k != key
         ]
         num_node_data_sum = sum(num_node_data)
         num_cell_data_sum = sum(num_cell_data)
-        f.write(
-            "{} {} {} {} 0\n".format(
-                num_nodes, num_cells, num_node_data_sum, num_cell_data_sum
-            )
-        )
+        f.write(f"{num_nodes} {num_cells} {num_node_data_sum} {num_cell_data_sum} 0\n")
 
         # Write nodes
         _write_nodes(f, mesh.points)
 
         # Write cells
-        _write_cells(f, mesh.cells, mesh.cell_data, num_cells)
+        _write_cells(f, mesh.cells, material)
 
         # Write node data
         if num_node_data_sum:
@@ -204,13 +204,9 @@ def write(filename, mesh):
 
         # Write cell data
         if num_cell_data_sum:
-            labels = [k for k in mesh.cell_data.keys() if k not in _materials]
+            labels = [k for k in mesh.cell_data.keys() if k != key]
             data_array = np.column_stack(
-                [
-                    np.concatenate(v)
-                    for k, v in mesh.cell_data.items()
-                    if k not in _materials
-                ]
+                [np.concatenate(v) for k, v in mesh.cell_data.items() if k != key]
             )
             _write_data(
                 f, labels, data_array, num_cells, num_cell_data, num_cell_data_sum
@@ -219,38 +215,26 @@ def write(filename, mesh):
 
 def _write_nodes(f, points):
     for i, (x, y, z) in enumerate(points):
-        f.write("{} {} {} {}\n".format(i + 1, x, y, z))
+        f.write(f"{i + 1} {x} {y} {z}\n")
 
 
-def _write_cells(f, cells, cell_data, num_cells):
-    # Interoperability with other formats
-    mat_data = get_material_key(cell_data)
-
-    # Material array
-    if mat_data:
-        material = np.concatenate(cell_data[mat_data])
-    else:
-        material = np.zeros(num_cells, dtype=int)
-
-    # Loop over cells
+def _write_cells(f, cells, material):
     i = 0
     for k, v in cells:
         for cell in v[:, meshio_to_avsucd_order[k]]:
-            cell_str = " ".join(str(c + 1) for c in cell)
+            cell_str = " ".join(str(c) for c in cell + 1)
             f.write(
-                "{} {} {} {}\n".format(
-                    i + 1, int(material[i]), meshio_to_avsucd_type[k], cell_str
-                )
+                f"{i + 1} {int(material[i])} {meshio_to_avsucd_type[k]} {cell_str}\n"
             )
             i += 1
 
 
 def _write_data(f, labels, data_array, num_entities, num_data, num_data_sum):
     num_data_str = " ".join(str(i) for i in num_data)
-    f.write("{} {}\n".format(len(num_data), num_data_str))
+    f.write(f"{len(num_data)} {num_data_str}\n")
 
     for label in labels:
-        f.write("{}, real\n".format(label))
+        f.write(f"{label}, real\n")
 
     data_array = np.column_stack((np.arange(1, num_entities + 1), data_array))
     np.savetxt(f, data_array, delimiter=" ", fmt=["%d"] + ["%.14e"] * num_data_sum)

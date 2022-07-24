@@ -7,4 +7,4 @@ __all__ = [
 ]
 
 
-register("flac3d", [".f3grid"], read, write, "flac3d:group")
+register("flac3d", [".f3grid"], read, write)
