@@ -75,7 +75,7 @@ output_eleme = [
         "element",
         None,
         float(time),
-        np.array(["AAA0{}".format(i) for i in range(10)]),
+        np.array([f"AAA0{i}" for i in range(10)]),
         {
             "X": np.random.rand(10),
             "Y": np.random.rand(10),
@@ -92,7 +92,7 @@ output_conne = [
         "connection",
         None,
         float(time),
-        np.array([["AAA0{}".format(i), "AAA0{}".format(i)] for i in range(10)]),
+        np.array([[f"AAA0{i}", f"AAA0{i}"] for i in range(10)]),
         {
             "X": np.random.rand(10),
             "Y": np.random.rand(10),
@@ -132,7 +132,7 @@ def random_string(n):
 
 def random_label(label_length):
     n = label_length - 3
-    fmt = "{{:0{}d}}".format(n)
+    fmt = f"{{:0{n}d}}"
 
     return random_string(3) + fmt.format(np.random.randint(10 ** n))
 

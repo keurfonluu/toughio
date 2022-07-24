@@ -111,13 +111,13 @@ def labeler(n_cells, label_length=None):
         bins = 3185000 * 10 ** np.arange(5, dtype=np.int64) + 1
         label_length = np.digitize(n_cells, bins) + 5
         if label_length > 5:
-            logging.warning("Cell labels are {}-character long.".format(label_length))
+            logging.warning(f"Cell labels are {label_length}-character long.")
 
     n = label_length - 3
-    fmt = "{{: >{}}}".format(n)
+    fmt = f"{{: >{n}}}"
     alpha = np.array(list(ascii_uppercase))
     numer = np.array([fmt.format(i) for i in range(10 ** n)])
-    nomen = np.concatenate((["{:1}".format(i + 1) for i in range(9)], alpha))
+    nomen = np.concatenate(([f"{i + 1:1}" for i in range(9)], alpha))
 
     q1, r1 = np.divmod(np.arange(n_cells), numer.size)
     q2, r2 = np.divmod(q1, nomen.size)

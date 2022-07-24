@@ -15,7 +15,7 @@ def build(c):
 
 @task
 def tag(c):
-    c.run("git tag v{}".format(toughio.__version__))
+    c.run(f"git tag v{toughio.__version__}")
     c.run("git push --tags")
 
 

@@ -15,7 +15,7 @@ def read(filename, file_type, file_format, labels_order):
     labels = list(parameters["initial_conditions"])
     variables = [v["values"] for v in parameters["initial_conditions"].values()]
 
-    data = {"X{}".format(i + 1): x for i, x in enumerate(np.transpose(variables))}
+    data = {f"X{i + 1}": x for i, x in enumerate(np.transpose(variables))}
 
     data["porosity"] = np.array(
         [v["porosity"] for v in parameters["initial_conditions"].values()]

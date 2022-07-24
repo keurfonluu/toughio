@@ -218,7 +218,7 @@ def read_buffer(f, label_length, eos, simulator="tough"):
                     parameters["end_comments"] = end_comments
 
     except:
-        raise ReadError("failed to parse line {}.".format(fiter.count))
+        raise ReadError(f"failed to parse line {fiter.count}.")
 
     return parameters
 
@@ -696,9 +696,7 @@ def _read_oft(f, oft, label_length):
     line = f.next()
     if not label_length:
         label_length = get_label_length(line[:9])
-    label_format = "{{:>{}}}".format(
-        label_length if oft != "COFT" else 2 * label_length
-    )
+    label_format = f"{{:>{label_length if oft != 'COFT' else 2 * label_length}}}"
 
     while True:
         if line.strip():
@@ -731,14 +729,14 @@ def _read_gener(f, label_length, simulator="tough"):
     line = f.next()
     if not label_length:
         label_length = get_label_length(line[:9])
-    label_format = "{{:>{}}}".format(label_length)
+    label_format = f"{{:>{label_length}}}"
 
     while True:
         if line.strip():
             data = read_record(line, fmt[label_length])
             tmp = {
                 "label": label_format.format(data[0]),
-                "name": "{:>5}".format(data[1]) if data[1] else data[1],
+                "name": f"{data[1]:>5}" if data[1] else data[1],
                 "nseq": data[2],
                 "nadd": data[3],
                 "nads": data[4],
@@ -858,7 +856,7 @@ def _read_eleme(f, label_length):
     line = f.next()
     if not label_length:
         label_length = get_label_length(line[:9])
-    label_format = "{{:>{}}}".format(label_length)
+    label_format = f"{{:>{label_length}}}"
 
     while True:
         if line.strip():
@@ -915,7 +913,7 @@ def _read_conne(f, label_length):
     line = f.next()
     if not label_length:
         label_length = get_label_length(line[:9])
-    label_format = "{{:>{}}}".format(2 * label_length)
+    label_format = f"{{:>{2 * label_length}}}"
 
     flag = False
     while True:
@@ -961,7 +959,7 @@ def _read_incon(f, label_length, eos=None, simulator="tough"):
     line = f.next()
     if not label_length:
         label_length = get_label_length(line[:9])
-    label_format = "{{:>{}}}".format(label_length)
+    label_format = f"{{:>{label_length}}}"
 
     # Guess the number of lines to read for primary variables
     i = f.tell()

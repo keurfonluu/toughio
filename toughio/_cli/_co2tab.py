@@ -14,7 +14,7 @@ def co2tab(argv=None):
 
     # Check that target directory exists
     if not os.path.isdir(args.path):
-        raise ValueError("Directory '{}' not found.".format(args.path))
+        raise ValueError(f"Directory '{args.path}' not found.")
 
     # Copy CO2TAB file
     filename = pkg_resources.resource_filename("toughio", "data/CO2TAB")

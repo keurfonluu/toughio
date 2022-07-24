@@ -74,23 +74,23 @@ class Mesh(object):
         """Represent a :class:`toughio.Mesh`."""
         lines = [
             "<toughio mesh object>",
-            "  Number of points: {}".format(len(self.points)),
+            f"  Number of points: {len(self.points)}",
         ]
         if len(self.cells) > 0:
             lines.append("  Number of cells:")
             for tpe, elems in self.cells:
-                lines.append("    {}: {}".format(tpe, len(elems)))
+                lines.append(f"    {tpe}: {len(elems)}")
         else:
             lines.append("  No cells.")
 
         if self.point_sets:
-            lines.append("  Point sets: {}".format(", ".join(self.point_sets)))
+            lines.append(f"  Point sets: {', '.join(self.point_sets)}")
 
         if self.point_data:
-            lines.append("  Point data: {}".format(", ".join(self.point_data)))
+            lines.append(f"  Point data: {', '.join(self.point_data)}")
 
         if self.cell_data:
-            lines.append("  Cell data: {}".format(", ".join(self.cell_data)))
+            lines.append(f"  Cell data: {', '.join(self.cell_data)}")
 
         return "\n".join(lines)
 
@@ -121,7 +121,7 @@ class Mesh(object):
         npts, nh = len(mesh.points), len(height)
         if mesh.points.shape[1] == 3:
             if len(set(mesh.points[:, axis])) != 1:
-                raise ValueError("Cannot extrude mesh along axis {}.".format(axis))
+                raise ValueError(f"Cannot extrude mesh along axis {axis}.")
         else:
             mesh.points = np.column_stack((mesh.points, np.zeros(npts)))
             if axis != 2:
@@ -969,7 +969,7 @@ def from_pyvista(mesh, material="dfalt"):
     pixel_voxel = {8, 11}  # Handle pixels and voxels
     for cell_type in np.unique(vtk_cell_type):
         if not (cell_type in vtk_to_meshio_type or cell_type in pixel_voxel):
-            raise ValueError("toughio does not support VTK type {}.".format(cell_type))
+            raise ValueError(f"toughio does not support VTK type {cell_type}.")
 
     # Get cells
     cells = []
@@ -992,7 +992,7 @@ def from_pyvista(mesh, material="dfalt"):
         cell_type = (
             vtk_to_meshio_type[cell_type]
             if cell_type != 7
-            else "polygon{}".format(numnodes)
+            else f"polygon{numnodes}"
         )
 
         if len(cells) > 0 and cells[-1][0] == cell_type:

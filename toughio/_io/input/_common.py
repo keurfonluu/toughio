@@ -18,7 +18,7 @@ def getval(parameters, keys, default):
 
     except KeyError:
         key_str = (
-            "'{}'".format(keys)
+            f"'{keys}'"
             if isinstance(keys, str)
             else "".join(f"['{key}']" for key in keys)
         )

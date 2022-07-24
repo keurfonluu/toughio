@@ -28,23 +28,23 @@ def extract(argv=None):
 
     # Check that TOUGH output and MESH file exist
     if not os.path.isfile(args.infile):
-        raise ValueError("TOUGH output file '{}' not found.".format(args.infile))
+        raise ValueError(f"TOUGH output file '{args.infile}' not found.")
     if not os.path.isfile(args.mesh):
-        raise ValueError("MESH file '{}' not found.".format(args.mesh))
+        raise ValueError(f"MESH file '{args.mesh}' not found.")
 
     # Read MESH and extract X, Y and Z
     parameters = read_mesh(
         args.mesh, file_format="tough", label_length=args.label_length
     )
     if "elements" not in parameters:
-        raise ValueError("Invalid MESH file '{}'.".format(args.mesh))
+        raise ValueError(f"Invalid MESH file '{args.mesh}'.")
 
     # Read TOUGH output file
     output = read_output(
         args.infile, connection=args.connection, label_length=args.label_length
     )
     if output[-1].format != "tough":
-        raise ValueError("Invalid TOUGH output file '{}'.".format(args.infile))
+        raise ValueError(f"Invalid TOUGH output file '{args.infile}'.")
 
     try:
         if not args.connection:
@@ -66,9 +66,7 @@ def extract(argv=None):
 
     except KeyError:
         raise ValueError(
-            "Elements in '{}' and '{}' are not consistent.".format(
-                args.infile, args.mesh
-            )
+            f"Elements in '{args.infile}' and '{args.mesh}' are not consistent."
         )
 
     # Write TOUGH3 element output file
@@ -76,16 +74,16 @@ def extract(argv=None):
     filename = (
         args.output_file
         if args.output_file is not None
-        else "OUTPUT_ELEME{}".format(ext)
+        else f"OUTPUT_ELEME{ext}"
         if not args.connection
-        else "OUTPUT_CONNE{}".format(ext)
+        else f"OUTPUT_CONNE{ext}"
     )
     if not args.split or len(output) == 1:
         write_output(filename, output, file_format=args.file_format)
     else:
         head, ext = os.path.splitext(filename)
         for i, out in enumerate(output):
-            write_output("{}_{}{}".format(head, i + 1, ext), out, file_format="csv")
+            write_output(f"{head}_{i + 1}{ext}", out, file_format="csv")
 
 
 def _get_parser():

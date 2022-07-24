@@ -200,7 +200,7 @@ def write_mesh(
     """Write MESH file."""
     # Check materials
     materials = [
-        "{:5}".format(material.strip()) if isinstance(material, str) else material
+        f"{material.strip():5}" if isinstance(material, str) else material
         for material in materials
     ]
     material_name = material_name if material_name else {}
@@ -355,9 +355,7 @@ def _write_conne(
                     # Boundary conditions
                     bounds.append((boundary_conditions[i], boundary_conditions[j]))
         else:
-            logging.warning(
-                "Element '{}' is not connected to the grid.".format(labels[i])
-            )
+            logging.warning(f"Element '{labels[i]}' is not connected to the grid.")
         cell_list.add(i)
 
     centers = np.array(centers)

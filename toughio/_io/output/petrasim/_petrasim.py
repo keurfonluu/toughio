@@ -57,10 +57,10 @@ def write(filename, output):
     with open_file(filename, "w") as f:
         # Headers
         record = ",".join(
-            "{:>18}".format(header)
+            f"{header:>18}"
             for header in ["TIME [sec]", "ELEM", "INDEX"] + headers
         )
-        f.write("{}\n".format(record))
+        f.write(f"{record}\n")
 
         # Data
         for out in output:
@@ -73,5 +73,5 @@ def write(filename, output):
                 tmp = [out.time, out.labels[i], i + 1]
                 tmp += [x for x in d]
                 record = ",".join(fmt.format(x) for fmt, x in zip(formats, tmp))
-                f.write("{}\n".format(record))
+                f.write(f"{record}\n")
                 i += 1

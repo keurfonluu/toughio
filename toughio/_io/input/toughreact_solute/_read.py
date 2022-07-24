@@ -89,7 +89,7 @@ def read_buffer(f, mopr_11=0):
             parameters["end_comments"] = end_comments
 
     except:
-        raise ReadError("failed to parse line {}.".format(fiter.count))
+        raise ReadError(f"failed to parse line {fiter.count}.")
 
     return parameters
 

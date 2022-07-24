@@ -218,8 +218,8 @@ def block(keyword, multi=False, noend=False):
 
         @wraps(func)
         def wrapper(*args, **kwargs):
-            head_fmt = "{:5}{}" if noend else "{:5}{}\n"
-            out = [head_fmt.format(keyword, header)]
+            head = f"{keyword:5}{header}"
+            out = [head if noend else f"{head}\n"]
             out += func(*args, **kwargs)
             out += ["\n"] if multi else []
 
@@ -239,9 +239,7 @@ def check_parameters(input_types, keys=None, is_list=False):
             # Log error if it does and skip
             if k not in input_types:
                 logging.warning(
-                    "Unknown key '{}'{}. Skipping.".format(
-                        k, " in {}".format(keys) if keys else ""
-                    )
+                    f"Unknown key '{k}'{f' in {keys}' if keys else ''}. Skipping."
                 )
                 continue
 
@@ -249,9 +247,7 @@ def check_parameters(input_types, keys=None, is_list=False):
             input_type = str_to_dtype[input_types[k]]
             if not (v is None or isinstance(v, input_type)):
                 raise TypeError(
-                    "Invalid type for parameter '{}' {}(expected {}).".format(
-                        k, "in {} ".format(keys) if keys else "", input_types[k],
-                    )
+                    f"Invalid type for parameter '{k}' {f'in {keys}' if keys else ''}(expected {input_types[k]})."
                 )
 
     keys = [keys] if isinstance(keys, str) else keys
@@ -264,30 +260,30 @@ def check_parameters(input_types, keys=None, is_list=False):
 
             else:
                 params = deepcopy(parameters[keys[0]])
-                keys_str = "['{}']".format(keys[0])
+                keys_str = f"['{keys[0]}']"
                 if is_list:
                     if isinstance(params, dict):
                         for k, v in params.items():
                             tmp = keys_str
-                            tmp += "['{}']".format(k)
+                            tmp += f"['{k}']"
 
                             try:
                                 for key in keys[1:]:
                                     v = v[key]
-                                    tmp += "['{}']".format(key)
+                                    tmp += f"['{key}']"
                                 _check_parameters(v, tmp)
 
                             except KeyError:
                                 continue
                     else:
                         for i, param in enumerate(params):
-                            tmp = "{}[{}]".format(keys_str, i)
+                            tmp = f"{keys_str}[{i}]"
                             _check_parameters(param, tmp)
 
                 else:
                     for key in keys[1:]:
                         params = params[key]
-                        keys_str += "['{}']".format(key)
+                        keys_str += f"['{key}']"
 
                     _check_parameters(params, keys_str)
 

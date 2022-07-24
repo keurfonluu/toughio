@@ -26,12 +26,12 @@ def export(argv=None):
 
     # Check that TOUGH output and mesh file exist
     if not os.path.isfile(args.infile):
-        raise ValueError("TOUGH output file '{}' not found.".format(args.infile))
+        raise ValueError(f"TOUGH output file '{args.infile}' not found.")
 
     with_mesh = bool(args.mesh)
     if with_mesh:
         if not os.path.isfile(args.mesh):
-            raise ValueError("Mesh file '{}' not found.".format(args.mesh))
+            raise ValueError(f"Mesh file '{args.mesh}' not found.")
         if args.voxelize:
             print("Mesh file has been provided. Skipping option --voxelize.")
     else:
@@ -40,13 +40,11 @@ def export(argv=None):
                 raise ValueError("Option --voxelize requires option --origin.")
             elif len(args.origin) != 3:
                 raise ValueError(
-                    "Option --origin requires 3 parameters, got {}.".format(
-                        len(args.origin)
-                    )
+                    f"Option --origin requires 3 parameters, got {len(args.origin)}."
                 )
 
     # Read output file
-    print("Reading file '{}' ...".format(args.infile), end="")
+    print(f"Reading file '{args.infile}' ...", end="")
     sys.stdout.flush()
     output = read_output(args.infile)
     if args.file_format != "xdmf":
@@ -79,7 +77,7 @@ def export(argv=None):
     # Triangulate or voxelize if no mesh
     voxelized = False
     if not with_mesh:
-        print("{} ...".format(msg), end="")
+        print(f"{msg} ...", end="")
         sys.stdout.flush()
         points, axis = _get_points(
             output if args.file_format != "xdmf" else output[0], args.ignore_elements,
@@ -95,17 +93,13 @@ def export(argv=None):
         if args.voxelize or ndim == 1:
             if ndim == 1:
                 if not args.origin:
-                    raise ValueError(
-                        "Mesh is {}D and requires option --origin.".format(ndim)
-                    )
+                    raise ValueError(f"Mesh is {ndim}D and requires option --origin.")
                 elif len(args.origin) != 3:
                     raise ValueError(
-                        "Option --origin requires 3 parameters, got {}.".format(
-                            len(args.origin)
-                        )
+                        f"Option --origin requires 3 parameters, got {len(args.origin)}."
                     )
 
-            print("Mesh is {}D, voxelizing mesh ...".format(ndim), end="")
+            print(f"Mesh is {ndim}D, voxelizing mesh ...", end="")
             sys.stdout.flush()
 
             mesh = voxelize(points, args.origin, layer=args.layer)
@@ -135,7 +129,7 @@ def export(argv=None):
 
         else:
             print(
-                "Mesh is {}D, performing point triangulation ...".format(ndim), end=""
+                f"Mesh is {ndim}D, performing point triangulation ...", end=""
             )
             sys.stdout.flush()
 
@@ -153,13 +147,13 @@ def export(argv=None):
                     mesh.add_point_data(label, data)
 
     else:
-        print("Reading mesh file '{}' ...".format(args.mesh), end="")
+        print(f"Reading mesh file '{args.mesh}' ...", end="")
         sys.stdout.flush()
 
         try:
             mesh = read_mesh(args.mesh)
         except Exception as e:
-            raise ValueError("Unable to read mesh file {}: {}.".format(args.mesh, e))
+            raise ValueError(f"Unable to read mesh file {args.mesh}: {e}.")
 
         if args.file_format != "xdmf":
             mesh.point_data = {}
@@ -177,10 +171,10 @@ def export(argv=None):
         filename = args.output_file
     else:
         head, _ = os.path.splitext(args.infile)
-        filename = "{}{}".format(head, format_to_ext[args.file_format])
+        filename = f"{head}{format_to_ext[args.file_format]}"
 
     # Write output file
-    print("Writing output file '{}' ...".format(filename), end="")
+    print(f"Writing output file '{filename}' ...", end="")
     sys.stdout.flush()
 
     if args.file_format != "xdmf":
