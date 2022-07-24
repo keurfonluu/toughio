@@ -4,7 +4,6 @@ from copy import deepcopy
 import meshio
 import numpy as np
 
-from ._common import get_meshio_version, get_new_meshio_cells, get_old_meshio_cells
 from ._filter import MeshFilter
 from ._properties import (
     _connections,
@@ -252,22 +251,15 @@ class Mesh(object):
         keys = ["points", "point_data", "field_data"]
         kwargs = {key: getattr(self, key) for key in keys}
 
-        version = get_meshio_version()
         cell_data = {k: self.split(v) for k, v in self.cell_data.items()}
-        if version[0] >= 4:
-            kwargs.update(
-                {
-                    "cells": self.cells,
-                    "cell_data": cell_data,
-                    "point_sets": self.point_sets,
-                    "cell_sets": self.cell_sets,
-                }
-            )
-        else:
-            cells, cell_data = get_old_meshio_cells(self.cells, cell_data)
-            kwargs.update(
-                {"cells": cells, "cell_data": cell_data, "node_sets": self.point_sets,}
-            )
+        kwargs.update(
+            {
+                "cells": self.cells,
+                "cell_data": cell_data,
+                "point_sets": self.point_sets,
+                "cell_sets": self.cell_sets,
+            }
+        )
 
         return meshio.Mesh(**kwargs)
 
@@ -316,14 +308,14 @@ class Mesh(object):
 
         if VTK9:
             mesh = pyvista.UnstructuredGrid(
-                np.concatenate(cells),
+                np.concatenate(cells).astype(np.int64, copy=False),
                 np.array(cell_type),
                 np.array(points, np.float64),
             )
         else:
             mesh = pyvista.UnstructuredGrid(
                 np.array(offset),
-                np.concatenate(cells),
+                np.concatenate(cells).astype(np.int64, copy=False),
                 np.array(cell_type),
                 np.array(points, np.float64),
             )
@@ -689,27 +681,16 @@ class Mesh(object):
     @property
     def cells(self):
         """Return connectivity of cells."""
-        if self._cells:
-            return self._cells
-        else:
-            return [CellBlock(k, v) for k, v in self._cells_dict.items()]
+        return self._cells
 
     @cells.setter
     def cells(self, value):
-        if isinstance(value, dict):
-            self._cells = []
-            self._cells_dict = value
-        else:
-            self._cells = [CellBlock(k, v) for k, v in value]
-            self._cells_dict = {}
-
-    @property
-    def cells_dict(self):
-        """Return connectivity of cells (``meshio < 4.0.0``)."""
-        if self._cells:
-            return get_old_meshio_cells(self._cells)
-        else:
-            return self._cells_dict
+        self._cells = [
+            CellBlock(*c)
+            if isinstance(c, (list, tuple))
+            else CellBlock(c.type, c.data)
+            for c in value
+        ]
 
     @property
     def point_data(self):
@@ -904,21 +885,17 @@ def from_meshio(mesh, material="dfalt"):
     if not isinstance(material, str):
         raise TypeError()
 
-    version = get_meshio_version()
-
     if mesh.cell_data:
-        if version[0] >= 4:
-            cells = mesh.cells
-            cell_data = mesh.cell_data
-        else:
-            cells, cell_data = get_new_meshio_cells(mesh.cells, mesh.cell_data)
+        cells = mesh.cells
+        cell_data = mesh.cell_data
 
         key = get_material_key(cell_data)
         if key:
             cell_data["material"] = cell_data.pop(key)
         cell_data = {k: np.concatenate(v) for k, v in cell_data.items()}
+
     else:
-        cells = mesh.cells if version[0] >= 4 else get_new_meshio_cells(mesh.cells)
+        cells = mesh.cells
         cell_data = {}
 
     out = Mesh(
