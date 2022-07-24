@@ -1,5 +1,3 @@
-from __future__ import division, with_statement
-
 from ...._common import block_to_format, get_label_length, open_file
 from ...._exceptions import ReadError
 from ...._helpers import FileIterator

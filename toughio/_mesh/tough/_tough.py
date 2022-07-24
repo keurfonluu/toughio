@@ -1,5 +1,3 @@
-from __future__ import division, unicode_literals, with_statement
-
 import logging
 import os
 

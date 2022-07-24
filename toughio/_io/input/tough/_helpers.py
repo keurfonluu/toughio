@@ -1,5 +1,3 @@
-from __future__ import division
-
 import logging
 from copy import deepcopy
 from functools import wraps
