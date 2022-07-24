@@ -1,5 +1,3 @@
-from __future__ import with_statement
-
 import numpy as np
 
 from ...._common import open_file

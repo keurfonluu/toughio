@@ -1,5 +1,3 @@
-from __future__ import division, with_statement
-
 import logging
 from copy import deepcopy
 
@@ -50,17 +48,6 @@ def write(
     """
     if simulator not in {"tough", "toughreact"}:
         raise ValueError()
-
-    # Deprecation error
-    if "generators" in parameters:
-        if isinstance(parameters["generators"], dict):
-            raise ValueError("'generators' must be a list of dicts since v1.7.0.")
-
-    if "output" in parameters:
-        if "variables" in parameters["output"] and isinstance(
-            parameters["output"]["variables"], dict
-        ):
-            raise ValueError("'variables' must be a list of dicts since v1.7.0.")
 
     buffer = write_buffer(
         parameters, block, ignore_blocks, space_between_blocks, eos, simulator

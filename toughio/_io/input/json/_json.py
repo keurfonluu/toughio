@@ -1,5 +1,3 @@
-from __future__ import with_statement
-
 import json
 
 import numpy as np
