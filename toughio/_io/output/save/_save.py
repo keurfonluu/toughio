@@ -12,7 +12,7 @@ def read(filename, file_type, file_format, labels_order):
     """Read SAVE."""
     parameters = tough.read(filename)
 
-    labels = list(parameters["initial_conditions"].keys())
+    labels = list(parameters["initial_conditions"])
     variables = [v["values"] for v in parameters["initial_conditions"].values()]
 
     data = {"X{}".format(i + 1): x for i, x in enumerate(np.transpose(variables))}
@@ -24,7 +24,7 @@ def read(filename, file_type, file_format, labels_order):
     userx = [
         v["userx"]
         for v in parameters["initial_conditions"].values()
-        if "userx" in v.keys()
+        if "userx" in v
     ]
     if userx:
         data["userx"] = np.array(userx)

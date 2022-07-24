@@ -78,7 +78,7 @@ vtk_type_to_numnodes = {
 }
 
 
-meshio_type_to_ndim = {k: 3 for k in meshio_to_vtk_type.keys()}
+meshio_type_to_ndim = {k: 3 for k in meshio_to_vtk_type}
 meshio_type_to_ndim.update(
     {"empty": 0, "vertex": 1, "line": 2, "triangle": 2, "polygon": 2, "quad": 2}
 )

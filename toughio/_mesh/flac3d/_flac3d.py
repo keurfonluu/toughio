@@ -302,7 +302,7 @@ def _update_slots(slots, slot):
 
 def write(filename, mesh, float_fmt=".16e", binary=False):
     """Write FLAC3D f3grid grid file."""
-    if not any(c.type in meshio_only["zone"].keys() for c in mesh.cells):
+    if not any(c.type in meshio_only["zone"] for c in mesh.cells):
         raise ValueError("FLAC3D format only supports 3D cells")
 
     # Pick out material
@@ -396,7 +396,7 @@ def _write_groups(f, cells, cell_data, field_data, flag, binary):
             slot = "Default".encode("utf-8")
 
             f.write(struct.pack("<I", len(groups)))
-            for k in sorted(groups.keys()):
+            for k in sorted(groups):
                 num_chars, num_zones = len(labels[k]), len(groups[k])
                 fmt = "<H{}sH7sI{}I".format(num_chars, num_zones)
                 tmp = [
@@ -415,7 +415,7 @@ def _write_groups(f, cells, cell_data, field_data, flag, binary):
             }
 
             f.write("* {} GROUPS\n".format(flag.upper()))
-            for k in sorted(groups.keys()):
+            for k in sorted(groups):
                 f.write('{} "{}"\n'.format(flag_to_text[flag], labels[k]))
                 _write_table(f, groups[k])
     else:
@@ -440,7 +440,7 @@ def _translate_zones(points, cells):
 
     zones = []
     for key, idx in cells:
-        if key not in meshio_only["zone"].keys():
+        if key not in meshio_only["zone"]:
             continue
 
         # Compute scalar triple products
@@ -463,7 +463,7 @@ def _translate_faces(cells):
     """Reorder toughio cells to FLAC3D faces."""
     faces = []
     for key, idx in cells:
-        if key not in meshio_only["face"].keys():
+        if key not in meshio_only["face"]:
             continue
 
         key = meshio_only["face"][key]
@@ -487,7 +487,7 @@ def _translate_groups(cells, cell_data, field_data, flag):
     }
     groups = {k: v for k, v in groups.items() if v.size}
 
-    labels = {k: str(k) for k in groups.keys()}
+    labels = {k: str(k) for k in groups}
     labels[0] = "None"
     if field_data:
         labels.update(

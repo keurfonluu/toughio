@@ -84,13 +84,13 @@ class Mesh(object):
             lines.append("  No cells.")
 
         if self.point_sets:
-            lines.append("  Point sets: {}".format(", ".join(self.point_sets.keys())))
+            lines.append("  Point sets: {}".format(", ".join(self.point_sets)))
 
         if self.point_data:
-            lines.append("  Point data: {}".format(", ".join(self.point_data.keys())))
+            lines.append("  Point data: {}".format(", ".join(self.point_data)))
 
         if self.cell_data:
-            lines.append("  Cell data: {}".format(", ".join(self.cell_data.keys())))
+            lines.append("  Cell data: {}".format(", ".join(self.cell_data)))
 
         return "\n".join(lines)
 
@@ -143,7 +143,7 @@ class Mesh(object):
         cells = []
         cell_data = {k: mesh.split(v) for k, v in mesh.cell_data.items()}
         for ic, c in enumerate(mesh.cells):
-            if c.type in extruded_types.keys():
+            if c.type in extruded_types:
                 extruded_type = extruded_types[c.type]
                 nr, nc = c.data.shape
                 cell = CellBlock(extruded_type, np.tile(c.data, (nh, 2)))
@@ -164,7 +164,7 @@ class Mesh(object):
         mesh.cell_data = {k: np.concatenate(v) for k, v in cell_data.items()}
 
         if mesh.field_data:
-            for k in mesh.field_data.keys():
+            for k in mesh.field_data:
                 mesh.field_data[k][1] = 3
 
         if not inplace:
@@ -446,7 +446,7 @@ class Mesh(object):
 
             data = {
                 k: [[[0.0, 0.0, 0.0]] for _ in range(self.n_cells)]
-                for k in out.data.keys()
+                for k in out.data
             }
             for i, (label1, label2) in enumerate(out.labels):
                 i1, i2 = labels_map[label1], labels_map[label2]
@@ -597,7 +597,7 @@ class Mesh(object):
             data = self.cell_data["material"]
             imat = (
                 self.field_data[material][0]
-                if material in self.field_data.keys()
+                if material in self.field_data
                 else data.max() + 1
             )
             data[cells] = imat
@@ -914,7 +914,7 @@ def from_meshio(mesh, material="dfalt"):
         cell_sets=mesh.cell_sets if hasattr(mesh, "cell_sets") else None,
     )
 
-    if "material" not in out.cell_data.keys():
+    if "material" not in out.cell_data:
         imat = (
             np.max([v[0] for v in mesh.field_data.values() if v[1] == 3]) + 1
             if mesh.field_data
@@ -968,7 +968,7 @@ def from_pyvista(mesh, material="dfalt"):
     # Check that meshio supports all cell types in input mesh
     pixel_voxel = {8, 11}  # Handle pixels and voxels
     for cell_type in np.unique(vtk_cell_type):
-        if not (cell_type in vtk_to_meshio_type.keys() or cell_type in pixel_voxel):
+        if not (cell_type in vtk_to_meshio_type or cell_type in pixel_voxel):
             raise ValueError("toughio does not support VTK type {}.".format(cell_type))
 
     # Get cells
@@ -1017,7 +1017,7 @@ def from_pyvista(mesh, material="dfalt"):
         cell_data=cell_data,
     )
 
-    if "material" not in out.cell_data.keys():
+    if "material" not in out.cell_data:
         imat = 1
         out.cell_data["material"] = np.full(out.n_cells, imat, dtype=int)
         out.field_data[material] = np.array([imat, 3])

@@ -28,21 +28,21 @@ def read(filename):
 
     def to_int(data):
         """Return dict with integer keys instead of strings."""
-        return {int(k): data[k] for k in sorted(data.keys())}
+        return {int(k): data[k] for k in sorted(data)}
 
     with open_file(filename, "r") as f:
         parameters = json.load(f)
 
-    if "react" in parameters.keys() and "options" in parameters["react"].keys():
+    if "react" in parameters and "options" in parameters["react"]:
         parameters["react"]["options"] = to_int(parameters["react"]["options"])
 
-    if "extra_options" in parameters.keys():
+    if "extra_options" in parameters:
         parameters["extra_options"] = to_int(parameters["extra_options"])
 
-    if "more_options" in parameters.keys():
+    if "more_options" in parameters:
         parameters["more_options"] = to_int(parameters["more_options"])
 
-    if "selections" in parameters.keys():
+    if "selections" in parameters:
         parameters["selections"]["integers"] = to_int(
             parameters["selections"]["integers"]
         )

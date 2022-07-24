@@ -36,7 +36,7 @@ def extract(argv=None):
     parameters = read_mesh(
         args.mesh, file_format="tough", label_length=args.label_length
     )
-    if "elements" not in parameters.keys():
+    if "elements" not in parameters:
         raise ValueError("Invalid MESH file '{}'.".format(args.mesh))
 
     # Read TOUGH output file

@@ -200,7 +200,7 @@ def test_cell_data_to_point_data():
     mesh.cell_data_to_point_data()
 
     assert np.allclose(np.ones(mesh.n_points), mesh.point_data["a"])
-    assert "a" not in mesh.cell_data.keys()
+    assert "a" not in mesh.cell_data
 
 
 def test_point_data_to_cell_data():
@@ -210,7 +210,7 @@ def test_point_data_to_cell_data():
     mesh.point_data_to_cell_data()
 
     assert np.allclose(np.ones(mesh.n_cells), mesh.cell_data["a"])
-    assert "a" not in mesh.point_data.keys()
+    assert "a" not in mesh.point_data
 
 
 def test_near():

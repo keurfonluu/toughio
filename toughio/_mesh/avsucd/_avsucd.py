@@ -196,7 +196,7 @@ def write(filename, mesh):
 
         # Write node data
         if num_node_data_sum:
-            labels = mesh.point_data.keys()
+            labels = mesh.point_data
             data_array = np.column_stack([v for v in mesh.point_data.values()])
             _write_data(
                 f, labels, data_array, num_nodes, num_node_data, num_node_data_sum
@@ -204,7 +204,7 @@ def write(filename, mesh):
 
         # Write cell data
         if num_cell_data_sum:
-            labels = [k for k in mesh.cell_data.keys() if k != key]
+            labels = [k for k in mesh.cell_data if k != key]
             data_array = np.column_stack(
                 [np.concatenate(v) for k, v in mesh.cell_data.items() if k != key]
             )

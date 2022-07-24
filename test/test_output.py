@@ -94,7 +94,7 @@ def test_output_eleme(filename, filename_ref):
             else output.labels == None
         )
         if output.format != "tough":
-            assert keys_ref == sorted(list(output.data.keys()))
+            assert keys_ref == sorted(list(output.data))
 
     assert np.allclose(save.data["X1"], outputs[-1].data["PRES"])
     assert np.allclose(save.data["X2"], outputs[-1].data["TEMP"], atol=0.1)
@@ -166,4 +166,4 @@ def test_save():
 
     assert np.allclose(0.01, save.data["porosity"].mean())
 
-    assert "userx" not in save.data.keys()
+    assert "userx" not in save.data

@@ -151,7 +151,7 @@ def filetype_from_filename(filename, ext_to_fmt):
     """Determine file type from its extension."""
     ext = os.path.splitext(filename)[1].lower()
 
-    return ext_to_fmt[ext] if ext in ext_to_fmt.keys() else ""
+    return ext_to_fmt[ext] if ext in ext_to_fmt else ""
 
 
 @contextmanager

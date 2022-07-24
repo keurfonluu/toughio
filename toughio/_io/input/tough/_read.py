@@ -87,7 +87,7 @@ def read_buffer(f, label_length, eos, simulator="tough"):
             elif line.startswith("RPCAP"):
                 rpcap = _read_rpcap(fiter)
 
-                if "default" in parameters.keys():
+                if "default" in parameters:
                     parameters["default"].update(rpcap)
 
                 else:
@@ -127,7 +127,7 @@ def read_buffer(f, label_length, eos, simulator="tough"):
                 parameters["options"] = param["options"]
                 parameters["extra_options"] = param["extra_options"]
 
-                if "default" in parameters.keys():
+                if "default" in parameters:
                     parameters["default"].update(param["default"])
 
                 else:

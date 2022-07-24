@@ -122,12 +122,12 @@ def write_buffer(
     )
 
     for k, v in default.items():
-        if k not in parameters["default"].keys():
+        if k not in parameters["default"]:
             parameters["default"][k] = v
 
-    for rock in parameters["rocks"].keys():
+    for rock in parameters["rocks"]:
         for k, v in parameters["default"].items():
-            cond1 = k not in parameters["rocks"][rock].keys()
+            cond1 = k not in parameters["rocks"][rock]
             cond2 = k not in {
                 "initial_condition",
                 "relative_permeability",
@@ -177,7 +177,7 @@ def write_buffer(
         }
 
     # Check that EOS is defined (for block MULTI)
-    if parameters["eos"] and parameters["eos"] not in eos.keys():
+    if parameters["eos"] and parameters["eos"] not in eos:
         raise ValueError(
             "EOS '{}' is unknown or not supported.".format(parameters["eos"])
         )
@@ -190,11 +190,11 @@ def write_buffer(
 
     # Set some flags
     cond1 = (
-        "relative_permeability" in parameters["default"].keys()
+        "relative_permeability" in parameters["default"]
         and parameters["default"]["relative_permeability"]["id"] is not None
     )
     cond2 = (
-        "capillarity" in parameters["default"].keys()
+        "capillarity" in parameters["default"]
         and parameters["default"]["capillarity"]["id"] is not None
     )
     rpcap = cond1 or cond2
@@ -217,7 +217,7 @@ def write_buffer(
 
     indom = False
     for rock in parameters["rocks"].values():
-        if "initial_condition" in rock.keys():
+        if "initial_condition" in rock:
             if any(x is not None for x in rock["initial_condition"][:4]):
                 indom = True
                 break
@@ -377,11 +377,11 @@ def _write_rocks(parameters, simulator="tough"):
     # Reorder rocks
     if parameters["rocks_order"] is not None:
         order = parameters["rocks_order"]
-        for rock in parameters["rocks"].keys():
+        for rock in parameters["rocks"]:
             if rock not in order:
                 order.append(rock)
     else:
-        order = parameters["rocks"].keys()
+        order = parameters["rocks"]
 
     # Formats
     fmt = block_to_format["ROCKS"]
@@ -415,13 +415,13 @@ def _write_rocks(parameters, simulator="tough"):
         )
         nad = (
             2
-            if "relative_permeability" in data.keys() or "capillarity" in data.keys()
+            if "relative_permeability" in data or "capillarity" in data
             else int(cond)
         )
 
         if simulator == "toughreact":
-            nad = 4 if "react_tp" in data.keys() else nad
-            nad = 5 if "react_hcplaw" in data.keys() else nad
+            nad = 4 if "react_tp" in data else nad
+            nad = 5 if "react_hcplaw" in data else nad
 
         # Permeability
         per = data["permeability"]
@@ -487,7 +487,7 @@ def _write_rpcap(parameters):
 
     out = []
     for key in ["relative_permeability", "capillarity"]:
-        if key in data.keys():
+        if key in data:
             values = [data[key]["id"], None]
             values += list(data[key]["parameters"])
             out += write_record(values, fmt)
@@ -510,7 +510,7 @@ def _write_react(parameters):
     _react = deepcopy(react_options)
     _react.update(parameters["react"]["options"])
 
-    tmp = [" " if _react[k] is None else str(_react[k]) for k in sorted(_react.keys())]
+    tmp = [" " if _react[k] is None else str(_react[k]) for k in sorted(_react)]
     out = write_record(["".join(tmp)], fmt)
 
     return out
@@ -535,11 +535,11 @@ def _write_flac(parameters):
     # Reorder rocks
     if parameters["rocks_order"]:
         order = parameters["rocks_order"]
-        for rock in parameters["rocks"].keys():
+        for rock in parameters["rocks"]:
             if rock not in order:
                 order.append(rock)
     else:
-        order = parameters["rocks"].keys()
+        order = parameters["rocks"]
 
     # Formats
     fmt = block_to_format["FLAC"]
@@ -783,7 +783,7 @@ def _write_param(parameters, eos_=None, simulator="tough"):
     # Record 1
     _mop = deepcopy(extra_options)
     _mop.update(parameters["extra_options"])
-    mop = [" " if _mop[k] is None else str(_mop[k]) for k in sorted(_mop.keys())]
+    mop = [" " if _mop[k] is None else str(_mop[k]) for k in sorted(_mop)]
 
     values = [
         data["n_iteration"],
@@ -904,7 +904,7 @@ def _write_selec(parameters):
     fmt2 = str2format(fmt[2])
 
     # Record 1
-    values = [data["integers"][k] for k in sorted(data["integers"].keys())]
+    values = [data["integers"][k] for k in sorted(data["integers"])]
     out = write_record(values, fmt1)
 
     # Record 2
@@ -922,11 +922,11 @@ def _write_indom(parameters, eos_):
     """Write INDOM block data."""
     if parameters["rocks_order"]:
         order = parameters["rocks_order"]
-        for rock in parameters["rocks"].keys():
+        for rock in parameters["rocks"]:
             if rock not in order:
                 order.append(rock)
     else:
-        order = parameters["rocks"].keys()
+        order = parameters["rocks"]
 
     # Formats
     fmt = block_to_format["INDOM"]
@@ -986,7 +986,7 @@ def _write_momop(parameters):
     _momop = deepcopy(more_options)
     _momop.update(parameters["more_options"])
 
-    tmp = [" " if _momop[k] is None else str(_momop[k]) for k in sorted(_momop.keys())]
+    tmp = [" " if _momop[k] is None else str(_momop[k]) for k in sorted(_momop)]
     out = write_record(["".join(tmp)], fmt)
 
     return out
@@ -1262,7 +1262,7 @@ def _write_eleme(parameters):
     if parameters["elements_order"] is not None:
         order = parameters["elements_order"]
     else:
-        order = parameters["elements"].keys()
+        order = parameters["elements"]
 
     # Format
     label_length = len(max(parameters["elements"], key=len))
@@ -1303,7 +1303,7 @@ def _write_coord(parameters):
     if parameters["elements_order"] is not None:
         order = parameters["elements_order"]
     else:
-        order = parameters["elements"].keys()
+        order = parameters["elements"]
 
     # Format
     fmt = block_to_format["COORD"]
@@ -1327,7 +1327,7 @@ def _write_conne(parameters):
     if parameters["connections_order"] is not None:
         order = parameters["connections_order"]
     else:
-        order = parameters["connections"].keys()
+        order = parameters["connections"]
 
     # Format
     label_length = len(max(parameters["connections"], key=len)) // 2
@@ -1366,7 +1366,7 @@ def _write_incon(parameters, eos_=None, simulator="tough"):
     if parameters["initial_conditions_order"] is not None:
         order = parameters["initial_conditions_order"]
     else:
-        order = parameters["initial_conditions"].keys()
+        order = parameters["initial_conditions"]
 
     # Format
     label_length = len(max(parameters["initial_conditions"], key=len))

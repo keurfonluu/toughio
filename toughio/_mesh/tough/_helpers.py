@@ -31,7 +31,7 @@ def _write_eleme(labels, materials, volumes, nodes, material_name=None):
     for label, material, volume, node in iterables:
         mat = (
             material_name[material]
-            if material_name and material in material_name.keys()
+            if material_name and material in material_name
             else material
         )
         mat = mat if isinstance(mat, str) else "{:>5}".format(str(mat))
