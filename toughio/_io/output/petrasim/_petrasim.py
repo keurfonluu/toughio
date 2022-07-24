@@ -49,10 +49,10 @@ def write(filename, output):
     """Write Petrasim OUTPUT_ELEME.csv."""
     out = output[-1]
     headers = []
-    headers += ["X"] if "X" in out.data.keys() else []
-    headers += ["Y"] if "Y" in out.data.keys() else []
-    headers += ["Z"] if "Z" in out.data.keys() else []
-    headers += [k for k in out.data.keys() if k not in {"X", "Y", "Z"}]
+    headers += ["X"] if "X" in out.data else []
+    headers += ["Y"] if "Y" in out.data else []
+    headers += ["Z"] if "Z" in out.data else []
+    headers += [k for k in out.data if k not in {"X", "Y", "Z"}]
 
     with open_file(filename, "w") as f:
         # Headers

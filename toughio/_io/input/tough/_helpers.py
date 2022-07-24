@@ -237,7 +237,7 @@ def check_parameters(input_types, keys=None, is_list=False):
         for k, v in params.items():
             # Check whether parameters contain unknown keys
             # Log error if it does and skip
-            if k not in input_types.keys():
+            if k not in input_types:
                 logging.warning(
                     "Unknown key '{}'{}. Skipping.".format(
                         k, " in {}".format(keys) if keys else ""
@@ -312,7 +312,7 @@ def read_model_record(line, fmt, i=2):
 
 def write_model_record(data, key, fmt):
     """Write model record defined by 'id' and 'parameters'."""
-    if key in data.keys():
+    if key in data:
         values = [data[key]["id"], None]
         values += list(data[key]["parameters"])
         return write_record(values, fmt)

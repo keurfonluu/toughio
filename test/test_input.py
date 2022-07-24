@@ -68,7 +68,7 @@ def test_rocks(write_read):
             helpers.random_string(5): {key: np.random.rand() for key in keys},
         }
     }
-    names = list(parameters_ref["rocks"].keys())
+    names = list(parameters_ref["rocks"])
     parameters_ref["rocks"][names[-1]].update(
         {
             "relative_permeability": {
@@ -99,7 +99,7 @@ def test_rocks(write_read):
     )
     parameters = write_read(parameters_ref)
 
-    assert sorted(parameters_ref["rocks"].keys()) == sorted(parameters["rocks"].keys())
+    assert sorted(parameters_ref["rocks"]) == sorted(parameters["rocks"])
 
     for k, v in parameters_ref["rocks"].items():
         for kk, vv in v.items():
@@ -249,7 +249,7 @@ def test_multi(write_read, isothermal):
 
     parameters_ref = {
         "eos": random.choice(
-            [k for k in eos.keys() if k not in {"eos7", "eos8", "eos9", "tmvoc"}]
+            [k for k in eos if k not in {"eos7", "eos8", "eos9", "tmvoc"}]
         ),
         "isothermal": isothermal,
     }
@@ -335,7 +335,7 @@ def test_param(write_read, t_steps, num_pvars):
 
     helpers.allclose_dict(parameters_ref["options"], parameters["options"], atol=1.0e-5)
     helpers.allclose_dict(parameters_ref["extra_options"], parameters["extra_options"])
-    if "initial_condition" in parameters["default"].keys():
+    if "initial_condition" in parameters["default"]:
         assert np.allclose(
             parameters_ref["default"]["initial_condition"],
             parameters["default"]["initial_condition"],
@@ -379,7 +379,7 @@ def test_selec(write_read, num_floats):
     helpers.allclose_dict(
         parameters_ref["selections"]["integers"], parameters["selections"]["integers"]
     )
-    if "floats" in parameters["selections"].keys():
+    if "floats" in parameters["selections"]:
         assert np.allclose(
             parameters_ref["selections"]["floats"],
             parameters["selections"]["floats"],
@@ -654,8 +654,8 @@ def test_eleme(write_read, label_length, coord):
     }
     parameters = write_read(parameters_ref)
 
-    assert sorted(parameters_ref["elements"].keys()) == sorted(
-        parameters["elements"].keys()
+    assert sorted(parameters_ref["elements"]) == sorted(
+        parameters["elements"]
     )
 
     for k, v in parameters_ref["elements"].items():
@@ -712,8 +712,8 @@ def test_conne(write_read, label_length):
     }
     parameters = write_read(parameters_ref)
 
-    assert sorted(parameters_ref["connections"].keys()) == sorted(
-        parameters["connections"].keys()
+    assert sorted(parameters_ref["connections"]) == sorted(
+        parameters["connections"]
     )
 
     for k, v in parameters_ref["connections"].items():
@@ -759,8 +759,8 @@ def test_incon(write_read, label_length, num_pvars, num_items):
     }
     parameters = write_read(parameters_ref)
 
-    assert sorted(parameters_ref["initial_conditions"].keys()) == sorted(
-        parameters["initial_conditions"].keys()
+    assert sorted(parameters_ref["initial_conditions"]) == sorted(
+        parameters["initial_conditions"]
     )
 
     for k, v in parameters_ref["initial_conditions"].items():
@@ -878,12 +878,12 @@ def test_tmvoc():
 
     helpers.allclose_dict(parameters_ref["default"], parameters["default"])
 
-    assert sorted(parameters_ref["rocks"].keys()) == sorted(parameters["rocks"].keys())
+    assert sorted(parameters_ref["rocks"]) == sorted(parameters["rocks"])
     for k, v in parameters_ref["rocks"].items():
         helpers.allclose_dict(v, parameters["rocks"][k])
 
-    assert sorted(parameters_ref["initial_conditions"].keys()) == sorted(
-        parameters["initial_conditions"].keys()
+    assert sorted(parameters_ref["initial_conditions"]) == sorted(
+        parameters["initial_conditions"]
     )
     for k, v in parameters_ref["initial_conditions"].items():
         helpers.allclose_dict(v, parameters["initial_conditions"][k])
@@ -906,7 +906,7 @@ def test_flag(write_read, flag, enable):
     parameters_ref = {flag: enable}
     parameters = write_read(parameters_ref)
 
-    if flag in parameters.keys():
+    if flag in parameters:
         assert parameters_ref[flag] == parameters[flag]
     else:
         assert not enable

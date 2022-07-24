@@ -49,7 +49,7 @@ def test_mesh(nodal_distance, bound, coord):
     )
 
     # Check block ELEME
-    assert sorted(mesh.labels) == sorted(parameters["elements"].keys())
+    assert sorted(mesh.labels) == sorted(parameters["elements"])
 
     materials = [parameters["elements"][label]["material"] for label in mesh.labels]
     assert mesh.materials.tolist() == materials
@@ -152,7 +152,7 @@ def test_incon(anisotropic):
     )
 
     # Check block INCON
-    assert sorted(mesh.labels) == sorted(parameters["initial_conditions"].keys())
+    assert sorted(mesh.labels) == sorted(parameters["initial_conditions"])
 
     values = [
         parameters["initial_conditions"][label]["values"] for label in mesh.labels

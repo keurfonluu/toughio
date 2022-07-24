@@ -87,7 +87,7 @@ def read(filename, file_format=None, **kwargs):
     )
 
     # Call custom readers
-    if fmt in _reader_map.keys():
+    if fmt in _reader_map:
         mesh = _reader_map[fmt](filename, **kwargs)
         if fmt not in {"tough", "pickle"}:
             mesh.cell_data = {k: np.concatenate(v) for k, v in mesh.cell_data.items()}
@@ -165,7 +165,7 @@ def write(filename, mesh, file_format=None, **kwargs):
     )
 
     # Call custom writer
-    if fmt in _writer_map.keys():
+    if fmt in _writer_map:
         if fmt not in {"tough", "pickle"}:
             mesh = deepcopy(mesh)
             mesh.cell_data = {k: mesh.split(v) for k, v in mesh.cell_data.items()}
@@ -208,7 +208,7 @@ def read_time_series(filename):
 
     # Concatenate cell data arrays
     for cdata in cell_data:
-        for k in cdata.keys():
+        for k in cdata:
             cdata[k] = np.concatenate(cdata[k])
 
     return points, cells, point_data, cell_data, time_steps

@@ -302,19 +302,19 @@ def _get_points(output, ignore_elements):
     # Make sure that point coordinates exist
     count = 0
 
-    if "X" in output.data.keys():
+    if "X" in output.data:
         X = np.array(output.data["X"])
         count += 1
     else:
         X = np.zeros(n_points)
 
-    if "Y" in output.data.keys():
+    if "Y" in output.data:
         Y = np.array(output.data["Y"])
         count += 1
     else:
         Y = np.zeros(n_points)
 
-    if "Z" in output.data.keys():
+    if "Z" in output.data:
         Z = np.array(output.data["Z"])
         count += 1
     else:

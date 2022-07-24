@@ -64,7 +64,7 @@ def write(
     volumes = mesh.volumes
     boundary_conditions = (
         mesh.cell_data["boundary_condition"]
-        if "boundary_condition" in mesh.cell_data.keys()
+        if "boundary_condition" in mesh.cell_data
         else np.zeros(num_cells, dtype=int)
     )
     points = mesh.points
@@ -406,20 +406,20 @@ def init_incon(mesh):
     """Initialize primary variables, porosity and permeability arrays."""
     primary_variables = (
         mesh.cell_data["initial_condition"]
-        if "initial_condition" in mesh.cell_data.keys()
+        if "initial_condition" in mesh.cell_data
         else np.full((mesh.n_cells, 4), -1.0e9)
     )
     porosities = (
-        mesh.cell_data["porosity"] if "porosity" in mesh.cell_data.keys() else None
+        mesh.cell_data["porosity"] if "porosity" in mesh.cell_data else None
     )
     permeabilities = (
         mesh.cell_data["permeability"]
-        if "permeability" in mesh.cell_data.keys()
+        if "permeability" in mesh.cell_data
         else None
     )
     phase_compositions = (
         mesh.cell_data["phase_composition"]
-        if "phase_composition" in mesh.cell_data.keys()
+        if "phase_composition" in mesh.cell_data
         else None
     )
 

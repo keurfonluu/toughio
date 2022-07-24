@@ -100,10 +100,10 @@ def write(filename, output, unit=None):
 
     out = output[-1]
     headers = ["ELEM"] if out.type == "element" else ["ELEM1", "ELEM2"]
-    headers += ["X"] if "X" in out.data.keys() else []
-    headers += ["Y"] if "Y" in out.data.keys() else []
-    headers += ["Z"] if "Z" in out.data.keys() else []
-    headers += [k for k in out.data.keys() if k not in {"X", "Y", "Z"}]
+    headers += ["X"] if "X" in out.data else []
+    headers += ["Y"] if "Y" in out.data else []
+    headers += ["Z"] if "Z" in out.data else []
+    headers += [k for k in out.data if k not in {"X", "Y", "Z"}]
 
     with open_file(filename, "w") as f:
         _write_csv(f, output, headers, unit)
@@ -117,7 +117,7 @@ def _write_csv(f, output, headers, unit=None):
 
     # Headers
     units = [
-        header_to_unit_[header] if header in header_to_unit_.keys() else "-"
+        header_to_unit_[header] if header in header_to_unit_ else "-"
         for header in headers
     ]
     f.write(",".join('"{:>18}"'.format(header) for header in headers) + "\n")
