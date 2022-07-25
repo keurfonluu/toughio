@@ -24,7 +24,7 @@ The code is formatted with `black <https://github.com/psf/black>`__ so you don't
 
     invoke format
 
-Every new features must be unit tested in the directory ``test`` using the `pytest <https://docs.pytest.org/en/stable/>`__ framework. To run the test suite, run the command:
+Every new features must be unit tested in the directory ``tests`` using the `pytest <https://docs.pytest.org/en/stable/>`__ framework. To run the test suite, run the command:
 
 .. code:: bash
 

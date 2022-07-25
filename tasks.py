@@ -48,7 +48,7 @@ def clean(c, bytecode=False):
 @task
 def black(c):
     c.run("black -t py38 toughio")
-    c.run("black -t py38 test")
+    c.run("black -t py38 tests")
 
 
 @task
@@ -59,7 +59,7 @@ def docstring(c):
 @task
 def isort(c):
     c.run("isort toughio")
-    c.run("isort test")
+    c.run("isort tests")
 
 
 @task
