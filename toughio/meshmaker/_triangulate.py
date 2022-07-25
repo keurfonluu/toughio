@@ -43,7 +43,7 @@ def triangulate(points, material="dfalt"):
     cell_type = "triangle" if points.shape[1] == 2 else "tetra"
     cells = [CellBlock(cell_type, connectivity)]
     mesh = Mesh(points, cells)
-    mesh.add_cell_data("material", np.ones(mesh.n_cells, dtype=int))
+    mesh.add_cell_data("material", np.ones(mesh.n_cells, dtype=np.int64))
     mesh.field_data[material] = np.array([1, 3])
 
     return mesh

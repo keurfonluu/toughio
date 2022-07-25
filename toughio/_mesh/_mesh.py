@@ -920,7 +920,7 @@ def from_meshio(mesh, material="dfalt"):
             if mesh.field_data
             else 1
         )
-        out.cell_data["material"] = np.full(out.n_cells, imat, dtype=int)
+        out.cell_data["material"] = np.full(out.n_cells, imat, dtype=np.int64)
         out.field_data[material] = np.array([imat, 3])
 
     return out
@@ -1019,7 +1019,7 @@ def from_pyvista(mesh, material="dfalt"):
 
     if "material" not in out.cell_data:
         imat = 1
-        out.cell_data["material"] = np.full(out.n_cells, imat, dtype=int)
+        out.cell_data["material"] = np.full(out.n_cells, imat, dtype=np.int64)
         out.field_data[material] = np.array([imat, 3])
 
     return out
