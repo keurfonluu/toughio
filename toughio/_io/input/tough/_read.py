@@ -23,8 +23,8 @@ def read(filename, label_length=None, eos=None, simulator="tough"):
 
     Parameters
     ----------
-    filename : str
-        Input file name.
+    filename : str, pathlike or buffer
+        Input file name or buffer.
     label_length : int or None, optional, default None
         Number of characters in cell labels.
     eos : str or None, optional, default None
@@ -937,9 +937,7 @@ def _read_conne(f, label_length):
 
         line = f.next()
 
-    conne["connections"] = {
-        k: prune_values(v) for k, v in conne["connections"].items()
-    }
+    conne["connections"] = {k: prune_values(v) for k, v in conne["connections"].items()}
 
     return conne, flag
 

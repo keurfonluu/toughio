@@ -506,10 +506,7 @@ def test_outpu(write_read, fmt):
                 {"name": helpers.random_string(20)},
                 {"name": helpers.random_string(20), "options": None},
                 {"name": helpers.random_string(20), "options": np.random.randint(10)},
-                {
-                    "name": helpers.random_string(20),
-                    "options": np.random.randint(10),
-                },
+                {"name": helpers.random_string(20), "options": np.random.randint(10)},
                 {
                     "name": helpers.random_string(20),
                     "options": np.random.randint(10, size=2),

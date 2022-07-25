@@ -1,5 +1,5 @@
-from copy import deepcopy
 import pathlib
+from copy import deepcopy
 
 import meshio
 import numpy as np

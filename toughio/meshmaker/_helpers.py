@@ -11,8 +11,8 @@ def from_meshmaker(filename_or_dict, material="dfalt"):
 
     Parameters
     ----------
-    filename_or_dict: str or dict
-        Input file name or parameters dict with key "meshmaker".
+    filename_or_dict: str, pathlike, buffer or dict
+        Input file name, buffer or parameters dict with key "meshmaker".
     material : str, optional, default 'dfalt'
         Default material name.
 

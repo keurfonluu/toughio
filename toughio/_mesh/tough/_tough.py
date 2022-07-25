@@ -407,13 +407,9 @@ def init_incon(mesh):
         if "initial_condition" in mesh.cell_data
         else np.full((mesh.n_cells, 4), -1.0e9)
     )
-    porosities = (
-        mesh.cell_data["porosity"] if "porosity" in mesh.cell_data else None
-    )
+    porosities = mesh.cell_data["porosity"] if "porosity" in mesh.cell_data else None
     permeabilities = (
-        mesh.cell_data["permeability"]
-        if "permeability" in mesh.cell_data
-        else None
+        mesh.cell_data["permeability"] if "permeability" in mesh.cell_data else None
     )
     phase_compositions = (
         mesh.cell_data["phase_composition"]

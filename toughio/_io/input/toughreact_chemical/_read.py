@@ -15,8 +15,8 @@ def read(filename):
 
     Parameters
     ----------
-    filename : str
-        Input file name.
+    filename : str, pathlike or buffer
+        Input file name or buffer.
 
     """
     with open_file(filename, "r") as f:
