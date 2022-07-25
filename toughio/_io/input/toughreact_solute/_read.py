@@ -1,7 +1,7 @@
-from ...._common import open_file
+from ...._common import open_file, prune_values
 from ...._exceptions import ReadError
 from ...._helpers import FileIterator
-from ..._common import prune_nones_list, read_record, to_float
+from ..._common import read_record, to_float
 from .._common import read_end_comments
 
 __all__ = [
@@ -235,7 +235,7 @@ def _read_elements(f, n):
             data = read_record(line, fmt)
             elements += data
 
-        return prune_nones_list(elements[:n])
+        return prune_values(elements[:n])
 
     elif n < 0:
         line = f.next(skip_empty=True, comments="#").strip()

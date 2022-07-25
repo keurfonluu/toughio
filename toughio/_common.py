@@ -1,6 +1,8 @@
 import os
 from contextlib import contextmanager
 
+import numpy as np
+
 block_to_format = {
     "ROCKS": {
         1: "5s,5d,10.4e,10.4e,10.4e,10.4e,10.4e,10.4e,10.4e",
@@ -169,3 +171,15 @@ def open_file(path_or_buffer, mode):
     else:
         with open(path_or_buffer, mode) as f:
             yield f
+
+
+def prune_values(data, value=None):
+    """Remove values from dict or trailing values from list."""
+    if isinstance(data, dict):
+        return {k: v for k, v in data.items() if v != value}
+
+    elif isinstance(data, (list, tuple, np.ndarray)):
+        return [x for i, x in enumerate(data) if any(xx != value for xx in data[i:])]
+
+    else:
+        return data

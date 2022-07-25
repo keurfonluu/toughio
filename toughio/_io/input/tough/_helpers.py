@@ -4,7 +4,8 @@ from functools import wraps
 
 import numpy as np
 
-from ..._common import prune_nones_list, read_record, write_record
+from ...._common import prune_values
+from ..._common import read_record, write_record
 
 dtypes = {
     "PARAMETERS": {
@@ -302,7 +303,7 @@ def read_model_record(line, fmt, i=2):
 
     return {
         "id": data[0],
-        "parameters": prune_nones_list(data[i:]),
+        "parameters": prune_values(data[i:]),
     }
 
 
