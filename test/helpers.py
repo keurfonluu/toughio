@@ -137,35 +137,68 @@ def random_label(label_length):
     return random_string(3) + fmt.format(np.random.randint(10 ** n))
 
 
-def allclose_dict(a, b, atol=1.0e-8):
-    for k, v in a.items():
-        if v is not None:
-            assert np.allclose(v, b[k], atol=atol)
-        else:
-            assert b[k] is None
+def allclose(x, y, atol=1.0e-8, ignore_keys=None, ignore_none=False):
+    ignore_keys = ignore_keys if ignore_keys is not None else []
 
+    if isinstance(x, dict):
+        assert isinstance(y, dict)
 
-def allclose_mesh(mesh_ref, mesh):
-    assert np.allclose(mesh_ref.points, mesh.points)
+        for k, v in x.items():
+            if k in ignore_keys:
+                continue
 
-    for i, cell in enumerate(mesh_ref.cells):
-        assert cell.type == mesh.cells[i].type
-        assert np.allclose(cell.data, mesh.cells[i].data)
+            if ignore_none and v is None:
+                continue
 
-    if mesh.point_data:
-        for k, v in mesh_ref.point_data.items():
-            assert np.allclose(v, mesh.point_data[k])
+            try:
+                assert allclose(v, y[k], atol=atol, ignore_none=ignore_none)
 
-    if mesh.cell_data:
-        for k, v in mesh_ref.cell_data.items():
-            assert np.allclose(v, mesh.cell_data[k])
+            except KeyError as e:
+                print("x =", v, "\ny =", y[k], "\n")
+                raise KeyError(e)
 
+    else:
+        try:
+            if isinstance(x, toughio.Mesh):
+                assert isinstance(y, toughio.Mesh)
 
-def allclose_output(output_ref, output):
-    assert output_ref.type == output.type
-    assert np.allclose(output_ref.time, output.time)
-    assert output_ref.labels.tolist() == output_ref.labels.tolist()
-    allclose_dict(output_ref.data, output.data)
+                assert allclose(x.points, y.points)
+                assert allclose(x.cells, y.cells)
+                
+                if x.point_data:
+                    assert allclose(x.point_data, y.point_data)
+
+                if x.cell_data:
+                    assert allclose(x.cell_data, y.cell_data)
+
+            elif isinstance(x, toughio.Output):
+                assert isinstance(y, toughio.Output)
+
+                assert allclose(x.type, y.type)
+                assert allclose(x.time, y.time)
+                assert allclose(x.data, y.data)
+
+                if np.ndim(x.labels) != 0:
+                    assert allclose(x.labels, y.labels)
+
+            elif isinstance(x, str):
+                assert x == y
+
+            elif x is None:
+                assert y is None
+
+            elif np.ndim(x) == 0:
+                assert np.allclose(x, y, atol=atol)
+
+            else:
+                for xx, yy in zip(x, y):
+                    assert allclose(xx, yy, atol=atol, ignore_none=ignore_none)
+
+        except Exception as e:
+            print("x =", x, "\ny =", y, "\n")
+            raise Exception(e)
+
+    return True
 
 
 def convert_outputs_labels(outputs, connection=False):

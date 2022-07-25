@@ -80,17 +80,17 @@ def test_export(filename, mesh, voxelize, ext):
 
         centers_ref = np.column_stack([output.data[dim] for dim in ["X", "Y", "Z"]])
         assert (
-            np.allclose(centers_ref, mesh_in.centers)
+            helpers.allclose(centers_ref, mesh_in.centers)
             if mesh or voxelize
-            else np.allclose(centers_ref[:, :2], mesh_in.points[:, :2])
+            else helpers.allclose(centers_ref[:, :2], mesh_in.points[:, :2])
         )
 
         for k, v in output.data.items():
             if k not in {"X", "Y", "Z"}:
                 assert (
-                    np.allclose(v, mesh_in.cell_data[k])
+                    helpers.allclose(v, mesh_in.cell_data[k])
                     if mesh or voxelize
-                    else np.allclose(v, mesh_in.point_data[k])
+                    else helpers.allclose(v, mesh_in.point_data[k])
                 )
     else:
         mesh_in = toughio.read_time_series(output_filename)
@@ -100,12 +100,12 @@ def test_export(filename, mesh, voxelize, ext):
             [outputs[-1].data[dim] for dim in ["X", "Y", "Z"]]
         )
         assert (
-            np.allclose(
+            helpers.allclose(
                 centers_ref,
                 np.concatenate([points[c.data].mean(axis=1) for c in cells]),
             )
             if mesh or voxelize
-            else np.allclose(centers_ref[:, :2], points[:, :2])
+            else helpers.allclose(centers_ref[:, :2], points[:, :2])
         )
 
         assert len(point_data) == len(outputs)
@@ -119,14 +119,14 @@ def test_export(filename, mesh, voxelize, ext):
 
         for t, pdata in enumerate(point_data):
             for k, v in pdata.items():
-                assert np.allclose(v, outputs[t].data[k])
+                assert helpers.allclose(v, outputs[t].data[k])
 
         for t, cdata in enumerate(cell_data):
             for k, v in cdata.items():
-                assert np.allclose(v, outputs[t].data[k])
+                assert helpers.allclose(v, outputs[t].data[k])
 
         time_steps_ref = [output.time for output in outputs]
-        assert np.allclose(time_steps, time_steps_ref)
+        assert helpers.allclose(time_steps, time_steps_ref)
 
 
 @pytest.mark.parametrize(
@@ -173,7 +173,7 @@ def test_extract(file_format, split, connection):
         for output_ref, output in zip(outputs_ref, outputs):
             assert output_ref.time == output.time
             for k, v in output_ref.data.items():
-                assert np.allclose(v.mean(), output.data[k].mean(), atol=1.0e-2)
+                assert helpers.allclose(v.mean(), output.data[k].mean(), atol=1.0e-2)
     else:
         filenames = glob.glob(os.path.join(tempdir, f"{base_filename}_*.csv"))
         for i, output_filename in enumerate(sorted(filenames)):
@@ -186,7 +186,7 @@ def test_extract(file_format, split, connection):
 
             assert output_ref.time == output.time
             for k, v in output_ref.data.items():
-                assert np.allclose(v.mean(), output.data[k].mean(), atol=1.0e-2)
+                assert helpers.allclose(v.mean(), output.data[k].mean(), atol=1.0e-2)
 
 
 @pytest.mark.parametrize("incon", [True, False])
@@ -276,4 +276,4 @@ def test_save2incon(reset):
     incon = toughio.read_output(output_filename)
 
     assert save.labels.tolist() == incon.labels.tolist()
-    helpers.allclose_dict(save.data, incon.data)
+    helpers.allclose(save.data, incon.data)

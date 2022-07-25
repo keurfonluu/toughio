@@ -55,7 +55,7 @@ def test_history(filename, data_ref):
     data = toughio.read_history(filename)
 
     for k, v in data_ref.items():
-        assert np.allclose(v, data[k].sum())
+        assert helpers.allclose(v, data[k].sum())
 
 
 @pytest.mark.parametrize(
@@ -96,8 +96,8 @@ def test_output_eleme(filename, filename_ref):
         if output.format != "tough":
             assert keys_ref == sorted(list(output.data))
 
-    assert np.allclose(save.data["X1"], outputs[-1].data["PRES"])
-    assert np.allclose(save.data["X2"], outputs[-1].data["TEMP"], atol=0.1)
+    assert helpers.allclose(save.data["X1"], outputs[-1].data["PRES"])
+    assert helpers.allclose(save.data["X2"], outputs[-1].data["TEMP"], atol=0.1)
 
 
 @pytest.mark.parametrize(
@@ -128,7 +128,7 @@ def test_output_conne(filename):
             len(set("".join(labels) for labels in output.labels))
             == output.data["HEAT"].size
         )
-        assert np.allclose(data, np.abs(output.data["HEAT"]).mean(), atol=1.0)
+        assert helpers.allclose(data, np.abs(output.data["HEAT"]).mean(), atol=1.0)
 
 
 @pytest.mark.parametrize(
@@ -151,7 +151,8 @@ def test_output(output_ref, file_format):
 
     output_ref = output_ref if isinstance(output_ref, list) else [output_ref]
     for out_ref, out in zip(output_ref, output):
-        helpers.allclose_output(out_ref, out)
+        # Careful here, tecplot format has no label
+        helpers.allclose(out, out_ref)
 
 
 def test_save():
@@ -160,10 +161,10 @@ def test_save():
     save = toughio.read_output(filename)
 
     x_ref = [6.35804123e05, 1.42894499e02, 9.91868799e-01]
-    assert np.allclose(
+    assert helpers.allclose(
         x_ref, np.mean([save.data["X1"], save.data["X2"], save.data["X3"]], axis=1)
     )
 
-    assert np.allclose(0.01, save.data["porosity"].mean())
+    assert helpers.allclose(0.01, save.data["porosity"].mean())
 
     assert "userx" not in save.data

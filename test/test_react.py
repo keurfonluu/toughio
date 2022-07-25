@@ -5,29 +5,6 @@ import pytest
 import toughio
 
 
-def allclose(x, y, atol=1.0e-8):
-    if isinstance(x, dict):
-        for k, v in x.items():
-            try:
-                assert allclose(v, y[k], atol=atol)
-
-            except KeyError as e:
-                print(y[k])
-                raise KeyError(e)
-
-    elif isinstance(x, str):
-        assert x == y
-
-    elif np.ndim(x) == 0:
-        assert np.allclose(x, y, atol=atol)
-
-    else:
-        for xx, yy in zip(x, y):
-            assert allclose(xx, yy, atol=atol)
-
-    return True
-
-
 def test_flow():
     def write_read(x):
         writer_kws = {"file_format": "toughreact-flow"}
@@ -178,7 +155,7 @@ def test_flow():
     }
     parameters = write_read(parameters_ref)
 
-    assert allclose(parameters_ref, parameters, atol=1.0e-4)
+    assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
 
 @pytest.mark.parametrize(
@@ -333,7 +310,7 @@ def test_solute(verbose, mopr_10, mopr_11):
 
     parameters = write_read(parameters_ref)
 
-    assert allclose(parameters_ref, parameters, atol=1.0e-3)
+    assert helpers.allclose(parameters_ref, parameters, atol=1.0e-3)
 
 
 @pytest.mark.parametrize("verbose", [True, False])
@@ -681,4 +658,4 @@ def test_chemical(verbose):
 
     parameters = write_read(parameters_ref)
 
-    assert allclose(parameters_ref, parameters, atol=1.0e-3)
+    assert helpers.allclose(parameters_ref, parameters, atol=1.0e-3)
