@@ -37,18 +37,18 @@ def test_time_series():
     points, cells, point_data, cell_data, time_steps = mesh
 
     # Compare with reference data
-    assert np.allclose(points, mesh_ref.points)
+    assert helpers.allclose(points, mesh_ref.points)
 
     for cell_ref, cell in zip(mesh_ref.cells, cells):
         assert cell_ref.type == cell.type
-        assert np.allclose(cell_ref.data, cell.data)
+        assert helpers.allclose(cell_ref.data, cell.data)
 
     for t, pdata in enumerate(point_data):
         for k, v in pdata.items():
-            assert np.allclose(v, point_data_ref[t][k])
+            assert helpers.allclose(v, point_data_ref[t][k])
 
     for t, cdata in enumerate(cell_data):
         for k, v in cdata.items():
-            assert np.allclose(v, cell_data_ref[t][k])
+            assert helpers.allclose(v, cell_data_ref[t][k])
 
-    assert np.allclose(time_steps, time_steps_ref)
+    assert helpers.allclose(time_steps, time_steps_ref)

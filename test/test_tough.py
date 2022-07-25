@@ -59,17 +59,17 @@ def test_mesh(nodal_distance, bound, coord):
         for label, bcond in zip(mesh.labels, boundary_condition)
         if not bcond
     ]
-    assert np.allclose(mesh.volumes[boundary_condition == 0], volumes)
+    assert helpers.allclose(mesh.volumes[boundary_condition == 0], volumes)
 
     volumes = [
         parameters["elements"][label]["volume"]
         for label, bcond in zip(mesh.labels, boundary_condition)
         if bcond
     ]
-    assert np.allclose(mesh.volumes[boundary_condition == 1] * 1.0e50, volumes)
+    assert helpers.allclose(mesh.volumes[boundary_condition == 1] * 1.0e50, volumes)
 
     centers = [parameters["elements"][label]["center"] for label in mesh.labels]
-    assert np.allclose(mesh.centers, centers)
+    assert helpers.allclose(mesh.centers, centers)
 
     # Check block COORD
     assert parameters["coordinates"] == coord
@@ -116,7 +116,7 @@ def test_mesh(nodal_distance, bound, coord):
             ny * nz * (xmax - xmin) + nx * nz * (ymax - ymin) + nx * ny * (zmax - zmin)
         )
         distances = [v["nodal_distances"] for v in parameters["connections"].values()]
-        assert np.allclose(distances_ref, np.sum(distances))
+        assert helpers.allclose(distances_ref, np.sum(distances))
 
 
 @pytest.mark.parametrize("anisotropic", [True, False, None])
@@ -157,16 +157,16 @@ def test_incon(anisotropic):
     values = [
         parameters["initial_conditions"][label]["values"] for label in mesh.labels
     ]
-    assert np.allclose(mesh.cell_data["initial_condition"], values)
+    assert helpers.allclose(mesh.cell_data["initial_condition"], values)
 
     porosity = [
         parameters["initial_conditions"][label]["porosity"] for label in mesh.labels
     ]
-    assert np.allclose(mesh.cell_data["porosity"], porosity)
+    assert helpers.allclose(mesh.cell_data["porosity"], porosity)
 
     if anisotropic is not None:
         userx = np.array(
             [parameters["initial_conditions"][label]["userx"] for label in mesh.labels]
         )
         permeability = userx[:, :3] if anisotropic else userx[:, 0]
-        assert np.allclose(mesh.cell_data["permeability"], permeability, atol=1.0e-4)
+        assert helpers.allclose(mesh.cell_data["permeability"], permeability, atol=1.0e-4)

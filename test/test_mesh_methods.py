@@ -45,16 +45,16 @@ def test_extrude_to_3d():
     assert mesh.cell_data["d"].shape == (5 * mesh_ref.n_cells, 3)
 
     for v in mesh.point_data["a"].reshape((6, mesh.n_points // 6)):
-        assert np.allclose(mesh_ref.point_data["a"], v)
+        assert helpers.allclose(mesh_ref.point_data["a"], v)
 
     for v in mesh.point_data["b"].reshape((6, mesh.n_points // 6, 3)):
-        assert np.allclose(mesh_ref.point_data["b"], v)
+        assert helpers.allclose(mesh_ref.point_data["b"], v)
 
     for v in mesh.cell_data["c"].reshape((5, mesh.n_cells // 5)):
-        assert np.allclose(mesh_ref.cell_data["c"], v)
+        assert helpers.allclose(mesh_ref.cell_data["c"], v)
 
     for v in mesh.cell_data["d"].reshape((5, mesh.n_cells // 5, 3)):
-        assert np.allclose(mesh_ref.cell_data["d"], v)
+        assert helpers.allclose(mesh_ref.cell_data["d"], v)
 
 
 def test_prune_duplicates():
@@ -123,7 +123,7 @@ def test_prune_duplicates():
 def test_from_to(mesh_ref, from_, to_):
     mesh = from_(getattr(mesh_ref, to_)())
 
-    helpers.allclose_mesh(mesh_ref, mesh)
+    helpers.allclose(mesh_ref, mesh)
 
 
 @pytest.mark.parametrize(
@@ -147,7 +147,7 @@ def test_read_output(filename, file_type, time_step):
     # mesh.read_output(filename, time_step=time_step)
 
     for k, v in output_ref[file_type][time_step].items():
-        assert np.allclose(v, mesh.cell_data[k].mean())
+        assert helpers.allclose(v, mesh.cell_data[k].mean())
 
 
 def test_add_point_data():
@@ -155,7 +155,7 @@ def test_add_point_data():
     data = np.random.rand(mesh.n_points)
     mesh.add_point_data("a", data)
 
-    assert np.allclose(data, mesh.point_data["a"])
+    assert helpers.allclose(data, mesh.point_data["a"])
 
 
 def test_add_cell_data():
@@ -163,7 +163,7 @@ def test_add_cell_data():
     data = np.random.rand(mesh.n_cells)
     mesh.add_cell_data("a", data)
 
-    assert np.allclose(data, mesh.cell_data["a"])
+    assert helpers.allclose(data, mesh.cell_data["a"])
 
 
 @pytest.mark.parametrize("bool_cells", [False, True])
@@ -199,7 +199,7 @@ def test_cell_data_to_point_data():
     mesh.add_cell_data("a", data)
     mesh.cell_data_to_point_data()
 
-    assert np.allclose(np.ones(mesh.n_points), mesh.point_data["a"])
+    assert helpers.allclose(np.ones(mesh.n_points), mesh.point_data["a"])
     assert "a" not in mesh.cell_data
 
 
@@ -209,7 +209,7 @@ def test_point_data_to_cell_data():
     mesh.add_point_data("a", data)
     mesh.point_data_to_cell_data()
 
-    assert np.allclose(np.ones(mesh.n_cells), mesh.cell_data["a"])
+    assert helpers.allclose(np.ones(mesh.n_cells), mesh.cell_data["a"])
     assert "a" not in mesh.point_data
 
 
@@ -251,16 +251,16 @@ def test_write_tough(num_pvars, eos):
 
     volumes = [v["volume"] for v in mesh["elements"].values()]
     volumes = [v if v < 1.0e20 else v * 1.0e-50 for v in volumes]
-    assert np.allclose(mesh_ref.volumes, volumes, atol=1.0e-6)
+    assert helpers.allclose(mesh_ref.volumes, volumes, atol=1.0e-6)
 
     centers = [v["center"] for v in mesh["elements"].values()]
-    assert np.allclose(mesh_ref.centers, centers, atol=1.0e-3)
+    assert helpers.allclose(mesh_ref.centers, centers, atol=1.0e-3)
 
     pvars = np.row_stack([v["values"] for v in incon["initial_conditions"].values()])
-    assert np.allclose(mesh_ref.cell_data["initial_condition"], pvars)
+    assert helpers.allclose(mesh_ref.cell_data["initial_condition"], pvars)
 
     if eos == "tmvoc":
         indicat0 = [
             v["phase_composition"] for v in incon["initial_conditions"].values()
         ]
-        assert np.allclose(mesh_ref.cell_data["phase_composition"], indicat0)
+        assert helpers.allclose(mesh_ref.cell_data["phase_composition"], indicat0)
