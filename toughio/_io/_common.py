@@ -94,13 +94,3 @@ def to_str(x, fmt):
 
     else:
         return fmt.replace("g", "").replace("e", "").replace("f", "").format(x)
-
-
-def prune_nones_dict(data):
-    """Remove None key/value pairs from dict."""
-    return {k: v for k, v in data.items() if v is not None}
-
-
-def prune_nones_list(data):
-    """Remove trailing None values from list."""
-    return [x for i, x in enumerate(data) if any(xx is not None for xx in data[i:])]

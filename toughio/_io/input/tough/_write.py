@@ -3,8 +3,8 @@ from copy import deepcopy
 
 import numpy as np
 
-from ...._common import block_to_format, open_file, str2format
-from ..._common import prune_nones_list, write_record
+from ...._common import block_to_format, open_file, prune_values, str2format
+from ..._common import write_record
 from ._common import default
 from ._helpers import block, check_parameters, dtypes, write_model_record
 
@@ -198,7 +198,7 @@ def write_buffer(
     rpcap = cond1 or cond2
 
     param = False
-    if prune_nones_list(parameters["default"]["initial_condition"]):
+    if prune_values(parameters["default"]["initial_condition"]):
         param = True
     if eos_ == "tmvoc" and parameters["default"]["phase_composition"] is not None:
         param = True
