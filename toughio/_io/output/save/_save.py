@@ -22,9 +22,7 @@ def read(filename, file_type, file_format, labels_order):
     )
 
     userx = [
-        v["userx"]
-        for v in parameters["initial_conditions"].values()
-        if "userx" in v
+        v["userx"] for v in parameters["initial_conditions"].values() if "userx" in v
     ]
     if userx:
         data["userx"] = np.array(userx)

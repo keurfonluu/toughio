@@ -27,8 +27,8 @@ def write(
 
     Parameters
     ----------
-    filename : str
-        Output file name.
+    filename : str, pathlike or buffer
+        Output file name or buffer.
     parameters : dict
         Parameters to export.
     block : str {'all', 'gener', 'mesh', 'incon'} or None, optional, default None
@@ -412,9 +412,7 @@ def _write_rocks(parameters, simulator="tough"):
             ]
         )
         nad = (
-            2
-            if "relative_permeability" in data or "capillarity" in data
-            else int(cond)
+            2 if "relative_permeability" in data or "capillarity" in data else int(cond)
         )
 
         if simulator == "toughreact":

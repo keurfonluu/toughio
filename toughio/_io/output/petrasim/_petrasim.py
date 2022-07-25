@@ -57,8 +57,7 @@ def write(filename, output):
     with open_file(filename, "w") as f:
         # Headers
         record = ",".join(
-            f"{header:>18}"
-            for header in ["TIME [sec]", "ELEM", "INDEX"] + headers
+            f"{header:>18}" for header in ["TIME [sec]", "ELEM", "INDEX"] + headers
         )
         f.write(f"{record}\n")
 

@@ -16,8 +16,8 @@ def read(filename):
 
     Parameters
     ----------
-    filename : str
-        Input file name.
+    filename : str, pathlike or buffer
+        Input file name or buffer.
 
     Returns
     -------
@@ -56,8 +56,8 @@ def write(filename, parameters):
 
     Parameters
     ----------
-    filename : str
-        Output file name.
+    filename : str, pathlike or buffer
+        Output file name or buffer.
     parameters : dict
         Parameters to export.
 

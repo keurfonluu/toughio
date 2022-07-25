@@ -175,7 +175,7 @@ def write(filename, mesh):
             if key
             else np.zeros(num_cells, dtype=int)
         )
-        
+
         num_node_data = [
             1 if v.ndim == 1 else v.shape[1] for v in mesh.point_data.values()
         ]

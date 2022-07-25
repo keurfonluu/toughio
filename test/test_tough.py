@@ -169,4 +169,6 @@ def test_incon(anisotropic):
             [parameters["initial_conditions"][label]["userx"] for label in mesh.labels]
         )
         permeability = userx[:, :3] if anisotropic else userx[:, 0]
-        assert helpers.allclose(mesh.cell_data["permeability"], permeability, atol=1.0e-4)
+        assert helpers.allclose(
+            mesh.cell_data["permeability"], permeability, atol=1.0e-4
+        )

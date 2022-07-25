@@ -128,9 +128,7 @@ def export(argv=None):
             voxelized = True
 
         else:
-            print(
-                f"Mesh is {ndim}D, performing point triangulation ...", end=""
-            )
+            print(f"Mesh is {ndim}D, performing point triangulation ...", end="")
             sys.stdout.flush()
 
             mesh = triangulate(points[:, axis])

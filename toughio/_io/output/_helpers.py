@@ -129,8 +129,8 @@ def write(filename, output, file_format=None, **kwargs):
 
     Parameters
     ----------
-    filename : str
-        Input file name.
+    filename : str, pathlike or buffer
+        Output file name or buffer.
     output : namedtuple or list of namedtuple
         namedtuple (type, format, time, labels, data) or list of namedtuple for each time step to export.
     file_format : str or None, optional, default None
@@ -142,9 +142,6 @@ def write(filename, output, file_format=None, **kwargs):
         Only if ``file_format = "tough"``. Overwrite header unit.
 
     """
-    if not isinstance(filename, str):
-        raise TypeError()
-
     output = [output] if isinstance(output, Output) else output
     if not (
         isinstance(output, (list, tuple))
@@ -176,9 +173,6 @@ def read_history(filename):
         History data.
 
     """
-    if not isinstance(filename, str):
-        raise TypeError()
-
     with open_file(filename, "r") as f:
         line = f.readline().strip()
 

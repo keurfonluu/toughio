@@ -7,8 +7,8 @@ def read(filename, eos=None):
 
     Parameters
     ----------
-    filename : str
-        Input file name.
+    filename : str, pathlike or buffer
+        Input file name or buffer.
     eos : str or None, optional, default None
         Equation of State.
 
@@ -27,8 +27,8 @@ def write(filename, parameters, block=None, ignore_blocks=None, eos=None):
 
     Parameters
     ----------
-    filename : str
-        Output file name.
+    filename : str, pathlike or buffer
+        Output file name or buffer.
     parameters : dict
         Parameters to export.
     block : str {'all', 'gener', 'mesh', 'incon'} or None, optional, default None

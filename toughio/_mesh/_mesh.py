@@ -336,8 +336,8 @@ class Mesh(object):
 
         Parameters
         ----------
-        filename : str, optional, default 'MESH'
-            Output file name.
+        filename : str, pathlike or buffer, optional, default 'MESH'
+            Output file name or buffer.
 
         Other Parameters
         ----------------
@@ -367,8 +367,8 @@ class Mesh(object):
 
         Parameters
         ----------
-        filename : str, optional, default 'INCON'
-            Output file name.
+        filename : str, pathlike or buffer, optional, default 'INCON'
+            Output file name or buffer.
         eos : str or None, optional, default None
             Equation of State.
 
@@ -445,8 +445,7 @@ class Mesh(object):
             labels_map = {k: v for v, k in enumerate(self.labels)}
 
             data = {
-                k: [[[0.0, 0.0, 0.0]] for _ in range(self.n_cells)]
-                for k in out.data
+                k: [[[0.0, 0.0, 0.0]] for _ in range(self.n_cells)] for k in out.data
             }
             for i, (label1, label2) in enumerate(out.labels):
                 i1, i2 = labels_map[label1], labels_map[label2]
@@ -468,8 +467,8 @@ class Mesh(object):
 
         Parameters
         ----------
-        filename : str
-            Output file name.
+        filename : str, pathlike or buffer
+            Output file name or buffer.
         file_format : str or None, optional, default None
             Output file format. If `None`, it will be guessed from file's
             extension. To write TOUGH MESH, `file_format` must be specified
@@ -686,9 +685,7 @@ class Mesh(object):
     @cells.setter
     def cells(self, value):
         self._cells = [
-            CellBlock(*c)
-            if isinstance(c, (list, tuple))
-            else CellBlock(c.type, c.data)
+            CellBlock(*c) if isinstance(c, (list, tuple)) else CellBlock(c.type, c.data)
             for c in value
         ]
 
@@ -990,9 +987,7 @@ def from_pyvista(mesh, material="dfalt"):
         )
         cell_type = cell_type if cell_type not in pixel_voxel else cell_type + 1
         cell_type = (
-            vtk_to_meshio_type[cell_type]
-            if cell_type != 7
-            else f"polygon{numnodes}"
+            vtk_to_meshio_type[cell_type] if cell_type != 7 else f"polygon{numnodes}"
         )
 
         if len(cells) > 0 and cells[-1][0] == cell_type:
