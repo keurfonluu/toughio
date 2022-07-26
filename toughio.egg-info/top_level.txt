@@ -1,5 +1,0 @@
-doc
-examples
-paper
-tests
-toughio
