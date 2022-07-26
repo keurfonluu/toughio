@@ -65,7 +65,7 @@ def structured_grid(dx, dy, dz=None, origin=None, layer=False, material="dfalt")
 
     mesh = Mesh(points, cells)
     mesh.add_cell_data("material", np.ones(mesh.n_cells, dtype=np.int64))
-    mesh.field_data[material] = np.array([1, 3])
+    mesh.add_material(material, 1)
 
     return mesh
 
