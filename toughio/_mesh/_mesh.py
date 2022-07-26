@@ -503,6 +503,20 @@ class Mesh(object):
         mesh = self.to_pyvista()
         mesh.plot(*args, **kwargs)
 
+    def add_material(self, label, imat):
+        """
+        Add a material name.
+
+        Parameters
+        ----------
+        label : str
+            Material name.
+        imat : int
+            Material ID.
+        
+        """
+        self.field_data[label] = np.array([imat, 3])
+
     def add_point_data(self, label, data):
         """
         Add a new point data array.
@@ -601,7 +615,7 @@ class Mesh(object):
             )
             data[cells] = imat
             self.add_cell_data("material", data)
-            self.field_data[material] = np.array([imat, 3])
+            self.add_material(material, imat)
 
     def cell_data_to_point_data(self):
         """Interpolate cell data to point data."""
