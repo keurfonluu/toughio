@@ -150,6 +150,13 @@ def test_read_output(filename, file_type, time_step):
         assert helpers.allclose(v, mesh.cell_data[k].mean())
 
 
+def test_add_material():
+    mesh = deepcopy(helpers.hybrid_mesh)
+    mesh.add_material("a", 1)
+
+    assert helpers.allclose(mesh.materials, np.array(["a"] * mesh.n_cells))
+
+
 def test_add_point_data():
     mesh = deepcopy(helpers.hybrid_mesh)
     data = np.random.rand(mesh.n_points)
