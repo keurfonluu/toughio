@@ -162,24 +162,24 @@ def allclose(x, y, atol=1.0e-8, ignore_keys=None, ignore_none=False):
             if isinstance(x, toughio.Mesh):
                 assert isinstance(y, toughio.Mesh)
 
-                assert allclose(x.points, y.points)
-                assert allclose(x.cells, y.cells)
+                assert allclose(x.points, y.points, atol=atol)
+                assert allclose(x.cells, y.cells, atol=atol)
 
                 if x.point_data:
-                    assert allclose(x.point_data, y.point_data)
+                    assert allclose(x.point_data, y.point_data, atol=atol)
 
                 if x.cell_data:
-                    assert allclose(x.cell_data, y.cell_data)
+                    assert allclose(x.cell_data, y.cell_data, atol=atol)
 
             elif isinstance(x, toughio.Output):
                 assert isinstance(y, toughio.Output)
 
-                assert allclose(x.type, y.type)
-                assert allclose(x.time, y.time)
-                assert allclose(x.data, y.data)
+                assert allclose(x.type, y.type, atol=atol)
+                assert allclose(x.time, y.time, atol=atol)
+                assert allclose(x.data, y.data, atol=atol)
 
                 if np.ndim(x.labels) != 0:
-                    assert allclose(x.labels, y.labels)
+                    assert allclose(x.labels, y.labels, atol=atol)
 
             elif isinstance(x, str):
                 assert x == y
