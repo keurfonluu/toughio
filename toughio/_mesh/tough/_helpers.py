@@ -12,7 +12,7 @@ def block(keyword):
 
         @wraps(func)
         def wrapper(f, *args):
-            f.write("{}{}\n".format(keyword, header))
+            f.write(f"{keyword}{header}\n")
             func(f, *args)
             f.write("\n")
 
@@ -31,10 +31,10 @@ def _write_eleme(labels, materials, volumes, nodes, material_name=None):
     for label, material, volume, node in iterables:
         mat = (
             material_name[material]
-            if material_name and material in material_name.keys()
+            if material_name and material in material_name
             else material
         )
-        mat = mat if isinstance(mat, str) else "{:>5}".format(str(mat))
+        mat = mat if isinstance(mat, str) else f"{str(mat):>5}"
         record = write_record(
             [
                 label,  # ID
@@ -134,7 +134,7 @@ def _write_incon(
                 fmt[eos][label_length] if eos in fmt else fmt["default"][label_length],
                 ignore_types=ignore_types,
             )
-            fmt1 = "{}\n".format("".join(fmt1[: len(values)]))
+            fmt1 = f"{''.join(fmt1[: len(values)])}\n"
             record = fmt1.format(*values)
 
             # Record 2
@@ -149,7 +149,7 @@ def _write_incon(
                     ignore_types.append(i)
 
             fmt2 = str2format(fmt[0], ignore_types=ignore_types)
-            fmt2 = "{}\n".format("".join(fmt2[: len(values)]))
+            fmt2 = f"{''.join(fmt2[: len(values)])}\n"
             record += fmt2.format(*values)
 
             # Record 3 (EOS7R)
@@ -164,7 +164,7 @@ def _write_incon(
                         ignore_types.append(i)
 
                 fmt2 = str2format(fmt[0], ignore_types=ignore_types)
-                fmt2 = "{}\n".format("".join(fmt2[: len(values)]))
+                fmt2 = f"{''.join(fmt2[: len(values)])}\n"
                 record += fmt2.format(*values)
 
             yield record

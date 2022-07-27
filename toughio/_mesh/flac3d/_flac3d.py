@@ -1,5 +1,3 @@
-from __future__ import division, unicode_literals, with_statement
-
 import struct
 import time
 
@@ -218,7 +216,7 @@ def _read_cell(buf_or_line, point_ids, binary):
     """Read cell connectivity."""
     if binary:
         cid, num_verts = struct.unpack("<2I", buf_or_line.read(8))
-        cell = struct.unpack("<{}I".format(num_verts), buf_or_line.read(4 * num_verts))
+        cell = struct.unpack(f"<{num_verts}I", buf_or_line.read(4 * num_verts))
         is_b7 = num_verts == 7
     else:
         cid = int(buf_or_line[2])
@@ -237,17 +235,17 @@ def _read_group(buf_or_line, binary, line=None):
     if binary:
         # Group name
         (num_chars,) = struct.unpack("<H", buf_or_line.read(2))
-        (name,) = struct.unpack("<{}s".format(num_chars), buf_or_line.read(num_chars))
+        (name,) = struct.unpack(f"<{num_chars}s", buf_or_line.read(num_chars))
         name = name.decode("utf-8")
 
         # Slot name
         (num_chars,) = struct.unpack("<H", buf_or_line.read(2))
-        (slot,) = struct.unpack("<{}s".format(num_chars), buf_or_line.read(num_chars))
+        (slot,) = struct.unpack(f"<{num_chars}s", buf_or_line.read(num_chars))
         slot = slot.decode("utf-8")
 
         # Zones
         (num_zones,) = struct.unpack("<I", buf_or_line.read(4))
-        data = struct.unpack("<{}I".format(num_zones), buf_or_line.read(4 * num_zones))
+        data = struct.unpack(f"<{num_zones}I", buf_or_line.read(4 * num_zones))
     else:
         name = line[1].replace('"', "")
         data = []
@@ -304,7 +302,7 @@ def _update_slots(slots, slot):
 
 def write(filename, mesh, float_fmt=".16e", binary=False):
     """Write FLAC3D f3grid grid file."""
-    if not any(c.type in meshio_only["zone"].keys() for c in mesh.cells):
+    if not any(c.type in meshio_only["zone"] for c in mesh.cells):
         raise ValueError("FLAC3D format only supports 3D cells")
 
     # Pick out material
@@ -321,8 +319,8 @@ def write(filename, mesh, float_fmt=".16e", binary=False):
                 struct.pack("<2I", 1375135718, 3)
             )  # Don't know what these values represent
         else:
-            f.write("* FLAC3D grid produced by toughio v{}\n".format(version))
-            f.write("* {}\n".format(time.ctime()))
+            f.write(f"* FLAC3D grid produced by toughio v{version}\n")
+            f.write(f"* {time.ctime()}\n")
 
         _write_points(f, mesh.points, binary, float_fmt)
         for flag in ["zone", "face"]:
@@ -367,9 +365,7 @@ def _write_cells(f, points, cells, flag, binary):
                     cdata + 1,
                 )
             )
-            f.write(
-                struct.pack("<{}I".format((num_verts + 2) * num_cells), *tmp.ravel())
-            )
+            f.write(struct.pack(f"<{(num_verts + 2) * num_cells}I", *tmp.ravel()))
             count += num_cells
     else:
         flag_to_text = {
@@ -377,13 +373,9 @@ def _write_cells(f, points, cells, flag, binary):
             "face": ("FACES", "F"),
         }
 
-        f.write("* {}\n".format(flag_to_text[flag][0]))
+        f.write(f"* {flag_to_text[flag][0]}\n")
         for ctype, cdata in cells:
-            fmt = (
-                "{} {{}} {{}} ".format(flag_to_text[flag][1])
-                + " ".join(["{}"] * cdata.shape[1])
-                + "\n"
-            )
+            fmt = f"{flag_to_text[flag][1]} {{}} {{}} {' '.join(['{}'] * cdata.shape[1])}\n"
             for entry in cdata + 1:
                 count += 1
                 f.write(fmt.format(meshio_to_flac3d_type[ctype], count, *entry))
@@ -398,9 +390,9 @@ def _write_groups(f, cells, cell_data, field_data, flag, binary):
             slot = "Default".encode("utf-8")
 
             f.write(struct.pack("<I", len(groups)))
-            for k in sorted(groups.keys()):
+            for k in sorted(groups):
                 num_chars, num_zones = len(labels[k]), len(groups[k])
-                fmt = "<H{}sH7sI{}I".format(num_chars, num_zones)
+                fmt = f"<H{num_chars}sH7sI{num_zones}I"
                 tmp = [
                     num_chars,
                     labels[k].encode("utf-8"),
@@ -416,9 +408,9 @@ def _write_groups(f, cells, cell_data, field_data, flag, binary):
                 "face": "FGROUP",
             }
 
-            f.write("* {} GROUPS\n".format(flag.upper()))
-            for k in sorted(groups.keys()):
-                f.write('{} "{}"\n'.format(flag_to_text[flag], labels[k]))
+            f.write(f"* {flag.upper()} GROUPS\n")
+            for k in sorted(groups):
+                f.write(f'{flag_to_text[flag]} "{labels[k]}"\n')
                 _write_table(f, groups[k])
     else:
         if binary:
@@ -442,7 +434,7 @@ def _translate_zones(points, cells):
 
     zones = []
     for key, idx in cells:
-        if key not in meshio_only["zone"].keys():
+        if key not in meshio_only["zone"]:
             continue
 
         # Compute scalar triple products
@@ -465,7 +457,7 @@ def _translate_faces(cells):
     """Reorder toughio cells to FLAC3D faces."""
     faces = []
     for key, idx in cells:
-        if key not in meshio_only["face"].keys():
+        if key not in meshio_only["face"]:
             continue
 
         key = meshio_only["face"][key]
@@ -489,7 +481,7 @@ def _translate_groups(cells, cell_data, field_data, flag):
     }
     groups = {k: v for k, v in groups.items() if v.size}
 
-    labels = {k: str(k) for k in groups.keys()}
+    labels = {k: str(k) for k in groups}
     labels[0] = "None"
     if field_data:
         labels.update(
@@ -505,4 +497,4 @@ def _write_table(f, data, ncol=20):
     lines = np.split(data, np.full(nrow, ncol).cumsum())
     for line in lines:
         if len(line):
-            f.write(" {}\n".format(" ".join([str(l) for l in line])))
+            f.write(f" {' '.join([str(l) for l in line])}\n")

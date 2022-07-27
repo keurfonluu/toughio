@@ -1,5 +1,6 @@
 import os
 
+import helpers
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
@@ -37,7 +38,7 @@ def test_relative_permeability(model, parameters, monkeypatch):
     perm = model(*parameters)
     relperm = np.transpose(perm(sl))
 
-    assert np.allclose(relperm, relperm_ref[perm.name])
+    assert helpers.allclose(relperm, relperm_ref[perm.name])
 
     monkeypatch.setattr(plt, "show", lambda: None)
     perm.plot()

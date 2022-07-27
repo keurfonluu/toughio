@@ -1,3 +1,4 @@
+import pathlib
 from copy import deepcopy
 
 import meshio
@@ -18,10 +19,9 @@ __all__ = [
 _extension_to_filetype = {}
 _reader_map = {}
 _writer_map = {}
-_materials = ["material", "gmsh:physical", "medit:ref"]
 
 
-def register(file_format, extensions, reader, writer=None, material=None):
+def register(file_format, extensions, reader, writer=None):
     """
     Register a new mesh format.
 
@@ -35,8 +35,6 @@ def register(file_format, extensions, reader, writer=None, material=None):
         Read fumction.
     writer : callable or None, optional, default None
         Write function.
-    material : str or None, optional, default None
-        Cell data key associated to material.
 
     """
     register_format(
@@ -48,16 +46,15 @@ def register(file_format, extensions, reader, writer=None, material=None):
         reader=reader,
         writer=writer,
     )
-    if material:
-        _materials.append(material)
 
 
 def get_material_key(cell_data):
     """Get key of material data in cell_data."""
-    for k in cell_data.keys():
-        if k in _materials:
-            return k
-    return None
+    from meshio._common import _pick_first_int_data
+
+    key, _ = _pick_first_int_data(cell_data)
+
+    return key
 
 
 def read(filename, file_format=None, **kwargs):
@@ -90,7 +87,7 @@ def read(filename, file_format=None, **kwargs):
     )
 
     # Call custom readers
-    if fmt in _reader_map.keys():
+    if fmt in _reader_map:
         mesh = _reader_map[fmt](filename, **kwargs)
         if fmt not in {"tough", "pickle"}:
             mesh.cell_data = {k: np.concatenate(v) for k, v in mesh.cell_data.items()}
@@ -168,7 +165,7 @@ def write(filename, mesh, file_format=None, **kwargs):
     )
 
     # Call custom writer
-    if fmt in _writer_map.keys():
+    if fmt in _writer_map:
         if fmt not in {"tough", "pickle"}:
             mesh = deepcopy(mesh)
             mesh.cell_data = {k: mesh.split(v) for k, v in mesh.cell_data.items()}
@@ -184,7 +181,7 @@ def read_time_series(filename):
 
     Parameters
     ----------
-    filename : str
+    filename : str, pathlike or buffer
         Input file name.
 
     Returns
@@ -199,38 +196,19 @@ def read_time_series(filename):
         Time step values.
 
     """
-    from ._common import get_meshio_version, get_new_meshio_cells
-
-    if not isinstance(filename, str):
-        raise ValueError()
-
     point_data, cell_data, time_steps = [], [], []
-    if get_meshio_version() < (3,):
-        reader = meshio.XdmfTimeSeriesReader(filename)
+    with meshio.xdmf.TimeSeriesReader(filename) as reader:
         points, cells = reader.read_points_cells()
 
         for k in range(reader.num_steps):
             t, pdata, cdata = reader.read_data(k)
-
-            _, cdata = get_new_meshio_cells(cells, cdata)
             point_data.append(pdata)
             cell_data.append(cdata)
             time_steps.append(t)
 
-        cells = get_new_meshio_cells(cells)
-    else:
-        with meshio.xdmf.TimeSeriesReader(filename) as reader:
-            points, cells = reader.read_points_cells()
-
-            for k in range(reader.num_steps):
-                t, pdata, cdata = reader.read_data(k)
-                point_data.append(pdata)
-                cell_data.append(cdata)
-                time_steps.append(t)
-
     # Concatenate cell data arrays
     for cdata in cell_data:
-        for k in cdata.keys():
+        for k in cdata:
             cdata[k] = np.concatenate(cdata[k])
 
     return points, cells, point_data, cell_data, time_steps
@@ -244,7 +222,7 @@ def write_time_series(
 
     Parameters
     ----------
-    filename : str
+    filename : str, pathlike or buffer
         Output file name.
     points : ndarray
         Grid points array.
@@ -258,10 +236,10 @@ def write_time_series(
         Time step values.
 
     """
-    from ._common import get_meshio_version, get_old_meshio_cells
+    import shutil
 
-    if not isinstance(filename, str):
-        raise TypeError()
+    filename = pathlib.Path(filename)
+
     if point_data is not None and not isinstance(point_data, (list, tuple)):
         raise TypeError()
     if cell_data is not None and not isinstance(cell_data, (list, tuple)):
@@ -303,12 +281,10 @@ def write_time_series(
         for tstep, pdata, cdata in zip(time_steps, point_data, cell_data):
             writer.write_data(tstep, point_data=pdata, cell_data=cdata)
 
-    if get_meshio_version() < (3,):
-        writer = meshio.XdmfTimeSeriesWriter(filename)
-        tmp = [get_old_meshio_cells(cells, cdata) for cdata in cell_data]
-        cells = tmp[0][0]
-        cell_data = [cell[1] for cell in tmp]
+    with meshio.xdmf.TimeSeriesWriter(filename) as writer:
         write_data(writer, points, cells, point_data, cell_data, time_steps)
-    else:
-        with meshio.xdmf.TimeSeriesWriter(filename) as writer:
-            write_data(writer, points, cells, point_data, cell_data, time_steps)
+
+    # Bug in meshio v5: H5 file is written in the current working directory
+    if str(filename.parent) != ".":
+        h5_filename = f"{filename.stem}.h5"
+        shutil.move(h5_filename, str(filename.parent))

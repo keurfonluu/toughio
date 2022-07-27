@@ -15,8 +15,8 @@ def read(filename):
 
     Parameters
     ----------
-    filename : str
-        Input file name.
+    filename : str, pathlike or buffer
+        Input file name or buffer.
 
     """
     with open_file(filename, "r") as f:
@@ -58,7 +58,7 @@ def read_buffer(f):
             parameters["end_comments"] = end_comments
 
     except:
-        raise ReadError("failed to parse line {}.".format(fiter.count))
+        raise ReadError(f"failed to parse line {fiter.count}.")
 
     return parameters
 

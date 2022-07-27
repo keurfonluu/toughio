@@ -6,7 +6,7 @@ import numpy as np
 
 def _materials(mesh):
     """Return materials of cell in mesh."""
-    if "material" in mesh.cell_data.keys():
+    if "material" in mesh.cell_data:
         if mesh.field_data:
             out = mesh.cell_data["material"]
             try:
@@ -90,7 +90,7 @@ def _face_areas(mesh):
         [_get_triangle_normals(mesh, v) for k, v in faces_dict.items()]
     )
     areas = np.linalg.norm(areas, axis=-1)
-    if "quad" in faces_dict.keys() and len(faces_dict["quad"]):
+    if "quad" in faces_dict and len(faces_dict["quad"]):
         tmp = np.concatenate(
             [
                 _get_triangle_normals(mesh, v, [0, 2, 3])
