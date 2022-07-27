@@ -513,7 +513,7 @@ class Mesh(object):
             Material name.
         imat : int
             Material ID.
-        
+
         """
         self.field_data[label] = np.array([imat, 3])
 
