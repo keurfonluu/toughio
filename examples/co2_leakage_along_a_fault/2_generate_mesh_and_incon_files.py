@@ -17,7 +17,20 @@ import toughio
 ########################################################################################
 # A supported mesh can be read using the function :func:`toughio.read_mesh` that returns a :class:`toughio.Mesh` object.
 
-mesh = toughio.read_mesh("mesh.msh")
+mesh = toughio.read_mesh("mesh.vtu")
+
+########################################################################################
+
+########################################################################################
+# (Optional) Although physical group names have been defined previously, most meshes do not export this information, including VTU.
+# We can use the method :meth:`toughio.Mesh.add_material` to manually add material names.
+
+mesh.add_material("UPPAQ", 1)
+mesh.add_material("CAPRO", 2)
+mesh.add_material("CENAQ", 3)
+mesh.add_material("BASAQ", 4)
+mesh.add_material("FAULT", 5)
+mesh.add_material("BOUND", 6)
 
 ########################################################################################
 
