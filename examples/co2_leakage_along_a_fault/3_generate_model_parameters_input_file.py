@@ -22,6 +22,7 @@ parameters = {
     "title": "Simulation of CO2 leak along a fault",
     "eos": "eco2n",
     "isothermal": True,
+    "start": True,
 }
 
 ########################################################################################
