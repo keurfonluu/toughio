@@ -16,14 +16,13 @@ jobs:
       - uses: actions/setup-python@v4
         with:
             python-version: '3.9'
-      - uses: awalsh128/cache-apt-pkgs-action@v1.0.3
-        with:
-          packages: libosmesa6-dev libgl1-mesa-dev python3-tk pandoc
-          version: 1.0
       - name: Install OSMesa VTK
         run: |
           sudo apt install libosmesa6-dev libgl1-mesa-dev
           pip install https://github.com/pyvista/pyvista-wheels/raw/main/vtk-osmesa-9.1.0-cp39-cp39-linux_x86_64.whl
+      - name: Install libGLU for pygmsh
+        run: |
+          sudo apt install libglu1
       - name: Install toughio
         run: |
           git lfs pull
