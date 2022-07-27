@@ -27,8 +27,6 @@ def read(filename, file_type, file_format, labels_order):
     if userx:
         data["userx"] = np.array(userx)
 
-    labels_order = (
-        labels_order if labels_order else parameters["initial_conditions"]
-    )
+    labels_order = labels_order if labels_order else parameters["initial_conditions"]
     output = Output(file_type, file_format, None, np.array(labels), data)
     return reorder_labels(output, labels_order)

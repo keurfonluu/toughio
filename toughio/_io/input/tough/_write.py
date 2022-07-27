@@ -399,9 +399,7 @@ def _write_rocks(parameters, simulator="tough"):
                 "porosity_crit",
             ]
         )
-        nad = (
-            2 if "relative_permeability" in v or "capillarity" in v else int(cond)
-        )
+        nad = 2 if "relative_permeability" in v or "capillarity" in v else int(cond)
 
         if simulator == "toughreact":
             nad = 4 if "react_tp" in v else nad
