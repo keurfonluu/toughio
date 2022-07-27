@@ -372,15 +372,6 @@ def write_buffer(
 @block("ROCKS", multi=True)
 def _write_rocks(parameters, simulator="tough"):
     """Write ROCKS block data."""
-    # Reorder rocks
-    if parameters["rocks_order"] is not None:
-        order = parameters["rocks_order"]
-        for rock in parameters["rocks"]:
-            if rock not in order:
-                order.append(rock)
-    else:
-        order = parameters["rocks"]
-
     # Formats
     fmt = block_to_format["ROCKS"]
     fmt1 = str2format(fmt[1])
@@ -392,13 +383,10 @@ def _write_rocks(parameters, simulator="tough"):
     fmt5 = str2format(fmt)
 
     out = []
-    for k in order:
-        # Load data
-        data = parameters["rocks"][k]
-
+    for k, v in parameters["rocks"].items():
         # Number of additional lines to write per rock
         cond = any(
-            data[k] is not None
+            v[k] is not None
             for k in [
                 "compressibility",
                 "expansivity",
@@ -412,15 +400,15 @@ def _write_rocks(parameters, simulator="tough"):
             ]
         )
         nad = (
-            2 if "relative_permeability" in data or "capillarity" in data else int(cond)
+            2 if "relative_permeability" in v or "capillarity" in v else int(cond)
         )
 
         if simulator == "toughreact":
-            nad = 4 if "react_tp" in data else nad
-            nad = 5 if "react_hcplaw" in data else nad
+            nad = 4 if "react_tp" in v else nad
+            nad = 5 if "react_hcplaw" in v else nad
 
         # Permeability
-        per = data["permeability"]
+        per = v["permeability"]
         per = [per] * 3 if not np.ndim(per) else per
         if not (isinstance(per, (list, tuple, np.ndarray)) and len(per) == 3):
             raise TypeError()
@@ -429,28 +417,28 @@ def _write_rocks(parameters, simulator="tough"):
         values = [
             k,
             nad if nad else "",
-            data["density"],
-            data["porosity"],
+            v["density"],
+            v["porosity"],
             per[0],
             per[1],
             per[2],
-            data["conductivity"],
-            data["specific_heat"],
+            v["conductivity"],
+            v["specific_heat"],
         ]
         out += write_record(values, fmt1)
 
         # Record 2
         if cond:
             values = [
-                data["compressibility"],
-                data["expansivity"],
-                data["conductivity_dry"],
-                data["tortuosity"],
-                data["klinkenberg_parameter"],
-                data["distribution_coefficient_3"],
-                data["distribution_coefficient_4"],
-                data["tortuosity_exponent"],
-                data["porosity_crit"],
+                v["compressibility"],
+                v["expansivity"],
+                v["conductivity_dry"],
+                v["tortuosity"],
+                v["klinkenberg_parameter"],
+                v["distribution_coefficient_3"],
+                v["distribution_coefficient_4"],
+                v["tortuosity_exponent"],
+                v["porosity_crit"],
             ]
             out += write_record(values, fmt2)
         else:
@@ -458,13 +446,13 @@ def _write_rocks(parameters, simulator="tough"):
 
         # TOUGHREACT
         if nad >= 4:
-            out += write_model_record(data, "react_tp", fmt3)
-            out += write_model_record(data, "react_hcplaw", fmt4)
+            out += write_model_record(v, "react_tp", fmt3)
+            out += write_model_record(v, "react_hcplaw", fmt4)
 
         # Relative permeability / Capillary pressure
         if nad >= 2:
-            out += write_model_record(data, "relative_permeability", fmt5)
-            out += write_model_record(data, "capillarity", fmt5)
+            out += write_model_record(v, "relative_permeability", fmt5)
+            out += write_model_record(v, "capillarity", fmt5)
 
     return out
 
@@ -528,15 +516,6 @@ def _write_flac(parameters):
     data = deepcopy(flac)
     data.update(parameters["flac"])
 
-    # Reorder rocks
-    if parameters["rocks_order"]:
-        order = parameters["rocks_order"]
-        for rock in parameters["rocks"]:
-            if rock not in order:
-                order.append(rock)
-    else:
-        order = parameters["rocks"]
-
     # Formats
     fmt = block_to_format["FLAC"]
     fmt1 = str2format(fmt[1])
@@ -552,11 +531,11 @@ def _write_flac(parameters):
     out = write_record(values, fmt1)
 
     # Additional records
-    for k in order:
+    for k, v in parameters["rocks"].items():
         # Load data
         data = deepcopy(default)
         data.update(parameters["default"])
-        data.update(parameters["rocks"][k])
+        data.update(v)
 
         # Permeability model
         values = [data["permeability_model"]["id"]]
@@ -916,26 +895,18 @@ def _write_selec(parameters):
 @block("INDOM", multi=True)
 def _write_indom(parameters, eos_):
     """Write INDOM block data."""
-    if parameters["rocks_order"]:
-        order = parameters["rocks_order"]
-        for rock in parameters["rocks"]:
-            if rock not in order:
-                order.append(rock)
-    else:
-        order = parameters["rocks"]
-
     # Formats
     fmt = block_to_format["INDOM"]
     fmt1 = str2format(fmt[5])
     fmt2 = str2format(fmt[0])
 
     out = []
-    for k in order:
-        cond1 = "initial_condition" in parameters["rocks"][k]
+    for k, v in parameters["rocks"].items():
+        cond1 = "initial_condition" in v
         cond2 = (
             eos_ == "tmvoc"
-            and "phase_composition" in parameters["rocks"][k]
-            and parameters["rocks"][k]["phase_composition"] is not None
+            and "phase_composition" in v
+            and v["phase_composition"] is not None
         )
 
         if cond1 or cond2:
@@ -943,7 +914,7 @@ def _write_indom(parameters, eos_):
             values = [k]
 
             if eos_ == "tmvoc":
-                values.append(parameters["rocks"][k]["phase_composition"])
+                values.append(v["phase_composition"])
 
             else:
                 values.append(None)
@@ -951,7 +922,7 @@ def _write_indom(parameters, eos_):
             out += write_record(values, fmt1)
 
             if cond1:
-                data = parameters["rocks"][k]["initial_condition"]
+                data = v["initial_condition"]
 
                 # Record 2
                 n = min(4, len(data))
@@ -1254,21 +1225,15 @@ def _write_eleme(parameters):
     """Write ELEME block data."""
     from ._common import elements
 
-    # Reorder elements
-    if parameters["elements_order"] is not None:
-        order = parameters["elements_order"]
-    else:
-        order = parameters["elements"]
-
     # Format
     label_length = len(max(parameters["elements"], key=len))
     fmt = block_to_format["ELEME"]
     fmt = str2format(fmt[label_length])
 
     out = []
-    for k in order:
+    for k, v in parameters["elements"].items():
         data = deepcopy(elements)
-        data.update(parameters["elements"][k])
+        data.update(v)
 
         material = (
             f"{data['material']:>5}"
@@ -1295,19 +1260,13 @@ def _write_eleme(parameters):
 @block("COORD", multi=True)
 def _write_coord(parameters):
     """Write COORD block data."""
-    # Reorder elements
-    if parameters["elements_order"] is not None:
-        order = parameters["elements_order"]
-    else:
-        order = parameters["elements"]
-
     # Format
     fmt = block_to_format["COORD"]
     fmt = str2format(fmt)
 
     out = []
-    for k in order:
-        values = parameters["elements"][k]["center"]
+    for v in parameters["elements"].values():
+        values = v["center"]
         out += write_record(values, fmt)
 
     return out
@@ -1319,21 +1278,15 @@ def _write_conne(parameters):
     """Write CONNE block data."""
     from ._common import connections
 
-    # Reorder connections
-    if parameters["connections_order"] is not None:
-        order = parameters["connections_order"]
-    else:
-        order = parameters["connections"]
-
     # Format
     label_length = len(max(parameters["connections"], key=len)) // 2
     fmt = block_to_format["CONNE"]
     fmt = str2format(fmt[label_length])
 
     out = []
-    for k in order:
+    for k, v in parameters["connections"].items():
         data = deepcopy(connections)
-        data.update(parameters["connections"][k])
+        data.update(v)
 
         values = [
             k,
@@ -1358,12 +1311,6 @@ def _write_incon(parameters, eos_=None, simulator="tough"):
     """Write INCON block data."""
     from ._common import initial_conditions
 
-    # Reorder connections
-    if parameters["initial_conditions_order"] is not None:
-        order = parameters["initial_conditions_order"]
-    else:
-        order = parameters["initial_conditions"]
-
     # Format
     label_length = len(max(parameters["initial_conditions"], key=len))
     label_length = max(label_length, 5)
@@ -1378,9 +1325,9 @@ def _write_incon(parameters, eos_=None, simulator="tough"):
     fmt2 = str2format(fmt[0])
 
     out = []
-    for k in order:
+    for k, v in parameters["initial_conditions"].items():
         data = deepcopy(initial_conditions)
-        data.update(parameters["initial_conditions"][k])
+        data.update(v)
 
         # Record 1
         values = [
