@@ -13,8 +13,8 @@ def write(filename, parameters, verbose=True):
 
     Parameters
     ----------
-    filename : str
-        Input file name.
+    filename : str, pathlike or buffer
+        Output file name or buffer.
     parameters : dict
         Parameters to export.
     verbose : bool, optional, default True

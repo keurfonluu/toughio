@@ -1,6 +1,8 @@
 import os
 from contextlib import contextmanager
 
+import numpy as np
+
 block_to_format = {
     "ROCKS": {
         1: "5s,5d,10.4e,10.4e,10.4e,10.4e,10.4e,10.4e,10.4e",
@@ -117,9 +119,9 @@ def str2format(fmt, ignore_types=None):
         if i in ignore_types:
             out.append(base_fmt.format(n.split(".")[0]))
         elif token[-1].lower() == "s":
-            out.append(base_fmt.format("{}.{}".format(n, n)))
+            out.append(base_fmt.format(f"{n}.{n}"))
         else:
-            out.append(base_fmt.format(">{}{}".format(n, token_to_format[token[-1]])))
+            out.append(base_fmt.format(f">{n}{token_to_format[token[-1]]}"))
 
     return out
 
@@ -151,7 +153,7 @@ def filetype_from_filename(filename, ext_to_fmt):
     """Determine file type from its extension."""
     ext = os.path.splitext(filename)[1].lower()
 
-    return ext_to_fmt[ext] if ext in ext_to_fmt.keys() else ""
+    return ext_to_fmt[ext] if ext in ext_to_fmt else ""
 
 
 @contextmanager
@@ -169,3 +171,15 @@ def open_file(path_or_buffer, mode):
     else:
         with open(path_or_buffer, mode) as f:
             yield f
+
+
+def prune_values(data, value=None):
+    """Remove values from dict or trailing values from list."""
+    if isinstance(data, dict):
+        return {k: v for k, v in data.items() if v != value}
+
+    elif isinstance(data, (list, tuple, np.ndarray)):
+        return [x for i, x in enumerate(data) if any(xx != value for xx in data[i:])]
+
+    else:
+        return data

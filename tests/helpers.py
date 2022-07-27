@@ -19,7 +19,7 @@ tet_mesh = toughio.Mesh(
     ),
     cells=[("tetra", np.array([[0, 1, 2, 4], [0, 2, 3, 4]]))],
     point_data={"a": np.random.rand(5), "b": np.random.rand(5)},
-    cell_data={"c": np.random.rand(2), "material": np.ones(2)},
+    cell_data={"c": np.random.rand(2), "material": np.ones(2, dtype=np.int64)},
 )
 
 hex_mesh = toughio.Mesh(
@@ -37,7 +37,7 @@ hex_mesh = toughio.Mesh(
     ),
     cells=[("hexahedron", np.array([[0, 1, 2, 3, 4, 5, 6, 7]]))],
     point_data={"a": np.random.rand(8), "b": np.random.rand(8)},
-    cell_data={"c": np.random.rand(1), "material": np.ones(1)},
+    cell_data={"c": np.random.rand(1), "material": np.ones(1, dtype=np.int64)},
 )
 
 hybrid_mesh = toughio.Mesh(
@@ -67,7 +67,7 @@ hybrid_mesh = toughio.Mesh(
         ("wedge", np.array([[1, 11, 5, 2, 12, 6], [13, 0, 4, 14, 3, 7]])),
     ],
     point_data={"a": np.random.rand(15), "b": np.random.rand(15)},
-    cell_data={"c": np.random.rand(6), "material": np.ones(6)},
+    cell_data={"c": np.random.rand(6), "material": np.ones(6, dtype=np.int64)},
 )
 
 output_eleme = [
@@ -75,7 +75,7 @@ output_eleme = [
         "element",
         None,
         float(time),
-        np.array(["AAA0{}".format(i) for i in range(10)]),
+        np.array([f"AAA0{i}" for i in range(10)]),
         {
             "X": np.random.rand(10),
             "Y": np.random.rand(10),
@@ -92,7 +92,7 @@ output_conne = [
         "connection",
         None,
         float(time),
-        np.array([["AAA0{}".format(i), "AAA0{}".format(i)] for i in range(10)]),
+        np.array([[f"AAA0{i}", f"AAA0{i}"] for i in range(10)]),
         {
             "X": np.random.rand(10),
             "Y": np.random.rand(10),
@@ -132,40 +132,73 @@ def random_string(n):
 
 def random_label(label_length):
     n = label_length - 3
-    fmt = "{{:0{}d}}".format(n)
+    fmt = f"{{:0{n}d}}"
 
     return random_string(3) + fmt.format(np.random.randint(10 ** n))
 
 
-def allclose_dict(a, b, atol=1.0e-8):
-    for k, v in a.items():
-        if v is not None:
-            assert np.allclose(v, b[k], atol=atol)
-        else:
-            assert b[k] is None
+def allclose(x, y, atol=1.0e-8, ignore_keys=None, ignore_none=False):
+    ignore_keys = ignore_keys if ignore_keys is not None else []
 
+    if isinstance(x, dict):
+        assert isinstance(y, dict)
 
-def allclose_mesh(mesh_ref, mesh):
-    assert np.allclose(mesh_ref.points, mesh.points)
+        for k, v in x.items():
+            if k in ignore_keys:
+                continue
 
-    for i, cell in enumerate(mesh_ref.cells):
-        assert cell.type == mesh.cells[i].type
-        assert np.allclose(cell.data, mesh.cells[i].data)
+            if ignore_none and v is None:
+                continue
 
-    if mesh.point_data:
-        for k, v in mesh_ref.point_data.items():
-            assert np.allclose(v, mesh.point_data[k])
+            try:
+                assert allclose(v, y[k], atol=atol, ignore_none=ignore_none)
 
-    if mesh.cell_data:
-        for k, v in mesh_ref.cell_data.items():
-            assert np.allclose(v, mesh.cell_data[k])
+            except KeyError as e:
+                print("x =", v, "\ny =", y[k], "\n")
+                raise KeyError(e)
 
+    else:
+        try:
+            if isinstance(x, toughio.Mesh):
+                assert isinstance(y, toughio.Mesh)
 
-def allclose_output(output_ref, output):
-    assert output_ref.type == output.type
-    assert np.allclose(output_ref.time, output.time)
-    assert output_ref.labels.tolist() == output_ref.labels.tolist()
-    allclose_dict(output_ref.data, output.data)
+                assert allclose(x.points, y.points, atol=atol)
+                assert allclose(x.cells, y.cells, atol=atol)
+
+                if x.point_data:
+                    assert allclose(x.point_data, y.point_data, atol=atol)
+
+                if x.cell_data:
+                    assert allclose(x.cell_data, y.cell_data, atol=atol)
+
+            elif isinstance(x, toughio.Output):
+                assert isinstance(y, toughio.Output)
+
+                assert allclose(x.type, y.type, atol=atol)
+                assert allclose(x.time, y.time, atol=atol)
+                assert allclose(x.data, y.data, atol=atol)
+
+                if np.ndim(x.labels) != 0:
+                    assert allclose(x.labels, y.labels, atol=atol)
+
+            elif isinstance(x, str):
+                assert x == y
+
+            elif x is None:
+                assert y is None
+
+            elif np.ndim(x) == 0:
+                assert np.allclose(x, y, atol=atol)
+
+            else:
+                for xx, yy in zip(x, y):
+                    assert allclose(xx, yy, atol=atol, ignore_none=ignore_none)
+
+        except Exception as e:
+            print("x =", x, "\ny =", y, "\n")
+            raise Exception(e)
+
+    return True
 
 
 def convert_outputs_labels(outputs, connection=False):

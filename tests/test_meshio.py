@@ -43,7 +43,6 @@ def test_meshio(mesh_ref, file_format, binary):
     mesh = write_read(
         mesh=mesh_ref, writer_kws=writer_kws, reader_kws={"file_format": file_format},
     )
-    if file_format == "flac3d":
-        mesh_ref.cell_data.pop("c", None)
 
-    helpers.allclose_mesh(mesh_ref, mesh)
+    # Some meshes do not support point and/or cell data
+    helpers.allclose(mesh, mesh_ref)

@@ -4,7 +4,6 @@ from copy import deepcopy
 import meshio
 import numpy as np
 
-from ._common import get_meshio_version, get_new_meshio_cells, get_old_meshio_cells
 from ._filter import MeshFilter
 from ._properties import (
     _connections,
@@ -75,23 +74,23 @@ class Mesh(object):
         """Represent a :class:`toughio.Mesh`."""
         lines = [
             "<toughio mesh object>",
-            "  Number of points: {}".format(len(self.points)),
+            f"  Number of points: {len(self.points)}",
         ]
         if len(self.cells) > 0:
             lines.append("  Number of cells:")
             for tpe, elems in self.cells:
-                lines.append("    {}: {}".format(tpe, len(elems)))
+                lines.append(f"    {tpe}: {len(elems)}")
         else:
             lines.append("  No cells.")
 
         if self.point_sets:
-            lines.append("  Point sets: {}".format(", ".join(self.point_sets.keys())))
+            lines.append(f"  Point sets: {', '.join(self.point_sets)}")
 
         if self.point_data:
-            lines.append("  Point data: {}".format(", ".join(self.point_data.keys())))
+            lines.append(f"  Point data: {', '.join(self.point_data)}")
 
         if self.cell_data:
-            lines.append("  Cell data: {}".format(", ".join(self.cell_data.keys())))
+            lines.append(f"  Cell data: {', '.join(self.cell_data)}")
 
         return "\n".join(lines)
 
@@ -122,7 +121,7 @@ class Mesh(object):
         npts, nh = len(mesh.points), len(height)
         if mesh.points.shape[1] == 3:
             if len(set(mesh.points[:, axis])) != 1:
-                raise ValueError("Cannot extrude mesh along axis {}.".format(axis))
+                raise ValueError(f"Cannot extrude mesh along axis {axis}.")
         else:
             mesh.points = np.column_stack((mesh.points, np.zeros(npts)))
             if axis != 2:
@@ -144,7 +143,7 @@ class Mesh(object):
         cells = []
         cell_data = {k: mesh.split(v) for k, v in mesh.cell_data.items()}
         for ic, c in enumerate(mesh.cells):
-            if c.type in extruded_types.keys():
+            if c.type in extruded_types:
                 extruded_type = extruded_types[c.type]
                 nr, nc = c.data.shape
                 cell = CellBlock(extruded_type, np.tile(c.data, (nh, 2)))
@@ -165,7 +164,7 @@ class Mesh(object):
         mesh.cell_data = {k: np.concatenate(v) for k, v in cell_data.items()}
 
         if mesh.field_data:
-            for k in mesh.field_data.keys():
+            for k in mesh.field_data:
                 mesh.field_data[k][1] = 3
 
         if not inplace:
@@ -252,22 +251,15 @@ class Mesh(object):
         keys = ["points", "point_data", "field_data"]
         kwargs = {key: getattr(self, key) for key in keys}
 
-        version = get_meshio_version()
         cell_data = {k: self.split(v) for k, v in self.cell_data.items()}
-        if version[0] >= 4:
-            kwargs.update(
-                {
-                    "cells": self.cells,
-                    "cell_data": cell_data,
-                    "point_sets": self.point_sets,
-                    "cell_sets": self.cell_sets,
-                }
-            )
-        else:
-            cells, cell_data = get_old_meshio_cells(self.cells, cell_data)
-            kwargs.update(
-                {"cells": cells, "cell_data": cell_data, "node_sets": self.point_sets,}
-            )
+        kwargs.update(
+            {
+                "cells": self.cells,
+                "cell_data": cell_data,
+                "point_sets": self.point_sets,
+                "cell_sets": self.cell_sets,
+            }
+        )
 
         return meshio.Mesh(**kwargs)
 
@@ -316,14 +308,14 @@ class Mesh(object):
 
         if VTK9:
             mesh = pyvista.UnstructuredGrid(
-                np.concatenate(cells),
+                np.concatenate(cells).astype(np.int64, copy=False),
                 np.array(cell_type),
                 np.array(points, np.float64),
             )
         else:
             mesh = pyvista.UnstructuredGrid(
                 np.array(offset),
-                np.concatenate(cells),
+                np.concatenate(cells).astype(np.int64, copy=False),
                 np.array(cell_type),
                 np.array(points, np.float64),
             )
@@ -344,8 +336,8 @@ class Mesh(object):
 
         Parameters
         ----------
-        filename : str, optional, default 'MESH'
-            Output file name.
+        filename : str, pathlike or buffer, optional, default 'MESH'
+            Output file name or buffer.
 
         Other Parameters
         ----------------
@@ -375,8 +367,8 @@ class Mesh(object):
 
         Parameters
         ----------
-        filename : str, optional, default 'INCON'
-            Output file name.
+        filename : str, pathlike or buffer, optional, default 'INCON'
+            Output file name or buffer.
         eos : str or None, optional, default None
             Equation of State.
 
@@ -453,8 +445,7 @@ class Mesh(object):
             labels_map = {k: v for v, k in enumerate(self.labels)}
 
             data = {
-                k: [[[0.0, 0.0, 0.0]] for _ in range(self.n_cells)]
-                for k in out.data.keys()
+                k: [[[0.0, 0.0, 0.0]] for _ in range(self.n_cells)] for k in out.data
             }
             for i, (label1, label2) in enumerate(out.labels):
                 i1, i2 = labels_map[label1], labels_map[label2]
@@ -476,8 +467,8 @@ class Mesh(object):
 
         Parameters
         ----------
-        filename : str
-            Output file name.
+        filename : str, pathlike or buffer
+            Output file name or buffer.
         file_format : str or None, optional, default None
             Output file format. If `None`, it will be guessed from file's
             extension. To write TOUGH MESH, `file_format` must be specified
@@ -511,6 +502,20 @@ class Mesh(object):
         """Display mesh using :meth:`pyvista.UnstructuredGrid.plot`."""
         mesh = self.to_pyvista()
         mesh.plot(*args, **kwargs)
+
+    def add_material(self, label, imat):
+        """
+        Add a material name.
+
+        Parameters
+        ----------
+        label : str
+            Material name.
+        imat : int
+            Material ID.
+
+        """
+        self.field_data[label] = np.array([imat, 3])
 
     def add_point_data(self, label, data):
         """
@@ -605,12 +610,12 @@ class Mesh(object):
             data = self.cell_data["material"]
             imat = (
                 self.field_data[material][0]
-                if material in self.field_data.keys()
+                if material in self.field_data
                 else data.max() + 1
             )
             data[cells] = imat
             self.add_cell_data("material", data)
-            self.field_data[material] = np.array([imat, 3])
+            self.add_material(material, imat)
 
     def cell_data_to_point_data(self):
         """Interpolate cell data to point data."""
@@ -689,27 +694,14 @@ class Mesh(object):
     @property
     def cells(self):
         """Return connectivity of cells."""
-        if self._cells:
-            return self._cells
-        else:
-            return [CellBlock(k, v) for k, v in self._cells_dict.items()]
+        return self._cells
 
     @cells.setter
     def cells(self, value):
-        if isinstance(value, dict):
-            self._cells = []
-            self._cells_dict = value
-        else:
-            self._cells = [CellBlock(k, v) for k, v in value]
-            self._cells_dict = {}
-
-    @property
-    def cells_dict(self):
-        """Return connectivity of cells (``meshio < 4.0.0``)."""
-        if self._cells:
-            return get_old_meshio_cells(self._cells)
-        else:
-            return self._cells_dict
+        self._cells = [
+            CellBlock(*c) if isinstance(c, (list, tuple)) else CellBlock(c.type, c.data)
+            for c in value
+        ]
 
     @property
     def point_data(self):
@@ -904,21 +896,17 @@ def from_meshio(mesh, material="dfalt"):
     if not isinstance(material, str):
         raise TypeError()
 
-    version = get_meshio_version()
-
     if mesh.cell_data:
-        if version[0] >= 4:
-            cells = mesh.cells
-            cell_data = mesh.cell_data
-        else:
-            cells, cell_data = get_new_meshio_cells(mesh.cells, mesh.cell_data)
+        cells = mesh.cells
+        cell_data = mesh.cell_data
 
         key = get_material_key(cell_data)
         if key:
             cell_data["material"] = cell_data.pop(key)
         cell_data = {k: np.concatenate(v) for k, v in cell_data.items()}
+
     else:
-        cells = mesh.cells if version[0] >= 4 else get_new_meshio_cells(mesh.cells)
+        cells = mesh.cells
         cell_data = {}
 
     out = Mesh(
@@ -937,13 +925,13 @@ def from_meshio(mesh, material="dfalt"):
         cell_sets=mesh.cell_sets if hasattr(mesh, "cell_sets") else None,
     )
 
-    if "material" not in out.cell_data.keys():
+    if "material" not in out.cell_data:
         imat = (
             np.max([v[0] for v in mesh.field_data.values() if v[1] == 3]) + 1
             if mesh.field_data
             else 1
         )
-        out.cell_data["material"] = np.full(out.n_cells, imat, dtype=int)
+        out.cell_data["material"] = np.full(out.n_cells, imat, dtype=np.int64)
         out.field_data[material] = np.array([imat, 3])
 
     return out
@@ -991,8 +979,8 @@ def from_pyvista(mesh, material="dfalt"):
     # Check that meshio supports all cell types in input mesh
     pixel_voxel = {8, 11}  # Handle pixels and voxels
     for cell_type in np.unique(vtk_cell_type):
-        if not (cell_type in vtk_to_meshio_type.keys() or cell_type in pixel_voxel):
-            raise ValueError("toughio does not support VTK type {}.".format(cell_type))
+        if not (cell_type in vtk_to_meshio_type or cell_type in pixel_voxel):
+            raise ValueError(f"toughio does not support VTK type {cell_type}.")
 
     # Get cells
     cells = []
@@ -1013,9 +1001,7 @@ def from_pyvista(mesh, material="dfalt"):
         )
         cell_type = cell_type if cell_type not in pixel_voxel else cell_type + 1
         cell_type = (
-            vtk_to_meshio_type[cell_type]
-            if cell_type != 7
-            else "polygon{}".format(numnodes)
+            vtk_to_meshio_type[cell_type] if cell_type != 7 else f"polygon{numnodes}"
         )
 
         if len(cells) > 0 and cells[-1][0] == cell_type:
@@ -1040,9 +1026,9 @@ def from_pyvista(mesh, material="dfalt"):
         cell_data=cell_data,
     )
 
-    if "material" not in out.cell_data.keys():
+    if "material" not in out.cell_data:
         imat = 1
-        out.cell_data["material"] = np.full(out.n_cells, imat, dtype=int)
+        out.cell_data["material"] = np.full(out.n_cells, imat, dtype=np.int64)
         out.field_data[material] = np.array([imat, 3])
 
     return out

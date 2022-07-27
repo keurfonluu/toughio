@@ -1,6 +1,7 @@
 import logging
 
-from .._common import prune_nones_list, to_str
+from ..._common import prune_values
+from .._common import to_str
 
 
 def getval(parameters, keys, default):
@@ -18,7 +19,7 @@ def getval(parameters, keys, default):
 
     except KeyError:
         key_str = (
-            "'{}'".format(keys)
+            f"'{keys}'"
             if isinstance(keys, str)
             else "".join(f"['{key}']" for key in keys)
         )
@@ -62,7 +63,7 @@ def read_end_comments(fiter):
 
     # Remove trailing empty records
     end_comments = [comment if comment else None for comment in end_comments]
-    end_comments = prune_nones_list(end_comments)
+    end_comments = prune_values(end_comments)
     if end_comments:
         return (
             end_comments[0]

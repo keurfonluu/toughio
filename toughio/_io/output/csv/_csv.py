@@ -1,5 +1,3 @@
-from __future__ import with_statement
-
 import numpy as np
 
 from ...._common import open_file
@@ -102,10 +100,10 @@ def write(filename, output, unit=None):
 
     out = output[-1]
     headers = ["ELEM"] if out.type == "element" else ["ELEM1", "ELEM2"]
-    headers += ["X"] if "X" in out.data.keys() else []
-    headers += ["Y"] if "Y" in out.data.keys() else []
-    headers += ["Z"] if "Z" in out.data.keys() else []
-    headers += [k for k in out.data.keys() if k not in {"X", "Y", "Z"}]
+    headers += ["X"] if "X" in out.data else []
+    headers += ["Y"] if "Y" in out.data else []
+    headers += ["Z"] if "Z" in out.data else []
+    headers += [k for k in out.data if k not in {"X", "Y", "Z"}]
 
     with open_file(filename, "w") as f:
         _write_csv(f, output, headers, unit)
@@ -119,11 +117,11 @@ def _write_csv(f, output, headers, unit=None):
 
     # Headers
     units = [
-        header_to_unit_[header] if header in header_to_unit_.keys() else "-"
+        header_to_unit_[header] if header in header_to_unit_ else "-"
         for header in headers
     ]
-    f.write(",".join('"{:>18}"'.format(header) for header in headers) + "\n")
-    f.write(",".join('"{:>18}"'.format("({})".format(unit)) for unit in units) + "\n")
+    f.write(",".join(f'"{header:>18}"' for header in headers) + "\n")
+    f.write(",".join(f'"{f"({unit})":>18}"' for unit in units) + "\n")
 
     # Data
     formats = [
@@ -131,7 +129,7 @@ def _write_csv(f, output, headers, unit=None):
     ]
     for out in output:
         # Time step
-        f.write('"TIME [sec]  {:.8e}"\n'.format(out.time))
+        f.write(f'"TIME [sec]  {out.time:.8e}"\n')
 
         # Table
         for i, label in enumerate(out.labels):

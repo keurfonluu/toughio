@@ -1,9 +1,7 @@
-from __future__ import division, with_statement
-
-from ...._common import block_to_format, get_label_length, open_file
+from ...._common import block_to_format, get_label_length, open_file, prune_values
 from ...._exceptions import ReadError
 from ...._helpers import FileIterator
-from ..._common import prune_nones_dict, prune_nones_list, read_record
+from ..._common import read_record
 from .._common import read_end_comments
 from ._helpers import read_model_record
 
@@ -25,8 +23,8 @@ def read(filename, label_length=None, eos=None, simulator="tough"):
 
     Parameters
     ----------
-    filename : str
-        Input file name.
+    filename : str, pathlike or buffer
+        Input file name or buffer.
     label_length : int or None, optional, default None
         Number of characters in cell labels.
     eos : str or None, optional, default None
@@ -89,7 +87,7 @@ def read_buffer(f, label_length, eos, simulator="tough"):
             elif line.startswith("RPCAP"):
                 rpcap = _read_rpcap(fiter)
 
-                if "default" in parameters.keys():
+                if "default" in parameters:
                     parameters["default"].update(rpcap)
 
                 else:
@@ -103,7 +101,7 @@ def read_buffer(f, label_length, eos, simulator="tough"):
                     parameters.update(react)
 
             elif line.startswith("FLAC"):
-                flac = _read_flac(fiter, parameters["rocks_order"])
+                flac = _read_flac(fiter, parameters["rocks"])
                 parameters["flac"] = flac["flac"]
 
                 for k, v in flac["rocks"].items():
@@ -129,7 +127,7 @@ def read_buffer(f, label_length, eos, simulator="tough"):
                 parameters["options"] = param["options"]
                 parameters["extra_options"] = param["extra_options"]
 
-                if "default" in parameters.keys():
+                if "default" in parameters:
                     parameters["default"].update(param["default"])
 
                 else:
@@ -182,7 +180,7 @@ def read_buffer(f, label_length, eos, simulator="tough"):
             elif line.startswith("COORD"):
                 coord = _read_coord(fiter)
 
-                for k, v in zip(parameters["elements_order"], coord):
+                for k, v in zip(parameters["elements"], coord):
                     parameters["elements"][k]["center"] = v
 
                 parameters["coordinates"] = True
@@ -220,7 +218,7 @@ def read_buffer(f, label_length, eos, simulator="tough"):
                     parameters["end_comments"] = end_comments
 
     except:
-        raise ReadError("failed to parse line {}.".format(fiter.count))
+        raise ReadError(f"failed to parse line {fiter.count}.")
 
     return parameters
 
@@ -228,7 +226,7 @@ def read_buffer(f, label_length, eos, simulator="tough"):
 def _read_rocks(f, simulator="tough"):
     """Read ROCKS block data."""
     fmt = block_to_format["ROCKS"]
-    rocks = {"rocks": {}, "rocks_order": []}
+    rocks = {"rocks": {}}
 
     while True:
         line = f.next()
@@ -281,11 +279,10 @@ def _read_rocks(f, simulator="tough"):
 
                 rocks["rocks"][rock].update(_read_rpcap(f))
 
-            rocks["rocks_order"].append(rock)
         else:
             break
 
-    rocks["rocks"] = {k: prune_nones_dict(v) for k, v in rocks["rocks"].items()}
+    rocks["rocks"] = {k: prune_values(v) for k, v in rocks["rocks"].items()}
 
     return rocks
 
@@ -338,17 +335,17 @@ def _read_flac(f, rocks_order):
         data = read_record(line, fmt[2])
         flac["rocks"][rock]["permeability_model"] = {
             "id": data[0],
-            "parameters": prune_nones_list(data[1:]),
+            "parameters": prune_values(data[1:]),
         }
 
         line = f.next()
         data = read_record(line, fmt[3])
         flac["rocks"][rock]["equivalent_pore_pressure"] = {
             "id": data[0],
-            "parameters": prune_nones_list(data[2:]),
+            "parameters": prune_values(data[2:]),
         }
 
-    flac["flac"] = prune_nones_dict(flac["flac"])
+    flac["flac"] = prune_values(flac["flac"])
 
     return flac
 
@@ -528,7 +525,7 @@ def _read_param(f, eos=None):
             for _ in range(t_steps):
                 line = f.next()
                 data = read_record(line, fmt[3])
-                param["options"]["t_steps"] += prune_nones_list(data)
+                param["options"]["t_steps"] += prune_values(data)
 
             if len(param["options"]["t_steps"]) == 1:
                 param["options"]["t_steps"] = param["options"]["t_steps"][0]
@@ -578,12 +575,12 @@ def _read_param(f, eos=None):
         param["default"] = {}
 
     if any(x is not None for x in data):
-        data = prune_nones_list(data)
+        data = prune_values(data)
         param["default"]["initial_condition"] = data
 
     # Remove Nones
-    param["options"] = prune_nones_dict(param["options"])
-    param["extra_options"] = prune_nones_dict(param["extra_options"])
+    param["options"] = prune_values(param["options"])
+    param["extra_options"] = prune_values(param["extra_options"])
 
     return param
 
@@ -602,9 +599,9 @@ def _read_selec(f):
         for _ in range(selec["selections"]["integers"][1]):
             line = f.next()
             data = read_record(line, fmt[2])
-            selec["selections"]["floats"].append(prune_nones_list(data))
+            selec["selections"]["floats"].append(prune_values(data))
 
-    selec["selections"]["integers"] = prune_nones_dict(selec["selections"]["integers"])
+    selec["selections"]["integers"] = prune_values(selec["selections"]["integers"])
     if selec["selections"]["integers"][1] == 1:
         selec["selections"]["floats"] = selec["selections"]["floats"][0]
 
@@ -643,7 +640,7 @@ def _read_indom(f, eos=None):
                 else:
                     f.seek(i, increment=-1)
 
-            data = prune_nones_list(data)
+            data = prune_values(data)
             indom["rocks"][rock] = {"initial_condition": data}
 
             if eos == "tmvoc":
@@ -684,7 +681,7 @@ def _read_times(f):
     while len(times["times"]) < n_times:
         line = f.next()
         data = read_record(line, fmt[2])
-        times["times"] += prune_nones_list(data)
+        times["times"] += prune_values(data)
 
     return times
 
@@ -698,9 +695,7 @@ def _read_oft(f, oft, label_length):
     line = f.next()
     if not label_length:
         label_length = get_label_length(line[:9])
-    label_format = "{{:>{}}}".format(
-        label_length if oft != "COFT" else 2 * label_length
-    )
+    label_format = f"{{:>{label_length if oft != 'COFT' else 2 * label_length}}}"
 
     while True:
         if line.strip():
@@ -723,7 +718,7 @@ def _read_gener(f, label_length, simulator="tough"):
         while len(table) < n:
             line = f.next()
             data = read_record(line, fmt)
-            table += prune_nones_list(data)
+            table += prune_values(data)
 
         return table
 
@@ -733,14 +728,14 @@ def _read_gener(f, label_length, simulator="tough"):
     line = f.next()
     if not label_length:
         label_length = get_label_length(line[:9])
-    label_format = "{{:>{}}}".format(label_length)
+    label_format = f"{{:>{label_length}}}"
 
     while True:
         if line.strip():
             data = read_record(line, fmt[label_length])
             tmp = {
                 "label": label_format.format(data[0]),
-                "name": "{:>5}".format(data[1]) if data[1] else data[1],
+                "name": f"{data[1]:>5}" if data[1] else data[1],
                 "nseq": data[2],
                 "nadd": data[3],
                 "nads": data[4],
@@ -779,7 +774,7 @@ def _read_gener(f, label_length, simulator="tough"):
         line = f.next()
 
     return {
-        "generators": [prune_nones_dict(generator) for generator in gener["generators"]]
+        "generators": [prune_values(generator) for generator in gener["generators"]]
     }
 
 
@@ -795,7 +790,7 @@ def _read_diffu(f):
         if line.split():
             try:
                 data = read_record(line, fmt)
-                diffu["diffusion"].append(prune_nones_list(data))
+                diffu["diffusion"].append(prune_values(data))
             except ValueError:
                 f.seek(i, increment=-1)
                 break
@@ -842,7 +837,7 @@ def _read_outpu(f):
             data = read_record(line, fmt[3])
             name = data[0].lower()
 
-            tmp = prune_nones_list(data[1:])
+            tmp = prune_values(data[1:])
             options = None if len(tmp) == 0 else tmp[0] if len(tmp) == 1 else tmp
 
             outpu["output"]["variables"].append({"name": name})
@@ -855,12 +850,12 @@ def _read_outpu(f):
 def _read_eleme(f, label_length):
     """Read ELEME block data."""
     fmt = block_to_format["ELEME"]
-    eleme = {"elements": {}, "elements_order": []}
+    eleme = {"elements": {}}
 
     line = f.next()
     if not label_length:
         label_length = get_label_length(line[:9])
-    label_format = "{{:>{}}}".format(label_length)
+    label_format = f"{{:>{label_length}}}"
 
     while True:
         if line.strip():
@@ -880,13 +875,12 @@ def _read_eleme(f, label_length):
                 "center": data[7:10],
             }
 
-            eleme["elements_order"].append(label)
         else:
             break
 
         line = f.next()
 
-    eleme["elements"] = {k: prune_nones_dict(v) for k, v in eleme["elements"].items()}
+    eleme["elements"] = {k: prune_values(v) for k, v in eleme["elements"].items()}
 
     return eleme
 
@@ -912,12 +906,12 @@ def _read_coord(f):
 def _read_conne(f, label_length):
     """Read CONNE block data."""
     fmt = block_to_format["CONNE"]
-    conne = {"connections": {}, "connections_order": []}
+    conne = {"connections": {}}
 
     line = f.next()
     if not label_length:
         label_length = get_label_length(line[:9])
-    label_format = "{{:>{}}}".format(2 * label_length)
+    label_format = f"{{:>{2 * label_length}}}"
 
     flag = False
     while True:
@@ -934,16 +928,13 @@ def _read_conne(f, label_length):
                 "radiant_emittance_factor": data[9],
             }
 
-            conne["connections_order"].append(label)
         else:
             flag = line.startswith("+++")
             break
 
         line = f.next()
 
-    conne["connections"] = {
-        k: prune_nones_dict(v) for k, v in conne["connections"].items()
-    }
+    conne["connections"] = {k: prune_values(v) for k, v in conne["connections"].items()}
 
     return conne, flag
 
@@ -958,12 +949,12 @@ def _read_incon(f, label_length, eos=None, simulator="tough"):
         if eos in fmt
         else fmt["default"]
     )
-    incon = {"initial_conditions": {}, "initial_conditions_order": []}
+    incon = {"initial_conditions": {}}
 
     line = f.next()
     if not label_length:
         label_length = get_label_length(line[:9])
-    label_format = "{{:>{}}}".format(label_length)
+    label_format = f"{{:>{label_length}}}"
 
     # Guess the number of lines to read for primary variables
     i = f.tell()
@@ -997,7 +988,7 @@ def _read_incon(f, label_length, eos=None, simulator="tough"):
                 incon["initial_conditions"][label]["phase_composition"] = data[4]
 
             else:
-                userx = prune_nones_list(data[4:9])
+                userx = prune_values(data[4:9])
                 incon["initial_conditions"][label]["userx"] = userx if userx else None
 
             # Record 2
@@ -1009,8 +1000,7 @@ def _read_incon(f, label_length, eos=None, simulator="tough"):
                 line = f.next()
                 data += read_record(line, fmt[0])
 
-            incon["initial_conditions"][label]["values"] = prune_nones_list(data)
-            incon["initial_conditions_order"].append(label)
+            incon["initial_conditions"][label]["values"] = prune_values(data)
         else:
             flag = line.startswith("+++")
             break
@@ -1018,7 +1008,7 @@ def _read_incon(f, label_length, eos=None, simulator="tough"):
         line = f.next()
 
     incon["initial_conditions"] = {
-        k: prune_nones_dict(v) for k, v in incon["initial_conditions"].items()
+        k: prune_values(v) for k, v in incon["initial_conditions"].items()
     }
 
     return incon, flag
@@ -1065,7 +1055,7 @@ def _read_meshm(f):
                     while len(sizes) < tmp["n_increment"]:
                         line = f.next()
                         data = read_record(line, fmt[3])
-                        sizes += prune_nones_list(data)
+                        sizes += prune_values(data)
 
                     tmp["sizes"] = sizes[: tmp["n_increment"]]
 
@@ -1098,7 +1088,7 @@ def _read_meshm(f):
                     while len(radii) < n:
                         line = f.next()
                         data = read_record(line, fmt["RADII"][2])
-                        radii += prune_nones_list(data)
+                        radii += prune_values(data)
 
                     tmp = {
                         "type": data_type.lower(),
@@ -1140,7 +1130,7 @@ def _read_meshm(f):
                     while len(thicknesses) < n:
                         line = f.next()
                         data = read_record(line, fmt["LAYER"][2])
-                        thicknesses += prune_nones_list(data)
+                        thicknesses += prune_values(data)
 
                     tmp = {"type": data_type.lower(), "thicknesses": thicknesses[:n]}
                     meshm["meshmaker"]["parameters"].append(tmp)

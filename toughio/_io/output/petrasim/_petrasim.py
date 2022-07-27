@@ -1,5 +1,3 @@
-from __future__ import with_statement
-
 import numpy as np
 
 from ...._common import open_file
@@ -51,18 +49,17 @@ def write(filename, output):
     """Write Petrasim OUTPUT_ELEME.csv."""
     out = output[-1]
     headers = []
-    headers += ["X"] if "X" in out.data.keys() else []
-    headers += ["Y"] if "Y" in out.data.keys() else []
-    headers += ["Z"] if "Z" in out.data.keys() else []
-    headers += [k for k in out.data.keys() if k not in {"X", "Y", "Z"}]
+    headers += ["X"] if "X" in out.data else []
+    headers += ["Y"] if "Y" in out.data else []
+    headers += ["Z"] if "Z" in out.data else []
+    headers += [k for k in out.data if k not in {"X", "Y", "Z"}]
 
     with open_file(filename, "w") as f:
         # Headers
         record = ",".join(
-            "{:>18}".format(header)
-            for header in ["TIME [sec]", "ELEM", "INDEX"] + headers
+            f"{header:>18}" for header in ["TIME [sec]", "ELEM", "INDEX"] + headers
         )
-        f.write("{}\n".format(record))
+        f.write(f"{record}\n")
 
         # Data
         for out in output:
@@ -75,5 +72,5 @@ def write(filename, output):
                 tmp = [out.time, out.labels[i], i + 1]
                 tmp += [x for x in d]
                 record = ",".join(fmt.format(x) for fmt, x in zip(formats, tmp))
-                f.write("{}\n".format(record))
+                f.write(f"{record}\n")
                 i += 1

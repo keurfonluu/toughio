@@ -1,9 +1,4 @@
-from __future__ import with_statement
-
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
+import pickle
 
 from ..._common import open_file
 
@@ -19,8 +14,8 @@ def read(filename):
 
     Parameters
     ----------
-    filename : str
-        Input file name.
+    filename : str, pathlike or buffer
+        Input file name or buffer.
 
     Returns
     -------
@@ -40,8 +35,8 @@ def write(filename, mesh, protocol=pickle.HIGHEST_PROTOCOL):
 
     Parameters
     ----------
-    filename : str
-        Output file name.
+    filename : str, pathlike or buffer
+        Output file name or buffer.
     mesh : toughio.Mesh
         Mesh to pickle.
     protocol : integer, optional, default `pickle.HIGHEST_PROTOCOL`

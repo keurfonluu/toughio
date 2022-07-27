@@ -16,25 +16,25 @@ def test_cylindric_grid():
     section_areas = dr.sum() * dz.sum()
 
     volumes = mesh.volumes.sum()
-    assert np.allclose(volumes, base_areas[-1] * dz.sum())
+    assert helpers.allclose(volumes, base_areas[-1] * dz.sum())
 
     face_areas_top = np.array(mesh.face_areas)[:, 0].sum()
-    assert np.allclose(face_areas_top, base_areas[-1] * len(dz))
+    assert helpers.allclose(face_areas_top, base_areas[-1] * len(dz))
 
     face_areas_bottom = np.array(mesh.face_areas)[:, 1].sum()
-    assert np.allclose(face_areas_bottom, base_areas[-1] * len(dz))
+    assert helpers.allclose(face_areas_bottom, base_areas[-1] * len(dz))
 
     face_areas_section_1 = np.array(mesh.face_areas)[:, 2].sum()
-    assert np.allclose(face_areas_section_1, section_areas)
+    assert helpers.allclose(face_areas_section_1, section_areas)
 
     face_areas_outer = np.array(mesh.face_areas)[:, 3].sum()
-    assert np.allclose(face_areas_outer, surface_areas.sum())
+    assert helpers.allclose(face_areas_outer, surface_areas.sum())
 
     face_areas_section_2 = np.array(mesh.face_areas)[:, 4].sum()
-    assert np.allclose(face_areas_section_2, section_areas)
+    assert helpers.allclose(face_areas_section_2, section_areas)
 
     face_areas_inner = np.array(mesh.face_areas)[:, 5].sum()
-    assert np.allclose(face_areas_inner, surface_areas[:-1].sum())
+    assert helpers.allclose(face_areas_inner, surface_areas[:-1].sum())
 
 
 @pytest.mark.parametrize("ndim", [2, 3])
@@ -46,11 +46,11 @@ def test_structured_grid(ndim):
     origin = np.random.rand(ndim)
     mesh = toughio.meshmaker.structured_grid(dx, dy, dz, origin=origin)
 
-    assert np.allclose(origin, mesh.points.min(axis=0)[:ndim])
+    assert helpers.allclose(origin, mesh.points.min(axis=0)[:ndim])
 
     if ndim == 3:
         volumes_ref = dx.sum() * dy.sum() * dz.sum()
-        assert np.allclose(volumes_ref, mesh.volumes.sum())
+        assert helpers.allclose(volumes_ref, mesh.volumes.sum())
 
 
 @pytest.mark.parametrize("ndim", [2, 3])
@@ -58,7 +58,7 @@ def test_triangulate(ndim):
     points = np.random.rand(100, ndim)
     mesh = toughio.meshmaker.triangulate(points)
 
-    assert np.allclose(points, mesh.points)
+    assert helpers.allclose(points, mesh.points)
     assert mesh.cells[0].type == ("triangle" if ndim == 2 else "tetra")
 
 
@@ -70,7 +70,7 @@ def test_voxelize():
     mesh_ref = toughio.meshmaker.structured_grid(dx, dy, dz, origin=origin)
 
     mesh = toughio.meshmaker.voxelize(mesh_ref.centers, origin=origin)
-    helpers.allclose_mesh(mesh_ref, mesh)
+    helpers.allclose(mesh_ref, mesh)
 
 
 def test_layer():
@@ -84,8 +84,8 @@ def test_layer():
     i1 = mesh.near(point)
     i2 = mesh_layer.near(point)
 
-    assert np.allclose(mesh.volumes[i1], mesh_layer.volumes[i2])
-    assert np.allclose(mesh.face_areas[i1], mesh_layer.face_areas[i2])
+    assert helpers.allclose(mesh.volumes[i1], mesh_layer.volumes[i2])
+    assert helpers.allclose(mesh.face_areas[i1], mesh_layer.face_areas[i2])
 
 
 def test_from_meshmaker_xyz():
@@ -102,9 +102,9 @@ def test_from_meshmaker_xyz():
     mesh = toughio.meshmaker.from_meshmaker(parameters)
 
     assert mesh.n_cells == 90
-    assert np.allclose(mesh.points[:, 0].max(), 3 * 14.09)
-    assert np.allclose(mesh.points[:, 1].max(), 55.0)
-    assert np.allclose(mesh.points[:, 2].min(), -14.0 - 0.9 - 19.91)
+    assert helpers.allclose(mesh.points[:, 0].max(), 3 * 14.09)
+    assert helpers.allclose(mesh.points[:, 1].max(), 55.0)
+    assert helpers.allclose(mesh.points[:, 2].min(), -14.0 - 0.9 - 19.91)
 
 
 def test_from_meshmaker_rz2d():
@@ -127,7 +127,7 @@ def test_from_meshmaker_rz2d():
     mesh = toughio.meshmaker.from_meshmaker(parameters)
 
     assert mesh.n_cells == 26 * 3
-    assert np.allclose(mesh.points[:, 0].max(), 64.0)
-    assert np.allclose(mesh.points[:, 2].min(), -14.0 - 0.9 - 19.91)
-    assert np.allclose(mesh._dr.sum(), 64.0)
-    assert np.allclose(mesh._dz.sum(), 14 + 0.9 + 19.91)
+    assert helpers.allclose(mesh.points[:, 0].max(), 64.0)
+    assert helpers.allclose(mesh.points[:, 2].min(), -14.0 - 0.9 - 19.91)
+    assert helpers.allclose(mesh._dr.sum(), 64.0)
+    assert helpers.allclose(mesh._dz.sum(), 14 + 0.9 + 19.91)

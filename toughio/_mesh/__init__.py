@@ -1,6 +1,4 @@
-import meshio
-
-from . import avsucd, flac3d, pickle, tecplot, tough
+from . import avsucd, flac3d, pickle, tough
 from ._helpers import read, read_time_series, register, write, write_time_series
 from ._mesh import CellBlock, Mesh, from_meshio, from_pyvista
 

@@ -1,5 +1,3 @@
-from __future__ import with_statement
-
 from functools import partial
 
 import numpy as np
@@ -59,7 +57,7 @@ def _read_table(f, file_type, label_length):
                         break
 
                 except StopIteration:
-                    raise ValueError("No data related to {}s found.".format(file_type))
+                    raise ValueError(f"No data related to {file_type}s found.")
 
             # Read headers
             headers = line.split()
@@ -100,7 +98,7 @@ def _read_table(f, file_type, label_length):
                             # Determine number of characters for index
                             idx = line.replace("-", " ").split()[0]
                             nidx = line.index(idx) + len(idx)
-                            ifmt = "{}s".format(nidx)
+                            ifmt = f"{idx}s"
 
                             # Determine number of characters between two Es
                             i1 = line.find("E")
@@ -110,7 +108,7 @@ def _read_table(f, file_type, label_length):
                             fmt = [ifmt]
                             if i2 >= 0:
                                 di = i2 - i1
-                                dfmt = "{}.{}e".format(di, di - 7)
+                                dfmt = f"{di}.{di - 7}e"
                                 fmt += 20 * [dfmt]  # Read 20 data columns at most
                             else:
                                 fmt += ["12.5e"]

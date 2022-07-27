@@ -1,4 +1,4 @@
-pygmsh==6.1.1
+pygmsh
 seaborn
 sphinx
 sphinx-argparse

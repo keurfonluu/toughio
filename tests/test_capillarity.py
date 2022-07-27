@@ -1,5 +1,6 @@
 import os
 
+import helpers
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
@@ -40,7 +41,7 @@ def test_capillarity(model, parameters, sl, monkeypatch):
 
     cap = model(*parameters)
     pcap = cap(sl)
-    assert np.allclose(pcap, pcap_ref[cap.name][: len(pcap)])
+    assert helpers.allclose(pcap, pcap_ref[cap.name][: len(pcap)])
 
     monkeypatch.setattr(plt, "show", lambda: None)
     cap.plot()
