@@ -15,7 +15,7 @@ jobs:
       - uses: nschloe/action-cached-lfs-checkout@v1
       - uses: actions/setup-python@v4
         with:
-            python-version: '3.8'
+            python-version: '3.9'
       - name: Install OSMesa VTK
         run: pip install https://github.com/pyvista/pyvista-wheels/raw/main/vtk-osmesa-9.1.0-cp39-cp39-linux_x86_64.whl
       - name: Install toughio
