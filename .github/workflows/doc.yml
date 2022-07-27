@@ -1,0 +1,32 @@
+name: Build documentation
+on: [push, pull_request, workflow_dispatch]
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    env:
+      PYVISTA_OFF_SCREEN: 'True'
+      ALLOW_PLOTTING: true
+      SHELLOPTS: 'errexit:pipefail'
+    steps:
+      - uses: nschloe/action-cached-lfs-checkout@v1
+      - uses: actions/setup-python@v4
+        with:
+            python-version: '3.8'
+      - name: Install toughio
+        run: |
+          git lfs pull
+          pip install -e .[full]
+      - name: Install dependencies
+        run: |
+          pip install -r doc/requirements.txt
+      - name: Sphinx build
+        run: |
+          sphinx-build -b html doc/source doc/build
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+        with:
+          publish_branch: gh-pages
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: build/
+          force_orphan: true
