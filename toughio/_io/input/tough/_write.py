@@ -529,7 +529,7 @@ def _write_flac(parameters):
     out = write_record(values, fmt1)
 
     # Additional records
-    for k, v in parameters["rocks"].items():
+    for v in parameters["rocks"].values():
         # Load data
         data = deepcopy(default)
         data.update(parameters["default"])
