@@ -101,7 +101,7 @@ def read_buffer(f, label_length, eos, simulator="tough"):
                     parameters.update(react)
 
             elif line.startswith("FLAC"):
-                flac = _read_flac(fiter, parameters["rocks_order"])
+                flac = _read_flac(fiter, parameters["rocks"])
                 parameters["flac"] = flac["flac"]
 
                 for k, v in flac["rocks"].items():
@@ -180,7 +180,7 @@ def read_buffer(f, label_length, eos, simulator="tough"):
             elif line.startswith("COORD"):
                 coord = _read_coord(fiter)
 
-                for k, v in zip(parameters["elements_order"], coord):
+                for k, v in zip(parameters["elements"], coord):
                     parameters["elements"][k]["center"] = v
 
                 parameters["coordinates"] = True
@@ -226,7 +226,7 @@ def read_buffer(f, label_length, eos, simulator="tough"):
 def _read_rocks(f, simulator="tough"):
     """Read ROCKS block data."""
     fmt = block_to_format["ROCKS"]
-    rocks = {"rocks": {}, "rocks_order": []}
+    rocks = {"rocks": {}}
 
     while True:
         line = f.next()
@@ -279,7 +279,6 @@ def _read_rocks(f, simulator="tough"):
 
                 rocks["rocks"][rock].update(_read_rpcap(f))
 
-            rocks["rocks_order"].append(rock)
         else:
             break
 
@@ -851,7 +850,7 @@ def _read_outpu(f):
 def _read_eleme(f, label_length):
     """Read ELEME block data."""
     fmt = block_to_format["ELEME"]
-    eleme = {"elements": {}, "elements_order": []}
+    eleme = {"elements": {}}
 
     line = f.next()
     if not label_length:
@@ -876,7 +875,6 @@ def _read_eleme(f, label_length):
                 "center": data[7:10],
             }
 
-            eleme["elements_order"].append(label)
         else:
             break
 
@@ -908,7 +906,7 @@ def _read_coord(f):
 def _read_conne(f, label_length):
     """Read CONNE block data."""
     fmt = block_to_format["CONNE"]
-    conne = {"connections": {}, "connections_order": []}
+    conne = {"connections": {}}
 
     line = f.next()
     if not label_length:
@@ -930,7 +928,6 @@ def _read_conne(f, label_length):
                 "radiant_emittance_factor": data[9],
             }
 
-            conne["connections_order"].append(label)
         else:
             flag = line.startswith("+++")
             break
@@ -952,7 +949,7 @@ def _read_incon(f, label_length, eos=None, simulator="tough"):
         if eos in fmt
         else fmt["default"]
     )
-    incon = {"initial_conditions": {}, "initial_conditions_order": []}
+    incon = {"initial_conditions": {}}
 
     line = f.next()
     if not label_length:
@@ -1004,7 +1001,6 @@ def _read_incon(f, label_length, eos=None, simulator="tough"):
                 data += read_record(line, fmt[0])
 
             incon["initial_conditions"][label]["values"] = prune_values(data)
-            incon["initial_conditions_order"].append(label)
         else:
             flag = line.startswith("+++")
             break
