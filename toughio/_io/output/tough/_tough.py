@@ -98,7 +98,7 @@ def _read_table(f, file_type, label_length):
                             # Determine number of characters for index
                             idx = line.replace("-", " ").split()[0]
                             nidx = line.index(idx) + len(idx)
-                            ifmt = f"{idx}s"
+                            ifmt = f"{nidx}s"
 
                             # Determine number of characters between two Es
                             i1 = line.find("E")
