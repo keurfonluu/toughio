@@ -306,6 +306,10 @@ def write_buffer(
         out += _write_times(parameters)
         out += ["\n"] if space_between_blocks else []
 
+    if "HYSTE" in blocks and parameters["hysteresis_options"]:
+        out += _write_hyste(parameters)
+        out += ["\n"] if space_between_blocks else []
+
     if "FOFT" in blocks and len(parameters["element_history"]):
         out += _write_foft(parameters)
 
@@ -973,6 +977,25 @@ def _write_times(parameters):
 
     # Record 2
     out += write_record(data, fmt2, multi=True)
+
+    return out
+
+
+@check_parameters(dtypes["HYSTE"], keys="hysteresis_options")
+@block("HYSTE")
+def _write_hyste(parameters):
+    """Write HYSTE block data."""
+    from ._common import hysteresis_options
+
+    # Formats
+    fmt = block_to_format["HYSTE"]
+    fmt = str2format(fmt)
+
+    _hyste = deepcopy(hysteresis_options)
+    _hyste.update(parameters["hysteresis_options"])
+
+    values = [_hyste[k] for k in sorted(_hyste)]
+    out = write_record(values, fmt)
 
     return out
 

@@ -29,6 +29,7 @@ dtypes = {
         "solver": "dict",
         "generators": "array_like",
         "times": "array_like",
+        "hysteresis_options": "dict",
         "element_history": "array_like",
         "connection_history": "array_like",
         "generator_history": "array_like",
@@ -128,6 +129,7 @@ dtypes = {
     "MOP": {i + 1: "int" for i in range(24)},
     "MOPR": {i + 1: "int" for i in range(25)},
     "MOMOP": {i + 1: "int" for i in range(40)},
+    "HYSTE": {i + 1: "int" for i in range(3)},
     "SELEC": {"integers": "dict", "floats": "array_like"},
     "SOLVR": {
         "method": "int",

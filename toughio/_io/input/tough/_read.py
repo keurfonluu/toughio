@@ -148,6 +148,9 @@ def read_buffer(f, label_length, eos, simulator="tough"):
             elif line.startswith("TIMES"):
                 parameters.update(_read_times(fiter))
 
+            elif line.startswith("HYSTE"):
+                parameters.update(_read_hyste(fiter))
+
             elif line.startswith("FOFT"):
                 parameters.update(_read_oft(fiter, "FOFT", label_length))
 
@@ -684,6 +687,19 @@ def _read_times(f):
         times["times"] += prune_values(data)
 
     return times
+
+
+def _read_hyste(f):
+    """Read HYSTE block data."""
+    fmt = block_to_format["HYSTE"]
+    hyste = {"hysteresis_options": {}}
+
+    line = f.next()
+    data = read_record(line, fmt)
+    hyste["hysteresis_options"] = {k + 1: v for k, v in enumerate(data)}
+    hyste["hysteresis_options"] = prune_values(hyste["hysteresis_options"])
+
+    return hyste
 
 
 def _read_oft(f, oft, label_length):
