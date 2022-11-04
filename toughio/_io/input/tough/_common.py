@@ -14,6 +14,7 @@ blocks = {
     "INDOM",
     "MOMOP",
     "TIMES",
+    "HYSTE",
     "FOFT",
     "COFT",
     "GOFT",
@@ -49,6 +50,7 @@ _Parameters = {
     "options": {},
     "extra_options": {},
     "more_options": {},
+    "hysteresis_options": {},
     "selections": {},
     "solver": {},
     "generators": [],
@@ -141,6 +143,8 @@ options = {
 extra_options = {k + 1: None for k in range(24)}
 
 more_options = {k + 1: None for k in range(40)}
+
+hysteresis_options = {k + 1: None for k in range(3)}
 
 react_options = {k + 1: None for k in range(25)}
 

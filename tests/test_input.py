@@ -387,6 +387,18 @@ def test_times(write_read, times):
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-5)
 
 
+@pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
+def test_hyste(write_read):
+    parameters_ref = {
+        "hysteresis_options": {
+            k + 1: v for k, v in enumerate(np.random.randint(10, size=3))
+        },
+    }
+    parameters = write_read(parameters_ref)
+
+    assert helpers.allclose(parameters_ref, parameters)
+
+
 @pytest.mark.parametrize(
     "write_read, oft, n",
     [
