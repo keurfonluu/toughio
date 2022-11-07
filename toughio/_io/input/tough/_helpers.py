@@ -28,6 +28,7 @@ dtypes = {
         "selections": "dict",
         "solver": "dict",
         "generators": "array_like",
+        "boundary_conditions": "array_like",
         "times": "array_like",
         "hysteresis_options": "dict",
         "element_history": "array_like",
@@ -153,6 +154,12 @@ dtypes = {
         "conductivity_times": "array_like",
         "conductivity_factors": "array_like",
     },
+    "TIMBC": {
+        "label": "str",
+        "variable": "int",
+        "times": "scalar_array_like",
+        "values": "scalar_array_like",
+    },
     "OUTPT": {"format": "int", "shape": "array_like"},
     "OUTPU": {"format": "str", "variables": "array_like"},
     "ELEME": {
@@ -246,7 +253,7 @@ def check_parameters(input_types, keys=None, is_list=False):
             input_type = str_to_dtype[input_types[k]]
             if not (v is None or isinstance(v, input_type)):
                 raise TypeError(
-                    f"Invalid type for parameter '{k}' {f'in {keys}' if keys else ''}(expected {input_types[k]})."
+                    f"Invalid type for parameter '{k}'{f' in {keys}' if keys else ''} (expected {input_types[k]})."
                 )
 
     keys = [keys] if isinstance(keys, str) else keys

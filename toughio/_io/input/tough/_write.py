@@ -5,6 +5,7 @@ import numpy as np
 
 from ...._common import block_to_format, open_file, prune_values, str2format
 from ..._common import write_record
+from .._common import write_ffrecord
 from ._common import default
 from ._helpers import block, check_parameters, dtypes, write_model_record
 
@@ -321,6 +322,10 @@ def write_buffer(
 
     if "GENER" in blocks and parameters["generators"]:
         out += _write_gener(parameters, simulator)
+
+    if "TIMBC" in blocks and parameters["boundary_conditions"]:
+        out += _write_timbc(parameters)
+        out += ["\n"] if space_between_blocks else []
 
     if "DIFFU" in blocks and len(parameters["diffusion"]):
         out += _write_diffu(parameters)
@@ -1154,6 +1159,46 @@ def _write_gener(parameters, simulator="tough"):
         if ktab:
             out += write_record(data["conductivity_times"], fmt2, multi=True)
             out += write_record(data["conductivity_factors"], fmt2, multi=True)
+
+    return out
+
+
+@check_parameters(dtypes["TIMBC"], keys="boundary_conditions", is_list=True)
+@block("TIMBC")
+def _write_timbc(parameters):
+    """Write TIMBC block data."""
+    from ._common import boundary_conditions
+
+    out = []
+
+    # Record 1
+    ntptab = len(parameters["boundary_conditions"])
+    out += write_ffrecord([ntptab], end="\n")
+
+    for v in parameters["boundary_conditions"]:
+        # Load data
+        data = deepcopy(boundary_conditions)
+        data.update(v)
+
+        # Times
+        times = data["times"] if data["times"] is not None else []
+        values = data["values"] if data["values"] is not None else []
+        nbcp = len(times)
+
+        if len(values) < nbcp:
+            raise ValueError()
+
+        # Record 2
+        out += write_ffrecord([nbcp, data["variable"]], end="\n")
+
+        # Record 3
+        out += write_ffrecord([data["label"]], end="\n")
+
+        # Record 4
+        tmp = np.zeros(2 * nbcp)
+        tmp[::2] = times
+        tmp[1::2] = values[:nbcp]
+        out += write_ffrecord(tmp, end="\n")
 
     return out
 
