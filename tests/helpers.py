@@ -130,7 +130,7 @@ def random_string(n):
     return "".join(random.choice(ascii_lowercase) for _ in range(n))
 
 
-def random_label(label_length):
+def random_label(label_length=5):
     n = label_length - 3
     fmt = f"{{:0{n}d}}"
 

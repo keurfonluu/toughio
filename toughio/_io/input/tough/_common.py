@@ -19,6 +19,7 @@ blocks = {
     "COFT",
     "GOFT",
     "GENER",
+    "TIMBC",
     "DIFFU",
     "OUTPT",
     "OUTPU",
@@ -64,6 +65,7 @@ _Parameters = {
     "coordinates": False,
     "connections": {},
     "initial_conditions": {},
+    "boundary_conditions": {},
     "meshmaker": {},
     "default": {},
     "end_comments": "",
@@ -170,6 +172,13 @@ generators = {
     "n_layer": None,
     "conductivity_times": None,
     "conductivity_factors": None,
+}
+
+boundary_conditions = {
+    "label": None,
+    "variable": None,
+    "times": None,
+    "values": None,
 }
 
 output = {

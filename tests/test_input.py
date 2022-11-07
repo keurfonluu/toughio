@@ -491,6 +491,24 @@ def test_gener_delv(write_read):
 
 
 @pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
+def test_timbc(write_read):
+    n_rnd = np.random.randint(10) + 2
+    parameters_ref = {
+        "boundary_conditions": [
+            {
+                "label": helpers.random_label(),
+                "variable": np.random.randint(6),
+                "times": np.random.rand(10),
+                "values": np.random.rand(10)}
+            for _ in range(n_rnd)
+        ],
+    }
+    parameters = write_read(parameters_ref)
+
+    assert helpers.allclose(parameters_ref, parameters, atol=1.0e-8)
+
+
+@pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
 def test_diffu(write_read):
     n_phase = np.random.randint(8) + 1
     parameters_ref = {

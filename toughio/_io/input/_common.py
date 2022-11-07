@@ -35,20 +35,21 @@ def write_ffrecord(
     int_fmt="{:4d}",
     float_fmt="{{:9f}}",
     str_fmt="{:20}",
+    end="",
 ):
     """Write free-format record."""
     if verbose:
         if fmt:
             values = [to_str(value, f) for value, f, in zip(values, fmt)]
-            return [f"{' '.join(values)}"]
+            return [f"{' '.join(values)}{end}"]
 
         else:
             return [
-                f"{' '.join(to_str(value, int_fmt if isinstance(value, int) else float_fmt if isinstance(value, float) else str_fmt) for value in values)}"
+                f"{' '.join(to_str(value, int_fmt if isinstance(value, int) else float_fmt if isinstance(value, float) else str_fmt) for value in values)}{end}"
             ]
 
     else:
-        return [f"{' '.join(str(x) for x in values)}"]
+        return [f"{' '.join(str(x) for x in values)}{end}"]
 
 
 def read_end_comments(fiter):

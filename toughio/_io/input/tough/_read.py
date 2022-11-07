@@ -163,6 +163,9 @@ def read_buffer(f, label_length, eos, simulator="tough"):
             elif line.startswith("GENER"):
                 parameters.update(_read_gener(fiter, label_length, simulator))
 
+            elif line.startswith("TIMBC"):
+                parameters.update(_read_timbc(fiter))
+
             elif line.startswith("DIFFU"):
                 parameters.update(_read_diffu(fiter))
 
@@ -792,6 +795,44 @@ def _read_gener(f, label_length, simulator="tough"):
     return {
         "generators": [prune_values(generator) for generator in gener["generators"]]
     }
+
+
+def _read_timbc(f):
+    """Read TIMBC block data."""
+    timbc = {"boundary_conditions": []}
+
+    # Record 1
+    line = f.next().strip()
+    ntptab = int(line)
+
+    for _ in range(ntptab):
+        # Record 2
+        line = f.next().strip()
+        data = [int(x) for x in line.split()]
+        if len(data) < 2:
+            raise ReadError()
+
+        nbcp = data[0]
+        nbcpv = data[1]
+
+        # Record 3
+        bcelm = f.next().strip()
+
+        # Record 4
+        line = f.next().strip()
+        data = [float(x) for x in line.split()]
+        if len(data) < 2 * nbcp:
+            raise ReadError()
+
+        tmp = {
+            "label": bcelm,
+            "variable": nbcpv,
+            "times": data[::2],
+            "values": data[1::2],
+        }
+        timbc["boundary_conditions"].append(tmp)
+
+    return timbc
 
 
 def _read_diffu(f):
