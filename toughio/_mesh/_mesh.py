@@ -194,7 +194,10 @@ class Mesh(object):
 
         # Prune duplicate points
         unique_points, pind, pinv = np.unique(
-            mesh.points, axis=0, return_index=True, return_inverse=True,
+            mesh.points,
+            axis=0,
+            return_index=True,
+            return_inverse=True,
         )
         if len(unique_points) < len(mesh.points):
             mesh.points = unique_points

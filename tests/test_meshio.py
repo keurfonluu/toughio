@@ -41,7 +41,9 @@ def test_meshio(mesh_ref, file_format, binary):
         writer_kws["binary"] = binary
 
     mesh = write_read(
-        mesh=mesh_ref, writer_kws=writer_kws, reader_kws={"file_format": file_format},
+        mesh=mesh_ref,
+        writer_kws=writer_kws,
+        reader_kws={"file_format": file_format},
     )
 
     # Some meshes do not support point and/or cell data
