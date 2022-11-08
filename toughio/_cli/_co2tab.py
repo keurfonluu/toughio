@@ -33,7 +33,9 @@ def _get_parser():
 
     # Output path
     parser.add_argument(
-        "path", type=str, help="directory path",
+        "path",
+        type=str,
+        help="directory path",
     )
 
     return parser

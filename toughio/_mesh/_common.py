@@ -116,7 +116,7 @@ def labeler(n_cells, label_length=None):
     n = label_length - 3
     fmt = f"{{: >{n}}}"
     alpha = np.array(list(ascii_uppercase))
-    numer = np.array([fmt.format(i) for i in range(10 ** n)])
+    numer = np.array([fmt.format(i) for i in range(10**n)])
     nomen = np.concatenate(([f"{i + 1:1}" for i in range(9)], alpha))
 
     q1, r1 = np.divmod(np.arange(n_cells), numer.size)

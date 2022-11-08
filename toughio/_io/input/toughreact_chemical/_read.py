@@ -130,7 +130,10 @@ def _read_akin(f):
         coeffs = data[1 : 2 * ncp + 1 : 2]
         tmp = {
             "species": [
-                {"name": name, "stoichiometric_coeff": to_float(coeff),}
+                {
+                    "name": name,
+                    "stoichiometric_coeff": to_float(coeff),
+                }
                 for name, coeff in zip(names, coeffs)
             ]
         }

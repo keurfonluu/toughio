@@ -188,7 +188,11 @@ dtypes = {
         "permeability": "scalar_array_like",
     },
     "MESHM": {"type": "str", "parameters": "array_like", "angle": "scalar"},
-    "POISE": {"start": "array_like", "end": "array_like", "aperture": "scalar",},
+    "POISE": {
+        "start": "array_like",
+        "end": "array_like",
+        "aperture": "scalar",
+    },
 }
 
 
