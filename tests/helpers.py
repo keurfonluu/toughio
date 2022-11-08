@@ -130,11 +130,11 @@ def random_string(n):
     return "".join(random.choice(ascii_lowercase) for _ in range(n))
 
 
-def random_label(label_length):
+def random_label(label_length=5):
     n = label_length - 3
     fmt = f"{{:0{n}d}}"
 
-    return random_string(3) + fmt.format(np.random.randint(10 ** n))
+    return random_string(3) + fmt.format(np.random.randint(10**n))
 
 
 def allclose(x, y, atol=1.0e-8, ignore_keys=None, ignore_none=False):

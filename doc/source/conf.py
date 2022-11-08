@@ -50,14 +50,8 @@ extensions = [
 from sphinx_gallery.sorting import FileNameSortKey
 
 sphinx_gallery_conf = {
-    "examples_dirs": [
-        "../../examples/heat_pipe_in_cylindrical_geometry/",
-        "../../examples/co2_leakage_along_a_fault/",
-    ],
-    "gallery_dirs": [
-        "examples/heat_pipe_in_cylindrical_geometry/",
-        "examples/co2_leakage_along_a_fault/",
-    ],
+    "examples_dirs": ["../../examples/"],
+    "gallery_dirs": ["examples/"],
     "filename_pattern": r"\.py",
     "download_all_examples": False,
     "within_subsection_order": FileNameSortKey,
@@ -125,8 +119,6 @@ autoclass_content = "both"
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-import pydata_sphinx_theme
-
 html_theme = "pydata_sphinx_theme"
 html_theme_path = [
     "_themes",

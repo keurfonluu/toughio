@@ -160,7 +160,12 @@ def parse_rz2d(parameters):
 
             rmax += n * size
             dr.append(
-                {"n_increment": n, "size": size, "type": "uniform", "radius_ref": None,}
+                {
+                    "n_increment": n,
+                    "size": size,
+                    "type": "uniform",
+                    "radius_ref": None,
+                }
             )
 
         elif parameter["type"] == "logar":

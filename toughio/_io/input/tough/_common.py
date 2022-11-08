@@ -14,10 +14,12 @@ blocks = {
     "INDOM",
     "MOMOP",
     "TIMES",
+    "HYSTE",
     "FOFT",
     "COFT",
     "GOFT",
     "GENER",
+    "TIMBC",
     "DIFFU",
     "OUTPT",
     "OUTPU",
@@ -49,6 +51,7 @@ _Parameters = {
     "options": {},
     "extra_options": {},
     "more_options": {},
+    "hysteresis_options": {},
     "selections": {},
     "solver": {},
     "generators": [],
@@ -62,6 +65,7 @@ _Parameters = {
     "coordinates": False,
     "connections": {},
     "initial_conditions": {},
+    "boundary_conditions": {},
     "meshmaker": {},
     "default": {},
     "end_comments": "",
@@ -142,6 +146,8 @@ extra_options = {k + 1: None for k in range(24)}
 
 more_options = {k + 1: None for k in range(40)}
 
+hysteresis_options = {k + 1: None for k in range(3)}
+
 react_options = {k + 1: None for k in range(25)}
 
 solver = {
@@ -166,6 +172,13 @@ generators = {
     "n_layer": None,
     "conductivity_times": None,
     "conductivity_factors": None,
+}
+
+boundary_conditions = {
+    "label": None,
+    "variable": None,
+    "times": None,
+    "values": None,
 }
 
 output = {

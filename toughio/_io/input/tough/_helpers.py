@@ -28,7 +28,9 @@ dtypes = {
         "selections": "dict",
         "solver": "dict",
         "generators": "array_like",
+        "boundary_conditions": "array_like",
         "times": "array_like",
+        "hysteresis_options": "dict",
         "element_history": "array_like",
         "connection_history": "array_like",
         "generator_history": "array_like",
@@ -128,6 +130,7 @@ dtypes = {
     "MOP": {i + 1: "int" for i in range(24)},
     "MOPR": {i + 1: "int" for i in range(25)},
     "MOMOP": {i + 1: "int" for i in range(40)},
+    "HYSTE": {i + 1: "int" for i in range(3)},
     "SELEC": {"integers": "dict", "floats": "array_like"},
     "SOLVR": {
         "method": "int",
@@ -150,6 +153,12 @@ dtypes = {
         "n_layer": "int",
         "conductivity_times": "array_like",
         "conductivity_factors": "array_like",
+    },
+    "TIMBC": {
+        "label": "str",
+        "variable": "int",
+        "times": "scalar_array_like",
+        "values": "scalar_array_like",
     },
     "OUTPT": {"format": "int", "shape": "array_like"},
     "OUTPU": {"format": "str", "variables": "array_like"},
@@ -179,7 +188,11 @@ dtypes = {
         "permeability": "scalar_array_like",
     },
     "MESHM": {"type": "str", "parameters": "array_like", "angle": "scalar"},
-    "POISE": {"start": "array_like", "end": "array_like", "aperture": "scalar",},
+    "POISE": {
+        "start": "array_like",
+        "end": "array_like",
+        "aperture": "scalar",
+    },
 }
 
 
@@ -244,7 +257,7 @@ def check_parameters(input_types, keys=None, is_list=False):
             input_type = str_to_dtype[input_types[k]]
             if not (v is None or isinstance(v, input_type)):
                 raise TypeError(
-                    f"Invalid type for parameter '{k}' {f'in {keys}' if keys else ''}(expected {input_types[k]})."
+                    f"Invalid type for parameter '{k}'{f' in {keys}' if keys else ''} (expected {input_types[k]})."
                 )
 
     keys = [keys] if isinstance(keys, str) else keys

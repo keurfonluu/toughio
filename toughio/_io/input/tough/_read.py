@@ -148,6 +148,9 @@ def read_buffer(f, label_length, eos, simulator="tough"):
             elif line.startswith("TIMES"):
                 parameters.update(_read_times(fiter))
 
+            elif line.startswith("HYSTE"):
+                parameters.update(_read_hyste(fiter))
+
             elif line.startswith("FOFT"):
                 parameters.update(_read_oft(fiter, "FOFT", label_length))
 
@@ -159,6 +162,9 @@ def read_buffer(f, label_length, eos, simulator="tough"):
 
             elif line.startswith("GENER"):
                 parameters.update(_read_gener(fiter, label_length, simulator))
+
+            elif line.startswith("TIMBC"):
+                parameters.update(_read_timbc(fiter))
 
             elif line.startswith("DIFFU"):
                 parameters.update(_read_diffu(fiter))
@@ -686,6 +692,19 @@ def _read_times(f):
     return times
 
 
+def _read_hyste(f):
+    """Read HYSTE block data."""
+    fmt = block_to_format["HYSTE"]
+    hyste = {"hysteresis_options": {}}
+
+    line = f.next()
+    data = read_record(line, fmt)
+    hyste["hysteresis_options"] = {k + 1: v for k, v in enumerate(data)}
+    hyste["hysteresis_options"] = prune_values(hyste["hysteresis_options"])
+
+    return hyste
+
+
 def _read_oft(f, oft, label_length):
     """Read FOFT, COFT and GOFT blocks data."""
     key = oft_to_key[oft]
@@ -756,7 +775,11 @@ def _read_gener(f, label_length, simulator="tough"):
 
             else:
                 tmp.update(
-                    {"times": None, "rates": data[9], "specific_enthalpy": data[10],}
+                    {
+                        "times": None,
+                        "rates": data[9],
+                        "specific_enthalpy": data[10],
+                    }
                 )
 
             if ltab and tmp["type"] == "DELV":
@@ -776,6 +799,44 @@ def _read_gener(f, label_length, simulator="tough"):
     return {
         "generators": [prune_values(generator) for generator in gener["generators"]]
     }
+
+
+def _read_timbc(f):
+    """Read TIMBC block data."""
+    timbc = {"boundary_conditions": []}
+
+    # Record 1
+    line = f.next().strip()
+    ntptab = int(line)
+
+    for _ in range(ntptab):
+        # Record 2
+        line = f.next().strip()
+        data = [int(x) for x in line.split()]
+        if len(data) < 2:
+            raise ReadError()
+
+        nbcp = data[0]
+        nbcpv = data[1]
+
+        # Record 3
+        bcelm = f.next().strip()
+
+        # Record 4
+        line = f.next().strip()
+        data = [float(x) for x in line.split()]
+        if len(data) < 2 * nbcp:
+            raise ReadError()
+
+        tmp = {
+            "label": bcelm,
+            "variable": nbcpv,
+            "times": data[::2],
+            "values": data[1::2],
+        }
+        timbc["boundary_conditions"].append(tmp)
+
+    return timbc
 
 
 def _read_diffu(f):

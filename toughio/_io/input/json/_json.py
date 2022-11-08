@@ -36,13 +36,11 @@ def read(filename):
     if "react" in parameters and "options" in parameters["react"]:
         parameters["react"]["options"] = to_int(parameters["react"]["options"])
 
-    if "extra_options" in parameters:
-        parameters["extra_options"] = to_int(parameters["extra_options"])
+    for key in {"extra_options", "more_options", "hysteresis_options"}:
+        if key in parameters:
+            parameters[key] = to_int(parameters[key])
 
-    if "more_options" in parameters:
-        parameters["more_options"] = to_int(parameters["more_options"])
-
-    if "selections" in parameters:
+    if "selections" in parameters and "integers" in parameters["selections"]:
         parameters["selections"]["integers"] = to_int(
             parameters["selections"]["integers"]
         )

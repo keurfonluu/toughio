@@ -1,5 +1,5 @@
 CO\ :sub:`2`\  leakage along a fault
-====================================
+------------------------------------
 
 The model geometry used in this example is inspired from the paper:
 
