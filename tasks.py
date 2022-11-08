@@ -14,6 +14,11 @@ def build(c):
 
 
 @task
+def html(c):
+    c.run("sphinx-build -b html doc/source doc/build")
+
+
+@task
 def tag(c):
     c.run(f"git tag v{toughio.__version__}")
     c.run("git push --tags")
