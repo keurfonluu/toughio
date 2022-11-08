@@ -64,6 +64,7 @@ A TOUGH input file is defined as follows:
         "more_options": dict,
         "selections": dict,
         "generators": list[dict],
+        "boundary_conditions": list[dict],
         "diffusion": list[list],
         "times": list[float],
         "element_history": list[str],
@@ -218,6 +219,22 @@ A generator is defined as follows:
 If ``"times"`` is provided, ``"rates"`` and ``"specific_enthalpy"`` must be provided as well as lists of equal length.
 
 
+Time-dependent boundary conditions
+**********************************
+
+Time-dependent boundary conditions (block TIMBC) are defined in ``"boundary_conditions"`` as a list of dictionaries repeated for each fixed variable and element.
+A time-dependent boundary condition is defined as follows:
+
+.. code-block::
+
+    {
+        "label": str,
+        "variable": int,
+        "times": list[float],
+        "values": list[float],
+    }
+
+
 Diffusion
 *********
 
@@ -230,6 +247,20 @@ History
 
 Outputs can be generated at specific time steps in ``"times"`` (block TIMES) defined as a list where each value corresponds to a time step at which an output is desired.
 Time-dependent outputs at specific element, connection or generator can be requested in ``"element_history"``, ``"connection_history"`` and ``"generator_history"`` as a list where each value is the label associated to the desired elements/connections.
+
+
+Hysteresis options
+******************
+
+Hysteresis options are defined in ``"hysteresis_options"`` as a dictionary:
+
+.. code-block::
+
+    {
+        1: int,
+        2: int,
+        3: int,
+    }
 
 
 Output
