@@ -1,6 +1,6 @@
-from collections.abc import Sequence
 import os
 import tempfile
+from collections.abc import Sequence
 
 import numpy as np
 
