@@ -892,9 +892,13 @@ def _write_selec(parameters):
     # Record 2
     if ndim == 1:
         out += write_record(data["floats"], fmt2)
+
     elif ndim == 2:
         for x in data["floats"]:
             out += write_record(x, fmt2)
+
+    else:
+        out += write_record([], fmt2)
 
     return out
 
