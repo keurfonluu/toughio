@@ -22,9 +22,8 @@ jobs:
             python-version: '3.9'
       - name: Install OSMesa VTK
         run: |
-          sudo apt clean
-          sudo apt update
-          sudo apt install libosmesa6-dev libgl1-mesa-dev
+          sudo apt update retry --option="APT::Acquire::Retries=3"
+          sudo apt install libosmesa6-dev libgl1-mesa-dev retry --option="APT::Acquire::Retries=3"
           pip install https://github.com/pyvista/pyvista-wheels/raw/main/vtk-osmesa-9.1.0-cp39-cp39-linux_x86_64.whl
       - name: Install libGLU for pygmsh
         run: |
