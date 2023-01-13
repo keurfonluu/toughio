@@ -171,6 +171,12 @@ def allclose(x, y, atol=1.0e-8, ignore_keys=None, ignore_none=False):
                 if x.cell_data:
                     assert allclose(x.cell_data, y.cell_data, atol=atol)
 
+            elif isinstance(x, toughio.CellBlock):
+                assert isinstance(y, toughio.CellBlock)
+
+                assert allclose(x.type, y.type, atol=atol)
+                assert allclose(x.data, y.data, atol=atol)
+
             elif isinstance(x, toughio.Output):
                 assert isinstance(y, toughio.Output)
 
