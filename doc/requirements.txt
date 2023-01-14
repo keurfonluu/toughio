@@ -1,6 +1,6 @@
 pygmsh
 seaborn
-sphinx
+sphinx == 5.3
 sphinx-argparse
 sphinx-gallery
 pydata-sphinx-theme

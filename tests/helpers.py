@@ -1,5 +1,6 @@
 import os
 import tempfile
+from collections.abc import Sequence
 
 import numpy as np
 
@@ -181,18 +182,16 @@ def allclose(x, y, atol=1.0e-8, ignore_keys=None, ignore_none=False):
                 if np.ndim(x.labels) != 0:
                     assert allclose(x.labels, y.labels, atol=atol)
 
-            elif isinstance(x, str):
+            # str is a Sequence
+            elif isinstance(x, (str, type(None))):
                 assert x == y
 
-            elif x is None:
-                assert y is None
-
-            elif np.ndim(x) == 0:
-                assert np.allclose(x, y, atol=atol)
-
-            else:
+            elif isinstance(x, (Sequence, np.ndarray)):
                 for xx, yy in zip(x, y):
                     assert allclose(xx, yy, atol=atol, ignore_none=ignore_none)
+
+            else:
+                assert np.allclose(x, y, atol=atol)
 
         except Exception as e:
             print("x =", x, "\ny =", y, "\n")

@@ -183,10 +183,10 @@ This Software was developed under funding from the U.S. Department of Energy and
 .. |DOI| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.3961278.svg?style=flat
    :target: https://doi.org/10.5281/zenodo.3961278
 
-.. |Build| image:: https://img.shields.io/github/workflow/status/keurfonluu/toughio/Python%20package
+.. |Build| image:: https://img.shields.io/github/actions/workflow/status/keurfonluu/toughio/ci.yml
    :target: https://github.com/keurfonluu/toughio
 
-.. |Docs| image:: https://img.shields.io/github/workflow/status/keurfonluu/toughio/Build%20documentation?label=docs
+.. |Docs| image:: https://img.shields.io/github/actions/workflow/status/keurfonluu/toughio/doc.yml?label=docs
    :target: https://keurfonluu.github.io/toughio/
 
 .. |JOSS| image:: https://joss.theoj.org/papers/10.21105/joss.02412/status.svg
