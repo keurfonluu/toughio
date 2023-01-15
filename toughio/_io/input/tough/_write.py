@@ -835,15 +835,8 @@ def _write_param(parameters, eos_=None, simulator="tough"):
             [parameters["default"]["phase_composition"]], str2format("5d")
         )
 
-    # Record 4
-    n = min(4, len(parameters["default"]["initial_condition"]))
-    values = parameters["default"]["initial_condition"][:n]
-    out += write_record(values, fmt5)
-
-    # Record 5 (EOS7R)
-    if len(parameters["default"]["initial_condition"]) > 4:
-        values = parameters["default"]["initial_condition"][n:]
-        out += write_record(values, fmt5)
+    # Record 5
+    out += write_record(parameters["default"]["initial_condition"], fmt5, multi=True)
 
     return out
 
@@ -933,17 +926,7 @@ def _write_indom(parameters, eos_):
             out += write_record(values, fmt1)
 
             if cond1:
-                data = v["initial_condition"]
-
-                # Record 2
-                n = min(4, len(data))
-                values = list(data[:n])
-                out += write_record(values, fmt2)
-
-                # Record 3
-                if len(data) > 4:
-                    values = list(data[4:])
-                    out += write_record(values, fmt2)
+                out += write_record(v["initial_condition"], fmt2, multi=True)
 
             else:
                 out += ["\n"]
@@ -1423,12 +1406,7 @@ def _write_incon(parameters, eos_=None, simulator="tough"):
         out += write_record(values, fmt1)
 
         # Record 2
-        n = min(4, len(data["values"]))
-        out += write_record(data["values"][:n], fmt2)
-
-        # Record 3 (EOS7R)
-        if len(data["values"]) > 4:
-            out += write_record(data["values"][4:], fmt2)
+        out += write_record(data["values"], fmt2, multi=True)
 
     return out
 

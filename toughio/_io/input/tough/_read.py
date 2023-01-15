@@ -3,7 +3,7 @@ from ...._exceptions import ReadError
 from ...._helpers import FileIterator
 from ..._common import read_record
 from .._common import read_end_comments
-from ._helpers import read_model_record
+from ._helpers import read_model_record, read_primary_variables
 
 __all__ = [
     "read",
@@ -566,16 +566,8 @@ def _read_param(f, eos=None):
         data = read_record(line, "5d")
         param["default"] = {"phase_composition": data[0]}
 
-    # Record 4 and record 5 (EOS7R)
-    line = f.next()
-    data = read_record(line, fmt[5])
-
-    i = f.tell()
-    try:
-        line = f.next()
-        data += read_record(line, fmt[5])
-    except ValueError:
-        f.seek(i, increment=-1)
+    # Record 5
+    data = read_primary_variables(f, fmt[5])
 
     if "default" not in param:
         param["default"] = {}
@@ -620,7 +612,6 @@ def _read_indom(f, eos=None):
     indom = {"rocks": {}}
 
     line = f.next()
-    two_lines = True
     while True:
         if line.strip():
             # Record 1
@@ -629,23 +620,7 @@ def _read_indom(f, eos=None):
             phase_composition = data[1]  # TMVOC
 
             # Record 2
-            line = f.next()
-            data = read_record(line, fmt[0])
-
-            # Record 3 (EOS7R)
-            if two_lines:
-                i = f.tell()
-                line = f.next()
-
-                if line.strip():
-                    try:
-                        data += read_record(line, fmt[0])
-                    except ValueError:
-                        two_lines = False
-                        f.seek(i, increment=-1)
-                else:
-                    f.seek(i, increment=-1)
-
+            data = read_primary_variables(f, fmt[0])
             data = prune_values(data)
             indom["rocks"][rock] = {"initial_condition": data}
 
@@ -1017,20 +992,6 @@ def _read_incon(f, label_length, eos=None, simulator="tough"):
         label_length = get_label_length(line[:9])
     label_format = f"{{:<{label_length}}}"
 
-    # Guess the number of lines to read for primary variables
-    i = f.tell()
-    _ = f.next()  # First line for primary variables
-    tmp = f.next()  # Second line for primary variables or next element
-    f.seek(i, increment=-2)  # Rewind
-
-    # If second line can be parsed as Record 1, only one line for variables
-    try:
-        _ = read_record(tmp, fmt2[label_length])
-        two_lines = False
-
-    except ValueError:
-        two_lines = True
-
     flag = False
     while True:
         if line.strip() and not line.startswith("+++"):
@@ -1053,15 +1014,9 @@ def _read_incon(f, label_length, eos=None, simulator="tough"):
                 incon["initial_conditions"][label]["userx"] = userx if userx else None
 
             # Record 2
-            line = f.next()
-            data = read_record(line, fmt[0])
-
-            # Record 3 (EOS7R)
-            if two_lines:
-                line = f.next()
-                data += read_record(line, fmt[0])
-
+            data = read_primary_variables(f, fmt[0])
             incon["initial_conditions"][label]["values"] = prune_values(data)
+
         else:
             flag = line.startswith("+++")
             break

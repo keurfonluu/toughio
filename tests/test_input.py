@@ -269,10 +269,10 @@ def test_solvr(write_read):
     [
         (write_read_tough, np.random.rand(), 4),
         (write_read_tough, np.random.rand(np.random.randint(100) + 1), 4),
-        (write_read_tough, np.random.rand(np.random.randint(100) + 1), 6),
+        (write_read_tough, np.random.rand(np.random.randint(100) + 1), 10),
         (write_read_json, np.random.rand(), 4),
         (write_read_json, np.random.rand(np.random.randint(100) + 1), 4),
-        (write_read_json, np.random.rand(np.random.randint(100) + 1), 6),
+        (write_read_json, np.random.rand(np.random.randint(100) + 1), 10),
     ],
 )
 def test_param(write_read, t_steps, num_pvars):
@@ -346,11 +346,11 @@ def test_selec(write_read, num_floats):
     "write_read, num_pvars, num_items",
     [
         (write_read_tough, 4, None),
-        (write_read_tough, 6, None),
+        (write_read_tough, 10, None),
         (write_read_tough, 4, 1),
-        (write_read_tough, 6, 1),
+        (write_read_tough, 10, 1),
         (write_read_json, 4, None),
-        (write_read_json, 6, None),
+        (write_read_json, 10, None),
     ],
 )
 def test_indom(write_read, num_pvars, num_items):
@@ -659,12 +659,12 @@ def test_conne(write_read, label_length):
     "write_read, label_length, num_pvars, num_items",
     [
         (write_read_tough, 5, 4, None),
-        (write_read_tough, 5, 6, None),
+        (write_read_tough, 5, 10, None),
         (write_read_tough, 6, 4, None),
         (write_read_tough, 5, 4, 1),
-        (write_read_tough, 5, 6, 1),
+        (write_read_tough, 5, 10, 1),
         (write_read_json, 5, 4, None),
-        (write_read_json, 5, 6, None),
+        (write_read_json, 5, 10, None),
         (write_read_json, 6, 4, None),
     ],
 )
