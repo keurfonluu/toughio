@@ -325,3 +325,26 @@ def write_model_record(data, key, fmt):
 
     else:
         return write_record([], [])
+
+
+def read_primary_variables(f, fmt):
+    """Read primary variables."""
+    data = []
+
+    while True:
+        i = f.tell()
+        line = f.next()
+
+        if line.strip():
+            try:
+                data += read_record(line, fmt)
+
+            except ValueError:
+                break
+
+        else:
+            break
+
+    f.seek(i, increment=-1)
+
+    return data
