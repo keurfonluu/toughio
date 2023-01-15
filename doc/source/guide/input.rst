@@ -101,12 +101,14 @@ The equation-of-state (EOS, block MULTI) is defined by the keyword ``"eos"`` whi
 Alternatively, the number of components and phases can be set individually by the keywords ``"n_component"`` and ``"n_phase"``, respectively. These keywords supersede the values set by ``"eos"``.
 Isothermal simulations can be carried out by setting ``"isothermal"`` to ``True``. In that case, the number of equations is equal to the number of components.
 
+.. _rock_properties:
 
 Rock properties
 ***************
 
 Rock properties (block ROCKS) are defined using the keyword ``"rocks"`` as a dictionary where keys refer to the names of the rocks and the values to their properties.
 Domainwise initial conditions (block INDOM) can also be defined by providing the keyword ``"initial_condition"``.
+For TMVOC, an additional keyword ``"phase_composition"`` can be used to define phase composition materialwise (block ROCKS), domainwise (block INDOM) or elementwise (block INCON).
 For instance, for a rock called ``"rock1"``, its properties are defined as follows:
 
 .. code-block::
@@ -124,6 +126,7 @@ For instance, for a rock called ``"rock1"``, its properties are defined as follo
         "klinkenberg_parameter": float,
         "distribution_coefficient_3": float,
         "distribution_coefficient_4": float,
+        "phase_composition": int,
         "initial_condition": list[float],
         "relative_permeability": {
             "id": int,
@@ -392,7 +395,7 @@ The keyword ``"type"`` denotes here the type of increments to generate. The foll
 TMVOC
 *****
 
-Two additional keywords can be set to define parameters specific to TMVOC.
+In addition to ``"phase_composition"`` (see :ref:`rock_properties`), two other keywords can be set to define parameters specific to TMVOC.
 
 Chemical properties (block CHEMP) are defined using the keyword ``"chemical_properties"`` as a dictionary where keys refer to the names of the chemical species and the values to their properties.
 For instance, for a chemical specie called ``"my_chemical"``, its properties are defined as follows:
@@ -435,6 +438,10 @@ For instance, for a chemical specie called ``"my_chemical"``, its properties are
     }
 
 Non-condensible gases (block NCGAS) can be listed using keyword ``"non_condensible_gas"`` as a list where each value is the name of a non-condensible gas.
+
+.. note::
+
+    For TMVOC input files, the argument ``eos="tmvoc"`` **must** be provided to the functions :func:`toughio.read_input` and :func:`toughio.write_input`.
 
 
 TOUGHREACT (flow.inp)
