@@ -6,7 +6,6 @@ __all__ = [
 
 
 class vanGenuchten(BaseCapillarity):
-
     _id = 7
     _name = "van Genuchten"
 

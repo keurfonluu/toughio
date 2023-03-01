@@ -8,7 +8,6 @@ __all__ = [
 
 
 class Pickens(BaseCapillarity):
-
     _id = 2
     _name = "Pickens"
 

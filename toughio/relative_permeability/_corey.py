@@ -6,7 +6,6 @@ __all__ = [
 
 
 class Corey(BaseRelativePermeability):
-
     _id = 3
     _name = "Corey"
 
