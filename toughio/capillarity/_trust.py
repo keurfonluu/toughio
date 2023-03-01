@@ -6,7 +6,6 @@ __all__ = [
 
 
 class TRUST(BaseCapillarity):
-
     _id = 3
     _name = "TRUST"
 

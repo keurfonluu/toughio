@@ -333,7 +333,7 @@ def read_primary_variables(f, fmt, num_pvars):
 
     if num_pvars is not None:
         n = int(np.ceil(num_pvars / 4))
-        
+
         for _ in range(n):
             line = f.next()
             data += read_record(line, fmt)

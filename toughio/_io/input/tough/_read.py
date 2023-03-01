@@ -201,7 +201,9 @@ def read_buffer(f, label_length, eos, simulator="tough"):
                     break
 
             elif line.startswith("INCON"):
-                incon, flag, num_pvars = _read_incon(fiter, label_length, num_pvars, eos, simulator)
+                incon, flag, num_pvars = _read_incon(
+                    fiter, label_length, num_pvars, eos, simulator
+                )
                 parameters.update(incon)
 
                 if flag:
