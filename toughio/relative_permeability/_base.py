@@ -12,7 +12,6 @@ ABC = ABCMeta("ABC", (object,), {"__slots__": ()})
 
 
 class BaseRelativePermeability(ABC):
-
     _id = None
     _name = ""
 

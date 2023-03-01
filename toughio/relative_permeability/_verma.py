@@ -6,7 +6,6 @@ __all__ = [
 
 
 class Verma(BaseRelativePermeability):
-
     _id = 8
     _name = "Verma"
 

@@ -6,7 +6,6 @@ __all__ = [
 
 
 class FattKlikoff(BaseRelativePermeability):
-
     _id = 6
     _name = "Fatt-Klikoff"
 
