@@ -730,13 +730,13 @@ def _read_gener(f, label_length, simulator="tough"):
     line = f.next()
     if not label_length:
         label_length = get_label_length(line[:9])
-    label_format = f"{{:<{label_length}}}"
+    label_format = f"{{:>{label_length}}}"
 
     while True:
         if line.strip():
             data = read_record(line, fmt[label_length])
             tmp = {
-                "label": label_format.format(data[0]).rstrip(),
+                "label": label_format.format(data[0]),
                 "name": f"{data[1]:>5}" if data[1] else data[1],
                 "nseq": data[2],
                 "nadd": data[3],
@@ -899,12 +899,13 @@ def _read_eleme(f, label_length):
     line = f.next()
     if not label_length:
         label_length = get_label_length(line[:9])
-    label_format = f"{{:<{label_length}}}"
+    label_format = f"{{:>{label_length}}}"
 
     while True:
         if line.strip():
             data = read_record(line, fmt[label_length])
-            label = label_format.format(data[0]).rstrip()
+            label = label_format.format(data[0])
+            label = label.lstrip() if label.lstrip().isalpha() else label
             rock = data[3]
             if rock:
                 rock = rock.strip()
@@ -998,14 +999,14 @@ def _read_incon(f, label_length, num_pvars, eos=None, simulator="tough"):
     line = f.next()
     if not label_length:
         label_length = get_label_length(line[:9])
-    label_format = f"{{:<{label_length}}}"
+    label_format = f"{{:>{label_length}}}"
 
     flag = False
     while True:
         if line.strip() and not line.startswith("+++"):
             # Record 1
             data = read_record(line, fmt2[label_length])
-            label = label_format.format(data[0]).rstrip()
+            label = label_format.format(data[0])
             incon["initial_conditions"][label] = {"porosity": data[3]}
 
             if simulator == "toughreact":
