@@ -116,7 +116,9 @@ def read_buffer(f, label_length, eos, simulator="tough"):
 
             elif line.startswith("MULTI"):
                 parameters.update(_read_multi(fiter))
-                num_pvars = parameters["n_component"] + 1
+
+                if not num_pvars:
+                    num_pvars = parameters["n_component"] + 1
 
             elif line.startswith("SOLVR"):
                 parameters.update(_read_solvr(fiter))
@@ -585,7 +587,7 @@ def _read_param(f, num_pvars, eos=None):
         data = prune_values(data)
         param["default"]["initial_condition"] = data
 
-    if num_pvars:
+    if not num_pvars:
         num_pvars = len(data)
 
     # Remove Nones
@@ -636,7 +638,7 @@ def _read_indom(f, num_pvars, eos=None):
             data = prune_values(data)
             indom["rocks"][rock] = {"initial_condition": data}
 
-            if num_pvars:
+            if not num_pvars:
                 num_pvars = len(data)
 
             if eos == "tmvoc":
@@ -1032,7 +1034,7 @@ def _read_incon(f, label_length, num_pvars, eos=None, simulator="tough"):
             data = prune_values(data)
             incon["initial_conditions"][label]["values"] = data
 
-            if num_pvars:
+            if not num_pvars:
                 num_pvars = len(data)
 
         else:
