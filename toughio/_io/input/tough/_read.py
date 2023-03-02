@@ -154,16 +154,20 @@ def read_buffer(f, label_length, eos, simulator="tough"):
                 parameters.update(_read_hyste(fiter))
 
             elif line.startswith("FOFT"):
-                parameters.update(_read_oft(fiter, "FOFT", label_length))
+                oft, label_length = _read_oft(fiter, "FOFT", label_length)
+                parameters.update(oft)
 
             elif line.startswith("COFT"):
-                parameters.update(_read_oft(fiter, "COFT", label_length))
+                oft, label_length = _read_oft(fiter, "COFT", label_length)
+                parameters.update(oft)
 
             elif line.startswith("GOFT"):
-                parameters.update(_read_oft(fiter, "GOFT", label_length))
+                oft, label_length = _read_oft(fiter, "GOFT", label_length)
+                parameters.update(oft)
 
             elif line.startswith("GENER"):
-                parameters.update(_read_gener(fiter, label_length, simulator))
+                gener, label_length = _read_gener(fiter, label_length, simulator)
+                parameters.update(gener)
 
             elif line.startswith("TIMBC"):
                 parameters.update(_read_timbc(fiter))
@@ -182,7 +186,8 @@ def read_buffer(f, label_length, eos, simulator="tough"):
                 parameters.update(_read_outpu(fiter))
 
             elif line.startswith("ELEME"):
-                parameters.update(_read_eleme(fiter, label_length))
+                eleme, label_length = _read_eleme(fiter, label_length)
+                parameters.update(eleme)
                 parameters["coordinates"] = False
 
             elif line.startswith("COORD"):
@@ -194,14 +199,14 @@ def read_buffer(f, label_length, eos, simulator="tough"):
                 parameters["coordinates"] = True
 
             elif line.startswith("CONNE"):
-                conne, flag = _read_conne(fiter, label_length)
+                conne, flag, label_length = _read_conne(fiter, label_length)
                 parameters.update(conne)
 
                 if flag:
                     break
 
             elif line.startswith("INCON"):
-                incon, flag, num_pvars = _read_incon(
+                incon, flag, label_length, num_pvars = _read_incon(
                     fiter, label_length, num_pvars, eos, simulator
                 )
                 parameters.update(incon)
@@ -711,7 +716,7 @@ def _read_oft(f, oft, label_length):
 
         line = f.next()
 
-    return history
+    return history, label_length
 
 
 def _read_gener(f, label_length, simulator="tough"):
@@ -781,9 +786,7 @@ def _read_gener(f, label_length, simulator="tough"):
 
         line = f.next()
 
-    return {
-        "generators": [prune_values(generator) for generator in gener["generators"]]
-    }
+    return {"generators": [prune_values(generator) for generator in gener["generators"]]}, label_length
 
 
 def _read_timbc(f):
@@ -929,7 +932,7 @@ def _read_eleme(f, label_length):
 
     eleme["elements"] = {k: prune_values(v) for k, v in eleme["elements"].items()}
 
-    return eleme
+    return eleme, label_length
 
 
 def _read_coord(f):
@@ -983,7 +986,7 @@ def _read_conne(f, label_length):
 
     conne["connections"] = {k: prune_values(v) for k, v in conne["connections"].items()}
 
-    return conne, flag
+    return conne, flag, label_length
 
 
 def _read_incon(f, label_length, num_pvars, eos=None, simulator="tough"):
@@ -1042,7 +1045,7 @@ def _read_incon(f, label_length, num_pvars, eos=None, simulator="tough"):
         k: prune_values(v) for k, v in incon["initial_conditions"].items()
     }
 
-    return incon, flag, num_pvars
+    return incon, flag, label_length, num_pvars
 
 
 def _read_meshm(f):
