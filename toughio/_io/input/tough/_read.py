@@ -739,7 +739,7 @@ def _read_gener(f, label_length, simulator="tough"):
             data = read_record(line, fmt[label_length])
             tmp = {
                 "label": label_format.format(data[0]),
-                "name": f"{data[1]:>5}" if data[1] else data[1],
+                "name": data[1],
                 "nseq": data[2],
                 "nadd": data[3],
                 "nads": data[4],
