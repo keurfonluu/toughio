@@ -331,7 +331,7 @@ def read_primary_variables(f, fmt, num_pvars):
     """Read primary variables."""
     data = []
 
-    if num_pvars is not None:
+    if num_pvars:
         n = int(np.ceil(num_pvars / 4))
 
         for _ in range(n):
