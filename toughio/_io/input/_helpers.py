@@ -63,6 +63,8 @@ def read(filename, file_format=None, **kwargs):
     ----------------
     label_length : int or None, optional, default None
         Only if ``file_format = "tough"``. Number of characters in cell labels.
+    n_variables : int or None, optional, default None
+        Only if ``file_format = "tough"``. Number of primary variables.
     eos : str or None, optional, default None
         Only if ``file_format = "tough"``. Equation of State.
     mopr_11 : int, optional, default 0
