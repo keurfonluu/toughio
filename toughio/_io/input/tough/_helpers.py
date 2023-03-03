@@ -327,12 +327,12 @@ def write_model_record(data, key, fmt):
         return write_record([], [])
 
 
-def read_primary_variables(f, fmt, num_pvars):
+def read_primary_variables(f, fmt, n_variables):
     """Read primary variables."""
     data = []
 
-    if num_pvars:
-        n = int(np.ceil(num_pvars / 4))
+    if n_variables:
+        n = int(np.ceil(n_variables / 4))
 
         for _ in range(n):
             line = f.next()
