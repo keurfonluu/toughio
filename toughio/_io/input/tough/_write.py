@@ -260,6 +260,9 @@ def write_buffer(
         out += [f"{title:80}\n" for title in parameters["title"]]
         out += ["\n"] if space_between_blocks else []
 
+    if "DIMEN" in blocks and parameters["array_dimensions"]:
+        out += _write_dimen(parameters)
+
     if "ROCKS" in blocks and parameters["rocks"]:
         out += _write_rocks(parameters, simulator)
 
@@ -375,6 +378,38 @@ def write_buffer(
     if "END COMMENTS" in blocks and parameters["end_comments"]:
         out += ["\n"] if space_between_blocks else []
         out += [f"{comment}\n" for comment in parameters["end_comments"]]
+
+    return out
+
+
+@check_parameters(dtypes["DIMEN"], keys="array_dimensions")
+@block("DIMEN")
+def _write_dimen(parameters):
+    """Write DIMEN block data."""
+    # Format
+    fmt = block_to_format["DIMEN"]
+    fmt1 = str2format(fmt)
+
+    data = parameters["array_dimensions"]
+    values = [
+        data["n_rocks"],
+        data["n_times"],
+        data["n_generators"],
+        data["n_rates"],
+        data["n_increment_x"],
+        data["n_increment_y"],
+        data["n_increment_z"],
+        data["n_increment_rad"],
+        data["n_properties"],
+        data["n_properties_times"],
+        data["n_regions"],
+        data["n_regions_parameters"],
+        data["n_ltab"],
+        data["n_rpcap"],
+        data["n_elements_timbc"],
+        data["n_timbc"],
+    ]
+    out = write_record(values, fmt1, multi=True)
 
     return out
 
