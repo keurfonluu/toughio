@@ -1,5 +1,6 @@
 blocks = {
     "TITLE",
+    "DIMEN",
     "ROCKS",
     "RPCAP",
     "REACT",
@@ -69,6 +70,7 @@ _Parameters = {
     "boundary_conditions": {},
     "meshmaker": {},
     "default": {},
+    "array_dimensions": {},
     "end_comments": "",
 }
 
@@ -259,6 +261,25 @@ default = {
     "permeability_model": {"id": 1, "parameters": []},
     "equivalent_pore_pressure": {"id": 3, "parameters": []},
     "phase_composition": None,
+}
+
+array_dimensions = {
+    "n_rocks": None,
+    "n_times": None,
+    "n_generators": None,
+    "n_rates": None,
+    "n_increment_x": None,
+    "n_increment_y": None,
+    "n_increment_z": None,
+    "n_increment_rad": None,
+    "n_properties": None,
+    "n_properties_times": None,
+    "n_regions": None,
+    "n_regions_parameters": None,
+    "n_ltab": None,
+    "n_rpcap": None,
+    "n_elements_timbc": None,
+    "n_timbc": None,
 }
 
 eos = {

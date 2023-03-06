@@ -4,6 +4,7 @@ from contextlib import contextmanager
 import numpy as np
 
 block_to_format = {
+    "DIMEN": ",".join(8 * ["10d"]),
     "ROCKS": {
         1: "5s,5d,10.4e,10.4e,10.4e,10.4e,10.4e,10.4e,10.4e",
         2: "10.4e,10.4e,10.4e,10.3e,10.4e,10.4e,10.4e,10.4e,10.4e",  # Tortuosity can be <0 in TOUGHREACT

@@ -83,7 +83,10 @@ def read_buffer(f, label_length, n_variables, eos, simulator="tough"):
 
     try:
         for line in fiter:
-            if line.startswith("ROCKS"):
+            if line.startswith("DIMEN"):
+                parameters.update(_read_dimen(fiter))
+
+            elif line.startswith("ROCKS"):
                 parameters.update(_read_rocks(fiter, simulator))
 
             elif line.startswith("RPCAP"):
@@ -240,6 +243,48 @@ def read_buffer(f, label_length, n_variables, eos, simulator="tough"):
         raise ReadError(f"failed to parse line {fiter.count}.")
 
     return parameters
+
+
+def _read_dimen(f):
+    """Read DIMEN block data."""
+    fmt = block_to_format["DIMEN"]
+    dimen = {"array_dimensions": {}}
+
+    # Record 1
+    line = f.next()
+    data = read_record(line, fmt)
+
+    dimen["array_dimensions"].update(
+        {
+            "n_rocks": data[0],
+            "n_times": data[1],
+            "n_generators": data[2],
+            "n_rates": data[3],
+            "n_increment_x": data[4],
+            "n_increment_y": data[5],
+            "n_increment_z": data[6],
+            "n_increment_rad": data[7],
+        }
+    )
+
+    # Record 2
+    line = f.next()
+    data = read_record(line, fmt)
+
+    dimen["array_dimensions"].update(
+            {
+            "n_properties": data[0],
+            "n_properties_times": data[1],
+            "n_regions": data[2],
+            "n_regions_parameters": data[3],
+            "n_ltab": data[4],
+            "n_rpcap": data[5],
+            "n_elements_timbc": data[6],
+            "n_timbc": data[7],
+        }
+    )
+
+    return dimen
 
 
 def _read_rocks(f, simulator="tough"):
