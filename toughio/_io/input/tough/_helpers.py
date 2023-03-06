@@ -13,6 +13,7 @@ dtypes = {
         "eos": "str",
         "n_component": "int",
         "n_phase": "int",
+        "do_diffusion": "bool",
         "n_component_incon": "int",
         "react": "dict",
         "flac": "dict",

@@ -40,6 +40,7 @@ _Parameters = {
     "n_component": None,
     "n_phase": None,
     "n_component_incon": None,
+    "do_diffusion": None,
     "react": {},
     "flac": {},
     "chemical_properties": {},

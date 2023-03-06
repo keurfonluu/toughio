@@ -99,6 +99,7 @@ def read_buffer(f, label_length, n_variables, eos, simulator="tough"):
                 react = _read_react(fiter)
                 if "react" in parameters:
                     parameters["react"].update(react["react"])
+
                 else:
                     parameters.update(react)
 
@@ -471,6 +472,7 @@ def _read_multi(f):
     multi["n_component"] = data[0]
     multi["isothermal"] = data[1] == data[0]
     multi["n_phase"] = data[2]
+    multi["do_diffusion"] = data[3] == 8
     multi["n_component_incon"] = data[4]
 
     return multi
