@@ -247,6 +247,13 @@ def write_buffer(
     if indom and not parameters["start"]:
         logging.warning("Option 'START' is needed to use 'INDOM' conditions.")
 
+    # Check diffusion
+    if parameters["do_diffusion"] is None:
+        parameters["do_diffusion"] = "diffusion" in parameters
+
+    if parameters["do_diffusion"] and not len(parameters["diffusion"]):
+        logging.warning("Diffusion is enabled but 'diffusion' data is missing.")
+
     # Define input file contents
     out = []
     if "TITLE" in blocks:
@@ -690,7 +697,7 @@ def _write_multi(parameters):
     values[2] = parameters["n_phase"] if parameters["n_phase"] else values[2]
 
     # Handle diffusion
-    if len(parameters["diffusion"]):
+    if parameters["do_diffusion"]:
         values[3] = 8
         parameters["n_phase"] = values[2]  # Save for later check
 
