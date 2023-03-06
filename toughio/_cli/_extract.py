@@ -41,7 +41,7 @@ def extract(argv=None):
 
     # Read TOUGH output file
     output = read_output(
-        args.infile, connection=args.connection, label_length=args.label_length
+        args.infile, connection=args.connection
     )
     if output[-1].format != "tough":
         raise ValueError(f"Invalid TOUGH output file '{args.infile}'.")
