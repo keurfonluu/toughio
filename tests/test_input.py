@@ -372,7 +372,7 @@ def test_indom(write_read, num_pvars, num_items):
 def test_momop(write_read):
     parameters_ref = {
         "more_options": {
-            k + 1: v for k, v in enumerate(np.random.randint(10, size=40))
+            k + 1: v for k, v in enumerate(np.random.randint(10, size=50))
         },
     }
     parameters = write_read(parameters_ref)

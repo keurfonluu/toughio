@@ -130,7 +130,7 @@ dtypes = {
     },
     "MOP": {i + 1: "int" for i in range(24)},
     "MOPR": {i + 1: "int" for i in range(25)},
-    "MOMOP": {i + 1: "int" for i in range(40)},
+    "MOMOP": {i + 1: "int" for i in range(50)},
     "HYSTE": {i + 1: "int" for i in range(3)},
     "SELEC": {"integers": "dict", "floats": "array_like"},
     "SOLVR": {
