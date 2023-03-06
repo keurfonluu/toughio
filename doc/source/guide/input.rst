@@ -56,6 +56,8 @@ A TOUGH input file is defined as follows:
         "isothermal": bool,
         "n_component": int,
         "n_phase": int,
+        "do_diffusion": bool,
+        "n_component_incon": int,
         "rocks": dict,
         "default": dict,
         "solver": dict,
@@ -241,8 +243,9 @@ A time-dependent boundary condition is defined as follows:
 Diffusion
 *********
 
-Diffusion is enabled when the keyword ``"diffusion"`` is defined as an array (i.e., list of lists) of shape ``(n_component, n_phase)``.
+Diffusion is enabled when the keyword ``"do_diffusion"`` is set to ``True``.
 In that case, the number of secondary parameters in block MULTI is automatically set to 8 (6 otherwise).
+Diffusion data is defined using the keyword ``"diffusion"`` as an array (i.e., list of lists) of shape ``(n_component, n_phase)``.
 
 
 History
