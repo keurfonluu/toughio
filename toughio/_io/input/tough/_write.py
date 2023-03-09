@@ -249,7 +249,7 @@ def write_buffer(
 
     # Check diffusion
     if parameters["do_diffusion"] is None:
-        parameters["do_diffusion"] = "diffusion" in parameters
+        parameters["do_diffusion"] = len(parameters["diffusion"]) > 0
 
     if parameters["do_diffusion"] and not len(parameters["diffusion"]):
         logging.warning("Diffusion is enabled but 'diffusion' data is missing.")
