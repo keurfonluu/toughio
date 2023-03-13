@@ -272,7 +272,7 @@ def _read_dimen(f):
     data = read_record(line, fmt)
 
     dimen["array_dimensions"].update(
-            {
+        {
             "n_properties": data[0],
             "n_properties_times": data[1],
             "n_regions": data[2],
@@ -836,7 +836,9 @@ def _read_gener(f, label_length, simulator="tough"):
 
         line = f.next()
 
-    return {"generators": [prune_values(generator) for generator in gener["generators"]]}, label_length
+    return {
+        "generators": [prune_values(generator) for generator in gener["generators"]]
+    }, label_length
 
 
 def _read_timbc(f):

@@ -58,9 +58,7 @@ def read(filename, file_type, file_format, labels_order):
         ilab = 1 if file_type == "element" else 2
         headers = headers[ilab + 1 :]
         labels = [labels.copy() for _ in variables]
-        variables = np.array(
-            [[v[2 :] for v in variable] for variable in variables]
-        )
+        variables = np.array([[v[2:] for v in variable] for variable in variables])
 
     return to_output(
         file_type, file_format, labels_order, headers, times, labels, variables
@@ -118,9 +116,9 @@ def _read_table(f, file_type):
                             break
 
                         # Find end of label(s)
-                        tmp = line[:line.index(x)].rstrip()
+                        tmp = line[: line.index(x)].rstrip()
                         tmp = tmp[::-1]
-                        tmp = tmp[:line.index(" "):-1].rstrip()
+                        tmp = tmp[: line.index(" ") : -1].rstrip()
                         iend = len(tmp)
 
                     tmp = [line[:iend]]
