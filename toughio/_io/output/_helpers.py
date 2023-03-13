@@ -112,9 +112,7 @@ def read(
             raise ValueError()
         file_type = "connection" if connection else "element"
 
-    return _reader_map[file_format](
-        filename, file_type, file_format, labels_order
-    )
+    return _reader_map[file_format](filename, file_type, file_format, labels_order)
 
 
 def write(filename, output, file_format=None, **kwargs):
