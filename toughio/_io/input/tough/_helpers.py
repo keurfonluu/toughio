@@ -13,6 +13,7 @@ dtypes = {
         "eos": "str",
         "n_component": "int",
         "n_phase": "int",
+        "do_diffusion": "bool",
         "n_component_incon": "int",
         "react": "dict",
         "flac": "dict",
@@ -43,7 +44,26 @@ dtypes = {
         "meshmaker": "dict",
         "poiseuille": "dict",
         "default": "dict",
+        "array_dimensions": "dict",
         "end_comments": "str_array_like",
+    },
+    "DIMEN": {
+        "n_rocks": "int",
+        "n_times": "int",
+        "n_generators": "int",
+        "n_rates": "int",
+        "n_increment_x": "int",
+        "n_increment_y": "int",
+        "n_increment_z": "int",
+        "n_increment_rad": "int",
+        "n_properties": "int",
+        "n_properties_times": "int",
+        "n_regions": "int",
+        "n_regions_parameters": "int",
+        "n_ltab": "int",
+        "n_rpcap": "int",
+        "n_elements_timbc": "int",
+        "n_timbc": "int",
     },
     "ROCKS": {
         "density": "scalar",
@@ -129,7 +149,7 @@ dtypes = {
     },
     "MOP": {i + 1: "int" for i in range(24)},
     "MOPR": {i + 1: "int" for i in range(25)},
-    "MOMOP": {i + 1: "int" for i in range(40)},
+    "MOMOP": {i + 1: "int" for i in range(50)},
     "HYSTE": {i + 1: "int" for i in range(3)},
     "SELEC": {"integers": "dict", "floats": "array_like"},
     "SOLVR": {
@@ -327,12 +347,12 @@ def write_model_record(data, key, fmt):
         return write_record([], [])
 
 
-def read_primary_variables(f, fmt, num_pvars):
+def read_primary_variables(f, fmt, n_variables):
     """Read primary variables."""
     data = []
 
-    if num_pvars is not None:
-        n = int(np.ceil(num_pvars / 4))
+    if n_variables:
+        n = int(np.ceil(n_variables / 4))
 
         for _ in range(n):
             line = f.next()

@@ -17,7 +17,7 @@ oft_to_key = {
 }
 
 
-def read(filename, label_length=None, eos=None, simulator="tough"):
+def read(filename, label_length=None, n_variables=None, eos=None, simulator="tough"):
     """
     Read TOUGH input file.
 
@@ -27,6 +27,8 @@ def read(filename, label_length=None, eos=None, simulator="tough"):
         Input file name or buffer.
     label_length : int or None, optional, default None
         Number of characters in cell labels.
+    n_variables : int or None, optional, default None
+        Number of primary variables.
     eos : str or None, optional, default None
         Equation of State.
 
@@ -44,17 +46,16 @@ def read(filename, label_length=None, eos=None, simulator="tough"):
         raise ValueError()
 
     with open_file(filename, "r") as f:
-        out = read_buffer(f, label_length, eos, simulator)
+        out = read_buffer(f, label_length, n_variables, eos, simulator)
 
     return out
 
 
-def read_buffer(f, label_length, eos, simulator="tough"):
+def read_buffer(f, label_length, n_variables, eos, simulator="tough"):
     """Read TOUGH input file."""
     from ._common import blocks
 
     parameters = {}
-    num_pvars = None  # Number of primary variables
 
     # Title
     title = []
@@ -82,7 +83,10 @@ def read_buffer(f, label_length, eos, simulator="tough"):
 
     try:
         for line in fiter:
-            if line.startswith("ROCKS"):
+            if line.startswith("DIMEN"):
+                parameters.update(_read_dimen(fiter))
+
+            elif line.startswith("ROCKS"):
                 parameters.update(_read_rocks(fiter, simulator))
 
             elif line.startswith("RPCAP"):
@@ -98,6 +102,7 @@ def read_buffer(f, label_length, eos, simulator="tough"):
                 react = _read_react(fiter)
                 if "react" in parameters:
                     parameters["react"].update(react["react"])
+
                 else:
                     parameters.update(react)
 
@@ -116,7 +121,9 @@ def read_buffer(f, label_length, eos, simulator="tough"):
 
             elif line.startswith("MULTI"):
                 parameters.update(_read_multi(fiter))
-                num_pvars = parameters["n_component"] + 1
+
+                if not n_variables:
+                    n_variables = parameters["n_component"] + 1
 
             elif line.startswith("SOLVR"):
                 parameters.update(_read_solvr(fiter))
@@ -125,7 +132,7 @@ def read_buffer(f, label_length, eos, simulator="tough"):
                 parameters["start"] = True
 
             elif line.startswith("PARAM"):
-                param, num_pvars = _read_param(fiter, num_pvars, eos)
+                param, n_variables = _read_param(fiter, n_variables, eos)
                 parameters["options"] = param["options"]
                 parameters["extra_options"] = param["extra_options"]
 
@@ -139,7 +146,7 @@ def read_buffer(f, label_length, eos, simulator="tough"):
                 parameters.update(_read_selec(fiter))
 
             elif line.startswith("INDOM"):
-                indom, num_pvars = _read_indom(fiter, num_pvars, eos)
+                indom, n_variables = _read_indom(fiter, n_variables, eos)
 
                 for k, v in indom["rocks"].items():
                     parameters["rocks"][k].update(v)
@@ -154,16 +161,20 @@ def read_buffer(f, label_length, eos, simulator="tough"):
                 parameters.update(_read_hyste(fiter))
 
             elif line.startswith("FOFT"):
-                parameters.update(_read_oft(fiter, "FOFT", label_length))
+                oft, label_length = _read_oft(fiter, "FOFT", label_length)
+                parameters.update(oft)
 
             elif line.startswith("COFT"):
-                parameters.update(_read_oft(fiter, "COFT", label_length))
+                oft, label_length = _read_oft(fiter, "COFT", label_length)
+                parameters.update(oft)
 
             elif line.startswith("GOFT"):
-                parameters.update(_read_oft(fiter, "GOFT", label_length))
+                oft, label_length = _read_oft(fiter, "GOFT", label_length)
+                parameters.update(oft)
 
             elif line.startswith("GENER"):
-                parameters.update(_read_gener(fiter, label_length, simulator))
+                gener, label_length = _read_gener(fiter, label_length, simulator)
+                parameters.update(gener)
 
             elif line.startswith("TIMBC"):
                 parameters.update(_read_timbc(fiter))
@@ -182,7 +193,8 @@ def read_buffer(f, label_length, eos, simulator="tough"):
                 parameters.update(_read_outpu(fiter))
 
             elif line.startswith("ELEME"):
-                parameters.update(_read_eleme(fiter, label_length))
+                eleme, label_length = _read_eleme(fiter, label_length)
+                parameters.update(eleme)
                 parameters["coordinates"] = False
 
             elif line.startswith("COORD"):
@@ -194,15 +206,15 @@ def read_buffer(f, label_length, eos, simulator="tough"):
                 parameters["coordinates"] = True
 
             elif line.startswith("CONNE"):
-                conne, flag = _read_conne(fiter, label_length)
+                conne, flag, label_length = _read_conne(fiter, label_length)
                 parameters.update(conne)
 
                 if flag:
                     break
 
             elif line.startswith("INCON"):
-                incon, flag, num_pvars = _read_incon(
-                    fiter, label_length, num_pvars, eos, simulator
+                incon, flag, label_length, n_variables = _read_incon(
+                    fiter, label_length, n_variables, eos, simulator
                 )
                 parameters.update(incon)
 
@@ -231,6 +243,48 @@ def read_buffer(f, label_length, eos, simulator="tough"):
         raise ReadError(f"failed to parse line {fiter.count}.")
 
     return parameters
+
+
+def _read_dimen(f):
+    """Read DIMEN block data."""
+    fmt = block_to_format["DIMEN"]
+    dimen = {"array_dimensions": {}}
+
+    # Record 1
+    line = f.next()
+    data = read_record(line, fmt)
+
+    dimen["array_dimensions"].update(
+        {
+            "n_rocks": data[0],
+            "n_times": data[1],
+            "n_generators": data[2],
+            "n_rates": data[3],
+            "n_increment_x": data[4],
+            "n_increment_y": data[5],
+            "n_increment_z": data[6],
+            "n_increment_rad": data[7],
+        }
+    )
+
+    # Record 2
+    line = f.next()
+    data = read_record(line, fmt)
+
+    dimen["array_dimensions"].update(
+        {
+            "n_properties": data[0],
+            "n_properties_times": data[1],
+            "n_regions": data[2],
+            "n_regions_parameters": data[3],
+            "n_ltab": data[4],
+            "n_rpcap": data[5],
+            "n_elements_timbc": data[6],
+            "n_timbc": data[7],
+        }
+    )
+
+    return dimen
 
 
 def _read_rocks(f, simulator="tough"):
@@ -463,6 +517,7 @@ def _read_multi(f):
     multi["n_component"] = data[0]
     multi["isothermal"] = data[1] == data[0]
     multi["n_phase"] = data[2]
+    multi["do_diffusion"] = data[3] == 8
     multi["n_component_incon"] = data[4]
 
     return multi
@@ -486,7 +541,7 @@ def _read_solvr(f):
     return solvr
 
 
-def _read_param(f, num_pvars, eos=None):
+def _read_param(f, n_variables, eos=None):
     """Read PARAM block data."""
     fmt = block_to_format["PARAM"]
     param = {}
@@ -571,7 +626,7 @@ def _read_param(f, num_pvars, eos=None):
         param["default"] = {"phase_composition": data[0]}
 
     # Record 5
-    data = read_primary_variables(f, fmt[5], num_pvars)
+    data = read_primary_variables(f, fmt[5], n_variables)
 
     if "default" not in param:
         param["default"] = {}
@@ -580,14 +635,14 @@ def _read_param(f, num_pvars, eos=None):
         data = prune_values(data)
         param["default"]["initial_condition"] = data
 
-    if num_pvars:
-        num_pvars = len(data)
+    if not n_variables:
+        n_variables = len(data)
 
     # Remove Nones
     param["options"] = prune_values(param["options"])
     param["extra_options"] = prune_values(param["extra_options"])
 
-    return param, num_pvars
+    return param, n_variables
 
 
 def _read_selec(f):
@@ -613,7 +668,7 @@ def _read_selec(f):
     return selec
 
 
-def _read_indom(f, num_pvars, eos=None):
+def _read_indom(f, n_variables, eos=None):
     """Read INDOM block data."""
     fmt = block_to_format["INDOM"]
     indom = {"rocks": {}}
@@ -627,12 +682,12 @@ def _read_indom(f, num_pvars, eos=None):
             phase_composition = data[1]  # TMVOC
 
             # Record 2
-            data = read_primary_variables(f, fmt[0], num_pvars)
+            data = read_primary_variables(f, fmt[0], n_variables)
             data = prune_values(data)
             indom["rocks"][rock] = {"initial_condition": data}
 
-            if num_pvars:
-                num_pvars = len(data)
+            if not n_variables:
+                n_variables = len(data)
 
             if eos == "tmvoc":
                 indom["rocks"][rock]["phase_composition"] = phase_composition
@@ -642,7 +697,7 @@ def _read_indom(f, num_pvars, eos=None):
 
         line = f.next()
 
-    return indom, num_pvars
+    return indom, n_variables
 
 
 def _read_momop(f):
@@ -711,7 +766,7 @@ def _read_oft(f, oft, label_length):
 
         line = f.next()
 
-    return history
+    return history, label_length
 
 
 def _read_gener(f, label_length, simulator="tough"):
@@ -739,7 +794,7 @@ def _read_gener(f, label_length, simulator="tough"):
             data = read_record(line, fmt[label_length])
             tmp = {
                 "label": label_format.format(data[0]),
-                "name": f"{data[1]:>5}" if data[1] else data[1],
+                "name": data[1],
                 "nseq": data[2],
                 "nadd": data[3],
                 "nads": data[4],
@@ -783,7 +838,7 @@ def _read_gener(f, label_length, simulator="tough"):
 
     return {
         "generators": [prune_values(generator) for generator in gener["generators"]]
-    }
+    }, label_length
 
 
 def _read_timbc(f):
@@ -929,7 +984,7 @@ def _read_eleme(f, label_length):
 
     eleme["elements"] = {k: prune_values(v) for k, v in eleme["elements"].items()}
 
-    return eleme
+    return eleme, label_length
 
 
 def _read_coord(f):
@@ -983,10 +1038,10 @@ def _read_conne(f, label_length):
 
     conne["connections"] = {k: prune_values(v) for k, v in conne["connections"].items()}
 
-    return conne, flag
+    return conne, flag, label_length
 
 
-def _read_incon(f, label_length, num_pvars, eos=None, simulator="tough"):
+def _read_incon(f, label_length, n_variables, eos=None, simulator="tough"):
     """Read INCON block data."""
     fmt = block_to_format["INCON"]
     fmt2 = (
@@ -1025,12 +1080,12 @@ def _read_incon(f, label_length, num_pvars, eos=None, simulator="tough"):
                 incon["initial_conditions"][label]["userx"] = userx if userx else None
 
             # Record 2
-            data = read_primary_variables(f, fmt[0], num_pvars)
+            data = read_primary_variables(f, fmt[0], n_variables)
             data = prune_values(data)
             incon["initial_conditions"][label]["values"] = data
 
-            if num_pvars:
-                num_pvars = len(data)
+            if not n_variables:
+                n_variables = len(data)
 
         else:
             flag = line.startswith("+++")
@@ -1042,7 +1097,7 @@ def _read_incon(f, label_length, num_pvars, eos=None, simulator="tough"):
         k: prune_values(v) for k, v in incon["initial_conditions"].items()
     }
 
-    return incon, flag, num_pvars
+    return incon, flag, label_length, n_variables
 
 
 def _read_meshm(f):

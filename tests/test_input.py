@@ -44,6 +44,33 @@ def test_title(write_read, single):
 
 
 @pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
+def test_dimen(write_read):
+    parameters_ref = {
+        "array_dimensions": {
+            "n_rocks": np.random.randint(100),
+            "n_times": np.random.randint(100),
+            "n_generators": np.random.randint(100),
+            "n_rates": np.random.randint(100),
+            "n_increment_x": np.random.randint(100),
+            "n_increment_y": np.random.randint(100),
+            "n_increment_z": np.random.randint(100),
+            "n_increment_rad": np.random.randint(100),
+            "n_properties": np.random.randint(100),
+            "n_properties_times": np.random.randint(100),
+            "n_regions": np.random.randint(100),
+            "n_regions_parameters": np.random.randint(100),
+            "n_ltab": np.random.randint(100),
+            "n_rpcap": np.random.randint(100),
+            "n_elements_timbc": np.random.randint(100),
+            "n_timbc": np.random.randint(100),
+        }
+    }
+    parameters = write_read(parameters_ref)
+
+    assert helpers.allclose(parameters_ref, parameters)
+
+
+@pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
 def test_rocks(write_read):
     keys = [
         "density",
@@ -372,7 +399,7 @@ def test_indom(write_read, num_pvars, num_items):
 def test_momop(write_read):
     parameters_ref = {
         "more_options": {
-            k + 1: v for k, v in enumerate(np.random.randint(10, size=40))
+            k + 1: v for k, v in enumerate(np.random.randint(10, size=50))
         },
     }
     parameters = write_read(parameters_ref)

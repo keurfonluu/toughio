@@ -56,6 +56,8 @@ A TOUGH input file is defined as follows:
         "isothermal": bool,
         "n_component": int,
         "n_phase": int,
+        "do_diffusion": bool,
+        "n_component_incon": int,
         "rocks": dict,
         "default": dict,
         "solver": dict,
@@ -79,6 +81,7 @@ A TOUGH input file is defined as follows:
         "non_condensible_gas": list[str],
         "start": bool,
         "nover": bool,
+        "array_dimensions": dict,
     }
 
 The equation-of-state (EOS, block MULTI) is defined by the keyword ``"eos"`` which accepts any of these values:
@@ -241,8 +244,9 @@ A time-dependent boundary condition is defined as follows:
 Diffusion
 *********
 
-Diffusion is enabled when the keyword ``"diffusion"`` is defined as an array (i.e., list of lists) of shape ``(n_component, n_phase)``.
+Diffusion is enabled when the keyword ``"do_diffusion"`` is set to ``True``.
 In that case, the number of secondary parameters in block MULTI is automatically set to 8 (6 otherwise).
+Diffusion data is defined using the keyword ``"diffusion"`` as an array (i.e., list of lists) of shape ``(n_component, n_phase)``.
 
 
 History
@@ -529,6 +533,33 @@ The permeability of an element called ``"AAA00"`` is defined as follows:
 
     "AAA00": {
         "permeability": list[float],
+    }
+
+
+Array dimensions (iTOUGH2)
+**************************
+
+iTOUGH2 allows users to provide array dimensions if an array is insufficiently dimensioned. An additional keyword ``"array_dimensions"`` can be used to specify such values, as follows:
+
+.. code-block::
+
+    "array_dimensions": {
+        "n_rocks": int,
+        "n_times": int,
+        "n_generators": int,
+        "n_rates": int,
+        "n_increment_x": int,
+        "n_increment_y": int,
+        "n_increment_z": int,
+        "n_increment_rad": int,
+        "n_properties": int,
+        "n_properties_times": int,
+        "n_regions": int,
+        "n_regions_parameters": int,
+        "n_ltab": int,
+        "n_rpcap": int,
+        "n_elements_timbc": int,
+        "n_timbc": int,
     }
 
 

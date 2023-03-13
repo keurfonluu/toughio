@@ -2,7 +2,7 @@ from functools import partial
 
 import numpy as np
 
-from ...._common import get_label_length, open_file
+from ...._common import open_file
 from ..._common import read_record
 from .._common import to_output
 
@@ -11,29 +11,61 @@ __all__ = [
 ]
 
 
-def read(filename, file_type, file_format, labels_order, label_length=None):
+def read(filename, file_type, file_format, labels_order):
     """Read standard TOUGH OUTPUT."""
     with open_file(filename, "r") as f:
-        headers, times, variables = _read_table(f, file_type, label_length)
+        headers, times, variables = _read_table(f, file_type)
+
+        # Postprocess labels
+        labels = [v[0].lstrip() for v in variables[0]]
+
+        if file_type == "element":
+            label_length = max(len(label) for label in labels)
+            fmt = f"{{:>{label_length}}}"
+            labels = [fmt.format(label) for label in labels]
+
+        else:
+            # Find end of first element processing backward
+            labels = [label[::-1] for label in labels]
+            tmp = max(labels, key=len)
+
+            while True:
+                iend = tmp.index(" ")
+
+                if iend < 2:
+                    tmp = f"{tmp[:iend]}0{tmp[iend + 1:]}"
+
+                else:
+                    break
+
+            iend += len(tmp[iend:]) - len(tmp[iend:].lstrip())
+
+            # Split connection names
+            labels1 = [label[iend:].rstrip() for label in labels]
+            labels2 = [label[:iend].rstrip() for label in labels]
+
+            # Find label length
+            len1 = max(len(label) for label in labels1)
+            len2 = max(len(label) for label in labels2)
+            label_length = max(len1, len2)
+
+            # Correct element names given label length
+            fmt = f"{{:<{label_length}}}"
+            labels1 = [fmt.format(label) for label in labels1]
+            labels2 = [fmt.format(label) for label in labels2]
+            labels = [[l1[::-1], l2[::-1]] for l1, l2 in zip(labels1, labels2)]
 
         ilab = 1 if file_type == "element" else 2
         headers = headers[ilab + 1 :]
-        labels = [[v[:ilab] for v in variable] for variable in variables]
-        labels = (
-            [[l[0] for l in label] for label in labels]
-            if file_type == "element"
-            else labels
-        )
-        variables = np.array(
-            [[v[ilab + 1 :] for v in variable] for variable in variables]
-        )
+        labels = [labels.copy() for _ in variables]
+        variables = np.array([[v[2:] for v in variable] for variable in variables])
 
     return to_output(
         file_type, file_format, labels_order, headers, times, labels, variables
     )
 
 
-def _read_table(f, file_type, label_length):
+def _read_table(f, file_type):
     """Read data table for current time step."""
     labels_key = "ELEM." if file_type == "element" else "ELEM1"
 
@@ -70,24 +102,28 @@ def _read_table(f, file_type, label_length):
 
             # Loop until end of output block
             while True:
-                if line[:10].strip() and not line.strip().startswith("ELEM"):
-                    line = line[1:] if file_type == "element" else line[5:]
+                if line[:15].strip() and not line.strip().startswith("ELEM"):
+                    if first:
+                        # Find first floating point
+                        for xf in line.split()[::-1]:
+                            try:
+                                _ = int(xf)
 
-                    if first and not label_length:
-                        label_length = get_label_length(line[:9])
-                        iend = (
-                            label_length
-                            if file_type == "element"
-                            else 2 * label_length + 2
-                        )
+                            except ValueError:
+                                x = xf
+                                continue
 
-                    tmp = (
-                        [line[:label_length]]
-                        if file_type == "element"
-                        else [line[:label_length], line[label_length + 2 : iend]]
-                    )
+                            break
 
+                        # Find end of label(s)
+                        tmp = line[: line.index(x)].rstrip()
+                        tmp = tmp[::-1]
+                        tmp = tmp[: line.index(" ") : -1].rstrip()
+                        iend = len(tmp)
+
+                    tmp = [line[:iend]]
                     line = line[iend:]
+
                     if first:
                         try:
                             # Set line parser and try parsing first line
@@ -110,8 +146,10 @@ def _read_table(f, file_type, label_length):
                                 di = i2 - i1
                                 dfmt = f"{di}.{di - 7}e"
                                 fmt += 20 * [dfmt]  # Read 20 data columns at most
+
                             else:
                                 fmt += ["12.5e"]
+
                             fmt = ",".join(fmt)
 
                             # Set line parser

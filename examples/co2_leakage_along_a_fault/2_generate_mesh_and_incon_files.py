@@ -70,7 +70,7 @@ p.show()
 
 import seaborn
 
-ax = seaborn.distplot(mesh.qualities[mesh.materials != "BOUND"], kde=False)
+ax = seaborn.displot(mesh.qualities[mesh.materials != "BOUND"], kind="hist")
 
 ########################################################################################
 

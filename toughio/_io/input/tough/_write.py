@@ -247,11 +247,21 @@ def write_buffer(
     if indom and not parameters["start"]:
         logging.warning("Option 'START' is needed to use 'INDOM' conditions.")
 
+    # Check diffusion
+    if parameters["do_diffusion"] is None:
+        parameters["do_diffusion"] = len(parameters["diffusion"]) > 0
+
+    if parameters["do_diffusion"] and not len(parameters["diffusion"]):
+        logging.warning("Diffusion is enabled but 'diffusion' data is missing.")
+
     # Define input file contents
     out = []
     if "TITLE" in blocks:
         out += [f"{title:80}\n" for title in parameters["title"]]
         out += ["\n"] if space_between_blocks else []
+
+    if "DIMEN" in blocks and parameters["array_dimensions"]:
+        out += _write_dimen(parameters)
 
     if "ROCKS" in blocks and parameters["rocks"]:
         out += _write_rocks(parameters, simulator)
@@ -368,6 +378,38 @@ def write_buffer(
     if "END COMMENTS" in blocks and parameters["end_comments"]:
         out += ["\n"] if space_between_blocks else []
         out += [f"{comment}\n" for comment in parameters["end_comments"]]
+
+    return out
+
+
+@check_parameters(dtypes["DIMEN"], keys="array_dimensions")
+@block("DIMEN")
+def _write_dimen(parameters):
+    """Write DIMEN block data."""
+    # Format
+    fmt = block_to_format["DIMEN"]
+    fmt1 = str2format(fmt)
+
+    data = parameters["array_dimensions"]
+    values = [
+        data["n_rocks"],
+        data["n_times"],
+        data["n_generators"],
+        data["n_rates"],
+        data["n_increment_x"],
+        data["n_increment_y"],
+        data["n_increment_z"],
+        data["n_increment_rad"],
+        data["n_properties"],
+        data["n_properties_times"],
+        data["n_regions"],
+        data["n_regions_parameters"],
+        data["n_ltab"],
+        data["n_rpcap"],
+        data["n_elements_timbc"],
+        data["n_timbc"],
+    ]
+    out = write_record(values, fmt1, multi=True)
 
     return out
 
@@ -690,7 +732,7 @@ def _write_multi(parameters):
     values[2] = parameters["n_phase"] if parameters["n_phase"] else values[2]
 
     # Handle diffusion
-    if len(parameters["diffusion"]):
+    if parameters["do_diffusion"]:
         values[3] = 8
         parameters["n_phase"] = values[2]  # Save for later check
 

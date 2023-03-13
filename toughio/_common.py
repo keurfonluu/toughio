@@ -4,6 +4,7 @@ from contextlib import contextmanager
 import numpy as np
 
 block_to_format = {
+    "DIMEN": ",".join(8 * ["10d"]),
     "ROCKS": {
         1: "5s,5d,10.4e,10.4e,10.4e,10.4e,10.4e,10.4e,10.4e",
         2: "10.4e,10.4e,10.4e,10.3e,10.4e,10.4e,10.4e,10.4e,10.4e",  # Tortuosity can be <0 in TOUGHREACT
@@ -34,7 +35,7 @@ block_to_format = {
         5: ",".join(4 * ["20.13e"]),
     },
     "INDOM": {0: ",".join(4 * ["20.13e"]), 5: "5s,5d"},  # 5d is for TMVOC
-    "MOMOP": "40S",
+    "MOMOP": "50S",
     "TIMES": {1: "5d,5d,10.4e,10.4e", 2: ",".join(8 * ["10.4e"])},
     "HYSTE": ",".join(3 * ["5d"]),
     "FOFT": {5: "5s", 6: "6s", 7: "7s", 8: "8s", 9: "9s"},
