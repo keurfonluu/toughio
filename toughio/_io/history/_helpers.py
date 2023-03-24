@@ -47,7 +47,7 @@ def read(filename, file_format=None, **kwargs):
     ----------
     filename : str, pathlike or buffer
         Input file name or buffer.
-    file_format : str ('col', 'csv') or None, optional, default None
+    file_format : str ('column', 'csv', 'tecplot') or None, optional, default None
         Input file format.
 
     Returns

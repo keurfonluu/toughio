@@ -1,4 +1,4 @@
-from . import column, csv
+from . import column, csv, tecplot
 from ._helpers import read, register
 
 __all__ = [
