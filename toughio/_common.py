@@ -165,11 +165,11 @@ def register_format(
         writer_map[fmt] = writer
 
 
-def filetype_from_filename(filename, ext_to_fmt):
+def filetype_from_filename(filename, ext_to_fmt, default=""):
     """Determine file type from its extension."""
     ext = os.path.splitext(filename)[1].lower()
 
-    return ext_to_fmt[ext] if ext in ext_to_fmt else ""
+    return ext_to_fmt[ext] if ext in ext_to_fmt else default
 
 
 @contextmanager

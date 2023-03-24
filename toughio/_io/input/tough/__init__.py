@@ -8,4 +8,4 @@ __all__ = [
 ]
 
 
-register("tough", [], read, write)
+register("tough", [""], read, write)

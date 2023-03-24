@@ -47,7 +47,7 @@ def read(filename, file_format=None, **kwargs):
     ----------
     filename : str, pathlike or buffer
         Input file name or buffer.
-    file_format : str or None, optional, default None
+    file_format : str ('csv') or None, optional, default None
         Input file format.
 
     Returns
@@ -56,19 +56,10 @@ def read(filename, file_format=None, **kwargs):
         History data.
 
     """
-    if not (file_format is None or file_format in _reader_map):
-        raise ValueError()
+    fmt = (
+        file_format
+        if file_format
+        else filetype_from_filename(filename, _extension_to_filetype, "csv")
+    )
 
-    file_format = _get_file_format(filename, file_format)
-    return _reader_map[file_format](filename, **kwargs)
-
-
-def _get_file_format(filename, file_format):
-    """Get file format."""
-    if not file_format:
-        file_format = filetype_from_filename(filename, _extension_to_filetype)
-
-    if not file_format:
-        file_format = "csv"
-
-    return file_format
+    return _reader_map[fmt](filename, **kwargs)

@@ -83,7 +83,7 @@ def read(filename, file_format=None, **kwargs):
     if not (file_format is None or file_format in _reader_map):
         raise ValueError()
 
-    file_format = _get_file_format(filename, file_format)
+    file_format = _get_file_format(filename, file_format, default="tough")
     return _reader_map[file_format](filename, **kwargs)
 
 
@@ -129,17 +129,17 @@ def write(filename, parameters, file_format=None, **kwargs):
     if not (file_format is None or file_format in _writer_map):
         raise ValueError()
 
-    file_format = _get_file_format(filename, file_format)
+    file_format = _get_file_format(filename, file_format, default="tough")
     _writer_map[file_format](filename, parameters, **kwargs)
 
 
-def _get_file_format(filename, file_format):
+def _get_file_format(filename, file_format, default):
     """Get file format."""
     if not file_format:
         file_format = _file_format_from_filename(filename)
 
     if not file_format:
-        file_format = filetype_from_filename(filename, _extension_to_filetype)
+        file_format = filetype_from_filename(filename, _extension_to_filetype, default)
 
     if not file_format:
         file_format = "tough"
