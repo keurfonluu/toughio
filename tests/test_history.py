@@ -13,7 +13,7 @@ import toughio
             "FOFT_A1912.csv",
             "csv",
             {
-                "TIME": 4.393722000e9,
+                "TIME(S)": 4.393722000e9,
                 "PRES": 1.8740899675005e8,
                 "TEMP": 720.0,
                 "SAT_G": 0.0,
@@ -24,7 +24,7 @@ import toughio
             "FOFT_A1912_T2.csv",
             "csv",
             {
-                "TIME": 3.06639400e9,
+                "TIME(S)": 3.06639400e9,
                 "PRES": 1.83000721e8,
                 "TEMP": 660.0,
                 "SAT_G": 0.0,
@@ -56,12 +56,12 @@ import toughio
         (
             "GOFT_A1162.csv",
             "csv",
-            {"TIME": 4.393722000e9, "GEN": -30.0, "ENTG": 1.528048035348e7, "PWB": 0.0},
+            {"TIME(S)": 4.393722000e9, "GEN": -30.0, "ENTG": 1.528048035348e7, "PWB": 0.0},
         ),
         (
             "GOFT_A1162_T2.csv",
             "csv",
-            {"TIME": 3.06639400e9, "GEN": -27.5, "ENTG": 1.40141971e7, "PWB": 0.0},
+            {"TIME(S)": 3.06639400e9, "GEN": -27.5, "ENTG": 1.40141971e7, "PWB": 0.0},
         ),
     ],
 )

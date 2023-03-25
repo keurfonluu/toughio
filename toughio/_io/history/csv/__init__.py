@@ -6,4 +6,4 @@ __all__ = [
 ]
 
 
-register("csv", [".csv"], read)
+register("csv", [".csv", ".foft"], read)

@@ -28,19 +28,32 @@ def read(filename):
         if line.startswith('"'):
             sep = ","
             line = line.replace('"', "")
+
         else:
             sep = None
-        headers = [x.strip() for x in line.split(sep)[1:]]
+
+        headers = [x.strip() for x in line.split(sep)]
 
         data = []
         line = f.readline().strip()
         while line:
-            data += [[float(x) for x in line.split(sep)]]
+            data.append([x.replace('"', "").strip() for x in line.split(sep)])
             line = f.readline().strip()
-        data = np.transpose(data)
 
-        out = {"TIME": data[0]}
-        for header, X in zip(headers, data[1:]):
-            out[header] = X
+        out = {}
+        for header, X in zip(headers, np.transpose(data)):
+            # Remove extra whitespaces
+            header = " ".join(header.split())
+
+            if header in {"KCYC", "ROCK"}:
+                out[header] = np.array([int(x) for x in X])
+
+            elif header.startswith("ELEM"):
+                label_length = max(len(x) for x in X)
+                fmt = f"{{:>{label_length}}}"
+                out[header] = np.array([fmt.format(x) for x in X])
+
+            else:
+                out[header] = np.array([float(x) for x in X])
 
         return out
