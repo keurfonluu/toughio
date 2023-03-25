@@ -11,7 +11,7 @@ __all__ = [
 def read(filename, file_type, file_format, labels_order):
     """
     Read SAVE file.
-    
+
     Parameters
     ----------
     filename : str, pathlike or buffer

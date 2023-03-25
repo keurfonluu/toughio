@@ -12,7 +12,7 @@ __all__ = [
 def read(filename, file_type, file_format, labels_order):
     """
     Read Petrasim OUTPUT_ELEME.csv.
-    
+
     Parameters
     ----------
     filename : str, pathlike or buffer
@@ -26,7 +26,7 @@ def read(filename, file_type, file_format, labels_order):
     -------
     namedtuple or list of namedtuple
         namedtuple (type, format, time, labels, data) or list of namedtuple for each time step.
-    
+
     """
     with open_file(filename, "r") as f:
         # Headers
@@ -65,14 +65,14 @@ def read(filename, file_type, file_format, labels_order):
 def write(filename, output):
     """
     Write Petrasim OUTPUT_ELEME.csv.
-    
+
     Parameters
     ----------
     filename : str, pathlike or buffer
         Output file name or buffer.
     output : namedtuple or list of namedtuple
         namedtuple (type, format, time, labels, data) or list of namedtuple for each time step to export.
-    
+
     """
     out = output[-1]
     headers = []

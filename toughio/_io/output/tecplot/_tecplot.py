@@ -31,7 +31,7 @@ zone_key_to_type = {
 def read(filename, file_type, file_format, labels_order):
     """
     Read OUTPUT_ELEME.tec.
-    
+
     Parameters
     ----------
     filename : str, pathlike or buffer
@@ -53,7 +53,7 @@ def read(filename, file_type, file_format, labels_order):
     times, labels, variables = [], [], []
     for zone in zones:
         time = float(zone["title"].split()[0]) if "title" in zone else None
-        
+
         times.append(time)
         labels.append([])
         variables.append(zone["data"])
@@ -92,21 +92,21 @@ def read_buffer(f):
 
         elif not line:
             break
-        
+
     return headers, zones
 
 
 def write(filename, output):
     """
     Write OUTPUT_ELEME.tec.
-    
+
     Parameters
     ----------
     filename : str, pathlike or buffer
         Output file name or buffer.
     output : namedtuple or list of namedtuple
         namedtuple (type, format, time, labels, data) or list of namedtuple for each time step to export.
-    
+
     """
     out = output[-1]
     headers = []

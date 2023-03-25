@@ -132,7 +132,7 @@ def get_output_type(filename):
             line = f.readline().strip()
             if line.startswith("@@@@@"):
                 return "element", "tough"
-            
+
             else:
                 raise ValueError()
 

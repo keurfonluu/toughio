@@ -72,6 +72,7 @@ def structured_grid(dx, dy, dz=None, origin=None, layer=False, material="dfalt")
 
 def _grid_3d(dx, dy, dz, order):
     """Generate 3D structured grid."""
+
     # Internal functions
     def meshgrid(x, y, z, indexing="ij", order=order):
         X, Y, Z = np.meshgrid(x, y, z, indexing=indexing)
@@ -125,6 +126,7 @@ def _grid_3d(dx, dy, dz, order):
 
 def _grid_2d(dx, dy, order):
     """Generate 2D structured grid."""
+
     # Internal functions
     def meshgrid(x, y, indexing="ij", order=order):
         X, Y = np.meshgrid(x, y, indexing=indexing)

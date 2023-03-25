@@ -83,7 +83,7 @@ def to_str(x, fmt):
                 # If it's longer than n-1, use scientific notation
                 if len(tmp) > n - 1:
                     fmt = f"{{:>{n}.{n - 7}e}}"
-                    
+
                     # Remove trailing zeros (e.g., "1.300e+07" -> "  1.3e+07")
                     left, right = fmt.format(x).split("e")
                     fmt = f"{{:>{len(left)}}}e{right}"

@@ -1,5 +1,5 @@
-from ...output.tecplot._tecplot import read_buffer
 from ...._common import open_file
+from ...output.tecplot._tecplot import read_buffer
 
 
 def read(filename):
@@ -15,7 +15,7 @@ def read(filename):
     -------
     dict
         Table data.
-    
+
     """
     with open_file(filename, "r") as f:
         headers, zones = read_buffer(f)
