@@ -9,7 +9,7 @@ __all__ = [
 
 def read(filename):
     """
-    Read CSV history file.
+    Read CSV table file.
 
     Parameters
     ----------
@@ -19,7 +19,11 @@ def read(filename):
     Returns
     -------
     dict
-        History data.
+        Table data.
+
+    Note
+    ----
+    Also supports iTOUGH2 .foft files.
 
     """
     with open_file(filename, "r") as f:

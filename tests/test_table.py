@@ -65,10 +65,10 @@ import toughio
         ),
     ],
 )
-def test_history(filename, file_format, data_ref):
+def test_table(filename, file_format, data_ref):
     this_dir = os.path.dirname(os.path.abspath(__file__))
     filename = os.path.join(this_dir, "support_files", "outputs", filename)
-    data = toughio.read_history(filename, file_format=file_format)
+    data = toughio.read_table(filename, file_format=file_format)
 
     for k, v in data_ref.items():
         assert helpers.allclose(v, data[k].sum())

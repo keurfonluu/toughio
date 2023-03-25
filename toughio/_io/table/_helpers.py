@@ -14,7 +14,7 @@ _writer_map = {}
 
 def register(file_format, extensions, reader, writer=None):
     """
-    Register a new history format.
+    Register a new table format.
 
     Parameters
     ----------
@@ -41,7 +41,7 @@ def register(file_format, extensions, reader, writer=None):
 
 def read(filename, file_format=None, **kwargs):
     """
-    Read history file.
+    Read table file.
 
     Parameters
     ----------
@@ -53,7 +53,7 @@ def read(filename, file_format=None, **kwargs):
     Returns
     -------
     dict
-        History data.
+        Table data.
 
     """
     fmt = (

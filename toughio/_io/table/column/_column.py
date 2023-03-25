@@ -9,7 +9,7 @@ __all__ = [
 
 def read(filename):
     """
-    Read COLUMN history file.
+    Read COLUMN table file.
 
     Parameters
     ----------
@@ -19,7 +19,7 @@ def read(filename):
     Returns
     -------
     dict
-        History data.
+        Table data.
 
     """
     with open_file(filename, "r") as f:
