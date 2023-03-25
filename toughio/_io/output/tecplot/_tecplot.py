@@ -29,7 +29,24 @@ zone_key_to_type = {
 
 
 def read(filename, file_type, file_format, labels_order):
-    """Read OUTPUT_ELEME.tec."""
+    """
+    Read OUTPUT_ELEME.tec.
+    
+    Parameters
+    ----------
+    filename : str, pathlike or buffer
+        Input file name or buffer.
+    file_format : str or None, optional, default None
+        Input file format.
+    labels_order : list of array_like or None, optional, default None
+        List of labels.
+
+    Returns
+    -------
+    namedtuple or list of namedtuple
+        namedtuple (type, format, time, labels, data) or list of namedtuple for each time step.
+
+    """
     with open_file(filename, "r") as f:
         headers, zones = read_buffer(f)
 
@@ -80,7 +97,17 @@ def read_buffer(f):
 
 
 def write(filename, output):
-    """Write OUTPUT_ELEME.tec."""
+    """
+    Write OUTPUT_ELEME.tec.
+    
+    Parameters
+    ----------
+    filename : str, pathlike or buffer
+        Output file name or buffer.
+    output : namedtuple or list of namedtuple
+        namedtuple (type, format, time, labels, data) or list of namedtuple for each time step to export.
+    
+    """
     out = output[-1]
     headers = []
 

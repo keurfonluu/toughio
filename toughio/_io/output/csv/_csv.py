@@ -33,7 +33,24 @@ header_to_unit = {
 
 
 def read(filename, file_type, file_format, labels_order):
-    """Read OUTPUT_{ELEME, CONNE}.csv."""
+    """
+    Read OUTPUT_{ELEME, CONNE}.csv.
+    
+    Parameters
+    ----------
+    filename : str, pathlike or buffer
+        Input file name or buffer.
+    file_format : str or None, optional, default None
+        Input file format.
+    labels_order : list of array_like or None, optional, default None
+        List of labels.
+
+    Returns
+    -------
+    namedtuple or list of namedtuple
+        namedtuple (type, format, time, labels, data) or list of namedtuple for each time step.
+    
+    """
     with open_file(filename, "r") as f:
         headers, times, variables = _read_csv(f, file_type)
 
@@ -94,7 +111,17 @@ def _read_csv(f, file_type):
 
 
 def write(filename, output, unit=None):
-    """Write OUTPUT_{ELEME, CONNE}.csv."""
+    """
+    Write OUTPUT_{ELEME, CONNE}.csv.
+    
+    Parameters
+    ----------
+    filename : str, pathlike or buffer
+        Output file name or buffer.
+    output : namedtuple or list of namedtuple
+        namedtuple (type, format, time, labels, data) or list of namedtuple for each time step to export.
+
+    """
     if not (unit is None or isinstance(unit, dict)):
         raise TypeError()
 
