@@ -1,9 +1,9 @@
 from .._helpers import register
-from ._save import read
+from ._column import read
 
 __all__ = [
     "read",
 ]
 
 
-register("save", [".sav"], read)
+register("column", [".col"], read)

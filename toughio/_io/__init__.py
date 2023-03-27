@@ -3,9 +3,10 @@ from .input import register as register_input
 from .input import write as write_input
 from .output import Output
 from .output import read as read_output
-from .output import read_history
 from .output import register as register_output
 from .output import write as write_output
+from .table import read as read_table
+from .table import register as register_table
 
 __all__ = [
     "Output",
@@ -15,5 +16,6 @@ __all__ = [
     "write_input",
     "read_output",
     "write_output",
-    "read_history",
+    "read_table",
+    "register_table",
 ]

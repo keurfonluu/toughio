@@ -75,17 +75,30 @@ def to_str(x, fmt):
                     return tmp
 
             # Let Python decides the format
+            # n - 1 to leave a whitespace between values
             else:
                 n = int(fmt[3:].split("f")[0])
                 tmp = str(float(x))
 
-                if len(tmp) > n:
-                    fmt = f"{{:>{n}.{n -7}e}}"
+                # If it's longer than n-1, use scientific notation
+                if len(tmp) > n - 1:
+                    fmt = f"{{:>{n}.{n - 7}e}}"
+
+                    # Remove trailing zeros (e.g., "1.300e+07" -> "  1.3e+07")
+                    left, right = fmt.format(x).split("e")
+                    fmt = f"{{:>{len(left)}}}e{right}"
+
+                    return fmt.format(str(float(left)))
+
+                # If it's a scientific notation, make sure there is a decimal point
+                elif "e" in tmp and "." not in tmp:
+                    fmt = f" {{:>{n - 1}.1e}}"
 
                     return fmt.format(x)
 
+                # Otherwise, display as is
                 else:
-                    fmt = "{{:>{}}}".format(n)
+                    fmt = f" {{:>{n - 1}}}"
 
                     return fmt.format(tmp)
 

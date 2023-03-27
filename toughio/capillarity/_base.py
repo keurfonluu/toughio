@@ -1,14 +1,10 @@
-from abc import ABCMeta, abstractmethod, abstractproperty
+from abc import ABC, abstractmethod, abstractproperty
 
 import numpy as np
 
 __all__ = [
     "BaseCapillarity",
 ]
-
-
-# See <https://stackoverflow.com/questions/35673474/using-abc-abcmeta-in-a-way-it-is-compatible-both-with-python-2-7-and-python-3-5>
-ABC = ABCMeta("ABC", (object,), {"__slots__": ()})
 
 
 class BaseCapillarity(ABC):

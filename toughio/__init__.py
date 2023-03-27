@@ -3,11 +3,12 @@ from .__about__ import __version__
 from ._helpers import convert_labels
 from ._io import (
     Output,
-    read_history,
     read_input,
     read_output,
+    read_table,
     register_input,
     register_output,
+    register_table,
     write_input,
     write_output,
 )
@@ -26,9 +27,10 @@ __all__ = [
     "register_input",
     "register_output",
     "register_mesh",
-    "read_history",
+    "register_table",
     "read_input",
     "read_output",
+    "read_table",
     "write_input",
     "write_output",
     "from_meshio",

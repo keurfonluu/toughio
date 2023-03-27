@@ -288,7 +288,7 @@ def test_solvr(write_read):
     }
     parameters = write_read(parameters_ref)
 
-    assert helpers.allclose(parameters_ref, parameters, atol=1.0e-5)
+    assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
 
 @pytest.mark.parametrize(
@@ -332,7 +332,7 @@ def test_param(write_read, t_steps, num_pvars):
     }
     parameters = write_read(parameters_ref)
 
-    assert helpers.allclose(parameters_ref, parameters, atol=1.0e-5)
+    assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
 
 @pytest.mark.parametrize(
@@ -418,7 +418,7 @@ def test_times(write_read, times):
     parameters_ref = {"times": times}
     parameters = write_read(parameters_ref)
 
-    assert helpers.allclose(parameters_ref, parameters, atol=1.0e-5)
+    assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
 
 @pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
