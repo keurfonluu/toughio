@@ -17,9 +17,11 @@ def read(filename, file_type, file_format, labels_order):
     ----------
     filename : str, pathlike or buffer
         Input file name or buffer.
-    file_format : str or None, optional, default None
+    file_type : str
+        Input file type.
+    file_format : str
         Input file format.
-    labels_order : list of array_like or None, optional, default None
+    labels_order : list of array_like
         List of labels.
 
     Returns
