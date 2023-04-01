@@ -456,7 +456,10 @@ def test_oft(write_read, oft, n):
 @pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
 def test_roft(write_read):
     parameters_ref = {
-        "rock_history": [[helpers.random_string(5), helpers.random_string(5)] for _ in range(np.random.randint(10) + 1)]
+        "rock_history": [
+            [helpers.random_string(5), helpers.random_string(5)]
+            for _ in range(np.random.randint(10) + 1)
+        ]
     }
     parameters = write_read(parameters_ref)
 
