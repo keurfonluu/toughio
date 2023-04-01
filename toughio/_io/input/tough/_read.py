@@ -65,14 +65,17 @@ def read_buffer(f, label_length, n_variables, eos, simulator="tough"):
 
         line = f.readline().strip()
 
-        if line[:5].upper() not in blocks:
+        if line[:5].rstrip().upper() not in blocks:
             title.append(line)
 
         else:
             break
 
     if title:
-        parameters["title"] = title[0] if len(title) == 1 else title
+        title = title[0] if len(title) == 1 else title
+
+    if title:
+        parameters["title"] = title
 
     f.seek(0)
 
