@@ -172,6 +172,9 @@ def read_buffer(f, label_length, n_variables, eos, simulator="tough"):
                 oft, label_length = _read_oft(fiter, "GOFT", label_length)
                 parameters.update(oft)
 
+            elif line.startswith("ROFT"):
+                parameters.update(_read_roft(fiter))
+
             elif line.startswith("GENER"):
                 gener, label_length = _read_gener(fiter, label_length, simulator)
                 parameters.update(gener)
@@ -767,6 +770,27 @@ def _read_oft(f, oft, label_length):
         line = f.next()
 
     return history, label_length
+
+
+def _read_roft(f):
+    """Read ROFT block data."""
+    fmt = block_to_format["ROFT"]
+    history = {"rock_history": []}
+
+    line = f.next()
+    while True:
+        if line.strip():
+            data = read_record(line, fmt)
+            rock1 = data[0] if data[0] else ""
+            rock2 = data[1] if data[1] else ""
+            history["rock_history"].append([rock1, rock2])
+
+        else:
+            break
+
+        line = f.next()
+
+    return history
 
 
 def _read_gener(f, label_length, simulator="tough"):

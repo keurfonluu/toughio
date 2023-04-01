@@ -35,6 +35,7 @@ dtypes = {
         "element_history": "array_like",
         "connection_history": "array_like",
         "generator_history": "array_like",
+        "rock_history": "array_like",
         "diffusion": "array_like",
         "output": "dict",
         "elements": "dict",

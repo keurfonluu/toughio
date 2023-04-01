@@ -41,6 +41,7 @@ block_to_format = {
     "FOFT": {5: "5s", 6: "6s", 7: "7s", 8: "8s", 9: "9s"},
     "COFT": {5: "10s", 6: "12s", 7: "14s", 8: "16s", 9: "18s"},
     "GOFT": {5: "5s", 6: "6s", 7: "7s", 8: "8s", 9: "9s"},
+    "ROFT": "5s,5s",
     "GENER": {
         0: ",".join(4 * ["14f"]),
         # Last integer is for KTAB value in TOUGHREACT
