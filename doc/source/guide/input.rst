@@ -67,11 +67,12 @@ A TOUGH input file is defined as follows:
         "selections": dict,
         "generators": list[dict],
         "boundary_conditions": list[dict],
-        "diffusion": list[list],
+        "diffusion": list[list[float]],
         "times": list[float],
         "element_history": list[str],
         "connection_history": list[str],
         "generator_history": list[str],
+        "rock_history": list[list[str]],
         "output": dict,
         "elements": dict,
         "connections": dict,
@@ -253,7 +254,7 @@ History
 *******
 
 Outputs can be generated at specific time steps in ``"times"`` (block TIMES) defined as a list where each value corresponds to a time step at which an output is desired.
-Time-dependent outputs at specific element, connection or generator can be requested in ``"element_history"``, ``"connection_history"`` and ``"generator_history"`` as a list where each value is the label associated to the desired elements/connections.
+Time-dependent outputs at specific element, connection or generator can be requested in ``"element_history"``, ``"connection_history"`` and ``"generator_history"`` as a list where each value is the label associated to the desired elements/connections. For TOUGH3 v1.1 and above, ``"rock_history"`` can be used to generate rock to rock flow data.
 
 
 Hysteresis options
