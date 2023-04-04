@@ -27,19 +27,26 @@ def read(filename):
 
     """
     with open_file(filename, "r") as f:
+        # Read headers
         line = f.readline().strip()
+        sep = "," if "," in line else None
 
-        if line.startswith('"'):
-            sep = ","
-            line = line.replace('"', "")
+        headers = []
+        while True:
+            hdr = [x.replace('"', "").strip() for x in line.split(sep)]
 
-        else:
-            sep = None
+            try:
+                _ = float(hdr[0])
+                break
 
-        headers = [x.strip() for x in line.split(sep)]
+            except ValueError:
+                headers.append(hdr)
+                line = f.readline().strip()
 
+        headers = [" ".join(hdr) for hdr in zip(*headers)]
+
+        # Read data
         data = []
-        line = f.readline().strip()
         while line:
             data.append([x.replace('"', "").strip() for x in line.split(sep)])
             line = f.readline().strip()

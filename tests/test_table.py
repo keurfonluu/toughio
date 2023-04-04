@@ -79,6 +79,17 @@ import toughio
             "csv",
             {"TIME(S)": 3.06639400e9, "GEN": -27.5, "ENTG": 1.40141971e7, "PWB": 0.0},
         ),
+        (
+            "ROFT.csv",
+            "csv",
+            {
+                "TIME (S)": 3.06639400e9,
+                "PRES (PA)": 1.83000721e8,
+                "TEMP (C)": 660.0,
+                "SAT_G (-)": 0.0,
+                "SAT_L (-)": 22.0,
+            },
+        ),
     ],
 )
 def test_table(filename, file_format, data_ref):

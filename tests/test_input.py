@@ -453,6 +453,19 @@ def test_oft(write_read, oft, n):
     assert helpers.allclose(parameters_ref, parameters)
 
 
+@pytest.mark.parametrize("write_read", [write_read_tough, write_read_json])
+def test_roft(write_read):
+    parameters_ref = {
+        "rock_history": [
+            [helpers.random_string(5), helpers.random_string(5)]
+            for _ in range(np.random.randint(10) + 1)
+        ]
+    }
+    parameters = write_read(parameters_ref)
+
+    assert helpers.allclose(parameters_ref, parameters)
+
+
 @pytest.mark.parametrize(
     "write_read, specific_enthalpy, label_length",
     [

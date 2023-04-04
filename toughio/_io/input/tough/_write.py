@@ -332,6 +332,9 @@ def write_buffer(
     if "GOFT" in blocks and len(parameters["generator_history"]):
         out += _write_goft(parameters)
 
+    if "ROFT" in blocks and len(parameters["rock_history"]):
+        out += _write_roft(parameters)
+
     if "GENER" in blocks and parameters["generators"]:
         out += _write_gener(parameters, simulator)
 
@@ -1071,6 +1074,20 @@ def _write_goft(parameters):
 
     values = [x for x in parameters["generator_history"]]
     out = write_record(values, fmt, multi=True)
+
+    return out
+
+
+@block("ROFT", multi=True)
+def _write_roft(parameters):
+    """Write ROFT block data."""
+    # Format
+    fmt = block_to_format["ROFT"]
+    fmt = str2format(fmt)
+
+    out = []
+    for values in parameters["rock_history"]:
+        out += write_record(values, fmt)
 
     return out
 
