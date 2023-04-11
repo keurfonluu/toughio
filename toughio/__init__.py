@@ -9,6 +9,7 @@ from ._io import (
     register_input,
     register_output,
     register_table,
+    write_h5,
     write_input,
     write_output,
 )
@@ -31,6 +32,7 @@ __all__ = [
     "read_input",
     "read_output",
     "read_table",
+    "write_h5",
     "write_input",
     "write_output",
     "from_meshio",
