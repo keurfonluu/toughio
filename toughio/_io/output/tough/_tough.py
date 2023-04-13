@@ -24,7 +24,7 @@ def read(filename, file_type, file_format, labels_order):
     file_format : str
         Input file format.
     labels_order : list of array_like
-        List of labels.
+        List of labels. If None, output will be assumed ordered.
 
     Returns
     -------

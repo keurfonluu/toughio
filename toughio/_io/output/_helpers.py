@@ -58,7 +58,7 @@ def read(
     file_format : str ('csv', 'petrasim', 'save', 'tecplot', 'tough') or None, optional, default None
         Input file format.
     labels_order : list of array_like or None, optional, default None
-        List of labels.
+        List of labels. If None, output will be assumed ordered.
     connection : bool, optional, default False
         Only for standard TOUGH output file. If `True`, return data related to connections.
 
