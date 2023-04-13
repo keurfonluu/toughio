@@ -74,15 +74,23 @@ def read(
         raise TypeError()
 
     if file_format is None:
+        # Guess type and format from content
         file_type, file_format = get_output_type(filename)
-        file_type = (
-            "connection" if (file_format == "tough" and connection) else file_type
+
+        # Otherwise, guess file format from extension
+        file_format = (
+            file_format
+            if file_format
+            else filetype_from_filename(filename, _extension_to_filetype, "")
         )
 
     else:
         if file_format not in _reader_map:
             raise ValueError()
+        
+        file_type = "element"  # By default
 
+    if connection:
         file_type = "connection" if connection else "element"
 
     return _reader_map[file_format](filename, file_type, file_format, labels_order)
@@ -158,4 +166,4 @@ def get_output_type(filename):
                 return "connection", "csv"
 
             else:
-                raise ValueError()
+                return "element", None
