@@ -890,16 +890,19 @@ def _read_timbc(f):
         bcelm = f.next().strip()
 
         # Record 4
-        line = f.next().strip()
-        data = [float(x) for x in line.split()]
-        if len(data) < 2 * nbcp:
-            raise ReadError()
+        times = []
+        values = []
+        for _ in range(nbcp):
+            line = f.next().strip()
+            data = [float(x) for x in line.split()]
+            times.append(data[0])
+            values.append(data[1])
 
         tmp = {
             "label": bcelm,
             "variable": nbcpv,
-            "times": data[::2],
-            "values": data[1::2],
+            "times": times,
+            "values": values,
         }
         timbc["boundary_conditions"].append(tmp)
 

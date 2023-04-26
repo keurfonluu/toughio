@@ -1243,10 +1243,8 @@ def _write_timbc(parameters):
         out += write_ffrecord([data["label"]], end="\n")
 
         # Record 4
-        tmp = np.zeros(2 * nbcp)
-        tmp[::2] = times
-        tmp[1::2] = values[:nbcp]
-        out += write_ffrecord(tmp, end="\n")
+        for time, value in zip(times, values):
+            out += write_ffrecord([time, value], end="\n")
 
     return out
 
