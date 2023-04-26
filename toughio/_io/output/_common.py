@@ -7,17 +7,16 @@ __all__ = [
 ]
 
 
-Output = collections.namedtuple("Output", ["type", "format", "time", "labels", "data"])
+Output = collections.namedtuple("Output", ["type", "time", "labels", "data"])
 
 
-def to_output(file_type, file_format, labels_order, headers, times, labels, variables):
+def to_output(file_type, labels_order, headers, times, labels, variables):
     """Create an Output namedtuple."""
     outputs = [
         Output(
             file_type,
-            file_format,
             time,
-            np.array(label),
+            np.array(label) if len(label) else np.array(label, dtype="<U1"),
             {k: v for k, v in zip(headers, np.transpose(variable))},
         )
         for time, label, variable in zip(times, labels, variables)

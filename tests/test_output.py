@@ -17,16 +17,16 @@ write_read = lambda output, writer_kws, reader_kws: helpers.write_read(
 
 
 @pytest.mark.parametrize(
-    "filename, filename_ref",
+    "filename, filename_ref, file_format",
     [
-        ("OUTPUT_ELEME.csv", "SAVE.out"),
-        ("OUTPUT_ELEME.tec", "SAVE.out"),
-        ("OUTPUT_ELEME_PETRASIM.csv", "SAVE.out"),
-        ("OUTPUT.out", "SAVE.out"),
-        ("OUTPUT_6.out", "SAVE_6.out"),
+        ("OUTPUT_ELEME.csv", "SAVE.out", "csv"),
+        ("OUTPUT_ELEME.tec", "SAVE.out", "tecplot"),
+        ("OUTPUT_ELEME_PETRASIM.csv", "SAVE.out", "petrasim"),
+        ("OUTPUT.out", "SAVE.out", "tough"),
+        ("OUTPUT_6.out", "SAVE_6.out", "tough"),
     ],
 )
-def test_output_eleme(filename, filename_ref):
+def test_output_eleme(filename, filename_ref, file_format):
     this_dir = os.path.dirname(os.path.abspath(__file__))
     filename = os.path.join(this_dir, "support_files", "outputs", filename)
     outputs = toughio.read_output(filename)
@@ -48,10 +48,10 @@ def test_output_eleme(filename, filename_ref):
         assert time_ref == output.time
         assert (
             save.labels.tolist() == output.labels.tolist()
-            if output.format in {"csv", "petrasim", "tough"}
+            if file_format in {"csv", "petrasim", "tough"}
             else len(output.labels) == 0
         )
-        if output.format != "tough":
+        if file_format != "tough":
             assert keys_ref == sorted(list(output.data))
 
     assert helpers.allclose(save.data["X1"], outputs[-1].data["PRES"])

@@ -74,7 +74,6 @@ hybrid_mesh = toughio.Mesh(
 output_eleme = [
     toughio.Output(
         "element",
-        None,
         float(time),
         np.array([f"AAA0{i}" for i in range(10)]),
         {
@@ -91,7 +90,6 @@ output_eleme = [
 output_conne = [
     toughio.Output(
         "connection",
-        None,
         float(time),
         np.array([[f"AAA0{i}", f"AAA0{i}"] for i in range(10)]),
         {

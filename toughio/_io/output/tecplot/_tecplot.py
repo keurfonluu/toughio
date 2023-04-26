@@ -28,7 +28,7 @@ zone_key_to_type = {
 }
 
 
-def read(filename, file_type, file_format, labels_order):
+def read(filename, file_type, labels_order=None):
     """
     Read OUTPUT_ELEME.tec.
 
@@ -38,8 +38,6 @@ def read(filename, file_type, file_format, labels_order):
         Input file name or buffer.
     file_type : str
         Input file type.
-    file_format : str
-        Input file format.
     labels_order : list of array_like
         List of labels. If None, output will be assumed ordered.
 
@@ -61,7 +59,7 @@ def read(filename, file_type, file_format, labels_order):
         variables.append(zone["data"])
 
     return to_output(
-        file_type, file_format, labels_order, headers, times, labels, variables
+        file_type, labels_order, headers, times, labels, variables
     )
 
 
