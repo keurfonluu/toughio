@@ -366,6 +366,7 @@ def _write_conne(
         cell_list.add(i)
 
     centers = np.array(centers)
+    centers = np.around(centers,decimals=4)
     int_points = np.array(int_points)
     int_normals = np.array(int_normals)
     bounds = np.array(bounds)
