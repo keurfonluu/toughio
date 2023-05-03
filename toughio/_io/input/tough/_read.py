@@ -179,8 +179,11 @@ def read_buffer(f, label_length, n_variables, eos, simulator="tough"):
                 parameters.update(_read_roft(fiter))
 
             elif line.startswith("GENER"):
-                gener, label_length = _read_gener(fiter, label_length, simulator)
+                gener, flag, label_length = _read_gener(fiter, label_length, simulator)
                 parameters.update(gener)
+
+                if flag:
+                    break
 
             elif line.startswith("TIMBC"):
                 parameters.update(_read_timbc(fiter))
@@ -816,8 +819,9 @@ def _read_gener(f, label_length, simulator="tough"):
         label_length = get_label_length(line[:9])
     label_format = f"{{:>{label_length}}}"
 
+    flag = False
     while True:
-        if line.strip():
+        if line.strip() and not line.startswith("+++"):
             data = read_record(line, fmt[label_length])
             tmp = {
                 "label": label_format.format(data[0]),
@@ -859,13 +863,14 @@ def _read_gener(f, label_length, simulator="tough"):
             gener["generators"].append(tmp)
 
         else:
+            flag = line.startswith("+++")
             break
 
         line = f.next()
 
     return {
         "generators": [prune_values(generator) for generator in gener["generators"]]
-    }, label_length
+    }, flag, label_length
 
 
 def _read_timbc(f):
