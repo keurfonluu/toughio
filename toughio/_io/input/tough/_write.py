@@ -1352,6 +1352,7 @@ def _write_eleme(parameters):
             if isinstance(data["material"], int)
             else data["material"]
         )
+        center = data["center"] if data["center"] is not None else [None, None, None]
         values = [
             k,
             data["nseq"],
@@ -1360,9 +1361,9 @@ def _write_eleme(parameters):
             data["volume"],
             data["heat_exchange_area"],
             data["permeability_modifier"],
-            data["center"][0],
-            data["center"][1],
-            data["center"][2],
+            center[0],
+            center[1],
+            center[2],
         ]
         out += write_record(values, fmt)
 
