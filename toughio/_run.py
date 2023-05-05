@@ -60,14 +60,14 @@ def run(
     input_path = pathlib.Path(input_filename)
     input_filename = working_dir / input_path.name
 
-    if input_path.parent != working_dir:
+    if input_path.parent.absolute() != working_dir.absolute():
         shutil.copy(input_path, input_filename)
 
     # Copy other simulation files to working directory
     for filename in other_filenames:
         filename = pathlib.Path(filename)
 
-        if filename.parent != working_dir:
+        if filename.parent.absolute() != working_dir.absolute():
             shutil.copy(filename, working_dir)
 
     # Output filename
