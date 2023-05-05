@@ -213,7 +213,7 @@ def _get_parser():
     parser.add_argument(
         "infile",
         type=str,
-        help="TOUGH output file",
+        help="TOUGH input file",
     )
 
     # Mesh file
