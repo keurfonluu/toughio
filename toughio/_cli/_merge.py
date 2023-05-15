@@ -38,24 +38,21 @@ def merge(argv=None):
     
     # Buffer GENER
     if gener_exists:
-        with open(gener_filename, "r") as f:
-            gener_file = list(f)
+        gener_file = _read_file(gener_filename, end="+++")
 
         if not gener_file[0].startswith("GENER"):
             raise ValueError("Invalid GENER file.")
 
     # Buffer MESH
     if mesh_exists:
-        with open(mesh_filename, "r") as f:
-            mesh_file = list(f)
+        mesh_file = _read_file(mesh_filename)
 
         if not mesh_file[0].startswith("ELEME"):
             raise ValueError("Invalid MESH file.")
 
     # Buffer INCON if exist
     if incon_exists:
-        with open(incon_filename, "r") as f:
-            incon_file = list(f)
+        incon_file = _read_file(incon_filename, end="+++")
 
         if not incon_file[0].startswith("INCON"):
             raise ValueError("Invalid INCON file.")
@@ -108,3 +105,21 @@ def _get_parser():
     parser.add_argument("outfile", type=str, help="merged TOUGH input file")
 
     return parser
+
+
+def _read_file(filename, end=None):
+    with open(filename, "r") as f:
+        if end is None:
+            file = list(f)
+
+        else:
+            file = []
+
+            for line in f:
+                if line.startswith(end):
+                    file.append("\n")
+                    break
+
+                file.append(line)
+
+    return file
