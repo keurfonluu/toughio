@@ -86,7 +86,7 @@ def run(
         filename = pathlib.Path(k)
         new_filename = pathlib.Path(v)
 
-        if filename.parent.absolute() != working_dir.absolute() and filename.name != new_filename.name:
+        if filename.parent.absolute() != working_dir.absolute() or filename.name != new_filename.name:
             shutil.copy(filename, working_dir / v)
 
     # Output filename
