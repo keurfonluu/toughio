@@ -4,6 +4,7 @@ import pathlib
 import shutil
 import subprocess
 import sys
+import tempfile
 
 
 def run(
@@ -15,6 +16,7 @@ def run(
     docker=None,
     wsl=False,
     working_dir=None,
+    use_temp=False,
     silent=False
 ):
     """
@@ -38,6 +40,8 @@ def run(
         Only for Windows. If `True`, run the final command as a Bash command. Ignored if `docker` is not None.
     working_dir : str, pathlike or None, optional, default None
         Working directory. Input and output files will be generated in this directory.
+    use_temp : bool, optional, default False
+        If `True`, run simulation in a temporary directory, and copy simulation files to `working_dir` at the end of the simulation.
     silent : bool, optional, default False
         If `True`, nothing will be printed to standard output.
 
@@ -69,25 +73,36 @@ def run(
     working_dir = pathlib.Path(working_dir)
     working_dir.mkdir(parents=True, exist_ok=True)
 
-    # Check if input file is in working directory, otherwise copy
+    # Simulation directory
+    if use_temp:
+        temp_dir = tempfile.mkdtemp()
+        simulation_dir = pathlib.Path(temp_dir)
+
+        with open(working_dir / "tempdir.txt", "w") as f:
+            f.write(temp_dir)
+
+    else:
+        simulation_dir = working_dir
+
+    # Check if input file is in simulation directory, otherwise copy
     if not isinstance(input_filename, dict):
         input_path = pathlib.Path(input_filename)
-        input_filename = working_dir / input_path.name
+        input_filename = simulation_dir / input_path.name
 
-        if input_path.parent.absolute() != working_dir.absolute():
+        if input_path.parent.absolute() != simulation_dir.absolute():
             shutil.copy(input_path, input_filename)
 
     else:
-        write_input(working_dir / "INFILE", input_filename)
-        input_filename = working_dir / "INFILE"
+        write_input(simulation_dir / "INFILE", input_filename)
+        input_filename = simulation_dir / "INFILE"
 
     # Copy other simulation files to working directory
     for k, v in other_filenames.items():
         filename = pathlib.Path(k)
         new_filename = pathlib.Path(v)
 
-        if filename.parent.absolute() != working_dir.absolute() or filename.name != new_filename.name:
-            shutil.copy(filename, working_dir / v)
+        if filename.parent.absolute() != simulation_dir.absolute() or filename.name != new_filename.name:
+            shutil.copy(filename, simulation_dir / v)
 
     # Output filename
     output_filename = f"{input_filename.stem}.out"
@@ -122,15 +137,33 @@ def run(
     status = subprocess.run(
         cmd,
         shell=True,
-        cwd=str(working_dir),
+        cwd=str(simulation_dir),
         **kwargs
     )
+
+    # List of files to delete
+    patterns = [".OUTPUT", "TABLE", "MESHA", "MESHB"]
+
+    # Copy files from temporary directory and delete it
+    if use_temp:
+        for filename in glob.glob(f"{str(simulation_dir)}/*"):
+            flag = True
+            
+            for pattern in patterns:
+                if pathlib.Path(filename).name.startswith(pattern):
+                    flag = False
+                    break
+            
+            if flag:
+                shutil.copy(filename, working_dir)
+
+        shutil.rmtree(simulation_dir, ignore_errors=True)
 
     # Clean up working directory
     filenames = glob.glob(f"{str(working_dir)}/*") + glob.glob(f"{str(working_dir)}/.*")
 
     for filename in filenames:
-        for pattern in [".OUTPUT", "TABLE", "MESHA", "MESHB"]:
+        for pattern in patterns + ["tempdir.txt"]:
             if pathlib.Path(filename).name.startswith(pattern):
                 os.remove(filename)
 
