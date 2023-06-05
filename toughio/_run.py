@@ -17,6 +17,7 @@ def run(
     wsl=False,
     working_dir=None,
     use_temp=False,
+    ignore_patterns=None,
     silent=False
 ):
     """
@@ -41,7 +42,9 @@ def run(
     working_dir : str, pathlike or None, optional, default None
         Working directory. Input and output files will be generated in this directory.
     use_temp : bool, optional, default False
-        If `True`, run simulation in a temporary directory, and copy simulation files to `working_dir` at the end of the simulation.
+        If `True`, run simulation in a temporary directory, and copy simulation files to `working_dir` at the end of the simulation. This option may be required when running TOUGH through a Docker.
+    ignore_patterns : list or None, optional, default None
+        If provided, output files that match the glob-style patterns will be discarded.
     silent : bool, optional, default False
         If `True`, nothing will be printed to standard output.
 
@@ -63,6 +66,9 @@ def run(
 
     if command is None:
         command = lambda exec, inp, out: f"{exec} {inp} {out}"
+
+    ignore_patterns = list(ignore_patterns) if ignore_patterns else []
+    ignore_patterns += [".OUTPUT*", "TABLE", "MESHA", "MESHB"]
 
     # Executable
     exec = str(exec)
@@ -141,32 +147,20 @@ def run(
         **kwargs
     )
 
-    # List of files to delete
-    patterns = [".OUTPUT", "TABLE", "MESHA", "MESHB"]
-
     # Copy files from temporary directory and delete it
     if use_temp:
-        for filename in glob.glob(f"{str(simulation_dir)}/*"):
-            flag = True
-            
-            for pattern in patterns:
-                if pathlib.Path(filename).name.startswith(pattern):
-                    flag = False
-                    break
-            
-            if flag:
-                shutil.copy(filename, working_dir)
-
+        shutil.copytree(simulation_dir, working_dir, ignore=shutil.ignore_patterns(*ignore_patterns), dirs_exist_ok=True)
         shutil.rmtree(simulation_dir, ignore_errors=True)
+        os.remove(working_dir / "tempdir.txt")
 
     # Clean up working directory
-    filenames = glob.glob(f"{str(working_dir)}/*") + glob.glob(f"{str(working_dir)}/.*")
+    patterns = [
+        pathlib.Path(filename)
+        for pattern in ignore_patterns
+        for filename in glob.glob(f"{str(simulation_dir)}/{pattern}")
+    ]
 
-    for filename in filenames:
-        for pattern in patterns + ["tempdir.txt"]:
-            if pathlib.Path(filename).name.startswith(pattern):
-                os.remove(filename)
-
-                break
+    for pattern in patterns:
+        os.remove(pattern)
 
     return status
