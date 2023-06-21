@@ -152,7 +152,12 @@ def _get_file_format(filename, file_format, default):
 def _file_format_from_filename(filename):
     """Determine file format from its name."""
     import pathlib
+    from io import TextIOWrapper
 
-    filename = pathlib.Path(filename).name
+    if not isinstance(filename, TextIOWrapper):
+        filename = pathlib.Path(filename).name
 
-    return _file_formats[filename] if filename in _file_formats else ""
+        return _file_formats[filename] if filename in _file_formats else ""
+    
+    else:
+        return ""

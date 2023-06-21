@@ -168,9 +168,15 @@ def register_format(
 
 def filetype_from_filename(filename, ext_to_fmt, default=""):
     """Determine file type from its extension."""
-    ext = os.path.splitext(filename)[1].lower()
+    from io import TextIOWrapper
 
-    return ext_to_fmt[ext] if ext in ext_to_fmt else default
+    if not isinstance(filename, TextIOWrapper):
+        ext = os.path.splitext(filename)[1].lower()
+
+        return ext_to_fmt[ext] if ext in ext_to_fmt else default
+    
+    else:
+        return default
 
 
 @contextmanager
