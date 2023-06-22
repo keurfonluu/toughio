@@ -43,6 +43,7 @@ dtypes = {
         "connections": "dict",
         "initial_conditions": "dict",
         "meshmaker": "dict",
+        "minc": "dict",
         "poiseuille": "dict",
         "default": "dict",
         "array_dimensions": "dict",
@@ -209,6 +210,15 @@ dtypes = {
         "permeability": "scalar_array_like",
     },
     "MESHM": {"type": "str", "parameters": "array_like", "angle": "scalar"},
+    "MINC": {
+        "type": "str",
+        "dual": "str",
+        "n_minc": "int",
+        "n_volume": "int",
+        "where": "str",
+        "parameters": "array_like",
+        "volumes": "array_like",
+    },
     "POISE": {
         "start": "array_like",
         "end": "array_like",

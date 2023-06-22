@@ -1137,7 +1137,6 @@ def _read_incon(f, label_length, n_variables, eos=None, simulator="tough"):
 
 def _read_meshm(f):
     """Read MESHM block data."""
-    meshm = {"meshmaker": {}}
     fmt = block_to_format["MESHM"]
 
     # Mesh type
@@ -1145,9 +1144,14 @@ def _read_meshm(f):
     data = read_record(line, fmt[1])
     mesh_type = data[0].upper()
 
+    if mesh_type in {"XYZ", "RZ2D", "RZ2DL"}:
+        meshm = {"meshmaker": {"type": mesh_type.lower()}}
+
+    else:
+        meshm = {"minc": {}}
+
     # XYZ
     if mesh_type == "XYZ":
-        meshm["meshmaker"]["type"] = mesh_type.lower()
         fmt = fmt["XYZ"]
 
         # Record 1
@@ -1187,7 +1191,6 @@ def _read_meshm(f):
 
     # RZ2D
     elif mesh_type in {"RZ2D", "RZ2DL"}:
-        meshm["meshmaker"]["type"] = mesh_type.lower()
         fmt = fmt["RZ2D"]
 
         # Record 1
@@ -1258,6 +1261,32 @@ def _read_meshm(f):
 
             else:
                 break
+
+    # MINC
+    elif mesh_type == "MINC":
+        fmt = fmt["MINC"]
+
+        # Record 1
+        line = f.next()
+        data = read_record(line, fmt[1])
+        meshm["minc"]["type"] = data[1].lower()
+        meshm["minc"]["dual"] = data[3].lower()
+
+        # Record 2
+        line = f.next()
+        data = read_record(line, fmt[2])
+        meshm["minc"]["n_minc"] = data[0]
+        meshm["minc"]["n_volume"] = data[1]
+        meshm["minc"]["where"] = data[2].lower()
+        meshm["minc"]["parameters"] = prune_values(data[3:])
+
+        # Record 3
+        meshm["minc"]["volumes"] = []
+
+        while len(meshm["minc"]["volumes"]) < meshm["minc"]["n_volume"]:
+            line = f.next()
+            data = read_record(line, fmt[3])
+            meshm["minc"]["volumes"] += prune_values(data)
 
     return meshm
 

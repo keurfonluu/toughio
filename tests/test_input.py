@@ -800,6 +800,25 @@ def test_meshm_rz2d(layer):
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
 
+def test_minc():
+    n_volume = np.random.randint(100) + 1
+
+    parameters_ref = {
+        "minc": {
+            "type": helpers.random_string(5),
+            "dual": helpers.random_string(5),
+            "n_minc": np.random.randint(100) + 1,
+            "n_volume": n_volume,
+            "where": helpers.random_string(4),
+            "parameters": np.random.rand(7),
+            "volumes": np.random.rand(n_volume),
+        }
+    }
+    parameters = write_read(parameters_ref)
+
+    assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
+
+
 def test_tmvoc():
     parameters_ref = {
         "eos": "tmvoc",

@@ -369,6 +369,9 @@ def write_buffer(
     if "MESHM" in blocks and parameters["meshmaker"]:
         out += _write_meshm(parameters)
 
+    if "MESHM" in blocks and parameters["minc"]:
+        out += _write_minc(parameters)
+
     if "POISE" in blocks and poise and simulator == "toughreact":
         out += _write_poise(parameters)
         out += ["\n"] if space_between_blocks else []
@@ -1571,6 +1574,49 @@ def _write_meshm(parameters):
 
                 out += write_record([len(parameter["thicknesses"])], fmt1)
                 out += write_record(parameter["thicknesses"], fmt2, multi=True)
+
+    return out
+
+
+@check_parameters(dtypes["MINC"], keys="minc")
+@block("MESHM", multi=True)
+def _write_minc(parameters):
+    """Write MESHM block data (MINC)."""
+    from ._common import minc
+
+    data = deepcopy(minc)
+    data.update(parameters["minc"])
+
+    # Format
+    fmt = block_to_format["MESHM"]
+    fmt0 = str2format(fmt[1])
+    fmt1 = str2format(fmt["MINC"][1])
+    fmt2 = str2format(fmt["MINC"][2])
+    fmt3 = str2format(fmt["MINC"][3])
+
+    # Mesh type
+    out = write_record(["MINC"], fmt0)
+
+    # Record 1
+    values = [
+        "PART",
+        data["type"].upper(),
+        None,
+        data["dual"].upper(),
+    ]
+    out += write_record(values, fmt1)
+
+    # Record 2
+    values = [
+        data["n_minc"],
+        data["n_volume"],
+        f"{data['where'].upper():<4}",
+        *data["parameters"],
+    ]
+    out += write_record(values, fmt2)
+
+    # Record 3
+    out += write_record(data["volumes"], fmt3, multi=True)
 
     return out
 

@@ -240,6 +240,16 @@ rz2d = {
     "thicknesses": [],
 }
 
+minc = {
+    "type": None,
+    "dual": None,
+    "n_minc": None,
+    "n_volume": None,
+    "where": None,
+    "parameters": [],
+    "volumes": [],
+}
+
 default = {
     "density": None,
     "porosity": None,
