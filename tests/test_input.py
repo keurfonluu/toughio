@@ -808,7 +808,6 @@ def test_minc():
             "type": helpers.random_string(5),
             "dual": helpers.random_string(5),
             "n_minc": np.random.randint(100) + 1,
-            "n_volume": n_volume,
             "where": helpers.random_string(4),
             "parameters": np.random.rand(7),
             "volumes": np.random.rand(n_volume),

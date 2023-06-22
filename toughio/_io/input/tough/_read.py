@@ -1276,14 +1276,14 @@ def _read_meshm(f):
         line = f.next()
         data = read_record(line, fmt[2])
         meshm["minc"]["n_minc"] = data[0]
-        meshm["minc"]["n_volume"] = data[1]
+        n_volume = data[1]
         meshm["minc"]["where"] = data[2].lower()
         meshm["minc"]["parameters"] = prune_values(data[3:])
 
         # Record 3
         meshm["minc"]["volumes"] = []
 
-        while len(meshm["minc"]["volumes"]) < meshm["minc"]["n_volume"]:
+        while len(meshm["minc"]["volumes"]) < n_volume:
             line = f.next()
             data = read_record(line, fmt[3])
             meshm["minc"]["volumes"] += prune_values(data)

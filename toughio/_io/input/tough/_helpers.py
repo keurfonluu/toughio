@@ -214,7 +214,6 @@ dtypes = {
         "type": "str",
         "dual": "str",
         "n_minc": "int",
-        "n_volume": "int",
         "where": "str",
         "parameters": "array_like",
         "volumes": "array_like",

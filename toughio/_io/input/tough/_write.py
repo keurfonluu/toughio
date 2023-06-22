@@ -1609,7 +1609,7 @@ def _write_minc(parameters):
     # Record 2
     values = [
         data["n_minc"],
-        data["n_volume"],
+        len(data["volumes"]),
         f"{data['where'].upper():<4}",
         *data["parameters"],
     ]
