@@ -1137,7 +1137,37 @@ def _read_incon(f, label_length, n_variables, eos=None, simulator="tough"):
 
 def _read_meshm(f):
     """Read MESHM block data."""
+
+    def read_minc(f, data, fmt):
+        """Read MINC data."""
+        minc = {}
+
+        # Record 1
+        line = f.next()
+        data = read_record(line, fmt[1])
+        minc["type"] = data[1].lower()
+        minc["dual"] = data[3].lower()
+
+        # Record 2
+        line = f.next()
+        data = read_record(line, fmt[2])
+        minc["n_minc"] = data[0]
+        n_volume = data[1]
+        minc["where"] = data[2].lower()
+        minc["parameters"] = prune_values(data[3:])
+
+        # Record 3
+        minc["volumes"] = []
+
+        while len(minc["volumes"]) < n_volume:
+            line = f.next()
+            data = read_record(line, fmt[3])
+            minc["volumes"] += prune_values(data)
+
+        return minc
+        
     fmt = block_to_format["MESHM"]
+    fmt_minc = fmt["MINC"]
 
     # Mesh type
     line = f.next().strip()
@@ -1259,35 +1289,23 @@ def _read_meshm(f):
                     tmp = {"type": data_type.lower(), "thicknesses": thicknesses[:n]}
                     meshm["meshmaker"]["parameters"].append(tmp)
 
+                    # LAYER closes the block RZ2D
+                    # RZ2D can be followed by MINC
+                    line = f.next()
+
+                    if line.startswith("MINC"):
+                        meshm["minc"] = read_minc(f, data, fmt_minc)
+
+                    else:
+                        break
+
             else:
                 break
 
     # MINC
     elif mesh_type == "MINC":
-        fmt = fmt["MINC"]
-
-        # Record 1
-        line = f.next()
-        data = read_record(line, fmt[1])
-        meshm["minc"]["type"] = data[1].lower()
-        meshm["minc"]["dual"] = data[3].lower()
-
-        # Record 2
-        line = f.next()
-        data = read_record(line, fmt[2])
-        meshm["minc"]["n_minc"] = data[0]
-        n_volume = data[1]
-        meshm["minc"]["where"] = data[2].lower()
-        meshm["minc"]["parameters"] = prune_values(data[3:])
-
-        # Record 3
-        meshm["minc"]["volumes"] = []
-
-        while len(meshm["minc"]["volumes"]) < n_volume:
-            line = f.next()
-            data = read_record(line, fmt[3])
-            meshm["minc"]["volumes"] += prune_values(data)
-
+        meshm["minc"] = read_minc(f, data, fmt_minc)
+        
     return meshm
 
 

@@ -366,11 +366,8 @@ def write_buffer(
     if "INCON" in blocks and parameters["initial_conditions"]:
         out += _write_incon(parameters, eos_, simulator)
 
-    if "MESHM" in blocks and parameters["meshmaker"]:
+    if "MESHM" in blocks and (parameters["meshmaker"] or parameters["minc"]):
         out += _write_meshm(parameters)
-
-    if "MESHM" in blocks and parameters["minc"]:
-        out += _write_minc(parameters)
 
     if "POISE" in blocks and poise and simulator == "toughreact":
         out += _write_poise(parameters)
@@ -1480,106 +1477,114 @@ def _write_meshm(parameters):
     """Write MESHM block data."""
     from ._common import meshmaker, rz2d, xyz
 
-    data = deepcopy(meshmaker)
-    data.update(parameters["meshmaker"])
+    out = []
 
-    # Format
-    fmt = block_to_format["MESHM"]
-    fmt1 = str2format(fmt[1])
+    if parameters["meshmaker"]:
+        data = deepcopy(meshmaker)
+        data.update(parameters["meshmaker"])
 
-    # Mesh type
-    mesh_type = data["type"].upper() if data["type"] else data["type"]
-    out = write_record([mesh_type], fmt1)
-
-    # XYZ
-    if mesh_type == "XYZ":
-        fmt = fmt["XYZ"]
+        # Format
+        fmt = block_to_format["MESHM"]
         fmt1 = str2format(fmt[1])
-        fmt2 = str2format(fmt[2])
-        fmt3 = str2format(fmt[3])
 
-        # Record 1
-        out += write_record([data["angle"]], fmt1)
+        # Mesh type
+        mesh_type = data["type"].upper() if data["type"] else data["type"]
+        out += write_record([mesh_type], fmt1)
 
-        # Record 2
-        for parameter_ in data["parameters"]:
-            parameter = deepcopy(xyz)
-            parameter.update(parameter_)
+        # XYZ
+        if mesh_type == "XYZ":
+            fmt = fmt["XYZ"]
+            fmt1 = str2format(fmt[1])
+            fmt2 = str2format(fmt[2])
+            fmt3 = str2format(fmt[3])
 
-            values = [parameter["type"].upper()]
-            ndim = np.ndim(parameter["sizes"])
+            # Record 1
+            out += write_record([data["angle"]], fmt1)
 
-            if ndim == 0:
-                values += [
-                    parameter["n_increment"],
-                    parameter["sizes"],
-                ]
-                out += write_record(values, fmt2)
+            # Record 2
+            for parameter_ in data["parameters"]:
+                parameter = deepcopy(xyz)
+                parameter.update(parameter_)
 
-            elif ndim == 1:
-                values += [
-                    parameter["n_increment"]
-                    if parameter["n_increment"]
-                    else len(parameter["sizes"])
-                ]
-                out += write_record(values, fmt2)
-                out += write_record(parameter["sizes"], fmt3, multi=True)
+                values = [parameter["type"].upper()]
+                ndim = np.ndim(parameter["sizes"])
 
-            else:
-                raise ValueError()
+                if ndim == 0:
+                    values += [
+                        parameter["n_increment"],
+                        parameter["sizes"],
+                    ]
+                    out += write_record(values, fmt2)
 
-    # RZ2D
-    elif mesh_type in {"RZ2D", "RZ2DL"}:
-        fmt = fmt["RZ2D"]
-        fmt0 = str2format(fmt[1])
+                elif ndim == 1:
+                    values += [
+                        parameter["n_increment"]
+                        if parameter["n_increment"]
+                        else len(parameter["sizes"])
+                    ]
+                    out += write_record(values, fmt2)
+                    out += write_record(parameter["sizes"], fmt3, multi=True)
 
-        for parameter_ in data["parameters"]:
-            parameter = deepcopy(rz2d)
-            parameter.update(parameter_)
+                else:
+                    raise ValueError()
+                
+            # Blank record
+            out += ["\n"]
 
-            parameter_type = parameter["type"].upper()
-            out += write_record([parameter_type], fmt0)
+        # RZ2D
+        elif mesh_type in {"RZ2D", "RZ2DL"}:
+            fmt = fmt["RZ2D"]
+            fmt0 = str2format(fmt[1])
 
-            if parameter_type == "RADII":
-                fmt1 = str2format(fmt["RADII"][1])
-                fmt2 = str2format(fmt["RADII"][2])
+            for parameter_ in data["parameters"]:
+                parameter = deepcopy(rz2d)
+                parameter.update(parameter_)
 
-                out += write_record([len(parameter["radii"])], fmt1)
-                out += write_record(parameter["radii"], fmt2, multi=True)
+                parameter_type = parameter["type"].upper()
+                out += write_record([parameter_type], fmt0)
 
-            elif parameter_type == "EQUID":
-                fmt1 = str2format(fmt["EQUID"])
+                if parameter_type == "RADII":
+                    fmt1 = str2format(fmt["RADII"][1])
+                    fmt2 = str2format(fmt["RADII"][2])
 
-                values = [
-                    parameter["n_increment"],
-                    None,
-                    parameter["size"],
-                ]
-                out += write_record(values, fmt1)
+                    out += write_record([len(parameter["radii"])], fmt1)
+                    out += write_record(parameter["radii"], fmt2, multi=True)
 
-            elif parameter_type == "LOGAR":
-                fmt1 = str2format(fmt["LOGAR"])
+                elif parameter_type == "EQUID":
+                    fmt1 = str2format(fmt["EQUID"])
 
-                values = [
-                    parameter["n_increment"],
-                    None,
-                    parameter["radius"],
-                    parameter["radius_ref"],
-                ]
-                out += write_record(values, fmt1)
+                    values = [
+                        parameter["n_increment"],
+                        None,
+                        parameter["size"],
+                    ]
+                    out += write_record(values, fmt1)
 
-            elif parameter_type == "LAYER":
-                fmt1 = str2format(fmt["LAYER"][1])
-                fmt2 = str2format(fmt["LAYER"][2])
+                elif parameter_type == "LOGAR":
+                    fmt1 = str2format(fmt["LOGAR"])
 
-                out += write_record([len(parameter["thicknesses"])], fmt1)
-                out += write_record(parameter["thicknesses"], fmt2, multi=True)
+                    values = [
+                        parameter["n_increment"],
+                        None,
+                        parameter["radius"],
+                        parameter["radius_ref"],
+                    ]
+                    out += write_record(values, fmt1)
+
+                elif parameter_type == "LAYER":
+                    fmt1 = str2format(fmt["LAYER"][1])
+                    fmt2 = str2format(fmt["LAYER"][2])
+
+                    out += write_record([len(parameter["thicknesses"])], fmt1)
+                    out += write_record(parameter["thicknesses"], fmt2, multi=True)
+
+    if parameters["minc"]:
+        out += _write_minc(parameters)
 
     return out
 
 
 @check_parameters(dtypes["MINC"], keys="minc")
-@block("MESHM", multi=True)
 def _write_minc(parameters):
     """Write MESHM block data (MINC)."""
     from ._common import minc
