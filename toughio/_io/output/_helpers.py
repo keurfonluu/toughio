@@ -106,7 +106,7 @@ def write(filename, output, file_format=None, **kwargs):
         Output file name or buffer.
     output : namedtuple or list of namedtuple
         namedtuple (type, format, time, labels, data) or list of namedtuple for each time step to export.
-    file_format : str ('csv', 'petrasim', 'save', 'tecplot', 'tough') or None, optional, default None
+    file_format : str ('csv', 'petrasim', 'tecplot') or None, optional, default None
         Output file format.
 
     Other Parameters
