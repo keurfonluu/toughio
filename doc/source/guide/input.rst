@@ -78,6 +78,7 @@ A TOUGH input file is defined as follows:
         "connections": dict,
         "initial_conditions": dict,
         "meshmaker": dict,
+        "minc": dict,
         "chemical_properties": dict,
         "non_condensible_gas": list[str],
         "start": bool,
@@ -365,6 +366,8 @@ The keyword ``"type"`` denotes the type of mesh to generate. The following value
  - ``"rz2d"``
  - ``"rz2dl"``
 
+Note that the keyword ``"angle"`` is only used when ``"type"`` is ``"xyz"``.
+
 If ``"type"`` is set to ``"xyz"``, each dictionary in ``"parameters"`` is defined as follows:
 
 .. code-block::
@@ -395,6 +398,23 @@ The keyword ``"type"`` denotes here the type of increments to generate. The foll
  - ``"equid"``: keywords ``"n_increment"`` and ``"size"`` are required
  - ``"logar"``: keywords ``"n_increment"`` and ``"radius"`` are required, ``"radius_ref"`` is optional
  - ``"layer"``: keyword ``"thicknesses"`` is required
+
+
+MINC
+****
+
+MINC parameters are defined in a separate dictionary from ``"meshmaker"`` by the keyword ``"minc"``, and is organized as follows:
+
+.. code-block::
+
+    {
+        "type": str,
+        "dual": str,
+        "n_minc": int,
+        "where": str,
+        "parameters": list[float],
+        "volumes": list[float],
+    }
 
 
 TMVOC
