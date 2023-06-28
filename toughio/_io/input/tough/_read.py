@@ -56,6 +56,7 @@ def read_buffer(f, label_length, n_variables, eos, simulator="tough"):
     from ._common import blocks
 
     parameters = {}
+    flag = False
 
     # Title
     title = []
@@ -245,11 +246,21 @@ def read_buffer(f, label_length, n_variables, eos, simulator="tough"):
 
             elif line.startswith("ENDCY"):
                 end_comments = read_end_comments(fiter)
+
                 if end_comments:
                     parameters["end_comments"] = end_comments
 
     except:
         raise ReadError(f"failed to parse line {fiter.count}.")
+    
+    if flag:
+        end_comments = read_end_comments(fiter)
+
+        if end_comments:
+            if isinstance(end_comments, str):
+                end_comments = [end_comments]
+
+            parameters["end_comments"] = ["+++", *end_comments]
 
     return parameters
 

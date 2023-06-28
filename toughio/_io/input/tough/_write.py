@@ -80,13 +80,13 @@ def write_buffer(
             blocks = blocks_.copy()
 
         elif block == "gener":
-            blocks = {"GENER"}
+            blocks = {"GENER", "END COMMENTS"}
 
         elif block == "mesh":
-            blocks = {"ELEME", "COORD", "CONNE"}
+            blocks = {"ELEME", "COORD", "CONNE", "END COMMENTS"}
 
         elif block == "incon":
-            blocks = {"INCON"}
+            blocks = {"INCON", "END COMMENTS"}
 
         else:
             raise ValueError()
@@ -381,7 +381,13 @@ def write_buffer(
         out += _write_endcy()
 
     if "END COMMENTS" in blocks and parameters["end_comments"]:
-        out += ["\n"] if space_between_blocks else []
+        if block in {"gener", "mesh", "incon"}:
+            while out[-1] == "\n":
+                out = out[:-1]
+
+        else:
+            out += ["\n"] if space_between_blocks else []
+        
         out += [f"{comment}\n" for comment in parameters["end_comments"]]
 
     return out
