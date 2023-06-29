@@ -53,6 +53,7 @@ def to_float(s):
     except ValueError:
         # It's probably something like "0.0001-001"
         significand, exponent = s[:-4], s[-4:]
+
         return float(f"{significand}e{exponent}")
 
 
@@ -61,49 +62,59 @@ def to_str(x, fmt):
     x = "" if x is None else x
 
     if not isinstance(x, str):
-        # Special handling for floating point numbers
+        # Let Python decides for floating points
         if "f" in fmt:
-            # Number of decimals is specified
-            if "." in fmt:
-                n = int(fmt[3:].split(".")[0])
-                tmp = fmt.format(x)
+            tmp = str(float(x))
 
-                if len(tmp) > n:
-                    return fmt.replace("f", "e").format(x)
+            n = int(fmt[3:].split("f")[0])
+            fmt = f"{{:>{n}}}"
 
-                else:
-                    return tmp
+            if len(tmp) > n - 1 or "e" in tmp:
+                return fmt.format(scientific_notation(x, n - 1))
 
-            # Let Python decides the format
-            # n - 1 to leave a whitespace between values
+            # Otherwise, display as is
             else:
-                n = int(fmt[3:].split("f")[0])
-                tmp = str(float(x))
+                fmt = f" {{:>{n - 1}}}"
 
-                # If it's longer than n-1, use scientific notation
-                if len(tmp) > n - 1:
-                    fmt = f"{{:>{n}.{n - 7}e}}"
+                return fmt.format(tmp)
+            
+        # Force scientific notation
+        elif "e" in fmt:
+            n = int(fmt[3:].split("e")[0])
+            fmt = f"{{:>{n}}}"
 
-                    # Remove trailing zeros (e.g., "1.300e+07" -> "  1.3e+07")
-                    left, right = fmt.format(x).split("e")
-                    fmt = f"{{:>{len(left)}}}e{right}"
-
-                    return fmt.format(str(float(left)))
-
-                # If it's a scientific notation, make sure there is a decimal point
-                elif "e" in tmp and "." not in tmp:
-                    fmt = f" {{:>{n - 1}.1e}}"
-
-                    return fmt.format(x)
-
-                # Otherwise, display as is
-                else:
-                    fmt = f" {{:>{n - 1}}}"
-
-                    return fmt.format(tmp)
+            return fmt.format(scientific_notation(x, n - 1))
 
         else:
             return fmt.format(x)
 
     else:
         return fmt.replace("g", "").replace("e", "").replace("f", "").format(x)
+
+
+def scientific_notation(x, n):
+    """
+    Scientific notation with fixed number of characters.
+    
+    Note
+    ----
+    This function maximizes accuracy given a fixed number of characters.
+    
+    """
+    tmp = np.format_float_scientific(
+        x,
+        unique=True,
+        trim="0",
+        exp_digits=1,
+        sign=False,
+    )
+    tmp = tmp.replace("+", "")
+
+    if len(tmp) > n:
+        significand, exponent = tmp.split("e")
+        significand = significand[:n - len(tmp)]
+
+        return f"{significand}e{exponent}"
+    
+    else:
+        return tmp

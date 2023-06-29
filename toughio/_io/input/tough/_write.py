@@ -839,10 +839,6 @@ def _write_param(parameters, eos_=None, simulator="tough"):
     if ndlt < 2:
         delten = t_steps[0] if ndlt else None
 
-        # Patch record format
-        fmt2 = block_to_format["PARAM"][2].replace("10.1f", "10.4e")
-        fmt2 = str2format(fmt2)
-
     else:
         delten = -((ndlt - 1) // 8 + 1)
 
