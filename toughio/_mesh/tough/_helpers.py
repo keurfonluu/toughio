@@ -50,16 +50,19 @@ def _write_eleme(labels, materials, volumes, nodes, material_name=None):
             ],
             fmt=fmt,
         )
+
         yield record[0]
 
 
 def _write_coord(nodes):
     """Return a generator that iterates over the records of block COORD."""
-    fmt = "{:20.13e}{:20.13e}{:20.13e}\n"
+    fmt = block_to_format["COORD"]
+    fmt = str2format(fmt)
 
     for node in nodes:
-        record = fmt.format(*node)
-        yield record
+        record = write_record(node, fmt)
+
+        yield record[0]
 
 
 def _write_conne(clabels, isot, d1, d2, areas, angles):
@@ -85,6 +88,7 @@ def _write_conne(clabels, isot, d1, d2, areas, angles):
             ],
             fmt=fmt,
         )
+
         yield record[0]
 
 
@@ -99,74 +103,41 @@ def _write_incon(
     )
     label_length = len(labels[0])
     fmt = block_to_format["INCON"]
+    fmt1 = str2format(
+        fmt[eos][label_length]
+        if eos in fmt
+        else fmt["default"][label_length]
+    )
+    fmt2 = str2format(fmt[0])
 
     iterables = zip(labels, values, porosity, userx, phase_composition)
     for label, value, phi, usrx, indicat0 in iterables:
-        cond1 = any(v > -1.0e-9 for v in value)
+        value = [v if v > -1.0e9 else None for v in value]
+        cond1 = any(v is not None for v in value)
         cond2 = phi is not None
         cond3 = usrx is not None
+
         if cond1 or cond2 or cond3:
             # Record 1
-            values = [label, "", ""]
-            ignore_types = [1, 2]
-
-            if phi is not None:
-                values.append(phi)
-            else:
-                values.append("")
-                ignore_types.append(3)
+            values = [
+                label,
+                None,
+                None,
+                phi,
+            ]
 
             if eos == "tmvoc":
-                if indicat0 is not None:
-                    values.append(indicat0)
-                else:
-                    values.append("")
-                    ignore_types.append(4)
+                values += [indicat0]
 
             else:
-                if usrx is not None:
-                    values += list(usrx)
-                else:
-                    values += 3 * [""]
-                    ignore_types += [4, 5, 6]
+                values += list(usrx) if usrx is not None else []
 
-            fmt1 = str2format(
-                fmt[eos][label_length] if eos in fmt else fmt["default"][label_length],
-                ignore_types=ignore_types,
-            )
-            fmt1 = f"{''.join(fmt1[: len(values)])}\n"
-            record = fmt1.format(*values)
+            record = write_record(values, fmt1)[0]
 
             # Record 2
-            n = min(4, len(value))
-            values = []
-            ignore_types = []
-            for i, v in enumerate(value[:n]):
-                if v > -1.0e9:
-                    values.append(v)
-                else:
-                    values.append("")
-                    ignore_types.append(i)
-
-            fmt2 = str2format(fmt[0], ignore_types=ignore_types)
-            fmt2 = f"{''.join(fmt2[: len(values)])}\n"
-            record += fmt2.format(*values)
-
-            # Record 3 (EOS7R)
-            if len(value) > 4:
-                values = []
-                ignore_types = []
-                for i, v in enumerate(value[n:]):
-                    if v > -1.0e9:
-                        values.append(v)
-                    else:
-                        values.append("")
-                        ignore_types.append(i)
-
-                fmt2 = str2format(fmt[0], ignore_types=ignore_types)
-                fmt2 = f"{''.join(fmt2[: len(values)])}\n"
-                record += fmt2.format(*values)
+            record += write_record(value, fmt2, multi=True)[0]
 
             yield record
+
         else:
             continue
