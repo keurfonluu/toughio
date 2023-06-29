@@ -62,7 +62,6 @@ def to_str(x, fmt):
     x = "" if x is None else x
 
     if not isinstance(x, str):
-        # Let Python decides for floating points
         if "f" in fmt:
             tmp = str(float(x))
 
@@ -72,18 +71,10 @@ def to_str(x, fmt):
             if len(tmp) > n - 1 or "e" in tmp:
                 return fmt.format(scientific_notation(x, n - 1))
 
-            # Otherwise, display as is
             else:
                 fmt = f" {{:>{n - 1}}}"
 
                 return fmt.format(tmp)
-            
-        # Force scientific notation
-        elif "e" in fmt:
-            n = int(fmt[3:].split("e")[0])
-            fmt = f"{{:>{n}}}"
-
-            return fmt.format(scientific_notation(x, n - 1))
 
         else:
             return fmt.format(x)

@@ -122,10 +122,8 @@ block_to_format = {
 }
 
 
-def str2format(fmt, ignore_types=None):
+def str2format(fmt):
     """Convert a string to a list of formats."""
-    ignore_types = ignore_types if ignore_types else ()
-
     token_to_format = {
         "s": "",
         "S": "",
@@ -135,15 +133,12 @@ def str2format(fmt, ignore_types=None):
     }
 
     base_fmt = "{{:{}}}"
-    out = []
-    for i, token in enumerate(fmt.split(",")):
-        n = token[:-1]
-        if i in ignore_types:
-            out.append(base_fmt.format(n.split(".")[0]))
-        elif token[-1].lower() == "s":
-            out.append(base_fmt.format(f"{n}.{n}"))
-        else:
-            out.append(base_fmt.format(f">{n}{token_to_format[token[-1]]}"))
+    out = [
+        base_fmt.format(f"{token[:-1]}.{token[:-1]}")
+        if token[-1].lower() == "s"
+        else base_fmt.format(f">{token[:-1]}{token_to_format[token[-1]]}")
+        for token in fmt.split(",")
+    ]
 
     return out
 

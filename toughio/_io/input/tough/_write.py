@@ -7,7 +7,7 @@ from ...._common import block_to_format, open_file, prune_values, str2format
 from ..._common import write_record
 from .._common import write_ffrecord
 from ._common import default
-from ._helpers import block, check_parameters, dtypes, write_model_record
+from ._helpers import block, write_model_record
 
 __all__ = [
     "write",
@@ -60,7 +60,6 @@ def write(
             f.write(record)
 
 
-@check_parameters(dtypes["PARAMETERS"])
 def write_buffer(
     params,
     block,
@@ -393,7 +392,6 @@ def write_buffer(
     return out
 
 
-@check_parameters(dtypes["DIMEN"], keys="array_dimensions")
 @block("DIMEN")
 def _write_dimen(parameters):
     """Write DIMEN block data."""
@@ -425,12 +423,6 @@ def _write_dimen(parameters):
     return out
 
 
-@check_parameters(dtypes["ROCKS"], keys="default")
-@check_parameters(dtypes["ROCKS"], keys="rocks", is_list=True)
-@check_parameters(
-    dtypes["MODEL"], keys=("rocks", "relative_permeability"), is_list=True
-)
-@check_parameters(dtypes["MODEL"], keys=("rocks", "capillarity"), is_list=True)
 @block("ROCKS", multi=True)
 def _write_rocks(parameters, simulator="tough"):
     """Write ROCKS block data."""
@@ -517,8 +509,6 @@ def _write_rocks(parameters, simulator="tough"):
     return out
 
 
-@check_parameters(dtypes["MODEL"], keys=("default", "relative_permeability"))
-@check_parameters(dtypes["MODEL"], keys=("default", "capillarity"))
 @block("RPCAP")
 def _write_rpcap(parameters):
     """Write RPCAP block data."""
@@ -541,7 +531,6 @@ def _write_rpcap(parameters):
     return out
 
 
-@check_parameters(dtypes["MOPR"], keys=("react", "options"))
 @block("REACT")
 def _write_react(parameters):
     """Write REACT block data."""
@@ -560,13 +549,6 @@ def _write_react(parameters):
     return out
 
 
-@check_parameters(dtypes["FLAC"], keys="flac")
-@check_parameters(dtypes["MODEL"], keys=("default", "permeability_model"))
-@check_parameters(dtypes["MODEL"], keys=("default", "equivalent_pore_pressure"))
-@check_parameters(dtypes["MODEL"], keys=("rocks", "permeability_model"), is_list=True)
-@check_parameters(
-    dtypes["MODEL"], keys=("rocks", "equivalent_pore_pressure"), is_list=True
-)
 @block("FLAC", multi=True)
 def _write_flac(parameters):
     """Write FLAC block data."""
@@ -610,7 +592,6 @@ def _write_flac(parameters):
     return out
 
 
-@check_parameters(dtypes["CHEMP"], keys="chemical_properties", is_list=True)
 @block("CHEMP")
 def _write_chemp(parameters):
     """Write CHEMP block data."""
@@ -756,7 +737,6 @@ def _write_multi(parameters):
     return out
 
 
-@check_parameters(dtypes["SOLVR"], keys="solver")
 @block("SOLVR")
 def _write_solvr(parameters):
     """Write SOLVR block data."""
@@ -789,8 +769,6 @@ def _write_start():
     return []
 
 
-@check_parameters(dtypes["PARAM"], keys="options")
-@check_parameters(dtypes["MOP"], keys="extra_options")
 def _write_param(parameters, eos_=None, simulator="tough"):
     """Write PARAM block data."""
     # Load data
@@ -890,7 +868,6 @@ def _write_param(parameters, eos_=None, simulator="tough"):
     return out
 
 
-@check_parameters(dtypes["SELEC"], keys="selections")
 @block("SELEC")
 def _write_selec(parameters):
     """Write SELEC block data."""
@@ -983,7 +960,6 @@ def _write_indom(parameters, eos_):
     return out
 
 
-@check_parameters(dtypes["MOMOP"], keys="more_options")
 @block("MOMOP")
 def _write_momop(parameters):
     """Write MOMOP block data."""
@@ -1022,7 +998,6 @@ def _write_times(parameters):
     return out
 
 
-@check_parameters(dtypes["HYSTE"], keys="hysteresis_options")
 @block("HYSTE")
 def _write_hyste(parameters):
     """Write HYSTE block data."""
@@ -1094,7 +1069,6 @@ def _write_roft(parameters):
     return out
 
 
-@check_parameters(dtypes["GENER"], keys="generators", is_list=True)
 @block("GENER", multi=True)
 def _write_gener(parameters, simulator="tough"):
     """Write GENER block data."""
@@ -1213,7 +1187,6 @@ def _write_gener(parameters, simulator="tough"):
     return out
 
 
-@check_parameters(dtypes["TIMBC"], keys="boundary_conditions", is_list=True)
 @block("TIMBC")
 def _write_timbc(parameters):
     """Write TIMBC block data."""
@@ -1265,7 +1238,6 @@ def _write_diffu(parameters):
     return out
 
 
-@check_parameters(dtypes["OUTPT"], keys=("react", "output"))
 @block("OUTPT")
 def _write_outpt(parameters):
     """Write OUTPT block data."""
@@ -1278,7 +1250,6 @@ def _write_outpt(parameters):
     return out
 
 
-@check_parameters(dtypes["OUTPU"], keys="output")
 @block("OUTPU")
 def _write_outpu(parameters):
     """Write OUTPU block data."""
@@ -1333,7 +1304,6 @@ def _write_outpu(parameters):
     return out
 
 
-@check_parameters(dtypes["ELEME"], keys="elements", is_list=True)
 @block("ELEME", multi=True)
 def _write_eleme(parameters):
     """Write ELEME block data."""
@@ -1387,7 +1357,6 @@ def _write_coord(parameters):
     return out
 
 
-@check_parameters(dtypes["CONNE"], keys="connections", is_list=True)
 @block("CONNE", multi=True)
 def _write_conne(parameters):
     """Write CONNE block data."""
@@ -1420,7 +1389,6 @@ def _write_conne(parameters):
     return out
 
 
-@check_parameters(dtypes["INCON"], keys="initial_conditions", is_list=True)
 @block("INCON", multi=True)
 def _write_incon(parameters, eos_=None, simulator="tough"):
     """Write INCON block data."""
@@ -1473,7 +1441,6 @@ def _write_incon(parameters, eos_=None, simulator="tough"):
     return out
 
 
-@check_parameters(dtypes["MESHM"], keys="meshmaker")
 @block("MESHM", multi=True)
 def _write_meshm(parameters):
     """Write MESHM block data."""
@@ -1586,7 +1553,6 @@ def _write_meshm(parameters):
     return out
 
 
-@check_parameters(dtypes["MINC"], keys="minc")
 def _write_minc(parameters):
     """Write MESHM block data (MINC)."""
     from ._common import minc
@@ -1628,7 +1594,6 @@ def _write_minc(parameters):
     return out
 
 
-@check_parameters(dtypes["POISE"], keys=("react", "poiseuille"))
 @block("POISE")
 def _write_poise(parameters):
     """Write POISE block data."""
