@@ -80,7 +80,7 @@ def to_str(x, fmt, space_between_values=False):
             return fmt.format(x)
 
     else:
-        return fmt.replace("g", "").replace("e", "").replace("f", "").format(x)
+        return fmt.replace("g", "").replace("f", "").format(x)
 
 
 def scientific_notation(x, n):
