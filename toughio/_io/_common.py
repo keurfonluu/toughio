@@ -23,10 +23,10 @@ def read_record(data, fmt):
     return out
 
 
-def write_record(data, fmt, multi=False):
+def write_record(data, fmt, space_between_values=False, multi=False):
     """Return a list of record strings given format."""
     if not multi:
-        data = [to_str(d, f) for d, f in zip(data, fmt)]
+        data = [to_str(d, f, space_between_values) for d, f in zip(data, fmt)]
         out = [f"{''.join(data):80}\n"]
 
     else:
@@ -39,7 +39,7 @@ def write_record(data, fmt, multi=False):
 
         out = []
         for d in data:
-            d = [to_str(dd, f) for dd, f in zip(d, fmt)]
+            d = [to_str(dd, f, space_between_values) for dd, f in zip(d, fmt)]
             out += [f"{''.join(d):80}\n"]
 
     return out
@@ -57,7 +57,7 @@ def to_float(s):
         return float(f"{significand}e{exponent}")
 
 
-def to_str(x, fmt):
+def to_str(x, fmt, space_between_values=False):
     """Convert variable to string."""
     x = "" if x is None else x
 
@@ -68,13 +68,13 @@ def to_str(x, fmt):
             n = int(fmt[3:].split("f")[0])
             fmt = f"{{:>{n}}}"
 
-            if len(tmp) > n - 1 or "e" in tmp:
-                return fmt.format(scientific_notation(x, n - 1))
+            if space_between_values:
+                n -= 1
 
-            else:
-                fmt = f" {{:>{n - 1}}}"
+            if len(tmp) > n or "e" in tmp:
+                tmp = format(scientific_notation(x, n))
 
-                return fmt.format(tmp)
+            return fmt.format(tmp)
 
         else:
             return fmt.format(x)

@@ -60,16 +60,16 @@ def read_model_record(line, fmt, i=2):
     }
 
 
-def write_model_record(data, key, fmt):
+def write_model_record(data, key, fmt, space_between_values=False):
     """Write model record defined by 'id' and 'parameters'."""
     if key in data:
         values = [data[key]["id"], None]
         values += list(data[key]["parameters"])
 
-        return write_record(values, fmt)
+        return write_record(values, fmt, space_between_values)
 
     else:
-        return write_record([], [])
+        return write_record([], [], space_between_values)
 
 
 def read_primary_variables(f, fmt, n_variables):
