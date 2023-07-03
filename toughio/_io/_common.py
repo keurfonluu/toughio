@@ -71,13 +71,10 @@ def to_str(x, fmt, space_between_values=False):
             if space_between_values:
                 n -= 1
 
-            cond1 = len(tmp) > n
-            cond2 = "e" in tmp
-
-            if cond1 or cond2:
+            if len(tmp) > n or "e" in tmp:
                 tmp = (
                     tmp[:n]
-                    if not cond2 and tmp[-2] != "."
+                    if 1.0 <= abs(x) < 10.0
                     else format(scientific_notation(x, n))
                 )
 
@@ -103,7 +100,7 @@ def scientific_notation(x, n):
         x,
         unique=True,
         trim="0",
-        exp_digits=1,
+        exp_digits=0,
         sign=False,
     )
     tmp = tmp.replace("+", "")
