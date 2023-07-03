@@ -71,8 +71,15 @@ def to_str(x, fmt, space_between_values=False):
             if space_between_values:
                 n -= 1
 
-            if len(tmp) > n or "e" in tmp:
-                tmp = format(scientific_notation(x, n))
+            cond1 = len(tmp) > n
+            cond2 = "e" in tmp
+
+            if cond1 or cond2:
+                tmp = (
+                    tmp[:n]
+                    if not cond2 and tmp[-2] != "."
+                    else format(scientific_notation(x, n))
+                )
 
             return fmt.format(tmp)
 
