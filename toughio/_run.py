@@ -95,7 +95,7 @@ def run(
         input_path = pathlib.Path(input_filename)
         input_filename = simulation_dir / input_path.name
 
-        if input_path.parent.absolute() != simulation_dir.absolute():
+        if input_path.parent.resolve() != simulation_dir.resolve():
             shutil.copy(input_path, input_filename)
 
     else:
@@ -107,8 +107,8 @@ def run(
         filename = pathlib.Path(k)
         new_filename = pathlib.Path(v)
 
-        if filename.parent.absolute() != simulation_dir.absolute() or filename.name != new_filename.name:
-            shutil.copy(filename, simulation_dir / v)
+        if filename.parent.resolve() != simulation_dir.resolve() or filename.name != new_filename.name:
+            shutil.copy(filename, simulation_dir / new_filename.name)
 
     # Output filename
     output_filename = f"{input_filename.stem}.out"
@@ -130,7 +130,7 @@ def run(
         else:
             cwd = "${PWD}"
 
-        cmd = f"docker run -it --rm -v {cwd}:/work -w /work {docker} {cmd}"
+        cmd = f"docker run --rm -v {cwd}:/work -w /work {docker} {cmd}"
 
     elif wsl and platform.startswith("win"):
         cmd = f'bash -c "{cmd}"'
