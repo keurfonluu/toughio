@@ -18,7 +18,8 @@ def run(
     working_dir=None,
     use_temp=False,
     ignore_patterns=None,
-    silent=False
+    silent=False,
+    **kwargs
 ):
     """
     Run TOUGH executable.
@@ -47,6 +48,33 @@ def run(
         If provided, output files that match the glob-style patterns will be discarded.
     silent : bool, optional, default False
         If `True`, nothing will be printed to standard output.
+    
+    Other Parameters
+    ----------------
+    block : str {'all', 'gener', 'mesh', 'incon'} or None, optional, default None
+        Only if ``file_format = "tough"``. Blocks to be written:
+
+         - 'all': write all blocks,
+         - 'gener': only write block GENER,
+         - 'mesh': only write blocks ELEME, COORD and CONNE,
+         - 'incon': only write block INCON,
+         - None: write all blocks except blocks defined in `ignore_blocks`.
+
+    ignore_blocks : list of str or None, optional, default None
+        Only if ``file_format = "tough"`` and `block` is None. Blocks to ignore.
+    space_between_blocks : bool, optional, default False
+        Only if ``file_format = "tough"``. Add an empty record between blocks.
+    space_between_blocks : bool, optional, default True
+        Only if ``file_format = "tough"``. Add a white space between floating point values.
+    eos : str or None, optional, default None
+        Only if ``file_format = "tough"``. Equation of State.
+        If `eos` is defined in `parameters`, this option will be ignored.
+    mopr_10 : int, optional, default 0
+        Only if ``file_format = "toughreact-solute"``. MOPR(10) value in file 'flow.inp'.
+    mopr_11 : int, optional, default 0
+        Only if ``file_format = "toughreact-solute"``. MOPR(11) value in file 'flow.inp'.
+    verbose : bool, optional, default True
+        Only if ``file_format`` in {"toughreact-solute", "toughreact-chemical"}. If `True`, add comments to describe content of file.
 
     Returns
     -------
@@ -99,7 +127,7 @@ def run(
             shutil.copy(input_path, input_filename)
 
     else:
-        write_input(simulation_dir / "INFILE", input_filename)
+        write_input(simulation_dir / "INFILE", input_filename, **kwargs)
         input_filename = simulation_dir / "INFILE"
 
     # Copy other simulation files to working directory
