@@ -31,7 +31,7 @@ def run(
     input_filename : str or pathlike
         TOUGH input file name.
     other_filenames : list, dict or None, optional, default None
-        Other simulation files to copy to working directory (e.g., MESH, INCON, GENER) if not already present. If ``other_filenames`` is a dict, must be in the for ``{old: new}``, where ``old`` is the current name of the file to copy, and ``new`` is the name of the file copied.
+        Other simulation files to copy to working directory (e.g., MESH, INCON, GENER) if not already present. If ``other_filenames`` is a dict, must be in the form ``{old: new}``, where ``old`` is the current name of the file to copy, and ``new`` is the name of the file copied.
     command : callable or None, optional, default None
         Command to execute TOUGH. Must be in the form ``f(exec, inp, [out])``, where ``exec`` is the path to TOUGH executable, ``inp`` is the input file name, and ``out`` is the output file name (optional).
     workers : int or None, optional, default None
