@@ -77,9 +77,7 @@ def read(filename, file_type, labels_order=None):
         labels = [labels.copy() for _ in variables]
         variables = np.array([[v[2:] for v in variable] for variable in variables])
 
-    return to_output(
-        file_type, labels_order, headers, times, labels, variables
-    )
+    return to_output(file_type, labels_order, headers, times, labels, variables)
 
 
 def _read_table(f, file_type):
@@ -113,7 +111,9 @@ def _read_table(f, file_type):
 
             # Read units
             line = next(f)
-            nwsp = line.index(line.strip()[0])  # Index of first non whitespace character
+            nwsp = line.index(
+                line.strip()[0]
+            )  # Index of first non whitespace character
 
             # Look for next non-empty line
             while True:

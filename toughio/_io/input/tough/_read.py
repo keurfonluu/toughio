@@ -252,7 +252,7 @@ def read_buffer(f, label_length, n_variables, eos, simulator="tough"):
 
     except:
         raise ReadError(f"failed to parse line {fiter.count}.")
-    
+
     if flag:
         end_comments = read_end_comments(fiter)
 
@@ -879,9 +879,11 @@ def _read_gener(f, label_length, simulator="tough"):
 
         line = f.next()
 
-    return {
-        "generators": [prune_values(generator) for generator in gener["generators"]]
-    }, flag, label_length
+    return (
+        {"generators": [prune_values(generator) for generator in gener["generators"]]},
+        flag,
+        label_length,
+    )
 
 
 def _read_timbc(f):
@@ -1176,7 +1178,7 @@ def _read_meshm(f):
             minc["volumes"] += prune_values(data)
 
         return minc
-        
+
     fmt = block_to_format["MESHM"]
     fmt_minc = fmt["MINC"]
 
@@ -1316,7 +1318,7 @@ def _read_meshm(f):
     # MINC
     elif mesh_type == "MINC":
         meshm["minc"] = read_minc(f, data, fmt_minc)
-        
+
     return meshm
 
 

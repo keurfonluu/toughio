@@ -56,7 +56,13 @@ def write(
         raise ValueError()
 
     buffer = write_buffer(
-        parameters, block, ignore_blocks, space_between_blocks, space_between_values, eos, simulator
+        parameters,
+        block,
+        ignore_blocks,
+        space_between_blocks,
+        space_between_values,
+        eos,
+        simulator,
     )
     with open_file(filename, "w") as f:
         for record in buffer:
@@ -390,7 +396,7 @@ def write_buffer(
 
         else:
             out += ["\n"] if space_between_blocks else []
-        
+
         out += [f"{comment}\n" for comment in parameters["end_comments"]]
 
     return out
@@ -508,7 +514,9 @@ def _write_rocks(parameters, space_between_values, simulator="tough"):
 
         # Relative permeability / Capillary pressure
         if nad >= 2:
-            out += write_model_record(v, "relative_permeability", fmt5, space_between_values)
+            out += write_model_record(
+                v, "relative_permeability", fmt5, space_between_values
+            )
             out += write_model_record(v, "capillarity", fmt5, space_between_values)
 
     return out
@@ -865,11 +873,18 @@ def _write_param(parameters, space_between_values, eos_=None, simulator="tough")
     # Record 4 (TMVOC)
     if eos_ == "tmvoc":
         out += write_record(
-            [parameters["default"]["phase_composition"]], str2format("5d"), space_between_values
+            [parameters["default"]["phase_composition"]],
+            str2format("5d"),
+            space_between_values,
         )
 
     # Record 5
-    out += write_record(parameters["default"]["initial_condition"], fmt5, space_between_values, multi=True)
+    out += write_record(
+        parameters["default"]["initial_condition"],
+        fmt5,
+        space_between_values,
+        multi=True,
+    )
 
     return out
 
@@ -961,7 +976,9 @@ def _write_indom(parameters, space_between_values, eos_):
             out += write_record(values, fmt1, space_between_values)
 
             if cond1:
-                out += write_record(v["initial_condition"], fmt2, space_between_values, multi=True)
+                out += write_record(
+                    v["initial_condition"], fmt2, space_between_values, multi=True
+                )
 
             else:
                 out += ["\n"]
@@ -1187,12 +1204,18 @@ def _write_gener(parameters, space_between_values, simulator="tough"):
                 else:
                     specific_enthalpy = np.full(ltab, data["specific_enthalpy"])
 
-                out += write_record(specific_enthalpy, fmt2, space_between_values, multi=True)
+                out += write_record(
+                    specific_enthalpy, fmt2, space_between_values, multi=True
+                )
 
         # TOUGHREACT
         if ktab:
-            out += write_record(data["conductivity_times"], fmt2, space_between_values, multi=True)
-            out += write_record(data["conductivity_factors"], fmt2, space_between_values, multi=True)
+            out += write_record(
+                data["conductivity_times"], fmt2, space_between_values, multi=True
+            )
+            out += write_record(
+                data["conductivity_factors"], fmt2, space_between_values, multi=True
+            )
 
     return out
 
@@ -1278,7 +1301,11 @@ def _write_outpu(parameters, space_between_values):
     out = []
 
     # Output format
-    out += write_record([data["format"].upper()], fmt1, space_between_values) if data["format"] else []
+    out += (
+        write_record([data["format"].upper()], fmt1, space_between_values)
+        if data["format"]
+        else []
+    )
 
     # Variables
     if data["variables"]:
@@ -1303,7 +1330,9 @@ def _write_outpu(parameters, space_between_values):
                     else:
                         for vv in v:
                             values_in = values + list(vv)
-                            buffer += write_record(values_in, fmt3, space_between_values)
+                            buffer += write_record(
+                                values_in, fmt3, space_between_values
+                            )
 
             else:
                 buffer += write_record(values, fmt3, space_between_values)
@@ -1504,11 +1533,13 @@ def _write_meshm(parameters, space_between_values):
                         else len(parameter["sizes"])
                     ]
                     out += write_record(values, fmt2, space_between_values)
-                    out += write_record(parameter["sizes"], fmt3, space_between_values, multi=True)
+                    out += write_record(
+                        parameter["sizes"], fmt3, space_between_values, multi=True
+                    )
 
                 else:
                     raise ValueError()
-                
+
             # Blank record
             out += ["\n"]
 
@@ -1528,8 +1559,12 @@ def _write_meshm(parameters, space_between_values):
                     fmt1 = str2format(fmt["RADII"][1])
                     fmt2 = str2format(fmt["RADII"][2])
 
-                    out += write_record([len(parameter["radii"])], fmt1, space_between_values)
-                    out += write_record(parameter["radii"], fmt2, space_between_values, multi=True)
+                    out += write_record(
+                        [len(parameter["radii"])], fmt1, space_between_values
+                    )
+                    out += write_record(
+                        parameter["radii"], fmt2, space_between_values, multi=True
+                    )
 
                 elif parameter_type == "EQUID":
                     fmt1 = str2format(fmt["EQUID"])
@@ -1556,8 +1591,12 @@ def _write_meshm(parameters, space_between_values):
                     fmt1 = str2format(fmt["LAYER"][1])
                     fmt2 = str2format(fmt["LAYER"][2])
 
-                    out += write_record([len(parameter["thicknesses"])], fmt1, space_between_values)
-                    out += write_record(parameter["thicknesses"], fmt2, space_between_values, multi=True)
+                    out += write_record(
+                        [len(parameter["thicknesses"])], fmt1, space_between_values
+                    )
+                    out += write_record(
+                        parameter["thicknesses"], fmt2, space_between_values, multi=True
+                    )
 
     if parameters["minc"]:
         out += _write_minc(parameters, space_between_values)

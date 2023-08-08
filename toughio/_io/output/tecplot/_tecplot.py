@@ -58,9 +58,7 @@ def read(filename, file_type, labels_order=None):
         labels.append([])
         variables.append(zone["data"])
 
-    return to_output(
-        file_type, labels_order, headers, times, labels, variables
-    )
+    return to_output(file_type, labels_order, headers, times, labels, variables)
 
 
 def read_buffer(f):

@@ -160,6 +160,6 @@ def _file_format_from_filename(filename):
         filename = pathlib.Path(filename).name
 
         return _file_formats[filename] if filename in _file_formats else ""
-    
+
     else:
         return ""

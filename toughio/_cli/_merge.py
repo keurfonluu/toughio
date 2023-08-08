@@ -35,7 +35,7 @@ def merge(argv=None):
         count += int(line.upper()[:5] in {"ROCKS", "PARAM", "ENDFI", "ENDCY"})
     if count < 3:
         raise ValueError(f"Invalid input file '{args.infile}'.")
-    
+
     # Buffer GENER
     if gener_exists:
         gener_file = _read_file(gener_filename, end="+++")

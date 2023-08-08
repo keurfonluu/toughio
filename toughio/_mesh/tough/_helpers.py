@@ -104,9 +104,7 @@ def _write_incon(
     label_length = len(labels[0])
     fmt = block_to_format["INCON"]
     fmt1 = str2format(
-        fmt[eos][label_length]
-        if eos in fmt
-        else fmt["default"][label_length]
+        fmt[eos][label_length] if eos in fmt else fmt["default"][label_length]
     )
     fmt2 = str2format(fmt[0])
 

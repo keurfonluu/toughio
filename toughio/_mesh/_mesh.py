@@ -407,7 +407,9 @@ class Mesh(object):
                 eos,
             )
 
-    def read_output(self, file_or_output, time_step=-1, labels_order=None, connection=False):
+    def read_output(
+        self, file_or_output, time_step=-1, labels_order=None, connection=False
+    ):
         """
         Import TOUGH results to the mesh.
 
@@ -438,7 +440,7 @@ class Mesh(object):
         if not isinstance(out, Output):
             if not (-len(out) <= time_step < len(out)):
                 raise ValueError()
-            
+
             out = out[time_step]
 
         if out.type == "element":
@@ -446,7 +448,7 @@ class Mesh(object):
                 out = reorder_labels(out, labels_order)
 
             self.cell_data.update(out.data)
-            
+
         elif out.type == "connection":
             centers = self.centers
             labels_map = {k: v for v, k in enumerate(self.labels)}

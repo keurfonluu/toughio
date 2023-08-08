@@ -1,5 +1,6 @@
-import h5py
 import pathlib
+
+import h5py
 
 from ..output import Output
 from ..output import read as read_output
@@ -39,7 +40,7 @@ def write(
         List of labels.
     compression_opts : int, optional, default 4
         Compression level for gzip compression. May be an integer from 0 to 9.
-    
+
     """
     kwargs = {
         "compression": "gzip",
@@ -84,7 +85,7 @@ def _write_output(f, outputs, labels_order, connection, **kwargs):
         for output in outputs:
             if not isinstance(output, Output):
                 raise ValueError()
-            
+
     else:
         raise ValueError()
 
@@ -103,7 +104,7 @@ def _write_table(f, tables, **kwargs):
 
     for name, table in tables.items():
         group = f.create_group(name)
-        
+
         if isinstance(table, (str, pathlib.Path)):
             table = read_table(table)
 

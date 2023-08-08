@@ -767,7 +767,9 @@ def test_meshm_xyz():
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
 
-@pytest.mark.parametrize("layer, minc", [(True, False), (False, False), (True, True), (False, True)])
+@pytest.mark.parametrize(
+    "layer, minc", [(True, False), (False, False), (True, True), (False, True)]
+)
 def test_meshm_rz2d(layer, minc):
     parameters_ref = {
         "meshmaker": {

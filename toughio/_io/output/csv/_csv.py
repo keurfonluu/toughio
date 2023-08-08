@@ -64,9 +64,7 @@ def read(filename, file_type, labels_order=None):
         )
         variables = np.array([[v[ilab:] for v in variable] for variable in variables])
 
-    return to_output(
-        file_type, labels_order, headers, times, labels, variables
-    )
+    return to_output(file_type, labels_order, headers, times, labels, variables)
 
 
 def _read_csv(f, file_type):

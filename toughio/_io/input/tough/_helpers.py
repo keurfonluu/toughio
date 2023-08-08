@@ -5,7 +5,6 @@ import numpy as np
 from ...._common import prune_values
 from ..._common import read_record, write_record
 
-
 str_to_dtype = {
     "int": (int, np.int32, np.int64),
     "float": (float, np.float32, np.float64),

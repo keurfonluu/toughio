@@ -57,9 +57,7 @@ def read(filename, file_type, labels_order=None):
         unique_times.append(time)
         variables.append(data[idx])
 
-    return to_output(
-        file_type, labels_order, headers, unique_times, labels, variables
-    )
+    return to_output(file_type, labels_order, headers, unique_times, labels, variables)
 
 
 def write(filename, output):

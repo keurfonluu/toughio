@@ -19,7 +19,7 @@ def run(
     use_temp=False,
     ignore_patterns=None,
     silent=False,
-    **kwargs
+    **kwargs,
 ):
     """
     Run TOUGH executable.
@@ -48,7 +48,7 @@ def run(
         If provided, output files that match the glob-style patterns will be discarded.
     silent : bool, optional, default False
         If `True`, nothing will be printed to standard output.
-    
+
     Other Parameters
     ----------------
     block : str {'all', 'gener', 'mesh', 'incon'} or None, optional, default None
@@ -80,7 +80,7 @@ def run(
     -------
     :class:`subprocess.CompletedProcess`
         Subprocess completion status.
-    
+
     """
     from . import write_input
 
@@ -135,7 +135,10 @@ def run(
         filename = pathlib.Path(k)
         new_filename = pathlib.Path(v)
 
-        if filename.parent.resolve() != simulation_dir.resolve() or filename.name != new_filename.name:
+        if (
+            filename.parent.resolve() != simulation_dir.resolve()
+            or filename.name != new_filename.name
+        ):
             shutil.copy(filename, simulation_dir / new_filename.name)
 
     # Output filename
@@ -168,16 +171,16 @@ def run(
         kwargs["stdout"] = subprocess.DEVNULL
         kwargs["stderr"] = subprocess.STDOUT
 
-    status = subprocess.run(
-        cmd,
-        shell=True,
-        cwd=str(simulation_dir),
-        **kwargs
-    )
+    status = subprocess.run(cmd, shell=True, cwd=str(simulation_dir), **kwargs)
 
     # Copy files from temporary directory and delete it
     if use_temp:
-        shutil.copytree(simulation_dir, working_dir, ignore=shutil.ignore_patterns(*ignore_patterns), dirs_exist_ok=True)
+        shutil.copytree(
+            simulation_dir,
+            working_dir,
+            ignore=shutil.ignore_patterns(*ignore_patterns),
+            dirs_exist_ok=True,
+        )
         shutil.rmtree(simulation_dir, ignore_errors=True)
         os.remove(working_dir / "tempdir.txt")
 

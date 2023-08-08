@@ -87,7 +87,7 @@ def read(
     else:
         if file_format not in _reader_map:
             raise ValueError()
-        
+
         file_type = "element"  # By default
 
     if connection:

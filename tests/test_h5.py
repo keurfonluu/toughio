@@ -1,6 +1,7 @@
+import pathlib
+
 import h5py
 import helpers
-import pathlib
 
 import toughio
 
@@ -21,4 +22,11 @@ def test_h5():
     )
 
     with h5py.File(filename, "r") as f:
-        assert list(f.keys()) == ["connection_history", "connections", "element_history", "elements", "generator_history", "rock_history"]
+        assert list(f.keys()) == [
+            "connection_history",
+            "connections",
+            "element_history",
+            "elements",
+            "generator_history",
+            "rock_history",
+        ]

@@ -90,11 +90,11 @@ def to_str(x, fmt, space_between_values=False):
 def scientific_notation(x, n):
     """
     Scientific notation with fixed number of characters.
-    
+
     Note
     ----
     This function maximizes accuracy given a fixed number of characters.
-    
+
     """
     tmp = np.format_float_scientific(
         x,
@@ -107,9 +107,9 @@ def scientific_notation(x, n):
 
     if len(tmp) > n:
         significand, exponent = tmp.split("e")
-        significand = significand[:n - len(tmp)]
+        significand = significand[: n - len(tmp)]
 
         return f"{significand}e{exponent}"
-    
+
     else:
         return tmp
