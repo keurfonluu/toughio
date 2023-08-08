@@ -89,11 +89,14 @@ def read(filename, file_format=None, **kwargs):
     # Call custom readers
     if fmt in _reader_map:
         mesh = _reader_map[fmt](filename, **kwargs)
-        if fmt not in {"tough", "pickle"}:
+
+        if fmt in {"avsucd", "flac3d"}:
             mesh.cell_data = {k: np.concatenate(v) for k, v in mesh.cell_data.items()}
             key = get_material_key(mesh.cell_data)
+
             if key:
                 mesh.cell_data["material"] = mesh.cell_data.pop(key)
+
     else:
         mesh = meshio.read(filename, file_format)
         mesh = from_meshio(mesh)

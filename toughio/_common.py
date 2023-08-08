@@ -29,7 +29,7 @@ block_to_format = {
     "SOLVR": "1d,2s,2s,3s,2s,10f,10f",
     "PARAM": {
         1: "2d,2d,4d,4d,4d,24S,10s,10f,10f",
-        2: "10f,10f,10.1f,10f,5s,5s,10f,10f,10f",
+        2: "10f,10f,10f,10f,5s,5s,10f,10f,10f",
         3: ",".join(8 * ["10f"]),
         4: "10f,10f,10s,10f,10f,10f",
         5: ",".join(4 * ["20f"]),
@@ -54,42 +54,42 @@ block_to_format = {
     "DIFFU": ",".join(8 * ["10f"]),
     "OUTPU": {1: "20s", 2: "15s", 3: "20s,5d,5d"},
     "ELEME": {
-        5: "5s,5d,5d,5s,10.4e,10.4e,10.4e,10f,10f,10f",
-        6: "6s,5d,4d,5s,10.4e,10.4e,10.4e,10f,10f,10f",
-        7: "7s,4d,4d,5s,10.4e,10.4e,10.4e,10f,10f,10f",
-        8: "8s,4d,3d,5s,10.4e,10.4e,10.4e,10f,10f,10f",
-        9: "9s,3d,3d,5s,10.4e,10.4e,10.4e,10f,10f,10f",
+        5: "5s,5d,5d,5s,10f,10f,10f,10f,10f,10f",
+        6: "6s,5d,4d,5s,10f,10f,10f,10f,10f,10f",
+        7: "7s,4d,4d,5s,10f,10f,10f,10f,10f,10f",
+        8: "8s,4d,3d,5s,10f,10f,10f,10f,10f,10f",
+        9: "9s,3d,3d,5s,10f,10f,10f,10f,10f,10f",
     },
     "COORD": ",".join(3 * ["20f"]),
     "CONNE": {
-        5: "10s,5d,5d,5d,5d,10.4e,10.4e,10.4e,10.3e,10.3e",
-        6: "12s,5d,4d,4d,5d,10.4e,10.4e,10.4e,10.3e,10.3e",
-        7: "14s,5d,3d,3d,5d,10.4e,10.4e,10.4e,10.3e,10.3e",
-        8: "16s,3d,3d,3d,5d,10.4e,10.4e,10.4e,10.3e,10.3e",
-        9: "18s,3d,2d,2d,5d,10.4e,10.4e,10.4e,10.3e,10.3e",
+        5: "10s,5d,5d,5d,5d,10f,10f,10f,10f,10f",
+        6: "12s,5d,4d,4d,5d,10f,10f,10f,10f,10f",
+        7: "14s,5d,3d,3d,5d,10f,10f,10f,10f,10f",
+        8: "16s,3d,3d,3d,5d,10f,10f,10f,10f,10f",
+        9: "18s,3d,2d,2d,5d,10f,10f,10f,10f,10f",
     },
     "INCON": {
-        0: ",".join(4 * ["20.13e"]),
+        0: ",".join(4 * ["20f"]),
         "default": {
-            5: "5s,5d,5d,15.9e,10.3e,10.3e,10.3e,10.3e,10.3e",
-            6: "6s,5d,4d,15.9e,10.3e,10.3e,10.3e,10.3e,10.3e",
-            7: "7s,4d,4d,15.9e,10.3e,10.3e,10.3e,10.3e,10.3e",
-            8: "8s,4d,3d,15.9e,10.3e,10.3e,10.3e,10.3e,10.3e",
-            9: "9s,3d,3d,15.9e,10.3e,10.3e,10.3e,10.3e,10.3e",
+            5: "5s,5d,5d,15f,10f,10f,10f,10f,10f,10f",
+            6: "6s,5d,4d,15f,10f,10f,10f,10f,10f,10f",
+            7: "7s,4d,4d,15f,10f,10f,10f,10f,10f,10f",
+            8: "8s,4d,3d,15f,10f,10f,10f,10f,10f,10f",
+            9: "9s,3d,3d,15f,10f,10f,10f,10f,10f,10f",
         },
         "tmvoc": {
-            5: "5s,5d,5d,15.9e,2d",
-            6: "6s,5d,4d,15.9e,2d",
-            7: "7s,4d,4d,15.9e,2d",
-            8: "8s,4d,3d,15.9e,2d",
-            9: "9s,3d,3d,15.9e,2d",
+            5: "5s,5d,5d,15f,2d",
+            6: "6s,5d,4d,15f,2d",
+            7: "7s,4d,4d,15f,2d",
+            8: "8s,4d,3d,15f,2d",
+            9: "9s,3d,3d,15f,2d",
         },
         "toughreact": {
-            5: "5s,5d,5d,15.9e,15.9e,15.9e,15.9e",
-            6: "6s,5d,4d,15.9e,15.9e,15.9e,15.9e",
-            7: "7s,4d,4d,15.9e,15.9e,15.9e,15.9e",
-            8: "8s,4d,3d,15.9e,15.9e,15.9e,15.9e",
-            9: "9s,3d,3d,15.9e,15.9e,15.9e,15.9e",
+            5: "5s,5d,5d,15f,15f,15f,15f",
+            6: "6s,5d,4d,15f,15f,15f,15f",
+            7: "7s,4d,4d,15f,15f,15f,15f",
+            8: "8s,4d,3d,15f,15f,15f,15f",
+            9: "9s,3d,3d,15f,15f,15f,15f",
         },
     },
     "MESHM": {
@@ -112,33 +112,32 @@ block_to_format = {
                 2: ",".join(8 * ["10f"]),
             },
         },
+        "MINC": {
+            1: "5s,5s,5s,5s",
+            2: "3d,3d,4s,10f,10f,10f,10f,10f,10f,10f",
+            3: ",".join(8 * ["10f"]),
+        },
     },
     "REACT": "25S",
 }
 
 
-def str2format(fmt, ignore_types=None):
+def str2format(fmt):
     """Convert a string to a list of formats."""
-    ignore_types = ignore_types if ignore_types else ()
-
     token_to_format = {
         "s": "",
         "S": "",
         "d": "g",
         "f": "f",
-        "e": "e",
     }
 
     base_fmt = "{{:{}}}"
-    out = []
-    for i, token in enumerate(fmt.split(",")):
-        n = token[:-1]
-        if i in ignore_types:
-            out.append(base_fmt.format(n.split(".")[0]))
-        elif token[-1].lower() == "s":
-            out.append(base_fmt.format(f"{n}.{n}"))
-        else:
-            out.append(base_fmt.format(f">{n}{token_to_format[token[-1]]}"))
+    out = [
+        base_fmt.format(f"{token[:-1]}.{token[:-1]}")
+        if token[-1].lower() == "s"
+        else base_fmt.format(f">{token[:-1]}{token_to_format[token[-1]]}")
+        for token in fmt.split(",")
+    ]
 
     return out
 
@@ -168,9 +167,15 @@ def register_format(
 
 def filetype_from_filename(filename, ext_to_fmt, default=""):
     """Determine file type from its extension."""
-    ext = os.path.splitext(filename)[1].lower()
+    from io import TextIOWrapper
 
-    return ext_to_fmt[ext] if ext in ext_to_fmt else default
+    if not isinstance(filename, TextIOWrapper):
+        ext = os.path.splitext(filename)[1].lower()
+
+        return ext_to_fmt[ext] if ext in ext_to_fmt else default
+
+    else:
+        return default
 
 
 @contextmanager

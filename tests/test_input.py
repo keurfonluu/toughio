@@ -767,8 +767,10 @@ def test_meshm_xyz():
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
 
-@pytest.mark.parametrize("layer", [True, False])
-def test_meshm_rz2d(layer):
+@pytest.mark.parametrize(
+    "layer, minc", [(True, False), (False, False), (True, True), (False, True)]
+)
+def test_meshm_rz2d(layer, minc):
     parameters_ref = {
         "meshmaker": {
             "type": "rz2dl" if layer else "rz2d",
@@ -793,6 +795,35 @@ def test_meshm_rz2d(layer):
                     "thicknesses": np.random.rand(np.random.randint(100) + 1),
                 },
             ],
+        }
+    }
+
+    if minc:
+        parameters_ref["minc"] = {
+            "type": helpers.random_string(5),
+            "dual": helpers.random_string(5),
+            "n_minc": np.random.randint(100) + 1,
+            "where": helpers.random_string(4),
+            "parameters": np.random.rand(7),
+            "volumes": np.random.rand(np.random.randint(100) + 1),
+        }
+
+    parameters = write_read(parameters_ref)
+
+    assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
+
+
+def test_minc():
+    n_volume = np.random.randint(100) + 1
+
+    parameters_ref = {
+        "minc": {
+            "type": helpers.random_string(5),
+            "dual": helpers.random_string(5),
+            "n_minc": np.random.randint(100) + 1,
+            "where": helpers.random_string(4),
+            "parameters": np.random.rand(7),
+            "volumes": np.random.rand(n_volume),
         }
     }
     parameters = write_read(parameters_ref)

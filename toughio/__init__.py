@@ -9,6 +9,7 @@ from ._io import (
     register_input,
     register_output,
     register_table,
+    write_h5,
     write_input,
     write_output,
 )
@@ -18,6 +19,7 @@ from ._mesh import read_time_series
 from ._mesh import register as register_mesh
 from ._mesh import write as write_mesh
 from ._mesh import write_time_series
+from ._run import run
 
 __all__ = [
     "Mesh",
@@ -31,6 +33,7 @@ __all__ = [
     "read_input",
     "read_output",
     "read_table",
+    "write_h5",
     "write_input",
     "write_output",
     "from_meshio",
@@ -42,6 +45,7 @@ __all__ = [
     "relative_permeability",
     "capillarity",
     "convert_labels",
+    "run",
     "_cli",
     "__version__",
 ]

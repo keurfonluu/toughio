@@ -11,14 +11,19 @@ def merge(argv=None):
 
     # Check that input, MESH and INCON files exist
     head = os.path.split(args.infile)[0]
+    gener_filename = head + ("/" if head else "") + "GENER"
     mesh_filename = head + ("/" if head else "") + "MESH"
     incon_filename = head + ("/" if head else "") + "INCON"
 
     if not os.path.isfile(args.infile):
         raise ValueError(f"File '{args.infile}' not found.")
-    if not os.path.isfile(mesh_filename):
-        raise ValueError("MESH file not found.")
+
+    gener_exists = os.path.isfile(gener_filename)
+    mesh_exists = os.path.isfile(mesh_filename)
     incon_exists = os.path.isfile(incon_filename)
+
+    if not (gener_exists or mesh_exists or incon_exists):
+        raise ValueError("GENER, MESH or INCON file(s) not found. Nothing to merge.")
 
     # Buffer input file
     with open(args.infile, "r") as f:
@@ -31,16 +36,24 @@ def merge(argv=None):
     if count < 3:
         raise ValueError(f"Invalid input file '{args.infile}'.")
 
+    # Buffer GENER
+    if gener_exists:
+        gener_file = _read_file(gener_filename, end="+++")
+
+        if not gener_file[0].startswith("GENER"):
+            raise ValueError("Invalid GENER file.")
+
     # Buffer MESH
-    with open(mesh_filename, "r") as f:
-        mesh_file = list(f)
-    if not mesh_file[0].startswith("ELEME"):
-        raise ValueError("Invalid MESH file.")
+    if mesh_exists:
+        mesh_file = _read_file(mesh_filename)
+
+        if not mesh_file[0].startswith("ELEME"):
+            raise ValueError("Invalid MESH file.")
 
     # Buffer INCON if exist
     if incon_exists:
-        with open(incon_filename, "r") as f:
-            incon_file = list(f)
+        incon_file = _read_file(incon_filename, end="+++")
+
         if not incon_file[0].startswith("INCON"):
             raise ValueError("Invalid INCON file.")
 
@@ -51,9 +64,16 @@ def merge(argv=None):
 
     # Buffer output file
     output_file = input_file[:i]
-    output_file += mesh_file
+
+    if gener_exists:
+        output_file += gener_file
+
+    if mesh_exists:
+        output_file += mesh_file
+
     if incon_exists:
         output_file += incon_file
+
     output_file += input_file[i:]
 
     # Write output file
@@ -68,8 +88,8 @@ def _get_parser():
     # Initialize parser
     parser = argparse.ArgumentParser(
         description=(
-            "Merge input file, MESH and/or INCON into a single file. "
-            "The files must be in the same directory."
+            "Merge input file, GENER and/or MESH and/or INCON into a single file. "
+            "The files must be in the same directory as input file."
         ),
         formatter_class=argparse.RawTextHelpFormatter,
     )
@@ -85,3 +105,21 @@ def _get_parser():
     parser.add_argument("outfile", type=str, help="merged TOUGH input file")
 
     return parser
+
+
+def _read_file(filename, end=None):
+    with open(filename, "r") as f:
+        if end is None:
+            file = list(f)
+
+        else:
+            file = []
+
+            for line in f:
+                if line.startswith(end):
+                    file.append("\n")
+                    break
+
+                file.append(line)
+
+    return file

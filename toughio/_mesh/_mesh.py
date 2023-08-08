@@ -407,7 +407,9 @@ class Mesh(object):
                 eos,
             )
 
-    def read_output(self, file_or_output, time_step=-1, connection=False):
+    def read_output(
+        self, file_or_output, time_step=-1, labels_order=None, connection=False
+    ):
         """
         Import TOUGH results to the mesh.
 
@@ -417,6 +419,8 @@ class Mesh(object):
             Input file name or buffer, or output data.
         time_step : int, optional, default -1
             Data for given time step to import. Default is last time step.
+        labels_order : list of array_like or None, optional, default None
+            List of labels. If None, output will be assumed ordered.
         connection : bool, optional, default False
             Only for standard TOUGH output file. If `True`, read data related to connections.
 
@@ -429,20 +433,22 @@ class Mesh(object):
 
         if isinstance(file_or_output, str):
             out = read_output(file_or_output, connection=connection)
+
         else:
             out = file_or_output
 
         if not isinstance(out, Output):
             if not (-len(out) <= time_step < len(out)):
                 raise ValueError()
+
             out = out[time_step]
 
         if out.type == "element":
-            if len(out.labels) != self.n_cells:
-                raise ValueError()
+            if labels_order is not None:
+                out = reorder_labels(out, labels_order)
 
-            out = reorder_labels(out, self.labels)
             self.cell_data.update(out.data)
+
         elif out.type == "connection":
             centers = self.centers
             labels_map = {k: v for v, k in enumerate(self.labels)}

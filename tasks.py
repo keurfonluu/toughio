@@ -1,6 +1,7 @@
 import glob
 import os
 import shutil
+import tarfile
 
 from invoke import task
 
@@ -70,3 +71,22 @@ def isort(c):
 @task
 def format(c):
     c.run("invoke isort black docstring")
+
+
+@task
+def tar(c):
+    patterns = [
+        "__pycache__",
+    ]
+
+    def filter(filename):
+        for pattern in patterns:
+            if filename.name.endswith(pattern):
+                return None
+        
+        return filename
+
+    with tarfile.open("toughio.tar.gz", "w:gz") as tf:
+        tf.add("toughio", arcname="toughio/toughio", filter=filter)
+        tf.add("pyproject.toml", arcname="toughio/pyproject.toml")
+        tf.add("setup.cfg", arcname="toughio/setup.cfg")

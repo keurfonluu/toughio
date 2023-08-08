@@ -71,6 +71,7 @@ _Parameters = {
     "initial_conditions": {},
     "boundary_conditions": {},
     "meshmaker": {},
+    "minc": {},
     "default": {},
     "array_dimensions": {},
     "end_comments": "",
@@ -238,6 +239,15 @@ rz2d = {
     "radius": None,
     "radius_ref": None,
     "thicknesses": [],
+}
+
+minc = {
+    "type": None,
+    "dual": None,
+    "n_minc": None,
+    "where": None,
+    "parameters": [],
+    "volumes": [],
 }
 
 default = {

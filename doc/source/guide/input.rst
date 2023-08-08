@@ -78,6 +78,7 @@ A TOUGH input file is defined as follows:
         "connections": dict,
         "initial_conditions": dict,
         "meshmaker": dict,
+        "minc": dict,
         "chemical_properties": dict,
         "non_condensible_gas": list[str],
         "start": bool,
@@ -365,6 +366,8 @@ The keyword ``"type"`` denotes the type of mesh to generate. The following value
  - ``"rz2d"``
  - ``"rz2dl"``
 
+Note that the keyword ``"angle"`` is only used when ``"type"`` is ``"xyz"``.
+
 If ``"type"`` is set to ``"xyz"``, each dictionary in ``"parameters"`` is defined as follows:
 
 .. code-block::
@@ -395,6 +398,23 @@ The keyword ``"type"`` denotes here the type of increments to generate. The foll
  - ``"equid"``: keywords ``"n_increment"`` and ``"size"`` are required
  - ``"logar"``: keywords ``"n_increment"`` and ``"radius"`` are required, ``"radius_ref"`` is optional
  - ``"layer"``: keyword ``"thicknesses"`` is required
+
+
+MINC
+****
+
+MINC parameters are defined in a separate dictionary from ``"meshmaker"`` by the keyword ``"minc"``, and is organized as follows:
+
+.. code-block::
+
+    {
+        "type": str,
+        "dual": str,
+        "n_minc": int,
+        "where": str,
+        "parameters": list[float],
+        "volumes": list[float],
+    }
 
 
 TMVOC
@@ -447,6 +467,33 @@ Non-condensible gases (block NCGAS) can be listed using keyword ``"non_condensib
 .. note::
 
     For TMVOC input files, the argument ``eos="tmvoc"`` **must** be provided to the functions :func:`toughio.read_input` and :func:`toughio.write_input`.
+
+
+Array dimensions (iTOUGH2)
+**************************
+
+iTOUGH2 allows users to provide array dimensions if an array is insufficiently dimensioned. An additional keyword ``"array_dimensions"`` can be used to specify such values, as follows:
+
+.. code-block::
+
+    "array_dimensions": {
+        "n_rocks": int,
+        "n_times": int,
+        "n_generators": int,
+        "n_rates": int,
+        "n_increment_x": int,
+        "n_increment_y": int,
+        "n_increment_z": int,
+        "n_increment_rad": int,
+        "n_properties": int,
+        "n_properties_times": int,
+        "n_regions": int,
+        "n_regions_parameters": int,
+        "n_ltab": int,
+        "n_rpcap": int,
+        "n_elements_timbc": int,
+        "n_timbc": int,
+    }
 
 
 TOUGHREACT (flow.inp)
@@ -534,33 +581,6 @@ The permeability of an element called ``"AAA00"`` is defined as follows:
 
     "AAA00": {
         "permeability": list[float],
-    }
-
-
-Array dimensions (iTOUGH2)
-**************************
-
-iTOUGH2 allows users to provide array dimensions if an array is insufficiently dimensioned. An additional keyword ``"array_dimensions"`` can be used to specify such values, as follows:
-
-.. code-block::
-
-    "array_dimensions": {
-        "n_rocks": int,
-        "n_times": int,
-        "n_generators": int,
-        "n_rates": int,
-        "n_increment_x": int,
-        "n_increment_y": int,
-        "n_increment_z": int,
-        "n_increment_rad": int,
-        "n_properties": int,
-        "n_properties_times": int,
-        "n_regions": int,
-        "n_regions_parameters": int,
-        "n_ltab": int,
-        "n_rpcap": int,
-        "n_elements_timbc": int,
-        "n_timbc": int,
     }
 
 

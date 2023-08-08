@@ -58,7 +58,7 @@ def read(
     file_format : str ('csv', 'petrasim', 'save', 'tecplot', 'tough') or None, optional, default None
         Input file format.
     labels_order : list of array_like or None, optional, default None
-        List of labels.
+        List of labels. If None, output will be assumed ordered.
     connection : bool, optional, default False
         Only for standard TOUGH output file. If `True`, return data related to connections.
 
@@ -74,18 +74,26 @@ def read(
         raise TypeError()
 
     if file_format is None:
+        # Guess type and format from content
         file_type, file_format = get_output_type(filename)
-        file_type = (
-            "connection" if (file_format == "tough" and connection) else file_type
+
+        # Otherwise, guess file format from extension
+        file_format = (
+            file_format
+            if file_format
+            else filetype_from_filename(filename, _extension_to_filetype, "")
         )
 
     else:
         if file_format not in _reader_map:
             raise ValueError()
 
+        file_type = "element"  # By default
+
+    if connection:
         file_type = "connection" if connection else "element"
 
-    return _reader_map[file_format](filename, file_type, file_format, labels_order)
+    return _reader_map[file_format](filename, file_type, labels_order)
 
 
 def write(filename, output, file_format=None, **kwargs):
@@ -98,7 +106,7 @@ def write(filename, output, file_format=None, **kwargs):
         Output file name or buffer.
     output : namedtuple or list of namedtuple
         namedtuple (type, format, time, labels, data) or list of namedtuple for each time step to export.
-    file_format : str ('csv', 'petrasim', 'save', 'tecplot', 'tough') or None, optional, default None
+    file_format : str ('csv', 'petrasim', 'tecplot') or None, optional, default None
         Output file format.
 
     Other Parameters
@@ -158,4 +166,4 @@ def get_output_type(filename):
                 return "connection", "csv"
 
             else:
-                raise ValueError()
+                return "element", None

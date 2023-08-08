@@ -23,10 +23,10 @@ def read_record(data, fmt):
     return out
 
 
-def write_record(data, fmt, multi=False):
+def write_record(data, fmt, space_between_values=False, multi=False):
     """Return a list of record strings given format."""
     if not multi:
-        data = [to_str(d, f) for d, f in zip(data, fmt)]
+        data = [to_str(d, f, space_between_values) for d, f in zip(data, fmt)]
         out = [f"{''.join(data):80}\n"]
 
     else:
@@ -39,7 +39,7 @@ def write_record(data, fmt, multi=False):
 
         out = []
         for d in data:
-            d = [to_str(dd, f) for dd, f in zip(d, fmt)]
+            d = [to_str(dd, f, space_between_values) for dd, f in zip(d, fmt)]
             out += [f"{''.join(d):80}\n"]
 
     return out
@@ -53,57 +53,63 @@ def to_float(s):
     except ValueError:
         # It's probably something like "0.0001-001"
         significand, exponent = s[:-4], s[-4:]
+
         return float(f"{significand}e{exponent}")
 
 
-def to_str(x, fmt):
+def to_str(x, fmt, space_between_values=False):
     """Convert variable to string."""
     x = "" if x is None else x
 
     if not isinstance(x, str):
-        # Special handling for floating point numbers
         if "f" in fmt:
-            # Number of decimals is specified
-            if "." in fmt:
-                n = int(fmt[3:].split(".")[0])
-                tmp = fmt.format(x)
+            tmp = str(float(x))
 
-                if len(tmp) > n:
-                    return fmt.replace("f", "e").format(x)
+            n = int(fmt[3:].split("f")[0])
+            fmt = f"{{:>{n}}}"
 
-                else:
-                    return tmp
+            if space_between_values:
+                n -= 1
 
-            # Let Python decides the format
-            # n - 1 to leave a whitespace between values
-            else:
-                n = int(fmt[3:].split("f")[0])
-                tmp = str(float(x))
+            if len(tmp) > n or "e" in tmp:
+                tmp = (
+                    tmp[:n]
+                    if 1.0 <= abs(x) < 10.0
+                    else format(scientific_notation(x, n))
+                )
 
-                # If it's longer than n-1, use scientific notation
-                if len(tmp) > n - 1:
-                    fmt = f"{{:>{n}.{n - 7}e}}"
-
-                    # Remove trailing zeros (e.g., "1.300e+07" -> "  1.3e+07")
-                    left, right = fmt.format(x).split("e")
-                    fmt = f"{{:>{len(left)}}}e{right}"
-
-                    return fmt.format(str(float(left)))
-
-                # If it's a scientific notation, make sure there is a decimal point
-                elif "e" in tmp and "." not in tmp:
-                    fmt = f" {{:>{n - 1}.1e}}"
-
-                    return fmt.format(x)
-
-                # Otherwise, display as is
-                else:
-                    fmt = f" {{:>{n - 1}}}"
-
-                    return fmt.format(tmp)
+            return fmt.format(tmp)
 
         else:
             return fmt.format(x)
 
     else:
-        return fmt.replace("g", "").replace("e", "").replace("f", "").format(x)
+        return fmt.replace("g", "").replace("f", "").format(x)
+
+
+def scientific_notation(x, n):
+    """
+    Scientific notation with fixed number of characters.
+
+    Note
+    ----
+    This function maximizes accuracy given a fixed number of characters.
+
+    """
+    tmp = np.format_float_scientific(
+        x,
+        unique=True,
+        trim="0",
+        exp_digits=0,
+        sign=False,
+    )
+    tmp = tmp.replace("+", "")
+
+    if len(tmp) > n:
+        significand, exponent = tmp.split("e")
+        significand = significand[: n - len(tmp)]
+
+        return f"{significand}e{exponent}"
+
+    else:
+        return tmp

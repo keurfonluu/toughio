@@ -56,6 +56,7 @@ def read_buffer(f, label_length, n_variables, eos, simulator="tough"):
     from ._common import blocks
 
     parameters = {}
+    flag = False
 
     # Title
     title = []
@@ -179,8 +180,11 @@ def read_buffer(f, label_length, n_variables, eos, simulator="tough"):
                 parameters.update(_read_roft(fiter))
 
             elif line.startswith("GENER"):
-                gener, label_length = _read_gener(fiter, label_length, simulator)
+                gener, flag, label_length = _read_gener(fiter, label_length, simulator)
                 parameters.update(gener)
+
+                if flag:
+                    break
 
             elif line.startswith("TIMBC"):
                 parameters.update(_read_timbc(fiter))
@@ -242,11 +246,21 @@ def read_buffer(f, label_length, n_variables, eos, simulator="tough"):
 
             elif line.startswith("ENDCY"):
                 end_comments = read_end_comments(fiter)
+
                 if end_comments:
                     parameters["end_comments"] = end_comments
 
     except:
         raise ReadError(f"failed to parse line {fiter.count}.")
+
+    if flag:
+        end_comments = read_end_comments(fiter)
+
+        if end_comments:
+            if isinstance(end_comments, str):
+                end_comments = [end_comments]
+
+            parameters["end_comments"] = ["+++", *end_comments]
 
     return parameters
 
@@ -816,8 +830,9 @@ def _read_gener(f, label_length, simulator="tough"):
         label_length = get_label_length(line[:9])
     label_format = f"{{:>{label_length}}}"
 
+    flag = False
     while True:
-        if line.strip():
+        if line.strip() and not line.startswith("+++"):
             data = read_record(line, fmt[label_length])
             tmp = {
                 "label": label_format.format(data[0]),
@@ -859,13 +874,16 @@ def _read_gener(f, label_length, simulator="tough"):
             gener["generators"].append(tmp)
 
         else:
+            flag = line.startswith("+++")
             break
 
         line = f.next()
 
-    return {
-        "generators": [prune_values(generator) for generator in gener["generators"]]
-    }, label_length
+    return (
+        {"generators": [prune_values(generator) for generator in gener["generators"]]},
+        flag,
+        label_length,
+    )
 
 
 def _read_timbc(f):
@@ -890,16 +908,19 @@ def _read_timbc(f):
         bcelm = f.next().strip()
 
         # Record 4
-        line = f.next().strip()
-        data = [float(x) for x in line.split()]
-        if len(data) < 2 * nbcp:
-            raise ReadError()
+        times = []
+        values = []
+        for _ in range(nbcp):
+            line = f.next().strip()
+            data = [float(x) for x in line.split()]
+            times.append(data[0])
+            values.append(data[1])
 
         tmp = {
             "label": bcelm,
             "variable": nbcpv,
-            "times": data[::2],
-            "values": data[1::2],
+            "times": times,
+            "values": values,
         }
         timbc["boundary_conditions"].append(tmp)
 
@@ -1129,17 +1150,51 @@ def _read_incon(f, label_length, n_variables, eos=None, simulator="tough"):
 
 def _read_meshm(f):
     """Read MESHM block data."""
-    meshm = {"meshmaker": {}}
+
+    def read_minc(f, data, fmt):
+        """Read MINC data."""
+        minc = {}
+
+        # Record 1
+        line = f.next()
+        data = read_record(line, fmt[1])
+        minc["type"] = data[1].lower()
+        minc["dual"] = data[3].lower()
+
+        # Record 2
+        line = f.next()
+        data = read_record(line, fmt[2])
+        minc["n_minc"] = data[0]
+        n_volume = data[1]
+        minc["where"] = data[2].lower()
+        minc["parameters"] = prune_values(data[3:])
+
+        # Record 3
+        minc["volumes"] = []
+
+        while len(minc["volumes"]) < n_volume:
+            line = f.next()
+            data = read_record(line, fmt[3])
+            minc["volumes"] += prune_values(data)
+
+        return minc
+
     fmt = block_to_format["MESHM"]
+    fmt_minc = fmt["MINC"]
 
     # Mesh type
     line = f.next().strip()
     data = read_record(line, fmt[1])
     mesh_type = data[0].upper()
 
+    if mesh_type in {"XYZ", "RZ2D", "RZ2DL"}:
+        meshm = {"meshmaker": {"type": mesh_type.lower()}}
+
+    else:
+        meshm = {"minc": {}}
+
     # XYZ
     if mesh_type == "XYZ":
-        meshm["meshmaker"]["type"] = mesh_type.lower()
         fmt = fmt["XYZ"]
 
         # Record 1
@@ -1179,7 +1234,6 @@ def _read_meshm(f):
 
     # RZ2D
     elif mesh_type in {"RZ2D", "RZ2DL"}:
-        meshm["meshmaker"]["type"] = mesh_type.lower()
         fmt = fmt["RZ2D"]
 
         # Record 1
@@ -1248,8 +1302,22 @@ def _read_meshm(f):
                     tmp = {"type": data_type.lower(), "thicknesses": thicknesses[:n]}
                     meshm["meshmaker"]["parameters"].append(tmp)
 
+                    # LAYER closes the block RZ2D
+                    # RZ2D can be followed by MINC
+                    line = f.next()
+
+                    if line.startswith("MINC"):
+                        meshm["minc"] = read_minc(f, data, fmt_minc)
+
+                    else:
+                        break
+
             else:
                 break
+
+    # MINC
+    elif mesh_type == "MINC":
+        meshm["minc"] = read_minc(f, data, fmt_minc)
 
     return meshm
 

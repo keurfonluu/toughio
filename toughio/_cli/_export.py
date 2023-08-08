@@ -54,25 +54,13 @@ def export(argv=None):
             output = output[args.time_step]
         else:
             output = output[-1]
-        input_format = output.format
         labels = output.labels
     else:
-        input_format = output[-1].format
         labels = output[-1].labels
     print(" Done!")
 
-    # Display warning if mesh is provided but input file format is 'tecplot'
-    # Continue as if mesh was not provided
-    if input_format == "tecplot":
-        with_mesh = False
-        msg = (
-            "Cannot use mesh file with Tecplot TOUGH output, inferring dimensionality"
-            if args.mesh
-            else "Inferring dimensionality"
-        )
-    else:
-        with_mesh = bool(args.mesh)
-        msg = "Mesh file not specified, inferring dimensionality"
+    with_mesh = bool(args.mesh)
+    msg = "Mesh file not specified, inferring dimensionality"
 
     # Triangulate or voxelize if no mesh
     voxelized = False
@@ -225,7 +213,7 @@ def _get_parser():
     parser.add_argument(
         "infile",
         type=str,
-        help="TOUGH output file",
+        help="TOUGH input file",
     )
 
     # Mesh file

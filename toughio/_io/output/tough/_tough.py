@@ -11,7 +11,7 @@ __all__ = [
 ]
 
 
-def read(filename, file_type, file_format, labels_order):
+def read(filename, file_type, labels_order=None):
     """
     Read standard TOUGH output file.
 
@@ -21,10 +21,8 @@ def read(filename, file_type, file_format, labels_order):
         Input file name or buffer.
     file_type : str
         Input file type.
-    file_format : str
-        Input file format.
     labels_order : list of array_like
-        List of labels.
+        List of labels. If None, output will be assumed ordered.
 
     Returns
     -------
@@ -79,9 +77,7 @@ def read(filename, file_type, file_format, labels_order):
         labels = [labels.copy() for _ in variables]
         variables = np.array([[v[2:] for v in variable] for variable in variables])
 
-    return to_output(
-        file_type, file_format, labels_order, headers, times, labels, variables
-    )
+    return to_output(file_type, labels_order, headers, times, labels, variables)
 
 
 def _read_table(f, file_type):
@@ -113,6 +109,12 @@ def _read_table(f, file_type):
             # Read headers
             headers = line.split()
 
+            # Read units
+            line = next(f)
+            nwsp = line.index(
+                line.strip()[0]
+            )  # Index of first non whitespace character
+
             # Look for next non-empty line
             while True:
                 line = next(f)
@@ -121,7 +123,7 @@ def _read_table(f, file_type):
 
             # Loop until end of output block
             while True:
-                if line[:15].strip() and not line.strip().startswith("ELEM"):
+                if line[:nwsp].strip() and not line.strip().startswith("ELEM"):
                     if first:
                         # Find first floating point
                         for xf in line.split()[::-1]:

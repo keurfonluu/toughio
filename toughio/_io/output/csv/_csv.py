@@ -32,7 +32,7 @@ header_to_unit = {
 }
 
 
-def read(filename, file_type, file_format, labels_order):
+def read(filename, file_type, labels_order=None):
     """
     Read OUTPUT_{ELEME, CONNE}.csv.
 
@@ -42,10 +42,8 @@ def read(filename, file_type, file_format, labels_order):
         Input file name or buffer.
     file_type : str
         Input file type.
-    file_format : str
-        Input file format.
     labels_order : list of array_like
-        List of labels.
+        List of labels. If None, output will be assumed ordered.
 
     Returns
     -------
@@ -66,9 +64,7 @@ def read(filename, file_type, file_format, labels_order):
         )
         variables = np.array([[v[ilab:] for v in variable] for variable in variables])
 
-    return to_output(
-        file_type, file_format, labels_order, headers, times, labels, variables
-    )
+    return to_output(file_type, labels_order, headers, times, labels, variables)
 
 
 def _read_csv(f, file_type):

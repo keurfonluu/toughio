@@ -372,7 +372,9 @@ def _write_conne(
 
     # Calculate remaining variables
     lines = np.diff(centers, axis=1)[:, 0]
-    isot = _isot(lines)
+    isot = _isot(
+        np.around(lines, decimals=4)
+    )  # Reduce sensitivity to floating point accuracy
     angles = np.dot(lines, gravity) / np.linalg.norm(lines, axis=1)
 
     if nodal_distance == "line":

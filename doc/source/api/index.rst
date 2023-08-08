@@ -7,6 +7,7 @@ API Reference
 
    io
    mesh
+   run
    rpcap
    cli
 

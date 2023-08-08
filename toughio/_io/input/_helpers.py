@@ -115,6 +115,8 @@ def write(filename, parameters, file_format=None, **kwargs):
         Only if ``file_format = "tough"`` and `block` is None. Blocks to ignore.
     space_between_blocks : bool, optional, default False
         Only if ``file_format = "tough"``. Add an empty record between blocks.
+    space_between_blocks : bool, optional, default True
+        Only if ``file_format = "tough"``. Add a white space between floating point values.
     eos : str or None, optional, default None
         Only if ``file_format = "tough"``. Equation of State.
         If `eos` is defined in `parameters`, this option will be ignored.
@@ -152,7 +154,12 @@ def _get_file_format(filename, file_format, default):
 def _file_format_from_filename(filename):
     """Determine file format from its name."""
     import pathlib
+    from io import TextIOWrapper
 
-    filename = pathlib.Path(filename).name
+    if not isinstance(filename, TextIOWrapper):
+        filename = pathlib.Path(filename).name
 
-    return _file_formats[filename] if filename in _file_formats else ""
+        return _file_formats[filename] if filename in _file_formats else ""
+
+    else:
+        return ""
