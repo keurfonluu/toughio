@@ -26,6 +26,7 @@ def write(
     filename : str or pathlike
         Output file name.
     elements : namedtuple, list of namedtuple, str, pathlike or None, optional, default None
+        Element outputs to export.
     connections : namedtuple, list of namedtuple, str, pathlike or None, optional, default None
         Connection outputs to export.
     element_history : dict or None, optional, default None

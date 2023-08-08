@@ -14,9 +14,11 @@ Input parameters
 Simulation outputs
 ------------------
 
-.. autofunction:: toughio.read_history
-
 .. autofunction:: toughio.read_output
+
+.. autofunction:: toughio.read_table
+
+.. autofunction:: toughio.write_h5
 
 .. autofunction:: toughio.write_output
 
