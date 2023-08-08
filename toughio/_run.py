@@ -1,9 +1,9 @@
 import glob
 import os
 import pathlib
+import platform
 import shutil
 import subprocess
-import sys
 import tempfile
 
 
@@ -39,7 +39,7 @@ def run(
     docker : str, optional, default None
         Name of Docker image.
     wsl : bool, optional, default False
-        Only for Windows. If `True`, run the final command as a Bash command. Ignored if `docker` is not None.
+        Only for Windows. If `True`, run the final command as a Bash command.
     working_dir : str, pathlike or None, optional, default None
         Working directory. Input and output files will be generated in this directory.
     use_temp : bool, optional, default False
@@ -151,11 +151,11 @@ def run(
     if workers is not None and workers > 1:
         cmd = f"mpiexec -n {workers} {cmd}"
 
-    # Use Docker or WSL
-    platform = sys.platform
-
+    # Use Docker
     if docker:
-        if platform.startswith("win") and os.getenv("ComSpec").endswith("cmd.exe"):
+        if platform.system().startswith("Win") and os.getenv("ComSpec").endswith(
+            "cmd.exe"
+        ):
             cwd = "%cd%"
 
         else:
@@ -163,13 +163,18 @@ def run(
 
         cmd = f"docker run --rm -v {cwd}:/work -w /work {docker} {cmd}"
 
-    elif wsl and platform.startswith("win"):
+    # Use WSL
+    if wsl and platform.system().startswith("Win"):
         cmd = f'bash -c "{cmd}"'
 
     kwargs = {}
     if silent:
         kwargs["stdout"] = subprocess.DEVNULL
         kwargs["stderr"] = subprocess.STDOUT
+
+    else:
+        kwargs["stderr"] = subprocess.PIPE
+        kwargs["universal_newlines"] = True
 
     status = subprocess.run(cmd, shell=True, cwd=str(simulation_dir), **kwargs)
 
