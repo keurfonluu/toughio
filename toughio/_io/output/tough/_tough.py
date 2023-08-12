@@ -126,15 +126,7 @@ def _read_table(f, file_type):
                 if line[:nwsp].strip() and not line.strip().startswith("ELEM"):
                     if first:
                         # Find first floating point
-                        for xf in line.split()[::-1]:
-                            try:
-                                _ = int(xf)
-
-                            except ValueError:
-                                x = xf
-                                continue
-
-                            break
+                        x = line.split()[-headers[::-1].index("INDEX")]
 
                         # Find end of label(s)
                         tmp = line[: line.index(x)].rstrip()
