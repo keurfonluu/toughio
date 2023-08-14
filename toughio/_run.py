@@ -171,7 +171,7 @@ def run(
 
     # Use WSL
     if wsl and is_windows:
-        cmd = f'bash -c "{cmd}"'
+        cmd = f"bash -c '{cmd}'"
 
     kwargs = {}
     if silent:
