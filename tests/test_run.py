@@ -1,3 +1,6 @@
+import os
+import platform
+
 import pytest
 
 import toughio
@@ -13,7 +16,7 @@ import toughio
             None,
             "docker-image",
             False,
-            'docker run --rm  -v "%cd%":/shared -w /shared docker-image tough-exec INFILE INFILE.out',
+            "docker run --rm  -v PLACEHOLDER:/shared -w /shared docker-image tough-exec INFILE INFILE.out",
         ),
         ("tough-exec", None, None, True, 'bash -c "tough-exec INFILE INFILE.out"'),
         (
@@ -21,7 +24,7 @@ import toughio
             8,
             "docker-image",
             True,
-            'bash -c "docker run --rm  -v "%cd%":/shared -w /shared docker-image mpiexec -n 8 tough-exec INFILE INFILE.out"',
+            'bash -c "docker run --rm  -v PLACEHOLDER:/shared -w /shared docker-image mpiexec -n 8 tough-exec INFILE INFILE.out"',
         ),
     ],
 )
@@ -35,5 +38,11 @@ def test_run(exec, workers, docker, wsl, cmd):
         use_temp=True,
         silent=True,
     )
+
+    if platform.system().startswith("Win") and os.getenv("ComSpec").endswith("cmd.exe"):
+        cmd = cmd.replace("PLACEHOLDER", '"%cd%"')
+
+    else:
+        cmd = cmd.replace("PLACEHOLDER", "${PWD}")
 
     assert status.args == cmd
