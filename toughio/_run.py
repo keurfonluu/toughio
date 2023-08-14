@@ -152,19 +152,27 @@ def run(
         cmd = f"mpiexec -n {workers} {cmd}"
 
     # Use Docker
+    is_windows = platform.system().startswith("Win")
+
     if docker:
-        if platform.system().startswith("Win") and os.getenv("ComSpec").endswith(
+        if is_windows and os.getenv("ComSpec").endswith(
             "cmd.exe"
         ):
-            cwd = "%cd%"
+            cwd = '"%cd%"'
 
         else:
             cwd = "${PWD}"
 
-        cmd = f"docker run --rm -v {cwd}:/work -w /work {docker} {cmd}"
+        try:
+            uid = f"-e LOCAL_USER_ID={os.getuid()}"
+
+        except AttributeError:
+            uid = ""
+
+        cmd = f"docker run --rm {uid} -v {cwd}:/shared -w /shared {docker} {cmd}"
 
     # Use WSL
-    if wsl and platform.system().startswith("Win"):
+    if wsl and is_windows:
         cmd = f'bash -c "{cmd}"'
 
     kwargs = {}
