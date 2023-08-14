@@ -190,7 +190,7 @@ def run(
             simulation_dir,
             working_dir,
             ignore=shutil.ignore_patterns(*ignore_patterns),
-            dirs_exist_ok=True,
+            dirs_exist_ok=True,  # Doesn't work with Python 3.7
         )
         shutil.rmtree(simulation_dir, ignore_errors=True)
         os.remove(working_dir / "tempdir.txt")

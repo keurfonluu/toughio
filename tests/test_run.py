@@ -1,5 +1,6 @@
 import os
 import platform
+import sys
 
 import pytest
 
@@ -35,7 +36,7 @@ def test_run(exec, workers, docker, wsl, cmd):
         workers=workers,
         docker=docker,
         wsl=wsl,
-        use_temp=True,
+        use_temp=sys.version_info >= (3, 8),  # dirs_exist_ok only works with Python > 3.8
         silent=True,
     )
 
