@@ -17,15 +17,15 @@ import toughio
             None,
             "docker-image",
             False,
-            "docker run --rm  -v PLACEHOLDER:/shared -w /shared docker-image tough-exec INFILE INFILE.out",
+            'docker run --rm  -v PLACEHOLDER:/shared -w /shared docker-image tough-exec INFILE INFILE.out',
         ),
-        ("tough-exec", None, None, True, 'bash -c "tough-exec INFILE INFILE.out"'),
+        ("tough-exec", None, None, True, "bash -c 'tough-exec INFILE INFILE.out'"),
         (
             "tough-exec",
             8,
             "docker-image",
             True,
-            'bash -c "docker run --rm  -v PLACEHOLDER:/shared -w /shared docker-image mpiexec -n 8 tough-exec INFILE INFILE.out"',
+            "bash -c 'docker run --rm  -v PLACEHOLDER:/shared -w /shared docker-image mpiexec -n 8 tough-exec INFILE INFILE.out'",
         ),
     ],
 )
