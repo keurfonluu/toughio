@@ -84,4 +84,4 @@ def test_run_windows(exec, workers, docker, wsl, cmd):
 )
 def test_run_unix(exec, workers, docker, cmd):
     cmd.replace("PLACEHOLDER", f"-e LOCAL_USER_ID={os.getuid()}")
-    test_run(exec, workers, docker, cmd)
+    test_run(exec, workers, docker, False, cmd)
