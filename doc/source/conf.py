@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.abspath(".../"))
 import toughio
 
 project = "toughio"
-copyright = "2022, Keurfon Luu"
+copyright = "2023, Keurfon Luu"
 author = "Keurfon Luu"
 
 version = toughio.__version__
