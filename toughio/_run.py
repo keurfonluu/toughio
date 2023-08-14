@@ -155,9 +155,7 @@ def run(
     is_windows = platform.system().startswith("Win")
 
     if docker:
-        if is_windows and os.getenv("ComSpec").endswith(
-            "cmd.exe"
-        ):
+        if is_windows and os.getenv("ComSpec").endswith("cmd.exe"):
             cwd = '"%cd%"'
 
         else:
