@@ -42,8 +42,9 @@ extensions = [
     "sphinx.ext.githubpages",
     "sphinx.ext.napoleon",
     "sphinxarg.ext",
-    # "sphinxcontrib.bibtex",
+    "sphinxcontrib.bibtex",
     "sphinx_gallery.gen_gallery",
+    "sphinx_subfigure",
 ]
 
 # Sphinx Gallery settings
@@ -85,10 +86,13 @@ napoleon_include_special_with_doc = False
 # napoleon_use_rtype = True
 
 # Numfig settings
-numfig = False
+numfig = True
 numfig_format = {
     "figure": "Figure %s",
 }
+
+# BibTeX
+bibtex_bibfiles = ["references.bib"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = [
@@ -120,13 +124,19 @@ autoclass_content = "both"
 # a list of builtin themes.
 #
 html_theme = "pydata_sphinx_theme"
+html_logo = "_static/logo.png"
 html_theme_path = [
     "_themes",
 ]
+html_context = {
+    "default_mode": "light",
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-# html_static_path = [
-#     "_static",
-# ]
+html_static_path = ["_static"]
+
+html_css_files = [
+    "css/custom.css",
+]
