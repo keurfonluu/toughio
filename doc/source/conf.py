@@ -124,7 +124,12 @@ autoclass_content = "both"
 # a list of builtin themes.
 #
 html_theme = "pydata_sphinx_theme"
-html_logo = "_static/logo.png"
+html_theme_options = {
+   "logo": {
+      "image_light": "_static/logo-light.png",
+      "image_dark": "_static/logo.png",
+   }
+}
 html_theme_path = [
     "_themes",
 ]
