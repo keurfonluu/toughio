@@ -5,4 +5,5 @@ User Guide
    :titlesonly:
    :maxdepth: 2
 
+   installation
    input

@@ -8,3 +8,4 @@
    guide/index
    examples/index
    api/index
+   tough3/index
