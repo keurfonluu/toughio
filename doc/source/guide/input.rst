@@ -81,6 +81,7 @@ A TOUGH input file is defined as follows:
         "minc": dict,
         "chemical_properties": dict,
         "non_condensible_gas": list[str],
+        "index": bool,
         "start": bool,
         "nover": bool,
         "array_dimensions": dict,
@@ -113,7 +114,7 @@ Rock properties
 
 Rock properties (block ROCKS) are defined using the keyword ``"rocks"`` as a dictionary where keys refer to the names of the rocks and the values to their properties.
 Domainwise initial conditions (block INDOM) can also be defined by providing the keyword ``"initial_condition"``.
-For TMVOC, an additional keyword ``"phase_composition"`` can be used to define phase composition materialwise (block ROCKS), domainwise (block INDOM) or elementwise (block INCON).
+For ECO2M and TMVOC, an additional keyword ``"phase_composition"`` can be used to define phase composition materialwise (block ROCKS), domainwise (block INDOM) or elementwise (block INCON).
 For instance, for a rock called ``"rock1"``, its properties are defined as follows:
 
 .. code-block::

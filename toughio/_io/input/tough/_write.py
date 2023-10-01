@@ -212,7 +212,10 @@ def write_buffer(
     param = False
     if prune_values(parameters["default"]["initial_condition"]):
         param = True
-    if eos_ == "tmvoc" and parameters["default"]["phase_composition"] is not None:
+    if (
+        eos_ in {"eco2m", "tmvoc"}
+        and parameters["default"]["phase_composition"] is not None
+    ):
         param = True
 
     for option in parameters["options"].values():
@@ -303,6 +306,10 @@ def write_buffer(
 
     if "SOLVR" in blocks and parameters["solver"]:
         out += _write_solvr(parameters, space_between_values)
+        out += ["\n"] if space_between_blocks else []
+
+    if "INDEX" in blocks and parameters["index"]:
+        out += _write_index()
         out += ["\n"] if space_between_blocks else []
 
     if "START" in blocks and parameters["start"]:
@@ -777,6 +784,12 @@ def _write_solvr(parameters, space_between_values):
     return out
 
 
+@block("INDEX")
+def _write_index():
+    """Write INDEX block data."""
+    return []
+
+
 @block("START")
 def _write_start():
     """Write START block data."""
@@ -870,8 +883,8 @@ def _write_param(parameters, space_between_values, eos_=None, simulator="tough")
     ]
     out += write_record(values, fmt4, space_between_values)
 
-    # Record 4 (TMVOC)
-    if eos_ == "tmvoc":
+    # Record 4 (ECO2M, TMVOC)
+    if eos_ in {"eco2m", "tmvoc"}:
         out += write_record(
             [parameters["default"]["phase_composition"]],
             str2format("5d"),
@@ -958,7 +971,7 @@ def _write_indom(parameters, space_between_values, eos_):
     for k, v in parameters["rocks"].items():
         cond1 = "initial_condition" in v
         cond2 = (
-            eos_ == "tmvoc"
+            eos_ in {"eco2m", "tmvoc"}
             and "phase_composition" in v
             and v["phase_composition"] is not None
         )
@@ -967,7 +980,7 @@ def _write_indom(parameters, space_between_values, eos_):
             # Record 1
             values = [k]
 
-            if eos_ == "tmvoc":
+            if eos_ in {"eco2m", "tmvoc"}:
                 values.append(v["phase_composition"])
 
             else:
@@ -1468,7 +1481,7 @@ def _write_incon(parameters, space_between_values, eos_=None, simulator="tough")
 
             values += [k for k in per]
 
-        elif eos_ == "tmvoc":
+        elif eos_ in {"eco2m", "tmvoc"}:
             values += [data["phase_composition"]]
 
         else:

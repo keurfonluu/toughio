@@ -132,6 +132,9 @@ def read_buffer(f, label_length, n_variables, eos, simulator="tough"):
             elif line.startswith("SOLVR"):
                 parameters.update(_read_solvr(fiter))
 
+            elif line.startswith("INDEX"):
+                parameters["index"] = True
+
             elif line.startswith("START"):
                 parameters["start"] = True
 
@@ -639,8 +642,8 @@ def _read_param(f, n_variables, eos=None):
         }
     )
 
-    # Record 4 (TMVOC)
-    if eos == "tmvoc":
+    # Record 4 (ECO2M, TMVOC)
+    if eos in {"eco2m", "tmvoc"}:
         line = f.next()
         data = read_record(line, "5d")
         param["default"] = {"phase_composition": data[0]}
@@ -699,7 +702,7 @@ def _read_indom(f, n_variables, eos=None):
             # Record 1
             data = read_record(line, fmt[5])
             rock = data[0]
-            phase_composition = data[1]  # TMVOC
+            phase_composition = data[1]  # ECO2M, TMVOC
 
             # Record 2
             data = read_primary_variables(f, fmt[0], n_variables)
@@ -709,7 +712,7 @@ def _read_indom(f, n_variables, eos=None):
             if not n_variables:
                 n_variables = len(data)
 
-            if eos == "tmvoc":
+            if eos in {"eco2m", "tmvoc"}:
                 indom["rocks"][rock]["phase_composition"] = phase_composition
 
         else:
@@ -1120,7 +1123,7 @@ def _read_incon(f, label_length, n_variables, eos=None, simulator="tough"):
                     permeability if permeability else None
                 )
 
-            elif eos == "tmvoc":
+            elif eos in {"eco2m", "tmvoc"}:
                 incon["initial_conditions"][label]["phase_composition"] = data[4]
 
             else:

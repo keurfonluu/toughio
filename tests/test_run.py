@@ -2,6 +2,7 @@ import os
 import platform
 import sys
 
+import helpers
 import pytest
 
 import toughio
@@ -21,8 +22,10 @@ def test_run(exec, workers, docker, wsl, cmd):
         workers=workers,
         docker=docker,
         wsl=wsl,
-        use_temp=sys.version_info
-        >= (3, 8),  # dirs_exist_ok only works with Python > 3.8
+        working_dir=helpers.tempdir(),
+        # dirs_exist_ok only works with Python > 3.8
+        use_temp=sys.version_info >= (3, 8),
+        ignore_patterns=["INFILE"],
         silent=True,
     )
 
