@@ -831,9 +831,10 @@ def test_minc():
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
 
-def test_tmvoc():
+@pytest.mark.parametrize("eos", ["eco2m", "tmvoc"])
+def test_phase_composition(eos):
     parameters_ref = {
-        "eos": "tmvoc",
+        "eos": eos,
         "n_component": 1,
         "n_phase": 1,
         "default": {
@@ -856,8 +857,8 @@ def test_tmvoc():
     }
     parameters = write_read(
         parameters_ref,
-        writer_kws={"eos": "tmvoc"},
-        reader_kws={"eos": "tmvoc"},
+        writer_kws={"eos": eos},
+        reader_kws={"eos": eos},
     )
 
     assert helpers.allclose(parameters_ref, parameters, ignore_keys=["eos"])
@@ -866,6 +867,8 @@ def test_tmvoc():
 @pytest.mark.parametrize(
     "write_read, flag, enable",
     [
+        (write_read_tough, "index", True),
+        (write_read_tough, "index", False),
         (write_read_tough, "start", True),
         (write_read_tough, "start", False),
         (write_read_tough, "nover", True),
