@@ -13,7 +13,7 @@ The notation used below is:
 - :math:`P_{cgn} = P_n - P_g =` gas-NAPL capillary pressure for TMVOC, which is equivalent to :math:`P_{cgl} = P_l - P_g =` gaseous CO\ :sub:`2`-liquid CO\ :sub:`2` capillary pressure for ECO2M
 - :math:`P_{cgl} = P_l - P_g =` gas-aqueous capillary pressure for TMVOC, which is equivalent to :math:`P_{cga} = P_a - P_g =` gaseous CO\ :sub:`2`-aqueous capillary pressure for ECO2M
 - :math:`P_{cnl} = P_{cgl} - P_{cgn}` for TMVOC, and similarly :math:`P_{cla} = P_{cga} - P_{cgl}` for ECO2M
-- :math:`S_l`, :math:`S_g`, and :math:`S_n` are the saturations of aqueous, gas (or gaseous COCO\ :sub:`2`) and NAPL (or liquid CO\ :sub:`2`) phases, respectively
+- :math:`S_l`, :math:`S_g`, and :math:`S_n` are the saturations of aqueous, gas (or gaseous CO\ :sub:`2`) and NAPL (or liquid CO\ :sub:`2`) phases, respectively
 
 
 Linear Function (ICP=1)

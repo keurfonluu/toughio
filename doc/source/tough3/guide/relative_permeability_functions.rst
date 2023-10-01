@@ -15,7 +15,7 @@ The notation used below is:
 - :math:`k_{rl}`: aqueous phase relative permeability
 - :math:`k_{rg}`: gas (for all two-phase EOSs and TMVOC) or gaseous CO\ :sub:`2` (for ECO2M) phase relative permeability
 - :math:`k_{rn}`: NAPL (for TMVOC) or liquid CO\ :sub:`2` (for ECO2M) phase relative permeability
-- :math:`S_l`, :math:`S_g`, and :math:`S_n` are the saturations of aqueous, gas (or gaseous COCO\ :sub:`2`) and NAPL (or liquid CO\ :sub:`2`) phases, respectively
+- :math:`S_l`, :math:`S_g`, and :math:`S_n` are the saturations of aqueous, gas (or gaseous CO\ :sub:`2`) and NAPL (or liquid CO\ :sub:`2`) phases, respectively
 
 
 Linear Functions (IRP=1)
