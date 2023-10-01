@@ -34,7 +34,7 @@ block_to_format = {
         4: "10f,10f,10s,10f,10f,10f",
         5: ",".join(4 * ["20f"]),
     },
-    "INDOM": {0: ",".join(4 * ["20f"]), 5: "5s,5d"},  # 5d is for TMVOC
+    "INDOM": {0: ",".join(4 * ["20f"]), 5: "5s,5d"},  # 5d is for ECO2M and TMVOC
     "MOMOP": "50S",
     "TIMES": {1: "5d,5d,10f,10f", 2: ",".join(8 * ["10f"])},
     "HYSTE": ",".join(3 * ["5d"]),
@@ -76,6 +76,13 @@ block_to_format = {
             7: "7s,4d,4d,15f,10f,10f,10f,10f,10f,10f",
             8: "8s,4d,3d,15f,10f,10f,10f,10f,10f,10f",
             9: "9s,3d,3d,15f,10f,10f,10f,10f,10f,10f",
+        },
+        "eco2m": {
+            5: "5s,5d,5d,15f,2d",
+            6: "6s,5d,4d,15f,2d",
+            7: "7s,4d,4d,15f,2d",
+            8: "8s,4d,3d,15f,2d",
+            9: "9s,3d,3d,15f,2d",
         },
         "tmvoc": {
             5: "5s,5d,5d,15f,2d",
