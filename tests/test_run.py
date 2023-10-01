@@ -23,7 +23,8 @@ def test_run(exec, workers, docker, wsl, cmd):
         docker=docker,
         wsl=wsl,
         working_dir=helpers.tempdir(),
-        use_temp=sys.version_info >= (3, 8),  # dirs_exist_ok only works with Python > 3.8
+        # dirs_exist_ok only works with Python > 3.8
+        use_temp=sys.version_info >= (3, 8),
         ignore_patterns=["INFILE"],
         silent=True,
     )

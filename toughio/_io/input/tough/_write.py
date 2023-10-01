@@ -212,7 +212,10 @@ def write_buffer(
     param = False
     if prune_values(parameters["default"]["initial_condition"]):
         param = True
-    if eos_ in {"eco2m", "tmvoc"} and parameters["default"]["phase_composition"] is not None:
+    if (
+        eos_ in {"eco2m", "tmvoc"}
+        and parameters["default"]["phase_composition"] is not None
+    ):
         param = True
 
     for option in parameters["options"].values():
