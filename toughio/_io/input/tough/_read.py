@@ -132,6 +132,9 @@ def read_buffer(f, label_length, n_variables, eos, simulator="tough"):
             elif line.startswith("SOLVR"):
                 parameters.update(_read_solvr(fiter))
 
+            elif line.startswith("INDEX"):
+                parameters["index"] = True
+
             elif line.startswith("START"):
                 parameters["start"] = True
 

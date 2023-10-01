@@ -305,6 +305,10 @@ def write_buffer(
         out += _write_solvr(parameters, space_between_values)
         out += ["\n"] if space_between_blocks else []
 
+    if "INDEX" in blocks and parameters["index"]:
+        out += _write_index()
+        out += ["\n"] if space_between_blocks else []
+
     if "START" in blocks and parameters["start"]:
         out += _write_start()
         out += ["\n"] if space_between_blocks else []
@@ -775,6 +779,12 @@ def _write_solvr(parameters, space_between_values):
     out = write_record(values, fmt, space_between_values)
 
     return out
+
+
+@block("INDEX")
+def _write_index():
+    """Write INDEX block data."""
+    return []
 
 
 @block("START")
