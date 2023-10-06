@@ -19,6 +19,7 @@ def run(
     use_temp=False,
     ignore_patterns=None,
     silent=False,
+    docker_args=None,
     **kwargs,
 ):
     """
@@ -48,6 +49,8 @@ def run(
         If provided, output files that match the glob-style patterns will be discarded.
     silent : bool, optional, default False
         If `True`, nothing will be printed to standard output.
+    docker_args : list or None, optional, default None
+        List of arguments passed to `docker run` command.
 
     Other Parameters
     ----------------
@@ -167,7 +170,16 @@ def run(
         except AttributeError:
             uid = ""
 
-        cmd = f"docker run --rm {uid} -v {cwd}:/shared -w /shared {docker} {cmd}"
+        docker_args = docker_args if docker_args else []
+        docker_args += [
+            "--rm",
+            uid,
+            "-v",
+            f"{cwd}:/shared",
+            "-w",
+            "/shared",
+        ]
+        cmd = f"docker run {' '.join(docker_args)} {docker} {cmd}"
 
     # Use WSL
     if wsl and is_windows:
