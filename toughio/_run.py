@@ -19,6 +19,7 @@ def run(
     use_temp=False,
     ignore_patterns=None,
     silent=False,
+    petsc_args=None,
     docker_args=None,
     **kwargs,
 ):
@@ -49,6 +50,8 @@ def run(
         If provided, output files that match the glob-style patterns will be discarded.
     silent : bool, optional, default False
         If `True`, nothing will be printed to standard output.
+    petsc_args : list or None, optional, default None
+        List of arguments passed to PETSc solver (written to `.petscrc`).
     docker_args : list or None, optional, default None
         List of arguments passed to `docker run` command.
 
@@ -143,6 +146,18 @@ def run(
             or filename.name != new_filename.name
         ):
             shutil.copy(filename, simulation_dir / new_filename.name)
+
+    # PETSc arguments
+    petsc_args = petsc_args if petsc_args else []
+    
+    if petsc_args:
+        with open(simulation_dir / ".petscrc", "w") as f:
+            for arg in petsc_args:
+                if arg.startswith("-"):
+                    f.write(f"{arg} ")
+
+                else:
+                    f.write(f"{arg}\n")
 
     # Output filename
     output_filename = f"{input_filename.stem}.out"
