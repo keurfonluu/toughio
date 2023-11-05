@@ -1,4 +1,5 @@
 import glob
+import json
 import os
 import pathlib
 import platform
@@ -107,6 +108,48 @@ def run(
     # Executable
     exec = str(exec)
     exec = f"{os.path.expanduser('~')}/{exec[2:]}" if exec.startswith("~/") else exec
+
+    if not docker:
+        if shutil.which(exec) is None:
+            raise RuntimeError(f"executable '{exec}' not found.")
+
+    else:
+        # Check if Docker is in the PATH
+        if shutil.which("docker") is None:
+            raise RuntimeError("Docker executable not found.")
+
+        # Check if Docker daemon is running
+        status = subprocess.run(
+            ["docker", "version", "-f", "'{{json .}}'"],
+            stdout=subprocess.PIPE,
+            universal_newlines=True,
+        )
+        ibeg = status.stdout.index("{")
+        iend = status.stdout[::-1].index("}")
+        data = json.loads(status.stdout[ibeg:-iend])
+
+        if not data["Server"]:
+            raise RuntimeError("cannot connect to the Docker daemon. Is the Docker daemon running?")
+
+        # Check if Docker image exists
+        status = subprocess.run(
+            ["docker", "images", "-q", docker],
+            stdout=subprocess.PIPE,
+            universal_newlines=True,
+        )
+
+        if not status.stdout:
+            raise RuntimeError(f"image '{docker}' not found.")
+
+        # Check if the executable exists inside the image
+        status = subprocess.run(
+            ["docker", "run", "--rm", docker, "which", exec],
+            stdout=subprocess.PIPE,
+            universal_newlines=True,
+        )
+
+        if not status.stdout:
+            raise RuntimeError(f"executable '{exec}' not found in Docker image '{docker}'.")
 
     # Working directory
     working_dir = os.getcwd() if working_dir is None else working_dir
