@@ -1,12 +1,10 @@
 import glob
-import json
 import os
 import pathlib
 import platform
 import shutil
 import subprocess
 import tempfile
-
 
 _check_exec = True  # Bool to be monkeypatched in tests
 
@@ -124,16 +122,15 @@ def run(
 
             # Check if Docker daemon is running
             status = subprocess.run(
-                ["docker", "version", "-f", "'{{json .}}'"],
+                ["docker", "version"],
                 stdout=subprocess.PIPE,
                 universal_newlines=True,
             )
-            ibeg = status.stdout.index("{")
-            iend = status.stdout[::-1].index("}")
-            data = json.loads(status.stdout[ibeg:-iend])
 
-            if not data["Server"]:
-                raise RuntimeError("cannot connect to the Docker daemon. Is the Docker daemon running?")
+            if "Server" not in status.stdout:
+                raise RuntimeError(
+                    "cannot connect to the Docker daemon. Is the Docker daemon running?"
+                )
 
             # Check if Docker image exists
             status = subprocess.run(
@@ -153,7 +150,9 @@ def run(
             )
 
             if not status.stdout:
-                raise RuntimeError(f"executable '{exec}' not found in Docker image '{docker}'.")
+                raise RuntimeError(
+                    f"executable '{exec}' not found in Docker image '{docker}'."
+                )
 
     # Working directory
     working_dir = os.getcwd() if working_dir is None else working_dir
@@ -196,7 +195,7 @@ def run(
 
     # PETSc arguments
     petsc_args = petsc_args if petsc_args else []
-    
+
     if petsc_args:
         with open(simulation_dir / ".petscrc", "w") as f:
             for arg in petsc_args:
@@ -247,16 +246,45 @@ def run(
     if wsl and is_windows:
         cmd = f"bash -c '{cmd}'"
 
-    kwargs = {}
-    if silent:
-        kwargs["stdout"] = subprocess.DEVNULL
-        kwargs["stderr"] = subprocess.STDOUT
+    # Run simulation
+    if not silent:
+        # See <https://www.koldfront.dk/making_subprocesspopen_in_python_3_play_nice_with_elaborate_output_1594>
+        p = subprocess.Popen(
+            cmd,
+            shell=True,
+            cwd=str(simulation_dir),
+            stderr=subprocess.STDOUT,
+            stdout=subprocess.PIPE,
+            universal_newlines=False,
+        )
+
+        stdout = []
+        cr = False
+        for line in open(os.dup(p.stdout.fileno()), newline=""):
+            # Handle carriage return
+            # newline in open is converting \r\n as \r moving \r at the end of the previous string
+            # This is only an issue for Spyder
+            line = f"\r{line}" if cr else line
+            cr = line.endswith("\r")
+
+            line = line[:-2] if cr else line
+            print(line, end="", flush=True)
+            stdout.append(line)
+
+        status = subprocess.CompletedProcess(
+            args=p.args,
+            returncode=0,
+            stdout="".join(stdout),
+        )
 
     else:
-        kwargs["stderr"] = subprocess.PIPE
-        kwargs["universal_newlines"] = True
-
-    status = subprocess.run(cmd, shell=True, cwd=str(simulation_dir), **kwargs)
+        status = subprocess.run(
+            cmd,
+            shell=True,
+            cwd=str(simulation_dir),
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.STDOUT,
+        )
 
     # Copy files from temporary directory and delete it
     if use_temp:
