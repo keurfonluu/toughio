@@ -17,7 +17,14 @@ oft_to_key = {
 }
 
 
-def read(filename, blocks=None, label_length=None, n_variables=None, eos=None, simulator="tough"):
+def read(
+    filename,
+    blocks=None,
+    label_length=None,
+    n_variables=None,
+    eos=None,
+    simulator="tough",
+):
     """
     Read TOUGH input file.
 
@@ -67,7 +74,7 @@ def read_buffer(f, block_stack, label_length, n_variables, eos, simulator="tough
     # Title
     if "TITLE" in block_stack:
         block_stack.remove("TITLE")
-        
+
         title = []
         while True:
             if len(title) >= 100:

@@ -93,7 +93,7 @@ class Mesh(object):
             lines.append(f"  Cell data: {', '.join(self.cell_data)}")
 
         return "\n".join(lines)
-    
+
     def __getitem__(self, islice):
         """Slice mesh."""
         if np.ndim(islice) == 0:
@@ -101,27 +101,27 @@ class Mesh(object):
 
         if np.ndim(islice) != 1:
             raise ValueError()
-        
+
         if isinstance(islice[0], (bool, np.bool_)):
             if len(islice) != self.n_cells:
                 raise ValueError()
-        
+
         elif isinstance(islice[0], (int, np.int8, np.int16, np.int32, np.int64)):
             if np.max(islice) >= self.n_cells:
                 raise ValueError()
-            
+
             tmp = islice
             islice = np.zeros(self.n_cells, dtype=bool)
             islice[tmp] = True
-            
+
         else:
             raise TypeError()
-        
+
         count = 0
         cell_idx = []
         nodes_to_keep = set()
 
-        for (_, cell_data) in self.cells:
+        for _, cell_data in self.cells:
             cell_idx.append([])
 
             for j, cell in enumerate(cell_data):
@@ -147,12 +147,15 @@ class Mesh(object):
         return Mesh(
             points=self.points[point_idx],
             cells=[
-                (cell_type, np.array([[node_map[i] for i in cell] for cell in cell_data[idx]]))
+                (
+                    cell_type,
+                    np.array([[node_map[i] for i in cell] for cell in cell_data[idx]]),
+                )
                 for idx, (cell_type, cell_data) in zip(cell_idx, self.cells)
             ],
             point_data={k: v[point_idx] for k, v in self.point_data.items()},
             cell_data={k: v[islice] for k, v in self.cell_data.items()},
-            field_data={k: v for k, v in self.field_data.items()}
+            field_data={k: v for k, v in self.field_data.items()},
         )
 
     def extrude_to_3d(self, height=1.0, axis=2, inplace=True):
