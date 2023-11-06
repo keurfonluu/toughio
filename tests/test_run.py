@@ -16,6 +16,7 @@ import toughio
     ],
 )
 def test_run(exec, workers, docker, wsl, cmd):
+    toughio._run._check_exec = False
     status = toughio.run(
         exec,
         {},

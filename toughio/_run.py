@@ -6,6 +6,8 @@ import shutil
 import subprocess
 import tempfile
 
+_check_exec = True  # Bool to be monkeypatched in tests
+
 
 def run(
     exec,
@@ -19,6 +21,8 @@ def run(
     use_temp=False,
     ignore_patterns=None,
     silent=False,
+    petsc_args=None,
+    docker_args=None,
     **kwargs,
 ):
     """
@@ -48,6 +52,10 @@ def run(
         If provided, output files that match the glob-style patterns will be discarded.
     silent : bool, optional, default False
         If `True`, nothing will be printed to standard output.
+    petsc_args : list or None, optional, default None
+        List of arguments passed to PETSc solver (written to `.petscrc`).
+    docker_args : list or None, optional, default None
+        List of arguments passed to `docker run` command.
 
     Other Parameters
     ----------------
@@ -102,6 +110,50 @@ def run(
     exec = str(exec)
     exec = f"{os.path.expanduser('~')}/{exec[2:]}" if exec.startswith("~/") else exec
 
+    if _check_exec:
+        if not docker:
+            if shutil.which(exec) is None:
+                raise RuntimeError(f"executable '{exec}' not found.")
+
+        else:
+            # Check if Docker is in the PATH
+            if shutil.which("docker") is None:
+                raise RuntimeError("Docker executable not found.")
+
+            # Check if Docker daemon is running
+            status = subprocess.run(
+                ["docker", "version"],
+                stdout=subprocess.PIPE,
+                universal_newlines=True,
+            )
+
+            if "Server" not in status.stdout:
+                raise RuntimeError(
+                    "cannot connect to the Docker daemon. Is the Docker daemon running?"
+                )
+
+            # Check if Docker image exists
+            status = subprocess.run(
+                ["docker", "images", "-q", docker],
+                stdout=subprocess.PIPE,
+                universal_newlines=True,
+            )
+
+            if not status.stdout:
+                raise RuntimeError(f"image '{docker}' not found.")
+
+            # Check if the executable exists inside the image
+            status = subprocess.run(
+                ["docker", "run", "--rm", docker, "which", exec],
+                stdout=subprocess.PIPE,
+                universal_newlines=True,
+            )
+
+            if not status.stdout:
+                raise RuntimeError(
+                    f"executable '{exec}' not found in Docker image '{docker}'."
+                )
+
     # Working directory
     working_dir = os.getcwd() if working_dir is None else working_dir
     working_dir = pathlib.Path(working_dir)
@@ -141,6 +193,18 @@ def run(
         ):
             shutil.copy(filename, simulation_dir / new_filename.name)
 
+    # PETSc arguments
+    petsc_args = petsc_args if petsc_args else []
+
+    if petsc_args:
+        with open(simulation_dir / ".petscrc", "w") as f:
+            for arg in petsc_args:
+                if arg.startswith("-"):
+                    f.write(f"{arg} ")
+
+                else:
+                    f.write(f"{arg}\n")
+
     # Output filename
     output_filename = f"{input_filename.stem}.out"
 
@@ -167,22 +231,60 @@ def run(
         except AttributeError:
             uid = ""
 
-        cmd = f"docker run --rm {uid} -v {cwd}:/shared -w /shared {docker} {cmd}"
+        docker_args = docker_args if docker_args else []
+        docker_args += [
+            "--rm",
+            uid,
+            "-v",
+            f"{cwd}:/shared",
+            "-w",
+            "/shared",
+        ]
+        cmd = f"docker run {' '.join(docker_args)} {docker} {cmd}"
 
     # Use WSL
     if wsl and is_windows:
         cmd = f"bash -c '{cmd}'"
 
-    kwargs = {}
-    if silent:
-        kwargs["stdout"] = subprocess.DEVNULL
-        kwargs["stderr"] = subprocess.STDOUT
+    # Run simulation
+    if not silent:
+        # See <https://www.koldfront.dk/making_subprocesspopen_in_python_3_play_nice_with_elaborate_output_1594>
+        p = subprocess.Popen(
+            cmd,
+            shell=True,
+            cwd=str(simulation_dir),
+            stderr=subprocess.STDOUT,
+            stdout=subprocess.PIPE,
+            universal_newlines=False,
+        )
+
+        stdout = []
+        cr = False
+        for line in open(os.dup(p.stdout.fileno()), newline=""):
+            # Handle carriage return
+            # newline in open is converting \r\n as \r moving \r at the end of the previous string
+            # This is only an issue for Spyder
+            line = f"\r{line}" if cr else line
+            cr = line.endswith("\r")
+
+            line = line[:-2] if cr else line
+            print(line, end="", flush=True)
+            stdout.append(line)
+
+        status = subprocess.CompletedProcess(
+            args=p.args,
+            returncode=0,
+            stdout="".join(stdout),
+        )
 
     else:
-        kwargs["stderr"] = subprocess.PIPE
-        kwargs["universal_newlines"] = True
-
-    status = subprocess.run(cmd, shell=True, cwd=str(simulation_dir), **kwargs)
+        status = subprocess.run(
+            cmd,
+            shell=True,
+            cwd=str(simulation_dir),
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.STDOUT,
+        )
 
     # Copy files from temporary directory and delete it
     if use_temp:

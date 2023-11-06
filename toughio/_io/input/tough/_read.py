@@ -17,7 +17,14 @@ oft_to_key = {
 }
 
 
-def read(filename, label_length=None, n_variables=None, eos=None, simulator="tough"):
+def read(
+    filename,
+    blocks=None,
+    label_length=None,
+    n_variables=None,
+    eos=None,
+    simulator="tough",
+):
     """
     Read TOUGH input file.
 
@@ -25,6 +32,8 @@ def read(filename, label_length=None, n_variables=None, eos=None, simulator="tou
     ----------
     filename : str, pathlike or buffer
         Input file name or buffer.
+    blocks : list of str or None, optional, default None
+        Blocks to read. If None, all blocks are read.
     label_length : int or None, optional, default None
         Number of characters in cell labels.
     n_variables : int or None, optional, default None
@@ -46,39 +55,46 @@ def read(filename, label_length=None, n_variables=None, eos=None, simulator="tou
         raise ValueError()
 
     with open_file(filename, "r") as f:
-        out = read_buffer(f, label_length, n_variables, eos, simulator)
+        out = read_buffer(f, blocks, label_length, n_variables, eos, simulator)
 
     return out
 
 
-def read_buffer(f, label_length, n_variables, eos, simulator="tough"):
+def read_buffer(f, block_stack, label_length, n_variables, eos, simulator="tough"):
     """Read TOUGH input file."""
     from ._common import blocks
+
+    # Block filters
+    block_stack = block_stack if block_stack is not None else blocks
+    block_stack = set(block_stack)
 
     parameters = {}
     flag = False
 
     # Title
-    title = []
-    while True:
-        if len(title) >= 100:
-            raise ValueError()
+    if "TITLE" in block_stack:
+        block_stack.remove("TITLE")
 
-        line = f.readline().strip()
+        title = []
+        while True:
+            if len(title) >= 100:
+                raise ValueError()
 
-        if line[:5].rstrip().upper() not in blocks:
-            title.append(line)
+            line = f.readline().strip()
 
-        else:
-            break
+            if line[:5].rstrip().upper() not in blocks:
+                title.append(line)
 
-    if title:
-        title = title[0] if len(title) == 1 else title
+            else:
+                break
 
-    if title:
-        parameters["title"] = title
+        if title:
+            title = title[0] if len(title) == 1 else title
 
-    f.seek(0)
+        if title:
+            parameters["title"] = title
+
+        f.seek(0)
 
     # Loop over blocks
     # Some blocks (INCON, INDOM, PARAM) need to rewind to previous line but tell and seek are disabled by next
@@ -87,13 +103,16 @@ def read_buffer(f, label_length, n_variables, eos, simulator="tough"):
 
     try:
         for line in fiter:
-            if line.startswith("DIMEN"):
+            if line.startswith("DIMEN") and "DIMEN" in block_stack:
+                block_stack.remove("DIMEN")
                 parameters.update(_read_dimen(fiter))
 
-            elif line.startswith("ROCKS"):
+            elif line.startswith("ROCKS") and "ROCKS" in block_stack:
+                block_stack.remove("ROCKS")
                 parameters.update(_read_rocks(fiter, simulator))
 
-            elif line.startswith("RPCAP"):
+            elif line.startswith("RPCAP") and "RPCAP" in block_stack:
+                block_stack.remove("RPCAP")
                 rpcap = _read_rpcap(fiter)
 
                 if "default" in parameters:
@@ -102,43 +121,53 @@ def read_buffer(f, label_length, n_variables, eos, simulator="tough"):
                 else:
                     parameters["default"] = rpcap
 
-            elif line.startswith("REACT"):
+            elif line.startswith("REACT") and "REACT" in block_stack:
+                block_stack.remove("REACT")
                 react = _read_react(fiter)
+
                 if "react" in parameters:
                     parameters["react"].update(react["react"])
 
                 else:
                     parameters.update(react)
 
-            elif line.startswith("FLAC"):
+            elif line.startswith("FLAC") and "FLAC" in block_stack:
+                block_stack.remove("FLAC")
                 flac = _read_flac(fiter, parameters["rocks"])
                 parameters["flac"] = flac["flac"]
 
                 for k, v in flac["rocks"].items():
                     parameters["rocks"][k].update(v)
 
-            elif line.startswith("CHEMP"):
+            elif line.startswith("CHEMP") and "CHEMP" in block_stack:
+                block_stack.remove("CHEMP")
                 parameters.update(_read_chemp(fiter))
 
-            elif line.startswith("NCGAS"):
+            elif line.startswith("NCGAS") and "NCGAS" in block_stack:
+                block_stack.remove("NCGAS")
                 parameters.update(_read_ncgas(fiter))
 
-            elif line.startswith("MULTI"):
+            elif line.startswith("MULTI") and "MULTI" in block_stack:
+                block_stack.remove("MULTI")
                 parameters.update(_read_multi(fiter))
 
                 if not n_variables:
                     n_variables = parameters["n_component"] + 1
 
-            elif line.startswith("SOLVR"):
+            elif line.startswith("SOLVR") and "SOLVR" in block_stack:
+                block_stack.remove("SOLVR")
                 parameters.update(_read_solvr(fiter))
 
-            elif line.startswith("INDEX"):
+            elif line.startswith("INDEX") and "INDEX" in block_stack:
+                block_stack.remove("INDEX")
                 parameters["index"] = True
 
-            elif line.startswith("START"):
+            elif line.startswith("START") and "START" in block_stack:
+                block_stack.remove("START")
                 parameters["start"] = True
 
-            elif line.startswith("PARAM"):
+            elif line.startswith("PARAM") and "PARAM" in block_stack:
+                block_stack.remove("PARAM")
                 param, n_variables = _read_param(fiter, n_variables, eos)
                 parameters["options"] = param["options"]
                 parameters["extra_options"] = param["extra_options"]
@@ -149,68 +178,86 @@ def read_buffer(f, label_length, n_variables, eos, simulator="tough"):
                 else:
                     parameters["default"] = param["default"]
 
-            elif line.startswith("SELEC"):
+            elif line.startswith("SELEC") and "SELEC" in block_stack:
+                block_stack.remove("SELEC")
                 parameters.update(_read_selec(fiter))
 
-            elif line.startswith("INDOM"):
+            elif line.startswith("INDOM") and "INDOM" in block_stack:
+                block_stack.remove("INDOM")
                 indom, n_variables = _read_indom(fiter, n_variables, eos)
 
                 for k, v in indom["rocks"].items():
                     parameters["rocks"][k].update(v)
 
-            elif line.startswith("MOMOP"):
+            elif line.startswith("MOMOP") and "MOMOP" in block_stack:
+                block_stack.remove("MOMOP")
                 parameters.update(_read_momop(fiter))
 
-            elif line.startswith("TIMES"):
+            elif line.startswith("TIMES") and "TIMES" in block_stack:
+                block_stack.remove("TIMES")
                 parameters.update(_read_times(fiter))
 
-            elif line.startswith("HYSTE"):
+            elif line.startswith("HYSTE") and "HYSTE" in block_stack:
+                block_stack.remove("HYSTE")
                 parameters.update(_read_hyste(fiter))
 
-            elif line.startswith("FOFT"):
+            elif line.startswith("FOFT") and "FOFT" in block_stack:
+                block_stack.remove("FOFT")
                 oft, label_length = _read_oft(fiter, "FOFT", label_length)
                 parameters.update(oft)
 
-            elif line.startswith("COFT"):
+            elif line.startswith("COFT") and "COFT" in block_stack:
+                block_stack.remove("COFT")
                 oft, label_length = _read_oft(fiter, "COFT", label_length)
                 parameters.update(oft)
 
-            elif line.startswith("GOFT"):
+            elif line.startswith("GOFT") and "GOFT" in block_stack:
+                block_stack.remove("GOFT")
                 oft, label_length = _read_oft(fiter, "GOFT", label_length)
                 parameters.update(oft)
 
-            elif line.startswith("ROFT"):
+            elif line.startswith("ROFT") and "ROFT" in block_stack:
+                block_stack.remove("ROFT")
                 parameters.update(_read_roft(fiter))
 
-            elif line.startswith("GENER"):
+            elif line.startswith("GENER") and "GENER" in block_stack:
+                block_stack.remove("GENER")
                 gener, flag, label_length = _read_gener(fiter, label_length, simulator)
                 parameters.update(gener)
 
                 if flag:
                     break
 
-            elif line.startswith("TIMBC"):
+            elif line.startswith("TIMBC") and "TIMBC" in block_stack:
+                block_stack.remove("TIMBC")
                 parameters.update(_read_timbc(fiter))
 
-            elif line.startswith("DIFFU"):
+            elif line.startswith("DIFFU") and "DIFFU" in block_stack:
+                block_stack.remove("DIFFU")
                 parameters.update(_read_diffu(fiter))
 
-            elif line.startswith("OUTPT"):
+            elif line.startswith("OUTPT") and "OUTPT" in block_stack:
+                block_stack.remove("OUTPT")
                 outpt = _read_outpt(fiter)
+
                 if "react" in parameters:
                     parameters["react"].update(outpt["react"])
+
                 else:
                     parameters.update(outpt)
 
-            elif line.startswith("OUTPU"):
+            elif line.startswith("OUTPU") and "OUTPU" in block_stack:
+                block_stack.remove("OUTPU")
                 parameters.update(_read_outpu(fiter))
 
-            elif line.startswith("ELEME"):
+            elif line.startswith("ELEME") and "ELEME" in block_stack:
+                block_stack.remove("ELEME")
                 eleme, label_length = _read_eleme(fiter, label_length)
                 parameters.update(eleme)
                 parameters["coordinates"] = False
 
-            elif line.startswith("COORD"):
+            elif line.startswith("COORD") and "COORD" in block_stack:
+                block_stack.remove("COORD")
                 coord = _read_coord(fiter)
 
                 for k, v in zip(parameters["elements"], coord):
@@ -218,14 +265,16 @@ def read_buffer(f, label_length, n_variables, eos, simulator="tough"):
 
                 parameters["coordinates"] = True
 
-            elif line.startswith("CONNE"):
+            elif line.startswith("CONNE") and "CONNE" in block_stack:
+                block_stack.remove("CONNE")
                 conne, flag, label_length = _read_conne(fiter, label_length)
                 parameters.update(conne)
 
                 if flag:
                     break
 
-            elif line.startswith("INCON"):
+            elif line.startswith("INCON") and "INCON" in block_stack:
+                block_stack.remove("INCON")
                 incon, flag, label_length, n_variables = _read_incon(
                     fiter, label_length, n_variables, eos, simulator
                 )
@@ -234,24 +283,34 @@ def read_buffer(f, label_length, n_variables, eos, simulator="tough"):
                 if flag:
                     break
 
-            elif line.startswith("MESHM"):
+            elif line.startswith("MESHM") and "MESHM" in block_stack:
+                block_stack.remove("MESHM")
                 parameters.update(_read_meshm(fiter))
 
-            elif line.startswith("POISE"):
+            elif line.startswith("POISE") and "POISE" in block_stack:
+                block_stack.remove("POISE")
                 poise = _read_poise(fiter)
+
                 if "react" in parameters:
                     parameters["react"].update(poise["react"])
+
                 else:
                     parameters.update(poise)
 
-            elif line.startswith("NOVER"):
+            elif line.startswith("NOVER") and "NOVER" in block_stack:
+                block_stack.remove("NOVER")
                 parameters["nover"] = True
 
-            elif line.startswith("ENDCY"):
+            elif line.startswith("ENDCY") and "ENDCY" in block_stack:
+                block_stack.remove("ENDCY")
                 end_comments = read_end_comments(fiter)
 
                 if end_comments:
                     parameters["end_comments"] = end_comments
+
+            # Stop reading if block stack is empty
+            if not block_stack:
+                break
 
     except:
         raise ReadError(f"failed to parse line {fiter.count}.")

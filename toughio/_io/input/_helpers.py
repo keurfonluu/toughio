@@ -61,6 +61,8 @@ def read(filename, file_format=None, **kwargs):
 
     Other Parameters
     ----------------
+    blocks : list of str or None, optional, default None
+        Only if ``file_format = "tough"``. Blocks to read. If None, all blocks are read.
     label_length : int or None, optional, default None
         Only if ``file_format = "tough"``. Number of characters in cell labels.
     n_variables : int or None, optional, default None
