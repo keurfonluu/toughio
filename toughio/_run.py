@@ -275,7 +275,7 @@ def run(
                 print(line, end="", flush=True)
                 stdout.append(line)
 
-    except KeyboardInterrupt as e:
+    except (KeyboardInterrupt, Exception) as e:
         # Handle children process termination when shell=True
         # See <https://stackoverflow.com/a/25134985/9729313>
         try:
