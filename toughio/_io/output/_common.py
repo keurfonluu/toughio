@@ -36,9 +36,11 @@ def to_output(file_type, labels_order, headers, times, labels, variables):
 
             else:
                 connections[(c1, c2)] = [i]
-                
+
         if found_duplicate:
-            logging.warning("Found duplicate connections. Fixing outputs by summing duplicate connections.")
+            logging.warning(
+                "Found duplicate connections. Fixing outputs by summing duplicate connections."
+            )
 
             outputs = [
                 Output(
@@ -48,7 +50,7 @@ def to_output(file_type, labels_order, headers, times, labels, variables):
                     {
                         k: np.array([v[idx].sum() for idx in connections.values()])
                         for k, v in output.data.items()
-                    }
+                    },
                 )
                 for output in outputs
             ]

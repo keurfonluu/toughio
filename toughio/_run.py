@@ -2,11 +2,12 @@ import glob
 import os
 import pathlib
 import platform
-import psutil
 import shutil
 import signal
 import subprocess
 import tempfile
+
+import psutil
 
 _check_exec = True  # Bool to be monkeypatched in tests
 
