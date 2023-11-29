@@ -242,7 +242,7 @@ def run(
             "-w",
             "/shared",
         ]
-        cmd = f"docker run {' '.join(docker_args)} {docker} {cmd}"
+        cmd = f"docker run {' '.join(str(arg) for arg in docker_args)} {docker} {cmd}"
 
     # Use WSL
     if wsl and is_windows:
