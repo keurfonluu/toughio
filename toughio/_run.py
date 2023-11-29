@@ -2,7 +2,9 @@ import glob
 import os
 import pathlib
 import platform
+import psutil
 import shutil
+import signal
 import subprocess
 import tempfile
 
@@ -248,28 +250,44 @@ def run(
 
     # Run simulation
     if not silent:
-        # See <https://www.koldfront.dk/making_subprocesspopen_in_python_3_play_nice_with_elaborate_output_1594>
-        p = subprocess.Popen(
-            cmd,
-            shell=True,
-            cwd=str(simulation_dir),
-            stderr=subprocess.STDOUT,
-            stdout=subprocess.PIPE,
-            universal_newlines=False,
-        )
+        try:
+            # See <https://www.koldfront.dk/making_subprocesspopen_in_python_3_play_nice_with_elaborate_output_1594>
+            p = subprocess.Popen(
+                cmd,
+                shell=True,  # shell must be True as the command may contain quotes
+                cwd=str(simulation_dir),
+                stderr=subprocess.STDOUT,
+                stdout=subprocess.PIPE,
+                universal_newlines=False,
+            )
 
-        stdout = []
-        cr = False
-        for line in open(os.dup(p.stdout.fileno()), newline=""):
-            # Handle carriage return
-            # newline in open is converting \r\n as \r moving \r at the end of the previous string
-            # This is only an issue for Spyder
-            line = f"\r{line}" if cr else line
-            cr = line.endswith("\r")
+            stdout = []
+            cr = False
+            for line in open(os.dup(p.stdout.fileno()), newline=""):
+                # Handle carriage return
+                # newline in open is converting \r\n as \r moving \r at the end of the previous string
+                # This is only an issue for Spyder
+                line = f"\r{line}" if cr else line
+                cr = line.endswith("\r")
 
-            line = line[:-2] if cr else line
-            print(line, end="", flush=True)
-            stdout.append(line)
+                line = line[:-2] if cr else line
+                print(line, end="", flush=True)
+                stdout.append(line)
+
+        except KeyboardInterrupt as e:
+            # Handle children process termination when shell=True
+            # See <https://stackoverflow.com/a/25134985/9729313>
+            try:
+                proc = psutil.Process(p.pid)
+                for child_process in proc.children(recursive=True):
+                    child_process.send_signal(signal.SIGTERM)
+
+                proc.send_signal(signal.SIGTERM)
+
+            except psutil.NoSuchProcess:
+                pass
+
+            raise e
 
         status = subprocess.CompletedProcess(
             args=p.args,
