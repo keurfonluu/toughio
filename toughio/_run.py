@@ -2,6 +2,7 @@ import glob
 import os
 import pathlib
 import platform
+import secrets
 import shutil
 import signal
 import subprocess
@@ -222,25 +223,16 @@ def run(
     is_windows = platform.system().startswith("Win")
 
     if docker:
-        if is_windows and os.getenv("ComSpec").endswith("cmd.exe"):
-            cwd = '"%cd%"'
-
-        else:
-            cwd = "${PWD}"
-
-        try:
-            uid = f"-e LOCAL_USER_ID={os.getuid()}"
-
-        except AttributeError:
-            uid = ""
+        container_name = f"toughio_{secrets.token_hex(4)}"
 
         docker_args = docker_args if docker_args else []
         docker_args += [
+            "--name",
+            container_name,
             "--rm",
-            uid,
-            "-v",
-            f"{cwd}:/shared",
-            "-w",
+            "--mount",
+            f"type=bind,source={simulation_dir},target=/shared",
+            "--workdir",
             "/shared",
         ]
         cmd = f"docker run {' '.join(str(arg) for arg in docker_args)} {docker} {cmd}"
@@ -276,11 +268,19 @@ def run(
                 stdout.append(line)
 
     except (KeyboardInterrupt, Exception) as e:
-        # Handle children process termination when shell=True
+        # Stop Docker container
+        if docker:
+            status = subprocess.run(
+                ["docker", "stop", container_name],
+                stdout=subprocess.PIPE,
+                universal_newlines=True,
+            )
+
+        # Handle children process termination
         # See <https://stackoverflow.com/a/25134985/9729313>
         try:
             proc = psutil.Process(p.pid)
-            for child_process in proc.children(recursive=True):
+            for child_process in proc.children():
                 child_process.send_signal(signal.SIGTERM)
 
             proc.send_signal(signal.SIGTERM)
