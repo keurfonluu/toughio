@@ -1,0 +1,4 @@
+Run
+===
+
+.. autofunction:: toughio.run
