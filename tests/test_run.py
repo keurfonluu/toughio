@@ -28,6 +28,7 @@ def test_run(exec, workers, docker, wsl, cmd):
         use_temp=sys.version_info >= (3, 8),
         ignore_patterns=["INFILE"],
         silent=True,
+        container_name="CONTAINER",
     )
 
     assert status.args == cmd
@@ -44,7 +45,7 @@ def test_run(exec, workers, docker, wsl, cmd):
             None,
             "docker-image",
             False,
-            "docker run --rm  -v PLACEHOLDER:/shared -w /shared docker-image tough-exec INFILE INFILE.out",
+            "docker run --name CONTAINER --rm --volume PLACEHOLDER:/shared --workdir /shared docker-image tough-exec INFILE INFILE.out",
         ),
         ("tough-exec", None, None, True, "bash -c 'tough-exec INFILE INFILE.out'"),
         (
@@ -52,7 +53,7 @@ def test_run(exec, workers, docker, wsl, cmd):
             8,
             "docker-image",
             True,
-            """bash -c 'docker run --rm  -v PLACEHOLDER:/shared -w /shared docker-image mpiexec -n 8 tough-exec INFILE INFILE.out'""",
+            """bash -c 'docker run --name CONTAINER --rm --volume PLACEHOLDER:/shared --workdir /shared docker-image mpiexec -n 8 tough-exec INFILE INFILE.out'""",
         ),
     ],
 )
@@ -76,13 +77,13 @@ def test_run_windows(exec, workers, docker, wsl, cmd):
             "tough-exec",
             None,
             "docker-image",
-            "docker run --rm PLACEHOLDER -v ${PWD}:/shared -w /shared docker-image tough-exec INFILE INFILE.out",
+            "docker run --name CONTAINER --rm --volume ${PWD}:/shared --workdir /shared docker-image tough-exec INFILE INFILE.out",
         ),
         (
             "tough-exec",
             8,
             "docker-image",
-            "docker run --rm PLACEHOLDER -v ${PWD}:/shared -w /shared docker-image mpiexec -n 8 tough-exec INFILE INFILE.out",
+            "docker run --name CONTAINER --rm --volume ${PWD}:/shared --workdir /shared docker-image mpiexec -n 8 tough-exec INFILE INFILE.out",
         ),
     ],
 )

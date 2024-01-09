@@ -159,7 +159,7 @@ This Software was developed under funding from the U.S. Department of Energy and
 .. |License| image:: https://img.shields.io/badge/license-BSD--3--Clause-green
    :target: https://github.com/keurfonluu/toughio/blob/master/LICENSE
 
-.. |Stars| image:: https://img.shields.io/github/stars/keurfonluu/toughio?logo=github
+.. |Stars| image:: https://img.shields.io/github/stars/keurfonluu/toughio?style=flat&logo=github
    :target: https://github.com/keurfonluu/toughio
 
 .. |Pyversions| image:: https://img.shields.io/pypi/pyversions/toughio.svg?style=flat

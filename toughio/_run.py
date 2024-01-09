@@ -2,9 +2,13 @@ import glob
 import os
 import pathlib
 import platform
+import secrets
 import shutil
+import signal
 import subprocess
 import tempfile
+
+import psutil
 
 _check_exec = True  # Bool to be monkeypatched in tests
 
@@ -23,6 +27,7 @@ def run(
     silent=False,
     petsc_args=None,
     docker_args=None,
+    container_name=None,
     **kwargs,
 ):
     """
@@ -56,6 +61,8 @@ def run(
         List of arguments passed to PETSc solver (written to `.petscrc`).
     docker_args : list or None, optional, default None
         List of arguments passed to `docker run` command.
+    container_name : str or None, optional, default None
+        Name of Docker container.
 
     Other Parameters
     ----------------
@@ -219,39 +226,41 @@ def run(
     is_windows = platform.system().startswith("Win")
 
     if docker:
+        container_name = (
+            container_name if container_name else f"toughio_{secrets.token_hex(4)}"
+        )
+
         if is_windows and os.getenv("ComSpec").endswith("cmd.exe"):
             cwd = '"%cd%"'
 
         else:
             cwd = "${PWD}"
 
-        try:
-            uid = f"-e LOCAL_USER_ID={os.getuid()}"
-
-        except AttributeError:
-            uid = ""
-
         docker_args = docker_args if docker_args else []
         docker_args += [
+            "--name",
+            container_name,
             "--rm",
-            uid,
-            "-v",
+            # Sometime raises a duplicate mount point error, use old-school volume instead (but shell must be True in this case)
+            # "--mount",
+            # f"type=bind,source={simulation_dir},target=/shared",
+            "--volume",
             f"{cwd}:/shared",
-            "-w",
+            "--workdir",
             "/shared",
         ]
-        cmd = f"docker run {' '.join(docker_args)} {docker} {cmd}"
+        cmd = f"docker run {' '.join(str(arg) for arg in docker_args)} {docker} {cmd}"
 
     # Use WSL
     if wsl and is_windows:
         cmd = f"bash -c '{cmd}'"
 
     # Run simulation
-    if not silent:
+    try:
         # See <https://www.koldfront.dk/making_subprocesspopen_in_python_3_play_nice_with_elaborate_output_1594>
         p = subprocess.Popen(
             cmd,
-            shell=True,
+            shell=True,  # shell must be True as the command may contain quotes
             cwd=str(simulation_dir),
             stderr=subprocess.STDOUT,
             stdout=subprocess.PIPE,
@@ -266,25 +275,41 @@ def run(
             # This is only an issue for Spyder
             line = f"\r{line}" if cr else line
             cr = line.endswith("\r")
-
             line = line[:-2] if cr else line
-            print(line, end="", flush=True)
-            stdout.append(line)
 
-        status = subprocess.CompletedProcess(
-            args=p.args,
-            returncode=0,
-            stdout="".join(stdout),
-        )
+            if not silent:
+                print(line, end="", flush=True)
+                stdout.append(line)
 
-    else:
-        status = subprocess.run(
-            cmd,
-            shell=True,
-            cwd=str(simulation_dir),
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.STDOUT,
-        )
+    except (KeyboardInterrupt, Exception) as e:
+        # Stop Docker container
+        if docker:
+            status = subprocess.run(
+                ["docker", "stop", container_name],
+                stdout=subprocess.PIPE,
+                universal_newlines=True,
+            )
+
+        # Handle children process termination
+        # See <https://stackoverflow.com/a/25134985/9729313>
+        try:
+            proc = psutil.Process(p.pid)
+            for child_process in proc.children():
+                child_process.send_signal(signal.SIGTERM)
+
+            proc.send_signal(signal.SIGTERM)
+
+        except psutil.NoSuchProcess:
+            pass
+
+        raise e
+
+    p.wait()
+    status = subprocess.CompletedProcess(
+        args=p.args,
+        returncode=p.returncode,
+        stdout="".join(stdout),
+    )
 
     # Copy files from temporary directory and delete it
     if use_temp:
