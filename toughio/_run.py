@@ -226,7 +226,9 @@ def run(
     is_windows = platform.system().startswith("Win")
 
     if docker:
-        container_name = container_name if container_name else f"toughio_{secrets.token_hex(4)}"
+        container_name = (
+            container_name if container_name else f"toughio_{secrets.token_hex(4)}"
+        )
 
         if is_windows and os.getenv("ComSpec").endswith("cmd.exe"):
             cwd = '"%cd%"'
