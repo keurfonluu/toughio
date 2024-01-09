@@ -28,6 +28,7 @@ def to_output(file_type, labels_order, headers, times, labels, variables):
     if file_type == "connection" and len(labels[0]):
         # Check whether there are duplicate connections
         connections = {}
+        found_duplicate = False
 
         for i, (c1, c2) in enumerate(outputs[0].labels):
             if (c1, c2) in connections:
