@@ -225,13 +225,22 @@ def run(
     if docker:
         container_name = f"toughio_{secrets.token_hex(4)}"
 
+        if is_windows and os.getenv("ComSpec").endswith("cmd.exe"):
+            cwd = '"%cd%"'
+
+        else:
+            cwd = "${PWD}"
+
         docker_args = docker_args if docker_args else []
         docker_args += [
             "--name",
             container_name,
             "--rm",
-            "--mount",
-            f"type=bind,source={simulation_dir},target=/shared",
+            # Sometime raises a duplicate mount point error, use old-school volume instead (but shell must be True in this case)
+            # "--mount",
+            # f"type=bind,source={simulation_dir},target=/shared",
+            "--volume",
+            f"{cwd}:/shared",
             "--workdir",
             "/shared",
         ]
