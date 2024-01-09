@@ -27,6 +27,7 @@ def run(
     silent=False,
     petsc_args=None,
     docker_args=None,
+    container_name=None,
     **kwargs,
 ):
     """
@@ -60,6 +61,8 @@ def run(
         List of arguments passed to PETSc solver (written to `.petscrc`).
     docker_args : list or None, optional, default None
         List of arguments passed to `docker run` command.
+    container_name : str or None, optional, default None
+        Name of Docker container.
 
     Other Parameters
     ----------------
@@ -223,7 +226,7 @@ def run(
     is_windows = platform.system().startswith("Win")
 
     if docker:
-        container_name = f"toughio_{secrets.token_hex(4)}"
+        container_name = container_name if container_name else f"toughio_{secrets.token_hex(4)}"
 
         if is_windows and os.getenv("ComSpec").endswith("cmd.exe"):
             cwd = '"%cd%"'
