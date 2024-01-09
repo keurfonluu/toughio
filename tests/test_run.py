@@ -77,13 +77,13 @@ def test_run_windows(exec, workers, docker, wsl, cmd):
             "tough-exec",
             None,
             "docker-image",
-            "docker run --rm PLACEHOLDER -v ${PWD}:/shared -w /shared docker-image tough-exec INFILE INFILE.out",
+            "docker run --name CONTAINER --rm --volume ${PWD}:/shared --workdir /shared docker-image tough-exec INFILE INFILE.out",
         ),
         (
             "tough-exec",
             8,
             "docker-image",
-            "docker run --rm PLACEHOLDER -v ${PWD}:/shared -w /shared docker-image mpiexec -n 8 tough-exec INFILE INFILE.out",
+            "docker run --name CONTAINER --rm --volume ${PWD}:/shared --workdir /shared docker-image mpiexec -n 8 tough-exec INFILE INFILE.out",
         ),
     ],
 )
