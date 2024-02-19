@@ -1186,7 +1186,7 @@ def _read_incon(f, label_length, n_variables, eos=None, simulator="tough"):
                 incon["initial_conditions"][label]["phase_composition"] = data[4]
 
             else:
-                userx = prune_values(data[4:9])
+                userx = prune_values(data[4:])
                 incon["initial_conditions"][label]["userx"] = userx if userx else None
 
             # Record 2
