@@ -46,7 +46,7 @@ def write(
         Blocks to ignore. Only if `block` is None.
     space_between_blocks : bool, optional, default False
         Add an empty record between blocks.
-    space_between_blocks : bool, optional, default True
+    space_between_values : bool, optional, default True
         Add a white space between floating point values.
     eos : str or None, optional, default None
         Equation of State. If `eos` is defined in `parameters`, this option will be ignored.
@@ -128,9 +128,11 @@ def write_buffer(
     parameters["end_comments"] = (
         None
         if not parameters["end_comments"]
-        else [parameters["end_comments"]]
-        if isinstance(parameters["end_comments"], str)
-        else parameters["end_comments"]
+        else (
+            [parameters["end_comments"]]
+            if isinstance(parameters["end_comments"], str)
+            else parameters["end_comments"]
+        )
     )
 
     for k, v in default.items():
@@ -356,7 +358,6 @@ def write_buffer(
 
     if "TIMBC" in blocks and parameters["boundary_conditions"]:
         out += _write_timbc(parameters)
-        out += ["\n"] if space_between_blocks else []
 
     if "DIFFU" in blocks and len(parameters["diffusion"]):
         out += _write_diffu(parameters, space_between_values)
@@ -1233,7 +1234,7 @@ def _write_gener(parameters, space_between_values, simulator="tough"):
     return out
 
 
-@block("TIMBC")
+@block("TIMBC", multi=True)
 def _write_timbc(parameters):
     """Write TIMBC block data."""
     from ._common import boundary_conditions
@@ -1453,9 +1454,7 @@ def _write_incon(parameters, space_between_values, eos_=None, simulator="tough")
     fmt1 = str2format(
         fmt[simulator][label_length]
         if simulator == "toughreact"
-        else fmt[eos_][label_length]
-        if eos_ in fmt
-        else fmt["default"][label_length]
+        else fmt[eos_][label_length] if eos_ in fmt else fmt["default"][label_length]
     )
     fmt2 = str2format(fmt[0])
 
@@ -1541,9 +1540,11 @@ def _write_meshm(parameters, space_between_values):
 
                 elif ndim == 1:
                     values += [
-                        parameter["n_increment"]
-                        if parameter["n_increment"]
-                        else len(parameter["sizes"])
+                        (
+                            parameter["n_increment"]
+                            if parameter["n_increment"]
+                            else len(parameter["sizes"])
+                        )
                     ]
                     out += write_record(values, fmt2, space_between_values)
                     out += write_record(

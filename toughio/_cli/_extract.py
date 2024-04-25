@@ -70,9 +70,7 @@ def extract(argv=None):
     filename = (
         args.output_file
         if args.output_file is not None
-        else f"OUTPUT_ELEME{ext}"
-        if not args.connection
-        else f"OUTPUT_CONNE{ext}"
+        else f"OUTPUT_ELEME{ext}" if not args.connection else f"OUTPUT_CONNE{ext}"
     )
     if not args.split or len(output) == 1:
         write_output(filename, output, file_format=args.file_format)

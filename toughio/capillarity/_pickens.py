@@ -45,9 +45,7 @@ class Pickens(BaseCapillarity):
 
         A = (1.0 + sl / sl0) * (sl0 - slr) / (sl0 + slr)
         B = 1.0 - sl / sl0
-        return -p0 * (np.log(A / B * (1.0 + (1.0 - B**2 / A**2) ** 0.5))) ** (
-            1.0 / x
-        )
+        return -p0 * (np.log(A / B * (1.0 + (1.0 - B**2 / A**2) ** 0.5))) ** (1.0 / x)
 
     @property
     def parameters(self):

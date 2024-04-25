@@ -991,9 +991,7 @@ def from_meshio(mesh, material="dfalt"):
         point_sets=(
             mesh.point_sets
             if hasattr(mesh, "point_sets")
-            else mesh.node_sets
-            if hasattr(mesh, "node_sets")
-            else None
+            else mesh.node_sets if hasattr(mesh, "node_sets") else None
         ),
         cell_sets=mesh.cell_sets if hasattr(mesh, "cell_sets") else None,
     )
@@ -1068,9 +1066,9 @@ def from_pyvista(mesh, material="dfalt"):
         cell = (
             cell
             if cell_type not in pixel_voxel
-            else cell[[0, 1, 3, 2]]
-            if cell_type == 8
-            else cell[[0, 1, 3, 2, 4, 5, 7, 6]]
+            else (
+                cell[[0, 1, 3, 2]] if cell_type == 8 else cell[[0, 1, 3, 2, 4, 5, 7, 6]]
+            )
         )
         cell_type = cell_type if cell_type not in pixel_voxel else cell_type + 1
         cell_type = (

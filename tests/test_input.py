@@ -631,11 +631,11 @@ def test_eleme(write_read, label_length, coord):
                 key: (
                     np.random.randint(10)
                     if key in {"nseq", "nadd"}
-                    else helpers.random_string(5)
-                    if key == "material"
-                    else np.random.rand(3)
-                    if key == "center"
-                    else np.random.rand()
+                    else (
+                        helpers.random_string(5)
+                        if key == "material"
+                        else np.random.rand(3) if key == "center" else np.random.rand()
+                    )
                 )
                 for key in keys
             }
@@ -677,13 +677,19 @@ def test_conne(write_read, label_length):
                 key: (
                     np.random.randint(10)
                     if key == "nseq"
-                    else np.random.randint(10, size=2)
-                    if key == "nadd"
-                    else np.random.randint(1, 4)
-                    if key == "permeability_direction"
-                    else np.random.rand(2)
-                    if key == "nodal_distances"
-                    else np.random.rand()
+                    else (
+                        np.random.randint(10, size=2)
+                        if key == "nadd"
+                        else (
+                            np.random.randint(1, 4)
+                            if key == "permeability_direction"
+                            else (
+                                np.random.rand(2)
+                                if key == "nodal_distances"
+                                else np.random.rand()
+                            )
+                        )
+                    )
                 )
                 for key in keys
             }
@@ -722,9 +728,11 @@ def test_incon(write_read, label_length, num_pvars, num_items):
                 key: (
                     np.random.rand()
                     if key == "porosity"
-                    else np.random.rand(np.random.randint(5) + 1)
-                    if key == "userx"
-                    else np.random.rand(num_pvars)
+                    else (
+                        np.random.rand(np.random.randint(5) + 1)
+                        if key == "userx"
+                        else np.random.rand(num_pvars)
+                    )
                 )
                 for key in keys
             }

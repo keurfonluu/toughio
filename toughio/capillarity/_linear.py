@@ -33,9 +33,7 @@ class Linear(BaseCapillarity):
         return (
             -pmax
             if sl <= smin
-            else 0.0
-            if sl >= smax
-            else -pmax * (smax - sl) / (smax - smin)
+            else 0.0 if sl >= smax else -pmax * (smax - sl) / (smax - smin)
         )
 
     @property

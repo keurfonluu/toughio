@@ -140,9 +140,11 @@ def str2format(fmt):
 
     base_fmt = "{{:{}}}"
     out = [
-        base_fmt.format(f"{token[:-1]}.{token[:-1]}")
-        if token[-1].lower() == "s"
-        else base_fmt.format(f">{token[:-1]}{token_to_format[token[-1]]}")
+        (
+            base_fmt.format(f"{token[:-1]}.{token[:-1]}")
+            if token[-1].lower() == "s"
+            else base_fmt.format(f">{token[:-1]}{token_to_format[token[-1]]}")
+        )
         for token in fmt.split(",")
     ]
 

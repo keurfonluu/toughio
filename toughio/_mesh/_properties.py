@@ -95,9 +95,11 @@ def _face_areas(mesh):
     if "quad" in faces_dict and len(faces_dict["quad"]):
         tmp = np.concatenate(
             [
-                _get_triangle_normals(mesh, v, [0, 2, 3])
-                if k == "quad"
-                else np.zeros((len(v), 3))
+                (
+                    _get_triangle_normals(mesh, v, [0, 2, 3])
+                    if k == "quad"
+                    else np.zeros((len(v), 3))
+                )
                 for k, v in faces_dict.items()
             ]
         )
