@@ -356,7 +356,6 @@ def write_buffer(
 
     if "TIMBC" in blocks and parameters["boundary_conditions"]:
         out += _write_timbc(parameters)
-        out += ["\n"] if space_between_blocks else []
 
     if "DIFFU" in blocks and len(parameters["diffusion"]):
         out += _write_diffu(parameters, space_between_values)
@@ -1233,7 +1232,7 @@ def _write_gener(parameters, space_between_values, simulator="tough"):
     return out
 
 
-@block("TIMBC")
+@block("TIMBC", multi=True)
 def _write_timbc(parameters):
     """Write TIMBC block data."""
     from ._common import boundary_conditions
