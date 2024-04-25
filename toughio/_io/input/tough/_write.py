@@ -128,9 +128,11 @@ def write_buffer(
     parameters["end_comments"] = (
         None
         if not parameters["end_comments"]
-        else [parameters["end_comments"]]
-        if isinstance(parameters["end_comments"], str)
-        else parameters["end_comments"]
+        else (
+            [parameters["end_comments"]]
+            if isinstance(parameters["end_comments"], str)
+            else parameters["end_comments"]
+        )
     )
 
     for k, v in default.items():
@@ -1452,9 +1454,7 @@ def _write_incon(parameters, space_between_values, eos_=None, simulator="tough")
     fmt1 = str2format(
         fmt[simulator][label_length]
         if simulator == "toughreact"
-        else fmt[eos_][label_length]
-        if eos_ in fmt
-        else fmt["default"][label_length]
+        else fmt[eos_][label_length] if eos_ in fmt else fmt["default"][label_length]
     )
     fmt2 = str2format(fmt[0])
 
@@ -1540,9 +1540,11 @@ def _write_meshm(parameters, space_between_values):
 
                 elif ndim == 1:
                     values += [
-                        parameter["n_increment"]
-                        if parameter["n_increment"]
-                        else len(parameter["sizes"])
+                        (
+                            parameter["n_increment"]
+                            if parameter["n_increment"]
+                            else len(parameter["sizes"])
+                        )
                     ]
                     out += write_record(values, fmt2, space_between_values)
                     out += write_record(

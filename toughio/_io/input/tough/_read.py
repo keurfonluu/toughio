@@ -1157,9 +1157,7 @@ def _read_incon(f, label_length, n_variables, eos=None, simulator="tough"):
     fmt2 = (
         fmt[simulator]
         if simulator == "toughreact"
-        else fmt[eos]
-        if eos in fmt
-        else fmt["default"]
+        else fmt[eos] if eos in fmt else fmt["default"]
     )
     incon = {"initial_conditions": {}}
 

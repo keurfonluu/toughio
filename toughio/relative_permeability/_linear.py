@@ -37,18 +37,14 @@ class Linear(BaseRelativePermeability):
         kl = (
             1.0
             if sl >= slmax
-            else 0.0
-            if sl <= slmin
-            else (sl - slmin) / (slmax - slmin)
+            else 0.0 if sl <= slmin else (sl - slmin) / (slmax - slmin)
         )
 
         sg = 1.0 - sl
         kg = (
             1.0
             if sg >= sgmax
-            else 0.0
-            if sg <= sgmin
-            else (sg - sgmin) / (sgmax - sgmin)
+            else 0.0 if sg <= sgmin else (sg - sgmin) / (sgmax - sgmin)
         )
 
         return kl, kg

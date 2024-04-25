@@ -102,9 +102,7 @@ def run(
     other_filenames = (
         {k: k for k in other_filenames}
         if isinstance(other_filenames, (list, tuple))
-        else other_filenames
-        if other_filenames
-        else {}
+        else other_filenames if other_filenames else {}
     )
 
     if command is None:
