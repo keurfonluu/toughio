@@ -117,7 +117,7 @@ def write(filename, parameters, file_format=None, **kwargs):
         Only if ``file_format = "tough"`` and `block` is None. Blocks to ignore.
     space_between_blocks : bool, optional, default False
         Only if ``file_format = "tough"``. Add an empty record between blocks.
-    space_between_blocks : bool, optional, default True
+    space_between_values : bool, optional, default True
         Only if ``file_format = "tough"``. Add a white space between floating point values.
     eos : str or None, optional, default None
         Only if ``file_format = "tough"``. Equation of State.

@@ -46,7 +46,7 @@ def write(
         Blocks to ignore. Only if `block` is None.
     space_between_blocks : bool, optional, default False
         Add an empty record between blocks.
-    space_between_blocks : bool, optional, default True
+    space_between_values : bool, optional, default True
         Add a white space between floating point values.
     eos : str or None, optional, default None
         Equation of State. If `eos` is defined in `parameters`, this option will be ignored.
