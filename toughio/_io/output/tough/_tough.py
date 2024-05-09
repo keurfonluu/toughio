@@ -21,20 +21,20 @@ def read(filename, file_type, labels_order=None):
         Input file name or buffer.
     file_type : str
         Input file type.
-    labels_order : list of array_like
+    labels_order : sequence of array_like
         List of labels. If None, output will be assumed ordered.
 
     Returns
     -------
-    namedtuple or list of namedtuple
-        namedtuple (type, format, time, labels, data) or list of namedtuple for each time step.
+    :class:`toughio.ElementOutput`, :class:`toughio.ConnectionOutput`, sequence of :class:`toughio.ElementOutput` or sequence of :class:`toughio.ConnectionOutput`
+        Output data for each time step.
 
     """
     with open_file(filename, "r") as f:
-        headers, times, variables = _read_table(f, file_type)
+        headers, times, data = _read_table(f, file_type)
 
         # Postprocess labels
-        labels = [v[0].lstrip() for v in variables[0]]
+        labels = [v[0].lstrip() for v in data[0]]
 
         if file_type == "element":
             label_length = max(len(label) for label in labels)
@@ -74,10 +74,10 @@ def read(filename, file_type, labels_order=None):
 
         ilab = 1 if file_type == "element" else 2
         headers = headers[ilab + 1 :]
-        labels = [labels.copy() for _ in variables]
-        variables = np.array([[v[2:] for v in variable] for variable in variables])
+        labels = [labels.copy() for _ in data]
+        data = np.array([[v[2:] for v in data] for data in data])
 
-    return to_output(file_type, labels_order, headers, times, labels, variables)
+    return to_output(file_type, labels_order, headers, times, labels, data)
 
 
 def _read_table(f, file_type):
@@ -85,7 +85,7 @@ def _read_table(f, file_type):
     labels_key = "ELEM." if file_type == "element" else "ELEM1"
 
     first = True
-    times, variables = [], []
+    times, data = [], []
     for line in f:
         line = line.strip()
 
@@ -94,7 +94,7 @@ def _read_table(f, file_type):
             # Read time step in following line
             line = next(f).strip()
             times.append(float(line.split()[0]))
-            variables.append([])
+            data.append([])
 
             # Look for "ELEM." or "ELEM1"
             while True:
@@ -172,13 +172,13 @@ def _read_table(f, file_type):
                             first = False
 
                     tmp += reader(line)
-                    variables[-1].append([x for x in tmp if x is not None])
+                    data[-1].append([x for x in tmp if x is not None])
 
                 line = next(f)
                 if line[1:].startswith("@@@@@"):
                     break
 
-    return headers, times, variables
+    return headers, times, data
 
 
 def to_float(x):

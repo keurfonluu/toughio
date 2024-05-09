@@ -2,7 +2,8 @@ from . import _cli, capillarity, meshmaker, relative_permeability
 from .__about__ import __version__
 from ._helpers import convert_labels
 from ._io import (
-    Output,
+    ElementOutput,
+    ConnectionOutput,
     read_input,
     read_output,
     read_table,
@@ -24,7 +25,8 @@ from ._run import run
 __all__ = [
     "Mesh",
     "CellBlock",
-    "Output",
+    "ElementOutput",
+    "ConnectionOutput",
     "meshmaker",
     "register_input",
     "register_output",

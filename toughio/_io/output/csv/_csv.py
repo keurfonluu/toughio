@@ -1,7 +1,5 @@
-import numpy as np
-
 from ...._common import open_file
-from .._common import to_output
+from .._common import to_output, ElementOutput
 
 __all__ = [
     "read",
@@ -42,70 +40,67 @@ def read(filename, file_type, labels_order=None):
         Input file name or buffer.
     file_type : str
         Input file type.
-    labels_order : list of array_like
+    labels_order : sequence of array_like
         List of labels. If None, output will be assumed ordered.
 
     Returns
     -------
-    namedtuple or list of namedtuple
-        namedtuple (type, format, time, labels, data) or list of namedtuple for each time step.
+    :class:`toughio.ElementOutput`, :class:`toughio.ConnectionOutput`, sequence of :class:`toughio.ElementOutput` or sequence of :class:`toughio.ConnectionOutput`
+        Output data for each time step.
 
     """
     with open_file(filename, "r") as f:
-        headers, times, variables = _read_csv(f, file_type)
+        headers, times, labels, data = _read_csv(f, file_type)
 
-        ilab = 1 if file_type == "element" else 2
-        headers = headers[ilab:]
-        labels = [[v[:ilab] for v in variable] for variable in variables]
-        labels = (
-            [[l[0] for l in label] for label in labels]
-            if file_type == "element"
-            else labels
-        )
-        variables = np.array([[v[ilab:] for v in variable] for variable in variables])
-
-    return to_output(file_type, labels_order, headers, times, labels, variables)
+        return to_output(file_type, labels_order, headers, times, labels, data)
 
 
 def _read_csv(f, file_type):
     """Read CSV table."""
+    # Label index
+    ilab = 1 if file_type == "element" else 2
+
     # Read header
     line = f.readline().replace('"', "")
-    headers = [l.strip() for l in line.split(",")]
+    headers = [l.strip() for l in line.split(",")[ilab:]]
 
     # Skip second line (unit)
     line = f.readline()
 
     # Check third line (does it start with TIME?)
     line = f.readline()
-    single = not line.startswith('"TIME')
+    single = not line.startswith('"TIME [sec]')
 
     # Read data
     if single:
-        times, variables = [None], [[]]
-    else:
-        times, variables = [], []
+        times, labels, data = [None], [[]], [[]]
 
-    line = line.replace('"', "").strip()
-    ilab = 1 if file_type == "element" else 2
+    else:
+        times, labels, data = [], [], []
+
     while line:
         line = line.split(",")
 
         # Time step
-        if line[0].startswith("TIME"):
-            line = line[0].split()
+        if line[0].startswith('"TIME [sec]'):
+            line = line[0].replace('"', "").split()
             times.append(float(line[-1]))
-            variables.append([])
+            labels.append([])
+            data.append([])
 
         # Output
         else:
-            tmp = [l.strip() for l in line[:ilab]]
-            tmp += [float(l.strip()) for l in line[ilab:]]
-            variables[-1].append(tmp)
+            if ilab == 1:
+                labels[-1].append(line[0].replace('"', "").strip())
 
-        line = f.readline().strip().replace('"', "")
+            else:
+                labels[-1].append([l.replace('"', "").strip() for l in line[:ilab]])
+            
+            data[-1].append([float(l.strip()) for l in line[ilab:]])
 
-    return headers, times, variables
+        line = f.readline()
+
+    return headers, times, labels, data
 
 
 def write(filename, output, unit=None):
@@ -124,7 +119,7 @@ def write(filename, output, unit=None):
         raise TypeError()
 
     out = output[-1]
-    headers = ["ELEM"] if out.type == "element" else ["ELEM1", "ELEM2"]
+    headers = ["ELEM"] if isinstance(out, ElementOutput) else ["ELEM1", "ELEM2"]
     headers += ["X"] if "X" in out.data else []
     headers += ["Y"] if "Y" in out.data else []
     headers += ["Z"] if "Z" in out.data else []

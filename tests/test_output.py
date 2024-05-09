@@ -47,9 +47,9 @@ def test_output_eleme(filename, filename_ref, file_format):
     for output, time_ref in zip(outputs, times_ref):
         assert time_ref == output.time
         assert (
-            save.labels.tolist() == output.labels.tolist()
+            list(save.labels) == list(output.labels)
             if file_format in {"csv", "petrasim", "tough"}
-            else len(output.labels) == 0
+            else not output.labels
         )
         if file_format != "tough":
             assert keys_ref == sorted(list(output.data))

@@ -72,10 +72,8 @@ hybrid_mesh = toughio.Mesh(
 )
 
 output_eleme = [
-    toughio.Output(
-        "element",
+    toughio.ElementOutput(
         float(time),
-        np.array([f"AAA0{i}" for i in range(10)]),
         {
             "X": np.random.rand(10),
             "Y": np.random.rand(10),
@@ -83,15 +81,14 @@ output_eleme = [
             "PRES": np.random.rand(10),
             "TEMP": np.random.rand(10),
         },
+        np.array([f"AAA0{i}" for i in range(10)]),
     )
     for time in range(3)
 ]
 
 output_conne = [
-    toughio.Output(
-        "connection",
+    toughio.ConnectionOutput(
         float(time),
-        np.array([[f"AAA0{i}", f"AAA0{i}"] for i in range(10)]),
         {
             "X": np.random.rand(10),
             "Y": np.random.rand(10),
@@ -99,6 +96,7 @@ output_conne = [
             "HEAT": np.random.rand(10),
             "FLOW": np.random.rand(10),
         },
+        np.array([[f"AAA0{i}", f"AAA0{i}"] for i in range(10)]),
     )
     for time in range(3)
 ]
@@ -170,10 +168,9 @@ def allclose(x, y, atol=1.0e-8, ignore_keys=None, ignore_none=False):
                 if x.cell_data:
                     assert allclose(x.cell_data, y.cell_data, atol=atol)
 
-            elif isinstance(x, toughio.Output):
-                assert isinstance(y, toughio.Output)
+            elif isinstance(x, (toughio.ElementOutput, toughio.ConnectionOutput)):
+                assert isinstance(y, (toughio.ElementOutput, toughio.ConnectionOutput))
 
-                assert allclose(x.type, y.type, atol=atol)
                 assert allclose(x.time, y.time, atol=atol)
                 assert allclose(x.data, y.data, atol=atol)
 
@@ -205,7 +202,7 @@ def convert_outputs_labels(outputs, connection=False):
                 output.labels[:] = toughio.convert_labels(output.labels)
 
             else:
-                labels = toughio.convert_labels(output.labels.ravel())
+                labels = toughio.convert_labels(np.ravel(output.labels))
                 output.labels[:] = labels.reshape((labels.size // 2, 2))
 
         except TypeError:

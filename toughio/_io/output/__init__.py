@@ -1,9 +1,10 @@
 from . import csv, petrasim, save, tecplot, tough
-from ._common import Output
+from ._common import ElementOutput, ConnectionOutput
 from ._helpers import read, register, write
 
 __all__ = [
-    "Output",
+    "ElementOutput",
+    "ConnectionOutput",
     "register",
     "read",
     "write",

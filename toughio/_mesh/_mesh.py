@@ -26,7 +26,7 @@ __all__ = [
 CellBlock = collections.namedtuple("CellBlock", ["type", "data"])
 
 
-class Mesh(object):
+class Mesh:
     def __init__(
         self,
         points,
@@ -479,18 +479,18 @@ class Mesh(object):
 
         Parameters
         ----------
-        file_or_output : str, pathlike, buffer, namedtuple or list of namedtuple
+        file_or_output : str, pathlike, buffer, :class:`toughio.ElementOutput`, :class:`toughio.ConnectionOutput`, sequence of :class:`toughio.ElementOutput` or sequence of :class:`toughio.ConnectionOutput`
             Input file name or buffer, or output data.
         time_step : int, optional, default -1
             Data for given time step to import. Default is last time step.
-        labels_order : list of array_like or None, optional, default None
+        labels_order : sequence of array_like or None, optional, default None
             List of labels. If None, output will be assumed ordered.
         connection : bool, optional, default False
             Only for standard TOUGH output file. If `True`, read data related to connections.
 
         """
         from .. import read_output
-        from .._io.output._common import Output, reorder_labels
+        from .._io.output._common import ElementOutput, ConnectionOutput
 
         if not isinstance(time_step, int):
             raise TypeError()
@@ -501,19 +501,19 @@ class Mesh(object):
         else:
             out = file_or_output
 
-        if not isinstance(out, Output):
+        if not isinstance(out, (ElementOutput, ConnectionOutput)):
             if not (-len(out) <= time_step < len(out)):
                 raise ValueError()
 
             out = out[time_step]
 
-        if out.type == "element":
+        if isinstance(out, ElementOutput):
             if labels_order is not None:
-                out = reorder_labels(out, labels_order)
+                out = out[labels_order]
 
             self.cell_data.update(out.data)
 
-        elif out.type == "connection":
+        elif isinstance(out, ConnectionOutput):
             centers = self.centers
             labels_map = {k: v for v, k in enumerate(self.labels)}
 

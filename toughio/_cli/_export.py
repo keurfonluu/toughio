@@ -18,7 +18,6 @@ def export(argv=None):
     import sys
 
     from .. import read_mesh, read_output, write_time_series
-    from .._io.output._common import reorder_labels
     from ..meshmaker import triangulate, voxelize
 
     parser = _get_parser()
@@ -144,13 +143,13 @@ def export(argv=None):
 
         if args.file_format != "xdmf":
             mesh.point_data = {}
-            mesh.cell_dada = {}
+            mesh.cell_data = {}
             mesh.field_data = {}
             mesh.point_sets = {}
             mesh.cell_sets = {}
             mesh.read_output(output)
         else:
-            output = [reorder_labels(data, mesh.labels) for data in output]
+            output = [out[mesh.labels] for out in output]
     print(" Done!")
 
     # Output file name

@@ -38,27 +38,27 @@ def read(filename, file_type, labels_order=None):
         Input file name or buffer.
     file_type : str
         Input file type.
-    labels_order : list of array_like
+    labels_order : sequence of array_like
         List of labels. If None, output will be assumed ordered.
 
     Returns
     -------
-    namedtuple or list of namedtuple
-        namedtuple (type, format, time, labels, data) or list of namedtuple for each time step.
+    :class:`toughio.ElementOutput`, :class:`toughio.ConnectionOutput`, sequence of :class:`toughio.ElementOutput` or sequence of :class:`toughio.ConnectionOutput`
+        Output data for each time step.
 
     """
     with open_file(filename, "r") as f:
         headers, zones = read_buffer(f)
 
-    times, labels, variables = [], [], []
+    times, labels, data = [], [], []
     for zone in zones:
         time = float(zone["title"].split()[0]) if "title" in zone else None
 
         times.append(time)
         labels.append([])
-        variables.append(zone["data"])
+        data.append(zone["data"])
 
-    return to_output(file_type, labels_order, headers, times, labels, variables)
+    return to_output(file_type, labels_order, headers, times, labels, data)
 
 
 def read_buffer(f):

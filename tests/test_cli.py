@@ -275,5 +275,5 @@ def test_save2incon(reset):
 
     incon = toughio.read_output(output_filename)
 
-    assert save.labels.tolist() == incon.labels.tolist()
+    assert list(save.labels) == list(incon.labels)
     helpers.allclose(save.data, incon.data)
