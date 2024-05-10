@@ -9,7 +9,7 @@ __all__ = [
 ]
 
 
-def read(filename, file_type, labels_order=None):
+def read(filename, file_type, labels_order=None, time_steps=None):
     """
     Read Petrasim OUTPUT_ELEME.csv.
 
@@ -21,13 +21,25 @@ def read(filename, file_type, labels_order=None):
         Input file type.
     labels_order : sequence of array_like
         List of labels. If None, output will be assumed ordered.
+    time_steps : int or sequence of int
+        List of time steps to read. If None, all time steps will be read.
 
     Returns
     -------
-    :class:`toughio.ElementOutput`, :class:`toughio.ConnectionOutput`, sequence of :class:`toughio.ElementOutput` or sequence of :class:`toughio.ConnectionOutput`
+    sequence of :class:`toughio.ElementOutput` or sequence of :class:`toughio.ConnectionOutput`
         Output data for each time step.
 
     """
+    if time_steps is not None:
+        if isinstance(time_steps, int):
+            time_steps = [time_steps]
+
+        if any(i < 0 for i in time_steps):
+            n_steps = _count_time_steps(filename)
+            time_steps = [i if i >= 0 else n_steps + i for i in time_steps]
+        
+        time_steps = set(time_steps)
+
     with open_file(filename, "r") as f:
         # Label index
         ilab = 3 if file_type == "element" else 4
@@ -37,6 +49,7 @@ def read(filename, file_type, labels_order=None):
         headers = [header.strip() for header in line.split(",")[ilab:]]
 
         # Data
+        t_step = -1
         count, tcur, offset = 0, None, []
         times, labels, data = [], [], []
 
@@ -47,22 +60,25 @@ def read(filename, file_type, labels_order=None):
                 line = line.split(",")
 
                 if line[0] != tcur:
+                    t_step += 1
                     tcur = line[0]
-                    offset.append(count)
-                    times.append(float(tcur))
 
-                if file_type == "element":
-                    labels.append(line[1].strip())
+                    if time_steps is None or t_step in time_steps:
+                        offset.append(count)
+                        times.append(float(tcur))
 
-                else:
-                    labels.append([line[1].strip(), line[2].strip()])
+                if time_steps is None or t_step in time_steps:
+                    if file_type == "element":
+                        labels.append(line[1].strip())
 
-                data.append([float(x) for x in line[ilab:]])
+                    else:
+                        labels.append([line[1].strip(), line[2].strip()])
+
+                    data.append([float(x) for x in line[ilab:]])
+                    count += 1
 
             else:
                 break
-
-            count += 1
 
         offset.append(count)
 
@@ -128,3 +144,11 @@ def write(filename, output):
                 record = ",".join(fmt.format(x) for fmt, x in zip(formats, tmp))
                 f.write(f"{record}\n")
                 i += 1
+
+
+def _count_time_steps(filename):
+    """Count the number of time steps."""
+    with open_file(filename, "r") as f:
+        x = np.genfromtxt(f, delimiter=",", skip_header=1, usecols=0)
+
+    return np.unique(x).size

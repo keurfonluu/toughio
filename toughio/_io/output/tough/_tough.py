@@ -11,7 +11,7 @@ __all__ = [
 ]
 
 
-def read(filename, file_type, labels_order=None):
+def read(filename, file_type, labels_order=None, time_steps=None):
     """
     Read standard TOUGH output file.
 
@@ -23,15 +23,27 @@ def read(filename, file_type, labels_order=None):
         Input file type.
     labels_order : sequence of array_like
         List of labels. If None, output will be assumed ordered.
+    time_steps : int or sequence of int
+        List of time steps to read. If None, all time steps will be read.
 
     Returns
     -------
-    :class:`toughio.ElementOutput`, :class:`toughio.ConnectionOutput`, sequence of :class:`toughio.ElementOutput` or sequence of :class:`toughio.ConnectionOutput`
+    sequence of :class:`toughio.ElementOutput` or sequence of :class:`toughio.ConnectionOutput`
         Output data for each time step.
 
     """
+    if time_steps is not None:
+        if isinstance(time_steps, int):
+            time_steps = [time_steps]
+
+        if any(i < 0 for i in time_steps):
+            n_steps = _count_time_steps(filename)
+            time_steps = [i if i >= 0 else n_steps + i for i in time_steps]
+        
+        time_steps = set(time_steps)
+
     with open_file(filename, "r") as f:
-        headers, times, data = _read_table(f, file_type)
+        headers, times, data = _read_table(f, file_type, time_steps)
 
         # Postprocess labels
         labels = [v[0].lstrip() for v in data[0]]
@@ -80,10 +92,11 @@ def read(filename, file_type, labels_order=None):
     return to_output(file_type, labels_order, headers, times, labels, data)
 
 
-def _read_table(f, file_type):
+def _read_table(f, file_type, time_steps=None):
     """Read data table for current time step."""
     labels_key = "ELEM." if file_type == "element" else "ELEM1"
 
+    t_step = -1
     first = True
     times, data = [], []
     for line in f:
@@ -91,6 +104,11 @@ def _read_table(f, file_type):
 
         # Look for "TOTAL TIME"
         if line.startswith("TOTAL TIME"):
+            t_step += 1
+
+            if not (time_steps is None or t_step in time_steps):
+                continue
+            
             # Read time step in following line
             line = next(f).strip()
             times.append(float(line.split()[0]))
@@ -190,3 +208,14 @@ def to_float(x):
 
     except ValueError:
         return np.nan
+
+
+def _count_time_steps(filename):
+    """Count the number of time steps."""
+    with open_file(filename, "r") as f:
+        count = 0
+
+        for line in f:
+            count += int(line.strip().startswith("TOTAL TIME"))
+
+    return count

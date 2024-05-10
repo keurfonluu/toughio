@@ -8,7 +8,7 @@ __all__ = [
 ]
 
 
-def read(filename, file_type=None, labels_order=None):
+def read(filename, file_type=None, labels_order=None, time_steps=None):
     """
     Read SAVE file.
 
@@ -20,6 +20,8 @@ def read(filename, file_type=None, labels_order=None):
         Input file type.
     labels_order : list of array_like
         List of labels. If None, output will be assumed ordered.
+    time_steps : int or sequence of int
+        List of time steps to read. If None, all time steps will be read.
 
     Returns
     -------

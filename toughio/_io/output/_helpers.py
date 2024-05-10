@@ -46,6 +46,7 @@ def read(
     filename,
     file_format=None,
     labels_order=None,
+    time_steps=None,
     connection=False,
 ):
     """
@@ -59,6 +60,8 @@ def read(
         Input file format.
     labels_order : sequence of array_like or None, optional, default None
         List of labels. If None, output will be assumed ordered.
+    time_steps : int or sequence of int
+        List of time steps to read. If None, all time steps will be read.
     connection : bool, optional, default False
         Only for standard TOUGH output file. If `True`, return data related to connections.
 
@@ -93,7 +96,7 @@ def read(
     if connection:
         file_type = "connection" if connection else "element"
 
-    return _reader_map[file_format](filename, file_type, labels_order)
+    return _reader_map[file_format](filename, file_type, labels_order, time_steps)
 
 
 def write(filename, output, file_format=None, **kwargs):

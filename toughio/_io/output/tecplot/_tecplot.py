@@ -28,7 +28,7 @@ zone_key_to_type = {
 }
 
 
-def read(filename, file_type, labels_order=None):
+def read(filename, file_type, labels_order=None, time_steps=None):
     """
     Read OUTPUT_ELEME.tec.
 
@@ -40,15 +40,27 @@ def read(filename, file_type, labels_order=None):
         Input file type.
     labels_order : sequence of array_like
         List of labels. If None, output will be assumed ordered.
+    time_steps : int or sequence of int
+        List of time steps to read. If None, all time steps will be read.
 
     Returns
     -------
-    :class:`toughio.ElementOutput`, :class:`toughio.ConnectionOutput`, sequence of :class:`toughio.ElementOutput` or sequence of :class:`toughio.ConnectionOutput`
+    sequence of :class:`toughio.ElementOutput` or sequence of :class:`toughio.ConnectionOutput`
         Output data for each time step.
 
     """
+    if time_steps is not None:
+        if isinstance(time_steps, int):
+            time_steps = [time_steps]
+
+        if any(i < 0 for i in time_steps):
+            n_steps = _count_time_steps(filename)
+            time_steps = [i if i >= 0 else n_steps + i for i in time_steps]
+        
+        time_steps = set(time_steps)
+
     with open_file(filename, "r") as f:
-        headers, zones = read_buffer(f)
+        headers, zones = read_buffer(f, time_steps)
 
     times, labels, data = [], [], []
     for zone in zones:
@@ -61,11 +73,13 @@ def read(filename, file_type, labels_order=None):
     return to_output(file_type, labels_order, headers, times, labels, data)
 
 
-def read_buffer(f):
+def read_buffer(f, time_steps=None):
     """Read OUTPUT_ELEME.tec."""
     zones = []
 
     # Loop until end of file
+    t_step = -1
+
     while True:
         line = f.readline().strip()
 
@@ -79,14 +93,22 @@ def read_buffer(f):
 
             if "I" not in zone:
                 raise ValueError()
+            
+            else:
+                t_step += 1
 
-            # Read data
-            data = np.genfromtxt(f, max_rows=zone["I"])
+            if time_steps is None or t_step in time_steps:
+                # Read data
+                data = np.genfromtxt(f, max_rows=zone["I"])
 
-            # Output
-            tmp = {"data": data}
-            tmp["title"] = zone["T"]
-            zones.append(tmp)
+                # Output
+                tmp = {"data": data}
+                tmp["title"] = zone["T"]
+                zones.append(tmp)
+
+            else:
+                for _ in range(zone["I"]):
+                    _ = f.readline()
 
         elif not line:
             break
@@ -215,3 +237,14 @@ def _read_zone(line):
         zone["T"] = zone_title.strip()
 
     return zone
+
+
+def _count_time_steps(filename):
+    """Count the number of time steps."""
+    with open_file(filename, "r") as f:
+        count = 0
+
+        for line in f:
+            count += int(line.strip().upper().startswith("ZONE"))
+
+    return count

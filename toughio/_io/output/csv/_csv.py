@@ -30,7 +30,7 @@ header_to_unit = {
 }
 
 
-def read(filename, file_type, labels_order=None):
+def read(filename, file_type, labels_order=None, time_steps=None):
     """
     Read OUTPUT_{ELEME, CONNE}.csv.
 
@@ -42,20 +42,32 @@ def read(filename, file_type, labels_order=None):
         Input file type.
     labels_order : sequence of array_like
         List of labels. If None, output will be assumed ordered.
+    time_steps : int or sequence of int
+        List of time steps to read. If None, all time steps will be read.
 
     Returns
     -------
-    :class:`toughio.ElementOutput`, :class:`toughio.ConnectionOutput`, sequence of :class:`toughio.ElementOutput` or sequence of :class:`toughio.ConnectionOutput`
+    sequence of :class:`toughio.ElementOutput` or sequence of :class:`toughio.ConnectionOutput`
         Output data for each time step.
 
     """
+    if time_steps is not None:
+        if isinstance(time_steps, int):
+            time_steps = [time_steps]
+
+        if any(i < 0 for i in time_steps):
+            n_steps = _count_time_steps(filename)
+            time_steps = [i if i >= 0 else n_steps + i for i in time_steps]
+        
+        time_steps = set(time_steps)
+
     with open_file(filename, "r") as f:
-        headers, times, labels, data = _read_csv(f, file_type)
+        headers, times, labels, data = _read_csv(f, file_type, time_steps)
 
         return to_output(file_type, labels_order, headers, times, labels, data)
 
 
-def _read_csv(f, file_type):
+def _read_csv(f, file_type, time_steps=None):
     """Read CSV table."""
     # Label index
     ilab = 1 if file_type == "element" else 2
@@ -73,9 +85,11 @@ def _read_csv(f, file_type):
 
     # Read data
     if single:
+        t_step = 0
         times, labels, data = [None], [[]], [[]]
 
     else:
+        t_step = -1
         times, labels, data = [], [], []
 
     while line:
@@ -83,13 +97,16 @@ def _read_csv(f, file_type):
 
         # Time step
         if line[0].startswith('"TIME [sec]'):
-            line = line[0].replace('"', "").split()
-            times.append(float(line[-1]))
-            labels.append([])
-            data.append([])
+            t_step += 1
+
+            if time_steps is None or t_step in time_steps:
+                line = line[0].replace('"', "").split()
+                times.append(float(line[-1]))
+                labels.append([])
+                data.append([])
 
         # Output
-        else:
+        elif time_steps is None or t_step in time_steps:
             if ilab == 1:
                 labels[-1].append(line[0].replace('"', "").strip())
 
@@ -163,3 +180,14 @@ def _write_csv(f, output, headers, unit=None):
                 + "\n"
             )
             f.write(record)
+
+
+def _count_time_steps(filename):
+    """Count the number of time steps."""
+    with open_file(filename, "r") as f:
+        count = 0
+
+        for line in f:
+            count += int(line.startswith('"TIME [sec]'))
+
+    return count
