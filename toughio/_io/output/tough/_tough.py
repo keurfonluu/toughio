@@ -28,7 +28,7 @@ def read(filename, file_type, labels_order=None, time_steps=None):
 
     Returns
     -------
-    sequence of :class:`toughio.ElementOutput` or sequence of :class:`toughio.ConnectionOutput`
+    :class:`toughio.ElementOutput`, :class:`toughio.ConnectionOutput`, sequence of :class:`toughio.ElementOutput` or sequence of :class:`toughio.ConnectionOutput`
         Output data for each time step.
 
     """

@@ -110,6 +110,7 @@ def test_output(output_ref, file_format):
         reader_kws={},
     )
 
+    output = output if isinstance(output, list) else [output]
     output_ref = output_ref if isinstance(output_ref, list) else [output_ref]
     for out_ref, out in zip(output_ref, output):
         # Careful here, tecplot format has no label

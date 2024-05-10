@@ -273,4 +273,4 @@ def to_output(file_type, labels_order, headers, times, labels, data):
     if file_type == "element" and labels_order is not None:
         outputs = [output[labels_order] for output in outputs]
 
-    return outputs
+    return outputs[0] if len(outputs) == 1 else outputs

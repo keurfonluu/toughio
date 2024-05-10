@@ -166,18 +166,23 @@ def test_extract(file_format, split, connection):
         this_dir, "support_files", "outputs", f"{base_filename}.csv"
     )
     outputs_ref = toughio.read_output(filename_ref)
+    outputs_ref = outputs_ref if isinstance(outputs_ref, list) else [outputs_ref]
 
     if not split:
         outputs = toughio.read_output(output_filename, connection=connection)
+        outputs = outputs if isinstance(outputs, list) else [outputs]
 
         for output_ref, output in zip(outputs_ref, outputs):
             assert output_ref.time == output.time
             for k, v in output_ref.data.items():
                 assert helpers.allclose(v.mean(), output.data[k].mean(), atol=1.0e-2)
+
     else:
         filenames = glob.glob(os.path.join(tempdir, f"{base_filename}_*.csv"))
+
         for i, output_filename in enumerate(sorted(filenames)):
             outputs = toughio.read_output(output_filename)
+            outputs = outputs if isinstance(outputs, list) else [outputs]
 
             assert len(outputs) == 1
 

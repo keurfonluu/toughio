@@ -44,18 +44,17 @@ def export(argv=None):
 
     # Read output file
     print(f"Reading file '{args.infile}' ...", end="")
+
     sys.stdout.flush()
-    output = read_output(args.infile)
     if args.file_format != "xdmf":
-        if args.time_step is not None:
-            if not (-len(output) <= args.time_step < len(output)):
-                raise ValueError("Inconsistent time step value.")
-            output = output[args.time_step]
-        else:
-            output = output[-1]
+        time_step = args.time_step if args.time_step is not None else -1
+        output = read_output(args.infile, time_steps=time_step)
         labels = output.labels
+
     else:
+        output = read_output(args.infile)
         labels = output[-1].labels
+
     print(" Done!")
 
     with_mesh = bool(args.mesh)
