@@ -97,6 +97,9 @@ def read_buffer(f, time_steps=None):
             else:
                 t_step += 1
 
+                if time_steps is not None and t_step > max(time_steps):
+                    break
+
             if time_steps is None or t_step in time_steps:
                 # Read data
                 data = np.genfromtxt(f, max_rows=zone["I"])

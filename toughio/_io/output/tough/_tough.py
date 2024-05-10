@@ -106,6 +106,9 @@ def _read_table(f, file_type, time_steps=None):
         if line.startswith("TOTAL TIME"):
             t_step += 1
 
+            if time_steps is not None and t_step > max(time_steps):
+                break
+
             if not (time_steps is None or t_step in time_steps):
                 continue
             

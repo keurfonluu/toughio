@@ -99,6 +99,9 @@ def _read_csv(f, file_type, time_steps=None):
         if line[0].startswith('"TIME [sec]'):
             t_step += 1
 
+            if time_steps is not None and t_step > max(time_steps):
+                break
+
             if time_steps is None or t_step in time_steps:
                 line = line[0].replace('"', "").split()
                 times.append(float(line[-1]))

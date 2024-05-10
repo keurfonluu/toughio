@@ -61,6 +61,10 @@ def read(filename, file_type, labels_order=None, time_steps=None):
 
                 if line[0] != tcur:
                     t_step += 1
+
+                    if time_steps is not None and t_step > max(time_steps):
+                        break
+
                     tcur = line[0]
 
                     if time_steps is None or t_step in time_steps:

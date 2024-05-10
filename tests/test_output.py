@@ -123,6 +123,7 @@ def test_output(output_ref, file_format):
         "OUTPUT_ELEME.csv",
         "OUTPUT_ELEME.tec",
         "OUTPUT_ELEME_PETRASIM.csv",
+        "OUTPUT.out",
         "OUTPUT_CONNE.csv",
     ],
 )
