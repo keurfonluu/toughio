@@ -117,6 +117,28 @@ def test_output(output_ref, file_format):
         helpers.allclose(out, out_ref)
 
 
+@pytest.mark.parametrize(
+    "filename",
+    [
+        "OUTPUT_ELEME.csv",
+        "OUTPUT_ELEME.tec",
+        "OUTPUT_ELEME_PETRASIM.csv",
+        "OUTPUT_CONNE.csv",
+    ],
+)
+def test_output_time_steps(filename):
+    this_dir = os.path.dirname(os.path.abspath(__file__))
+    filename = os.path.join(this_dir, "support_files", "outputs", filename)
+    outputs_ref = toughio.read_output(filename)
+
+    time_steps = [0, 2, -1]
+    outputs = toughio.read_output(filename, time_steps=time_steps)
+    outputs_ref = [outputs_ref[time_step] for time_step in time_steps]
+
+    for out_ref, out in zip(outputs_ref, outputs):
+        helpers.allclose(out, out_ref)
+
+
 def test_save():
     this_dir = os.path.dirname(os.path.abspath(__file__))
     filename = os.path.join(this_dir, "support_files", "outputs", "SAVE.out")
