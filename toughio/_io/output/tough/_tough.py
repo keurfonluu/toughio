@@ -3,7 +3,7 @@ from functools import partial
 import numpy as np
 
 from ...._common import open_file
-from ..._common import read_record
+from ..._common import read_record, to_float
 from .._common import to_output
 
 __all__ = [
@@ -97,7 +97,6 @@ def _read_table(f, file_type, time_steps=None):
     labels_key = "ELEM." if file_type == "element" else "ELEM1"
 
     t_step = -1
-    first = True
     times, data = [], []
     for line in f:
         line = line.strip()
@@ -143,9 +142,12 @@ def _read_table(f, file_type, time_steps=None):
                     break
 
             # Loop until end of output block
+            reader = lambda line: [to_float(x) for x in line.split()]
+            reader2 = None
+
             while True:
                 if line[:nwsp].strip() and not line.strip().startswith("ELEM"):
-                    if first:
+                    if reader2 is None:
                         # Find first floating point
                         x = line.split()[-headers[::-1].index("INDEX")]
 
@@ -158,41 +160,37 @@ def _read_table(f, file_type, time_steps=None):
                     tmp = [line[:iend]]
                     line = line[iend:]
 
-                    if first:
-                        try:
-                            # Set line parser and try parsing first line
-                            reader = lambda line: [to_float(x) for x in line.split()]
-                            _ = reader(line)
+                    if reader2 is None:
+                        # Determine number of characters for index
+                        idx = line.replace("-", " ").split()[0]
+                        nidx = line.index(idx) + len(idx)
+                        ifmt = f"{nidx}s"
 
-                        except ValueError:
-                            # Determine number of characters for index
-                            idx = line.replace("-", " ").split()[0]
-                            nidx = line.index(idx) + len(idx)
-                            ifmt = f"{nidx}s"
+                        # Determine number of characters between two Es
+                        i1 = line.find("E")
+                        i2 = line.find("E", i1 + 1)
 
-                            # Determine number of characters between two Es
-                            i1 = line.find("E")
-                            i2 = line.find("E", i1 + 1)
+                        # Initialize data format
+                        fmt = [ifmt]
+                        if i2 >= 0:
+                            di = i2 - i1
+                            dfmt = f"{di}.{di - 7}e"
+                            fmt += 20 * [dfmt]  # Read 20 data columns at most
 
-                            # Initialize data format
-                            fmt = [ifmt]
-                            if i2 >= 0:
-                                di = i2 - i1
-                                dfmt = f"{di}.{di - 7}e"
-                                fmt += 20 * [dfmt]  # Read 20 data columns at most
+                        else:
+                            fmt += ["12.5e"]
 
-                            else:
-                                fmt += ["12.5e"]
+                        fmt = ",".join(fmt)
 
-                            fmt = ",".join(fmt)
+                        # Set second line parser
+                        reader2 = partial(read_record, fmt=fmt)
 
-                            # Set line parser
-                            reader = partial(read_record, fmt=fmt)
+                    try:
+                        tmp += reader(line)
 
-                        finally:
-                            first = False
+                    except ValueError:
+                        tmp += reader2(line)
 
-                    tmp += reader(line)
                     data[-1].append([x for x in tmp if x is not None])
 
                 line = next(f)
@@ -200,17 +198,6 @@ def _read_table(f, file_type, time_steps=None):
                     break
 
     return headers, times, data
-
-
-def to_float(x):
-    """Return np.nan if x cannot be converted."""
-    from ..._common import to_float as _to_float
-
-    try:
-        return _to_float(x)
-
-    except ValueError:
-        return np.nan
 
 
 def _count_time_steps(filename):
