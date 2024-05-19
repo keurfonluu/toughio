@@ -498,7 +498,7 @@ class Mesh:
         if isinstance(file_or_output, str):
             out = read_output(
                 file_or_output, time_steps=time_step, connection=connection
-            )[0]
+            )
 
         else:
             out = file_or_output
