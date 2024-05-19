@@ -21,12 +21,12 @@ class Output(ABC):
         self._labels = list(labels) if labels is not None else labels
 
     @abstractmethod
-    def __getitem__(self, slice):
+    def __getitem__(self, islice):
         """Slice output."""
         raise NotImplementedError()
 
     @abstractmethod
-    def index(self, *args):
+    def index(self, label, *args):
         """Get index of element or connection."""
         if self.labels is None:
             raise AttributeError()
@@ -208,16 +208,16 @@ class ConnectionOutput(Output):
             [self._labels[i] for i in islice],
         )
 
-    def index(self, label1, label2):
+    def index(self, label, label2=None):
         """
         Get index of connection.
 
         Parameters
         ----------
-        label1 : str
-            Label of first element of connection.
-        label2 : str
-            Label of second element of connection.
+        label : str
+            Label of connection or label of first element of connection.
+        label2 : str or None, optional, default None
+            Label of second element of connection (if `label` is the label of the first element).
 
         Returns
         -------
@@ -228,7 +228,10 @@ class ConnectionOutput(Output):
         super().index()
         labels = ["".join(label) for label in self.labels]
 
-        return labels.index(f"{label1}{label2}")
+        if label2 is not None:
+            label = f"{label}{label2}"
+
+        return labels.index(label)
 
 
 def to_output(file_type, labels_order, headers, times, labels, data):
