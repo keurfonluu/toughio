@@ -46,6 +46,7 @@ def read(
     filename,
     file_format=None,
     labels_order=None,
+    time_steps=None,
     connection=False,
 ):
     """
@@ -55,17 +56,19 @@ def read(
     ----------
     filename : str, pathlike or buffer
         Input file name or buffer.
-    file_format : str ('csv', 'petrasim', 'save', 'tecplot', 'tough') or None, optional, default None
+    file_format : {'csv', 'petrasim', 'save', 'tecplot', 'tough'} or None, optional, default None
         Input file format.
-    labels_order : list of array_like or None, optional, default None
+    labels_order : sequence of array_like or None, optional, default None
         List of labels. If None, output will be assumed ordered.
+    time_steps : int or sequence of int
+        List of time steps to read. If None, all time steps will be read.
     connection : bool, optional, default False
         Only for standard TOUGH output file. If `True`, return data related to connections.
 
     Returns
     -------
-    namedtuple or list of namedtuple
-        namedtuple (type, format, time, labels, data) or list of namedtuple for each time step.
+    :class:`toughio.ElementOutput`, :class:`toughio.ConnectionOutput`, sequence of :class:`toughio.ElementOutput` or sequence of :class:`toughio.ConnectionOutput`
+        Output data for each time step.
 
     """
     if not (
@@ -93,7 +96,7 @@ def read(
     if connection:
         file_type = "connection" if connection else "element"
 
-    return _reader_map[file_format](filename, file_type, labels_order)
+    return _reader_map[file_format](filename, file_type, labels_order, time_steps)
 
 
 def write(filename, output, file_format=None, **kwargs):
@@ -104,9 +107,9 @@ def write(filename, output, file_format=None, **kwargs):
     ----------
     filename : str, pathlike or buffer
         Output file name or buffer.
-    output : namedtuple or list of namedtuple
-        namedtuple (type, format, time, labels, data) or list of namedtuple for each time step to export.
-    file_format : str ('csv', 'petrasim', 'tecplot') or None, optional, default None
+    output : :class:`toughio.ElementOutput`, :class:`toughio.ConnectionOutput`, sequence of :class:`toughio.ElementOutput` or sequence of :class:`toughio.ConnectionOutput`
+        Output data to export for each time step.
+    file_format : {'csv', 'petrasim', 'tecplot'} or None, optional, default None
         Output file format.
 
     Other Parameters
@@ -139,31 +142,47 @@ def get_output_type(filename):
         if not line:
             line = f.readline().strip()
             if line.startswith("@@@@@"):
-                return "element", "tough"
+                file_format = "tough"
+                file_type = "element"
 
             else:
                 raise ValueError()
 
         elif line.startswith("1      @@@@@"):
-            return "element", "tough"
+            file_format = "tough"
+            file_type = "element"
 
         elif line.startswith("INCON"):
-            return "element", "save"
+            file_format = "save"
+            file_type = "element"
 
         elif "=" in line:
-            return "element", "tecplot"
+            file_format = "tecplot"
+            file_type = (
+                "connection"
+                if "HEAT" in line or "FLOW" in line or "VEL" in line
+                else "element"
+            )
 
         elif line.startswith("TIME"):
-            return "element", "petrasim"
+            file_format = "petrasim"
+            file_type = "connection" if "ELEM1" in line else "element"
 
         else:
             header = line.split(",")[0].replace('"', "").strip()
+            file_format = "csv"
+            file_type = "connection" if header == "ELEM1" else "element"
 
             if header == "ELEM":
-                return "element", "csv"
+                file_format = "csv"
+                file_type = "element"
 
             elif header == "ELEM1":
-                return "connection", "csv"
+                file_format = "csv"
+                file_type = "connection"
 
             else:
-                return "element", None
+                file_format = "element"
+                file_type = None
+
+    return file_type, file_format

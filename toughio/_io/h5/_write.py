@@ -2,7 +2,7 @@ import pathlib
 
 import h5py
 
-from ..output import Output
+from ..output import ConnectionOutput, ElementOutput
 from ..output import read as read_output
 from ..table import read as read_table
 
@@ -25,9 +25,9 @@ def write(
     ----------
     filename : str or pathlike
         Output file name.
-    elements : namedtuple, list of namedtuple, str, pathlike or None, optional, default None
+    elements : str, pathlike, :class:`toughio.ElementOutput`, sequence of :class:`toughio.ElementOutput` or None, optional, default None
         Element outputs to export.
-    connections : namedtuple, list of namedtuple, str, pathlike or None, optional, default None
+    connections : str, pathlike, :class:`toughio.ConnectionOutput`, sequence of :class:`toughio.ConnectionOutput` or None, optional, default None
         Connection outputs to export.
     element_history : dict or None, optional, default None
         Element history to export.
@@ -79,12 +79,12 @@ def _write_output(f, outputs, labels_order, connection, **kwargs):
     if isinstance(outputs, (str, pathlib.Path)):
         outputs = read_output(outputs, labels_order=labels_order, connection=connection)
 
-    if isinstance(outputs, Output):
+    if isinstance(outputs, (ElementOutput, ConnectionOutput)):
         outputs = [outputs]
 
     elif isinstance(outputs, (list, tuple)):
         for output in outputs:
-            if not isinstance(output, Output):
+            if not isinstance(output, (ElementOutput, ConnectionOutput)):
                 raise ValueError()
 
     else:
@@ -92,7 +92,7 @@ def _write_output(f, outputs, labels_order, connection, **kwargs):
 
     for output in outputs:
         group = f.create_group(f"time={output.time}")
-        group.create_dataset("labels", data=output.labels.astype("S"), **kwargs)
+        group.create_dataset("labels", data=list(output.labels), **kwargs)
 
         for k, v in output.data.items():
             group.create_dataset(k, data=v, **kwargs)

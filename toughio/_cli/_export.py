@@ -18,7 +18,6 @@ def export(argv=None):
     import sys
 
     from .. import read_mesh, read_output, write_time_series
-    from .._io.output._common import reorder_labels
     from ..meshmaker import triangulate, voxelize
 
     parser = _get_parser()
@@ -45,18 +44,17 @@ def export(argv=None):
 
     # Read output file
     print(f"Reading file '{args.infile}' ...", end="")
+
     sys.stdout.flush()
-    output = read_output(args.infile)
     if args.file_format != "xdmf":
-        if args.time_step is not None:
-            if not (-len(output) <= args.time_step < len(output)):
-                raise ValueError("Inconsistent time step value.")
-            output = output[args.time_step]
-        else:
-            output = output[-1]
+        time_step = args.time_step if args.time_step is not None else -1
+        output = read_output(args.infile, time_steps=time_step)
         labels = output.labels
+
     else:
+        output = read_output(args.infile)
         labels = output[-1].labels
+
     print(" Done!")
 
     with_mesh = bool(args.mesh)
@@ -144,13 +142,13 @@ def export(argv=None):
 
         if args.file_format != "xdmf":
             mesh.point_data = {}
-            mesh.cell_dada = {}
+            mesh.cell_data = {}
             mesh.field_data = {}
             mesh.point_sets = {}
             mesh.cell_sets = {}
             mesh.read_output(output)
         else:
-            output = [reorder_labels(data, mesh.labels) for data in output]
+            output = [out[mesh.labels] for out in output]
     print(" Done!")
 
     # Output file name
