@@ -184,5 +184,5 @@ def get_output_type(filename):
             else:
                 file_format = "element"
                 file_type = None
-            
+
     return file_type, file_format

@@ -1,5 +1,5 @@
 from ...._common import open_file
-from .._common import to_output, ElementOutput
+from .._common import ElementOutput, to_output
 
 __all__ = [
     "read",
@@ -58,7 +58,7 @@ def read(filename, file_type, labels_order=None, time_steps=None):
         if any(i < 0 for i in time_steps):
             n_steps = _count_time_steps(filename)
             time_steps = [i if i >= 0 else n_steps + i for i in time_steps]
-        
+
         time_steps = set(time_steps)
 
     with open_file(filename, "r") as f:
@@ -115,7 +115,7 @@ def _read_csv(f, file_type, time_steps=None):
 
             else:
                 labels[-1].append([l.replace('"', "").strip() for l in line[:ilab]])
-            
+
             data[-1].append([float(l.strip()) for l in line[ilab:]])
 
         line = f.readline()

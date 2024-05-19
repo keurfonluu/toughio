@@ -1,5 +1,5 @@
-from abc import ABC, abstractmethod
 import logging
+from abc import ABC, abstractmethod
 
 import numpy as np
 
@@ -24,13 +24,13 @@ class Output(ABC):
     def __getitem__(self):
         """Slice output."""
         pass
-    
+
     @abstractmethod
     def index(self):
         """Get index of element or connection."""
         if self.labels is None:
             raise AttributeError()
-        
+
     @property
     def n_data(self):
         """Return number of data points."""
@@ -40,31 +40,31 @@ class Output(ABC):
     def time(self):
         """Return time step (in seconds)."""
         return self._time
-    
+
     @time.setter
     def time(self, value):
         self._time = value
-    
+
     @property
     def data(self):
         """Return data arrays."""
         return self._data
-    
+
     @data.setter
     def data(self, value):
         self._data = value
-    
+
     @property
     def labels(self):
         """Return labels."""
         return self._labels
-    
+
     @labels.setter
     def labels(self, value):
         if value is not None:
             if len(value) != self.n_data:
                 raise ValueError()
-            
+
             self._labels = list(value)
 
         else:
@@ -84,14 +84,14 @@ class ElementOutput(Output):
             Data arrays.
         labels : sequence of str or None, default, None
             Labels of elements.
-        
+
         """
         super().__init__(time, data, labels)
 
     def __getitem__(self, islice):
         """
         Slice element output.
-        
+
         Parameters
         ----------
         islice : int, str, slice, sequence of int or sequence of str
@@ -101,26 +101,26 @@ class ElementOutput(Output):
         -------
         dict or :class:`toughio.ElementOutput`
             Sliced element outputs.
-        
+
         """
         if self.labels is None:
             raise AttributeError()
-        
+
         if np.ndim(islice) == 0:
             if isinstance(islice, slice):
                 islice = np.arange(self.n_data)[islice]
 
             else:
                 islice = self.index(islice) if isinstance(islice, str) else islice
-            
+
                 return {k: v[islice] for k, v in self.data.items()}
-        
+
         elif np.ndim(islice) == 1:
             islice = [self.index(i) if isinstance(i, str) else i for i in islice]
 
         else:
             raise ValueError()
-        
+
         return ElementOutput(
             self.time,
             {k: v[islice] for k, v in self.data.items()},
@@ -130,7 +130,7 @@ class ElementOutput(Output):
     def index(self, label):
         """
         Get index of element.
-        
+
         Parameters
         ----------
         label : str
@@ -140,10 +140,10 @@ class ElementOutput(Output):
         -------
         int
             Index of element.
-        
+
         """
         super().index()
-        
+
         return self.labels.index(label)
 
 
@@ -160,14 +160,14 @@ class ConnectionOutput(Output):
             Data arrays.
         labels : sequence of str or None, default, None
             Labels of connections.
-        
+
         """
         super().__init__(time, data, labels)
 
     def __getitem__(self, islice):
         """
         Slice connection output.
-        
+
         Parameters
         ----------
         islice : int, str, slice, sequence of int or sequence of str
@@ -177,15 +177,16 @@ class ConnectionOutput(Output):
         -------
         dict or :class:`toughio.ConnectionOutput`
             Sliced connection outputs.
-        
+
         """
         if self.labels is None:
             raise AttributeError()
-        
+
         if np.ndim(islice) == 0:
             if isinstance(islice, str):
                 islice = [
-                    i for i, (label1, label2) in enumerate(self.labels)
+                    i
+                    for i, (label1, label2) in enumerate(self.labels)
                     if label1 == islice or label2 == islice
                 ]
 
@@ -194,13 +195,13 @@ class ConnectionOutput(Output):
 
             else:
                 return {k: v[islice] for k, v in self.data.items()}
-        
+
         elif np.ndim(islice) <= 2:
             islice = [self.index(*i) if np.ndim(i) == 1 else i for i in islice]
 
         else:
             raise ValueError()
-        
+
         return ConnectionOutput(
             self.time,
             {k: v[islice] for k, v in self.data.items()},
@@ -210,7 +211,7 @@ class ConnectionOutput(Output):
     def index(self, label1, label2):
         """
         Get index of connection.
-        
+
         Parameters
         ----------
         label1 : str
@@ -222,7 +223,7 @@ class ConnectionOutput(Output):
         -------
         int
             Index of connection.
-        
+
         """
         super().index()
         labels = ["".join(label) for label in self.labels]
@@ -240,7 +241,11 @@ def to_output(file_type, labels_order, headers, times, labels, data):
             "data": {k: v for k, v in zip(headers, np.transpose(data_))},
         }
 
-        output = ElementOutput(**kwargs) if file_type == "element" else ConnectionOutput(**kwargs)
+        output = (
+            ElementOutput(**kwargs)
+            if file_type == "element"
+            else ConnectionOutput(**kwargs)
+        )
         outputs.append(output)
 
     # Some older versions of TOUGH3 have duplicate connection outputs when running in parallel

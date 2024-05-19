@@ -2,7 +2,7 @@ import pathlib
 
 import h5py
 
-from ..output import ElementOutput, ConnectionOutput
+from ..output import ConnectionOutput, ElementOutput
 from ..output import read as read_output
 from ..table import read as read_table
 

@@ -2,8 +2,8 @@ from . import _cli, capillarity, meshmaker, relative_permeability
 from .__about__ import __version__
 from ._helpers import convert_labels
 from ._io import (
-    ElementOutput,
     ConnectionOutput,
+    ElementOutput,
     read_input,
     read_output,
     read_table,

@@ -39,7 +39,7 @@ def read(filename, file_type, labels_order=None, time_steps=None):
         if any(i < 0 for i in time_steps):
             n_steps = _count_time_steps(filename)
             time_steps = [i if i >= 0 else n_steps + i for i in time_steps]
-        
+
         time_steps = set(time_steps)
 
     with open_file(filename, "r") as f:
@@ -110,7 +110,7 @@ def _read_table(f, file_type, time_steps=None):
 
             if not (time_steps is None or t_step in time_steps):
                 continue
-            
+
             # Read time step in following line
             line = next(f).strip()
             times.append(float(line.split()[0]))

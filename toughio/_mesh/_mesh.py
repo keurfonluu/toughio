@@ -490,13 +490,15 @@ class Mesh:
 
         """
         from .. import read_output
-        from .._io.output._common import ElementOutput, ConnectionOutput
+        from .._io.output._common import ConnectionOutput, ElementOutput
 
         if not isinstance(time_step, int):
             raise TypeError()
 
         if isinstance(file_or_output, str):
-            out = read_output(file_or_output, time_steps=time_step, connection=connection)[0]
+            out = read_output(
+                file_or_output, time_steps=time_step, connection=connection
+            )[0]
 
         else:
             out = file_or_output

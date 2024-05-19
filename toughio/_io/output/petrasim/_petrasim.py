@@ -1,7 +1,7 @@
 import numpy as np
 
 from ...._common import open_file
-from .._common import to_output, ElementOutput
+from .._common import ElementOutput, to_output
 
 __all__ = [
     "read",
@@ -37,7 +37,7 @@ def read(filename, file_type, labels_order=None, time_steps=None):
         if any(i < 0 for i in time_steps):
             n_steps = _count_time_steps(filename)
             time_steps = [i if i >= 0 else n_steps + i for i in time_steps]
-        
+
         time_steps = set(time_steps)
 
     with open_file(filename, "r") as f:
@@ -122,9 +122,7 @@ def write(filename, output):
             if isinstance(out, ElementOutput)
             else ["TIME [sec]", "ELEM1", "ELEM2", "INDEX"]
         )
-        record = ",".join(
-            f"{header:>18}" for header in headers_ + headers
-        )
+        record = ",".join(f"{header:>18}" for header in headers_ + headers)
         f.write(f"{record}\n")
 
         # Data

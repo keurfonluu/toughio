@@ -56,7 +56,7 @@ def read(filename, file_type, labels_order=None, time_steps=None):
         if any(i < 0 for i in time_steps):
             n_steps = _count_time_steps(filename)
             time_steps = [i if i >= 0 else n_steps + i for i in time_steps]
-        
+
         time_steps = set(time_steps)
 
     with open_file(filename, "r") as f:
@@ -93,7 +93,7 @@ def read_buffer(f, time_steps=None):
 
             if "I" not in zone:
                 raise ValueError()
-            
+
             else:
                 t_step += 1
 

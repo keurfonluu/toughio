@@ -30,7 +30,7 @@ def read(filename, file_type=None, labels_order=None, time_steps=None):
 
     """
     parameters = tough.read(filename)
-    
+
     data = [v["values"] for v in parameters["initial_conditions"].values()]
     data = {f"X{i + 1}": x for i, x in enumerate(np.transpose(data))}
     data["porosity"] = np.array(
