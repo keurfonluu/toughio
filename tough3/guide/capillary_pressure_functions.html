@@ -1,0 +1,949 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Capillary Pressure Functions &#8212; toughio 1.15.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=8fbebee6" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../../_static/documentation_options.js?v=70d5d4a5"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tough3/guide/capillary_pressure_functions';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="EOS" href="../eos/index.html" />
+    <link rel="prev" title="Relative Permeability Functions" href="relative_permeability_functions.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../_static/logo-light.png" class="logo__image only-light" alt="toughio 1.15.0 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="toughio 1.15.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        TOUGH3
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        TOUGH3
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../install/index.html">Installation</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../install/linux.html">Installation on Linux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../install/windows.html">Installation on Windows</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">User Guide</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="governing_equations.html">Governing Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="numerical_methods.html">Numerical Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="initial_and_boundary_conditions.html">Initial and Boundary Conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="preparation_of_input_data.html">Preparation of Input Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="output_from_tough3.html">Output from TOUGH3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="relative_permeability_functions.html">Relative Permeability Functions</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Capillary Pressure Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../eos/index.html">EOS</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos1.html">EOS1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos2.html">EOS2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos3.html">EOS3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos4.html">EOS4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos5.html">EOS5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos7.html">EOS7</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos7r.html">EOS7R</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos8.html">EOS8</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos9.html">EOS9</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/ewasg.html">EWASG</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eco2n.html">ECO2N</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">TOUGH3</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">User Guide</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Capillary...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="capillary-pressure-functions">
+<span id="id1"></span><h1>Capillary Pressure Functions<a class="headerlink" href="#capillary-pressure-functions" title="Link to this heading">#</a></h1>
+<p>TOUGH3 provides several capillary pressure functions for two-phase or three-phase flow problems.
+The original TOUGH2 two-phase functions have been retained (from <code class="docutils literal notranslate"><span class="pre">ICP</span></code> = 1 to <code class="docutils literal notranslate"><span class="pre">ICP</span></code> = 8).
+The modified Brooks-Corey and van Genuchten models and two versions of the hysteresis model are implemented (<code class="docutils literal notranslate"><span class="pre">ICP</span></code> = 10, 11, 12, and 13).
+The three-phase functions from TMVOC and ECO2M start at IRP = 31.
+If one of the two-phase functions is chosen, the gas-NAPL (for TMVOC) or gaseous CO<sub>2</sub>-liquid CO<sub>2</sub> (for ECO2M) capillary pressure will be assumed to be zero.
+The notation used below is:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(P_{cgn} = P_n - P_g =\)</span> gas-NAPL capillary pressure for TMVOC, which is equivalent to <span class="math notranslate nohighlight">\(P_{cgl} = P_l - P_g =\)</span> gaseous CO<sub>2</sub>-liquid CO<sub>2</sub> capillary pressure for ECO2M</p></li>
+<li><p><span class="math notranslate nohighlight">\(P_{cgl} = P_l - P_g =\)</span> gas-aqueous capillary pressure for TMVOC, which is equivalent to <span class="math notranslate nohighlight">\(P_{cga} = P_a - P_g =\)</span> gaseous CO<sub>2</sub>-aqueous capillary pressure for ECO2M</p></li>
+<li><p><span class="math notranslate nohighlight">\(P_{cnl} = P_{cgl} - P_{cgn}\)</span> for TMVOC, and similarly <span class="math notranslate nohighlight">\(P_{cla} = P_{cga} - P_{cgl}\)</span> for ECO2M</p></li>
+<li><p><span class="math notranslate nohighlight">\(S_l\)</span>, <span class="math notranslate nohighlight">\(S_g\)</span>, and <span class="math notranslate nohighlight">\(S_n\)</span> are the saturations of aqueous, gas (or gaseous CO<sub>2</sub>) and NAPL (or liquid CO<sub>2</sub>) phases, respectively</p></li>
+</ul>
+<section id="linear-function-icp-1">
+<h2>Linear Function (ICP=1)<a class="headerlink" href="#linear-function-icp-1" title="Link to this heading">#</a></h2>
+<div class="math notranslate nohighlight">
+\[\begin{split}P_{cap} =
+    \begin{cases}
+        -CP(1) &amp; \text{for $S_l \le CP(2$} \\
+        0 &amp; \text{for $S_l \ge CP(3)$} \\
+        -CP(1) \frac{CP(3) - S_l}{CP(3) - CP(2)} &amp; \text{for $CP(2) \lt S_l \lt CP(3)$} \\
+    \end{cases}\end{split}\]</div>
+<p>Restrictions: <span class="math notranslate nohighlight">\(CP(3) \gt CP(2)\)</span></p>
+<p>If <span class="math notranslate nohighlight">\(CP(4) \ne 0\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[P_{cgn} = P_{cap} (= P_{cgl})\]</div>
+<div class="math notranslate nohighlight">
+\[P_{cap} (P_{cgl}) = 0\]</div>
+</section>
+<section id="function-of-pickens-et-al-icp-2">
+<h2>Function of Pickens et al. (ICP=2)<a class="headerlink" href="#function-of-pickens-et-al-icp-2" title="Link to this heading">#</a></h2>
+<p>After <span id="id2"><a class="reference internal" href="../references.html#id75" title="Pickens, J. F., Gillham, R. W., &amp; Cameron, D. R. (1979). Finite-element analysis of the transport of water and solutes in title-drained soils. Journal of Hydrology, 40(3-4), 243–264.">Pickens et al., 1979</a></span>.</p>
+<div class="math notranslate nohighlight">
+\[P_{cap} = -P_0 \left( \log \left( \frac{A}{B} \left(\ 1 + \sqrt{1 - \frac{B^2}{A^2}} \right) \right) \right)^{\frac{1}{x}}\]</div>
+<p>with</p>
+<div class="math notranslate nohighlight">
+\[A = \frac{\left( 1 + \frac{S_l}{S_{l0}} \right) \left( S_{l0} - S_{lr} \right)}{S_{l0} + S_{lr}}\]</div>
+<div class="math notranslate nohighlight">
+\[B = 1 - \frac{S_l}{S_{l0}}\]</div>
+<p>Parameters:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(CP(1) = P_0\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(2) = S_{lr}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(3) = S_{l0}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(4) = x\)</span></p></li>
+</ul>
+<p>Restrictions:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(0 \lt CP(2) \lt 1 \le CP(3)\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(4) \ne 0\)</span></p></li>
+</ul>
+</section>
+<section id="trust-capillary-pressure-icp-3">
+<h2>TRUST Capillary Pressure (ICP=3)<a class="headerlink" href="#trust-capillary-pressure-icp-3" title="Link to this heading">#</a></h2>
+<p>After <span id="id3"><a class="reference internal" href="../references.html#id62" title="Narasimhan, T. N., &amp; Witherspoon, P. (1978). Numerical model for saturated-unsaturated flow in deformable porous media: 3. applications. Water Resources Research, 14(6), 1017–1034.">Narasimhan &amp; Witherspoon, 1978</a></span>.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}P_{cap} =
+    \begin{cases}
+        -P_e - P_0 \left( \frac{1 - S_l}{S_l - S_{lr}} \right)^{\frac{1}{\eta}} &amp; \text{for $S_l \gt S_{lr}$} \\
+        -P_{max} &amp; \text{for $S_l \lt S_{lr}$} \\
+    \end{cases}\end{split}\]</div>
+<p>Parameters:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(CP(1) = P_0\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(2) = S_{lr}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(3) = \eta\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(4) = P_e\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(5) = P_{max}\)</span></p></li>
+</ul>
+<p>Restrictions:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(CP(2) \ge 0\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(3) \ne 0\)</span></p></li>
+</ul>
+</section>
+<section id="milly-s-functions-icp-4">
+<h2>Milly’s Functions (ICP=4)<a class="headerlink" href="#milly-s-functions-icp-4" title="Link to this heading">#</a></h2>
+<div class="math notranslate nohighlight">
+\[P_{cap} = -98.783 \times 10^A\]</div>
+<p>with</p>
+<div class="math notranslate nohighlight">
+\[A = 2.26 \left( \frac{0.371}{S_l - S_{lr}} - 1 \right)^{\frac{1}{4}}\]</div>
+<p>Parameters:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(CP(1) = S_{lr}\)</span></p></li>
+</ul>
+<p>Restrictions:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(CP(1) \ge 0\)</span></p></li>
+</ul>
+</section>
+<section id="leverett-s-function-icp-6">
+<h2>Leverett’s Function (ICP=6)<a class="headerlink" href="#leverett-s-function-icp-6" title="Link to this heading">#</a></h2>
+<p>After <span id="id4"><a class="reference internal" href="../references.html#id48" title="Leverett, M. (1941). Capillary behavior in porous solids. Transactions of the AIME, 142(01), 152–169.">Leverett, 1941</a></span> and <span id="id5"><a class="reference internal" href="../references.html#id105" title="Udell, K. S. (1985). Heat transfer in porous media considering phase change and capillarity—the heat pipe effect. International Journal of Heat and Mass Transfer, 28(2), 485–495.">Udell, 1985</a></span>.</p>
+<div class="math notranslate nohighlight">
+\[P_{cap} = -P_0 \sigma (T) f (S_l)\]</div>
+<p>with</p>
+<div class="math notranslate nohighlight">
+\[\sigma(T) = \text{surface tension of water (supplied internally in TOUGH3)}\]</div>
+<div class="math notranslate nohighlight">
+\[S^\ast = \frac{S_l - S_{lr}}{1 - S_{lr}}\]</div>
+<p>Parameters:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(CP(1) = P_0\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(2) = S_{lr}\)</span></p></li>
+</ul>
+<p>Restrictions:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(0 \le CP(2) \lt 1\)</span></p></li>
+</ul>
+<p>If <span class="math notranslate nohighlight">\(CP(3) \ne 0\)</span></p>
+<div class="math notranslate nohighlight">
+\[P_{cgn} = P_{cap} (= P_{cgl})\]</div>
+<div class="math notranslate nohighlight">
+\[P_{cap} (P_{cgl}) = 0\]</div>
+</section>
+<section id="van-genuchten-function-icp-7">
+<h2>van Genuchten Function (ICP=7)<a class="headerlink" href="#van-genuchten-function-icp-7" title="Link to this heading">#</a></h2>
+<div class="math notranslate nohighlight">
+\[P_{cap} = -P_0 \left( \left( S^\ast \right)^{-\frac{1}{\lambda}} - 1 \right)^{1 - \lambda}\]</div>
+<p>subject to the restriction</p>
+<div class="math notranslate nohighlight">
+\[-P_{max} \le P_{cap} \le 0\]</div>
+<p>Here,</p>
+<div class="math notranslate nohighlight">
+\[S^\ast = \frac{S_l - S_{lr}}{S_{ls} - S_{lr}}\]</div>
+<p>Parameters:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(CP(1) = \lambda = 1 - \frac{1}{n}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(2) = S_{lr}\)</span> (should be chosen smaller than the corresponding parameter in the relative permeability function)</p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(3) = \frac{1}{P_0} = \frac{\alpha}{\rho_w g}\)</span> (proportional to <span class="math notranslate nohighlight">\(\sqrt{k}\)</span>)</p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(4) = P_{max}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(5) = S_{ls}\)</span></p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Parameter <span class="math notranslate nohighlight">\(\lambda\)</span> is <span class="math notranslate nohighlight">\(m\)</span> in van Genuchten’s notation, with <span class="math notranslate nohighlight">\(m = 1 - \frac{1}{n}\)</span>; parameter <span class="math notranslate nohighlight">\(n\)</span> is often written as <span class="math notranslate nohighlight">\(\beta\)</span>.</p>
+<p>In <span id="id6"><a class="reference internal" href="../references.html#id107" title="Van Genuchten, M. T. (1980). A closed-form equation for predicting the hydraulic conductivity of unsaturated soils. Soil science society of America journal, 44(5), 892–898.">VanGenuchten, 1980</a></span>’s derivation, the parameter <span class="math notranslate nohighlight">\(S_{lr}\)</span> for irreducible water saturation is the same in the relative permeability and capillary pressure functions.
+As a consequence, for <span class="math notranslate nohighlight">\(S_l \rightarrow S_{lr}\)</span>, we have <span class="math notranslate nohighlight">\(k_{rl} \rightarrow 0\)</span> and <span class="math notranslate nohighlight">\(P_{cap} \rightarrow -\infty\)</span>, which is unphysical because it implies that the radii of capillary menisci go to zero as liquid phase is becoming immobile (discontinuous).
+In reality, no special capillary pressure effects are expected when liquid phase becomes discontinuous.
+Accordingly, we recommend to always choose a smaller <span class="math notranslate nohighlight">\(S_{lr}\)</span> for the capillary pressure as compared to the relative permeability function.</p>
+</div>
+</section>
+<section id="no-capillary-pressure-icp-8">
+<h2>No Capillary Pressure (ICP=8)<a class="headerlink" href="#no-capillary-pressure-icp-8" title="Link to this heading">#</a></h2>
+<p>For all saturations:</p>
+<div class="math notranslate nohighlight">
+\[P_{cap} \equiv 0\]</div>
+<p>No parameters.</p>
+</section>
+<section id="modified-brooks-corey-model-icp-10">
+<h2>Modified Brooks-Corey Model (ICP=10)<a class="headerlink" href="#modified-brooks-corey-model-icp-10" title="Link to this heading">#</a></h2>
+<p>A modified version of the Brooks-Corey model (<span id="id7"><a class="reference internal" href="../references.html#id11" title="Brooks, R. H. (1965). Hydraulic properties of porous media. Colorado State University.">Brooks, 1965</a></span>) has been implemented.
+In order to prevent the capillary pressure from decreasing towards negative infinity as the effective saturation approaches zero, a linear function is used for saturations <span class="math notranslate nohighlight">\(S_l\)</span> below a certain value <span class="math notranslate nohighlight">\(\left( S_{lrc} + \varepsilon \right)\)</span>, where <span class="math notranslate nohighlight">\(\varepsilon\)</span> is a small number.
+The slope of the linear extrapolation is identical with the slope of the capillary pressure curve at <span class="math notranslate nohighlight">\(S_l = S_{lrc} + \varepsilon\)</span>.
+Alternatively, the capillary pressure is prevented from becoming more negative than <span class="math notranslate nohighlight">\(-P_{max}\)</span>.
+The modified Brooks-Corey model is invoked by setting both <code class="docutils literal notranslate"><span class="pre">IRP</span></code> and <code class="docutils literal notranslate"><span class="pre">ICP</span></code> to 10.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}P_{cap} =
+    \begin{cases}
+        -P_e \left( S_{ec} \right)^{-\frac{1}{\lambda}} &amp; \text{for $S_l \gt S_{lrc} + \varepsilon$} \\
+        -P_e \left( \frac{\varepsilon}{1 - S_{lrc}} \right)^{-\frac{1}{\lambda}} + \frac{P_e}{\lambda} \frac{1}{1 - S_{lrc}} \left( \frac{\varepsilon}{1 - S_{lrc}} \right)^{-\frac{1 + \lambda}{\lambda}} \left( S_l - S_{lrc} - \varepsilon \right) &amp; \text{for $S_l \lt S_{lrc} + \varepsilon$} \\
+    \end{cases}\end{split}\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight">
+\[P_{cap} \le -P_{max}\]</div>
+<div class="math notranslate nohighlight">
+\[S_{ec} = \frac{S_l - S_{lrc}}{1 - S_{lrc}}\]</div>
+<p>Parameters:</p>
+<ul>
+<li><p><span class="math notranslate nohighlight">\(CP(1) = \lambda\)</span>, pore size distribution index</p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(2) = P_e\)</span>, gas entry pressure (Pa)</p>
+<blockquote>
+<div><ul>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">USERX(2,</span> <span class="pre">N)</span></code> is positive, <span class="math notranslate nohighlight">\(P_e = USERX(2, N)\)</span></p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">USERX(2,</span> <span class="pre">N)</span></code> is negative, <span class="math notranslate nohighlight">\(P_e = -USERX(2, N) \cdot CP(2)\)</span></p></li>
+<li><div class="line-block">
+<div class="line">If <span class="math notranslate nohighlight">\(CP(2)\)</span> is negative and <code class="docutils literal notranslate"><span class="pre">USERX(1,</span> <span class="pre">N)</span></code> is non-zero, apply Leverett’s rule:</div>
+<div class="line"><span class="math notranslate nohighlight">\(P_e = -CP(2) \sqrt{\frac{USERX(1, N)}{PER(NMAT)}}\)</span></div>
+</div>
+</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><span class="math notranslate nohighlight">\(CP(3) = P_{max}\)</span> or <span class="math notranslate nohighlight">\(\varepsilon\)</span></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>If <span class="math notranslate nohighlight">\(CP(3) = 0\)</span>, <span class="math notranslate nohighlight">\(P_{max} = 10^{50}\)</span>, <span class="math notranslate nohighlight">\(\varepsilon = -1\)</span></p></li>
+<li><p>If <span class="math notranslate nohighlight">\(0 \lt CP(3) \lt 1\)</span>, use linear model for <span class="math notranslate nohighlight">\(S_l \lt S_{lrc} + \varepsilon\)</span></p></li>
+<li><p>If <span class="math notranslate nohighlight">\(CP(3) \ge 1\)</span>, <span class="math notranslate nohighlight">\(P_{max} = CP(3)\)</span>, <span class="math notranslate nohighlight">\(\varepsilon = -1\)</span></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><span class="math notranslate nohighlight">\(CP(6) = S_{lrc}\)</span></p></li>
+</ul>
+</section>
+<section id="modified-van-genuchten-model">
+<h2>Modified van Genuchten Model<a class="headerlink" href="#modified-van-genuchten-model" title="Link to this heading">#</a></h2>
+<p>The van Genuchten model (<span id="id8"><a class="reference internal" href="../references.html#id52" title="Luckner, L., Van Genuchten, M. T., &amp; Nielsen, D. (1989). A consistent set of parametric models for the two-phase flow of immiscible fluids in the subsurface. Water Resources Research, 25(10), 2187–2193.">Luckner et al., 1989</a></span>) has been modified to prevent the capillary pressure from decreasing towards negative infinity as the effective saturation approaches zero.
+The approach is identical to that in <code class="docutils literal notranslate"><span class="pre">ICP</span></code> = 10, except that two extensions (linear and log-linear) are available.
+The modified van Genuchten model is invoked by setting both <code class="docutils literal notranslate"><span class="pre">IRP</span></code> and <code class="docutils literal notranslate"><span class="pre">ICP</span></code> to 11.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}P_{cap} =
+    \begin{cases}
+        -\frac{1}{\alpha} \left( \left( S_{ec} \right)^{\frac{\gamma - 1}{m}} - 1 \right)^{\frac{1}{n}} &amp; \text{for $S_l \ge S_{lrc} + \varepsilon$} \\
+        -\frac{1}{\alpha} \left( S_{ec\ast}^{\frac{\gamma - 1}{m}} - 1 \right)^{\frac{1}{n}} - \beta \left( S_l - S_{lrc} - \varepsilon \right) &amp; \text{for $S_l \lt S_{lrc} + \varepsilon$} \\
+    \end{cases}\end{split}\]</div>
+<p>with linear extension: <span class="math notranslate nohighlight">\(\beta = -\frac{1 - \gamma}{\alpha n m} \frac{1}{1 - S_{lrc}} \left( S_{ec\ast}^{\frac{\gamma - 1}{m}} - 1 \right)^{\frac{1}{n} - 1} S_{ec\ast}^{\frac{\gamma - 1 - m}{m}}\)</span></p>
+<div class="math notranslate nohighlight">
+\[P_{cap} = -\frac{1}{\alpha} \left( S_{ec\ast}^{\frac{\gamma - 1}{m}} - 1 \right)^{\frac{1}{n}} \cdot 10^{\beta \left( S_l - S_{lrc} - \varepsilon \right)} \quad \text{for $S_l \lt S_{lrc} + \varepsilon$}\]</div>
+<p>with log-linear extension: <span class="math notranslate nohighlight">\(\beta = -\log_{10} (e) \left( \frac{1 - m}{m} \frac{\gamma - 1}{\varepsilon} \frac{1}{S_{ec\ast}^{\frac{1 - \gamma}{m}} - 1} \right)\)</span></p>
+<div class="math notranslate nohighlight">
+\[P_{cap} \ge -P_{max}\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight">
+\[S_{ec} = \frac{S_l - S_{lrc}}{1 - S_{lrc}}\]</div>
+<div class="math notranslate nohighlight">
+\[S_{ec\ast} = \frac{\varepsilon}{1 - S_{lrc}}\]</div>
+<p>Parameters:</p>
+<ul>
+<li><p><span class="math notranslate nohighlight">\(CP(1) = n\)</span>, parameter related to pore size distribution index (see also <span class="math notranslate nohighlight">\(CP(4)\)</span>)</p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(2) = \frac{1}{\alpha}\)</span>, parameter related to gas entry pressure (Pa)</p>
+<blockquote>
+<div><ul>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">USERX(4,</span> <span class="pre">N)</span></code> is positive, <span class="math notranslate nohighlight">\(\frac{1}{\alpha_i} = USERX(4, N)\)</span></p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">USERX(4,</span> <span class="pre">N)</span></code> is negative, <span class="math notranslate nohighlight">\(\frac{1}{\alpha_i} = USERX(4, N) \cdot CP(2)\)</span></p></li>
+<li><div class="line-block">
+<div class="line">If <span class="math notranslate nohighlight">\(CP(2)\)</span> is negative, apply Leverett scaling rule:</div>
+<div class="line"><span class="math notranslate nohighlight">\(\frac{1}{\alpha_i} = \lvert CP(2) \rvert \sqrt{\frac{k_i}{PER(NMAT)}}\)</span></div>
+<div class="line">where</div>
+</div>
+<div class="math notranslate nohighlight">
+\[\begin{split}k_i =
+    \begin{cases}
+        USERX(1, N) &amp; \text{for $USERX(1, N) \gt 0$} \\
+        USERX(1, N) \cdot PER(NMAT) &amp; \text{for $USERX(1, N) \lt 0$} \\
+    \end{cases}\end{split}\]</div>
+</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><span class="math notranslate nohighlight">\(CP(3) = P_{max}\)</span> or <span class="math notranslate nohighlight">\(\varepsilon\)</span></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>If <span class="math notranslate nohighlight">\(CP(3) = 0\)</span>, <span class="math notranslate nohighlight">\(P_{max} = 10^{50}\)</span>, <span class="math notranslate nohighlight">\(\varepsilon = -1\)</span></p></li>
+<li><p>If <span class="math notranslate nohighlight">\(0 \lt CP(3) \lt 1\)</span>, <span class="math notranslate nohighlight">\(\varepsilon = CP(3)\)</span> and use linear extension</p></li>
+<li><p>If <span class="math notranslate nohighlight">\(CP(3) \ge 1\)</span>, <span class="math notranslate nohighlight">\(P_{max} = CP(3)\)</span>, <span class="math notranslate nohighlight">\(\varepsilon = -1\)</span></p></li>
+<li><p>If <span class="math notranslate nohighlight">\(-1 \lt CP(3) \lt 0\)</span>, <span class="math notranslate nohighlight">\(\varepsilon = \lvert CP(3) \rvert\)</span> and use log-linear extension</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><span class="math notranslate nohighlight">\(CP(4) = m\)</span>, if zero then <span class="math notranslate nohighlight">\(m = 1 - \frac{1}{CP(1)}\)</span>, else <span class="math notranslate nohighlight">\(m = CP(4)\)</span> and <span class="math notranslate nohighlight">\(n = \frac{1}{1 - m}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(5) = T_{ref}\)</span>, if negative, <span class="math notranslate nohighlight">\(\lvert CP(5) \rvert\)</span> is reference temperature to account for temperature dependence of capillary pressure due to changes in surface tension</p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(6) = \gamma\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(7) = S_{lrc}\)</span>, if zero, then <span class="math notranslate nohighlight">\(S_{lrc} = RP(1) = S_{lrk}\)</span></p></li>
+</ul>
+</section>
+<section id="regular-hysteresis-icp-12">
+<h2>Regular Hysteresis (ICP=12)<a class="headerlink" href="#regular-hysteresis-icp-12" title="Link to this heading">#</a></h2>
+<p>The hysteretic form of the van Genuchten model (<span id="id9"><a class="reference internal" href="../references.html#id47" title="Lenhard, R., &amp; Parker, J. (1987). A model for hysteretic constitutive relations governing multiphase flow: 2. permeability-saturation relations. Water Resources Research, 23(12), 2197–2206.">Lenhard &amp; Parker, 1987</a>, <a class="reference internal" href="../references.html#id69" title="Parker, J., &amp; Lenhard, R. (1987). A model for hysteretic constitutive relations governing multiphase flow: 1. saturation-pressure relations. Water Resources Research, 23(12), 2187–2196.">Parker &amp; Lenhard, 1987</a></span>) has been implemented.
+Details of the implementation are described in <span id="id10"><a class="reference internal" href="../references.html#id22" title="Doughty, C. (2013). User's Guide for Hysteretic Capillary Pressure and Relative Permeability Functions in TOUGH2 Earth Sciences Division Lawrence Berkeley National Laboratory. Lawrence Berkeley National Lab.(LBNL), Berkeley, CA (United States).">Doughty, 2013</a></span>.
+The hysteretic model is invoked by setting both <code class="docutils literal notranslate"><span class="pre">IRP</span></code> and <code class="docutils literal notranslate"><span class="pre">ICP</span></code> to 12.</p>
+<div class="math notranslate nohighlight">
+\[P_{cap} = -P_0^p \left( \left( \frac{S_l - S_{lmin} }{1 - S_{gr}^{\Delta} - S_{lmin}} \right)^{-\frac{1}{m^p}} - 1 \right)^{1 - m^p}\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight">
+\[S_{gr}^{\Delta} = \frac{1}{\frac{1}{1 - S_l^{\Delta}} + \frac{1}{S_{grmax}} - \frac{1}{1 - S_{lr}}}\]</div>
+<p>Parameters:</p>
+<ul>
+<li><p><span class="math notranslate nohighlight">\(CP(1) = m^d\)</span>, van Genuchten <span class="math notranslate nohighlight">\(m\)</span> for drainage branch <span class="math notranslate nohighlight">\(P_{cap}^d (S_l)\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(2) = S_{lmin}\)</span>, saturation at which original van Genuchten <span class="math notranslate nohighlight">\(P_{cap}\)</span> goes to infinity. Must have <span class="math notranslate nohighlight">\(S_{lmin} \lt S_{lr}\)</span>, where <span class="math notranslate nohighlight">\(S_{lr}\)</span> is the relative permeability parameter <span class="math notranslate nohighlight">\(RP(2)\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(3) = P_0^d\)</span>, capillary strength parameter for drainage branch <span class="math notranslate nohighlight">\(P_{cap}^d (S_l)\)</span> (Pa)</p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(4) = P_{max}\)</span>, maximum capillary pressure (Pa) obtained using original van Genuchten <span class="math notranslate nohighlight">\(P_{cap}\)</span>. Inverting the original van Genuchten function for <span class="math notranslate nohighlight">\(P_{max}\)</span> determines <span class="math notranslate nohighlight">\(S_m\)</span>, the transition point between the original van Genuchten function and an extension that stays finite as <span class="math notranslate nohighlight">\(S_l\)</span> goes to zero. For functional form of extension, see description of <span class="math notranslate nohighlight">\(CP(13)\)</span> below.</p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(5) =\)</span> scale factor for pressures for unit conversion (1 for pressure in Pa)</p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(6) = m^w\)</span>, van Genuchten <span class="math notranslate nohighlight">\(m\)</span> for imbibition branch  <span class="math notranslate nohighlight">\(P_{cap}^w (S_l)\)</span>. Default value is <span class="math notranslate nohighlight">\(CP(1)\)</span> (recommended unless compelling reason otherwise)</p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(7) = P_0^w\)</span>, capillary strength parameter for imbibition branch <span class="math notranslate nohighlight">\(P_{cap}^w (S_l)\)</span> (Pa). Default value is <span class="math notranslate nohighlight">\(CP(3)\)</span> (recommended unless compelling reason otherwise)</p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(8) =\)</span> parameter indicating whether to invoke non-zero <span class="math notranslate nohighlight">\(P_{cap}\)</span> extension for <span class="math notranslate nohighlight">\(S_l \gt S_l^\ast = 1 - S_{gr}^{\Delta}\)</span></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>=0: no extension; <span class="math notranslate nohighlight">\(P_{cap} = 0\)</span> for <span class="math notranslate nohighlight">\(S_l \gt S_l^\ast\)</span></p></li>
+<li><p>&gt;0: power-law extension for <span class="math notranslate nohighlight">\(S_l^\ast \lt S_l \lt 1\)</span>, with <span class="math notranslate nohighlight">\(P_{cap} = 0\)</span> when <span class="math notranslate nohighlight">\(S_l = 1\)</span>. A non-zero <span class="math notranslate nohighlight">\(CP(8)\)</span> is the fraction of <span class="math notranslate nohighlight">\(S_l^\ast\)</span> at which the <span class="math notranslate nohighlight">\(P_{cap}\)</span> curve departs from the original van Genuchten function. Recommended range of values: 0.97-0.99</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><span class="math notranslate nohighlight">\(CP(9) =\)</span> flag indicating how to treat negative radicand, which can arise for <span class="math notranslate nohighlight">\(S_l \gt S_l^{\Delta 23}\)</span> for second-order scanning drainage curves (<code class="docutils literal notranslate"><span class="pre">ICURV</span></code> = 3), where <span class="math notranslate nohighlight">\(S_l^{\Delta 23}\)</span> is the turning-point saturation between first-order scanning imbibition (<code class="docutils literal notranslate"><span class="pre">ICURV</span></code> = 2) and second-order scanning drainage. None of the options below have proved to be robust under all circumstances. If difficulties arise because <span class="math notranslate nohighlight">\(S_l \gt S_l^{\Delta 23}\)</span> for <code class="docutils literal notranslate"><span class="pre">ICURV</span></code> = 3, also consider using <code class="docutils literal notranslate"><span class="pre">IEHYS(3)</span></code> &gt; 0 or <span class="math notranslate nohighlight">\(CP(10)\)</span> &lt; 0, which should minimize the occurrence of <span class="math notranslate nohighlight">\(S_l \gt S_l^{\Delta 23}\)</span> for <code class="docutils literal notranslate"><span class="pre">ICURV</span></code> = 3.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>0: <span class="math notranslate nohighlight">\(radicand = \max(0, radicand)\)</span> regardless of <span class="math notranslate nohighlight">\(S_l\)</span> value</p></li>
+<li><p>1: if <span class="math notranslate nohighlight">\(S_l \gt S_l^{\Delta 23}\)</span>, radicand takes value of radicant at <span class="math notranslate nohighlight">\(S_l = S_l^{\Delta 23}\)</span></p></li>
+<li><p>2: if <span class="math notranslate nohighlight">\(S_l \gt S_l^{\Delta 23}\)</span>, use first-order scanning imbibition curve (<code class="docutils literal notranslate"><span class="pre">ICURV</span></code> = 2)</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><span class="math notranslate nohighlight">\(CP(10) =\)</span> threshold value of <span class="math notranslate nohighlight">\(\lvert \Delta S \rvert\)</span> (absolute value of saturation change since previous time step) for enabling a branch switch (default is 10<sup>-6</sup>; set to any negative number to do a branch switch no matter how small <span class="math notranslate nohighlight">\(\lvert \Delta S \rvert\)</span> is; set to a value greater than 1 to never do a branch switch). See also <code class="docutils literal notranslate"><span class="pre">IEHYS(3)</span></code></p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(11) =\)</span> threshold value of <span class="math notranslate nohighlight">\(S_{gr}^{\Delta}\)</span>. If value of <span class="math notranslate nohighlight">\(S_{gr}^{\Delta}\)</span> calculated from <span class="math notranslate nohighlight">\(S_l^{\Delta}\)</span> is less than <span class="math notranslate nohighlight">\(CP(11)\)</span>, use <span class="math notranslate nohighlight">\(S_{gr}^{\Delta} = 0\)</span>. Recommended value 0.01-0.03; default is 0.02</p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(12) =\)</span> flag to turn off hysteresis for <span class="math notranslate nohighlight">\(P_{cap}\)</span> (no effect on <span class="math notranslate nohighlight">\(k_{rl}\)</span> and <span class="math notranslate nohighlight">\(k_{rg}\)</span>; to turn off hysteresis entirely, set <span class="math notranslate nohighlight">\(S_{grmax}\)</span> in <span class="math notranslate nohighlight">\(RP(3)\)</span>).</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>0: hysteresis is on for <span class="math notranslate nohighlight">\(P_{cap}\)</span></p></li>
+<li><p>1: hysteresis is off for <span class="math notranslate nohighlight">\(P_{cap}\)</span> (switch branches of <span class="math notranslate nohighlight">\(P_{cap}\)</span> as usual, but set <span class="math notranslate nohighlight">\(S_{gr} = 0\)</span> in <span class="math notranslate nohighlight">\(P_{cap}\)</span> calculation. Make sure other parameters of <span class="math notranslate nohighlight">\(P_{cap}^d\)</span> and <span class="math notranslate nohighlight">\(P_{cap}^w\)</span> are the same: <span class="math notranslate nohighlight">\(CP(1) = CP(6)\)</span> and <span class="math notranslate nohighlight">\(CP(3) = CP(7)\)</span>)</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><span class="math notranslate nohighlight">\(CP(13) =\)</span> parameter to determine functional form of <span class="math notranslate nohighlight">\(P_{cap}\)</span> extension for <span class="math notranslate nohighlight">\(S_l \lt S_{lmin}\)</span> (i.e., <span class="math notranslate nohighlight">\(P_{cap} \gt P_{max}\)</span>).</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>=0: exponential extension</p></li>
+<li><p>&gt;0: power-law extension with zero slope at <span class="math notranslate nohighlight">\(S_l = 0\)</span> and <span class="math notranslate nohighlight">\(P_{cap} (0) = CP(13)\)</span>. Recommended value: 2 to 5 times <span class="math notranslate nohighlight">\(CP(4) = P_{max}\)</span>. Should not be less than or equal to <span class="math notranslate nohighlight">\(CP(4)\)</span>.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</section>
+<section id="simple-hysteresis-icp-13">
+<h2>Simple Hysteresis (ICP=13)<a class="headerlink" href="#simple-hysteresis-icp-13" title="Link to this heading">#</a></h2>
+<p>An approximate hysteretic formulation based on the simple hysteresis theory of <span id="id11"><a class="reference internal" href="../references.html#id71" title="Patterson, C. G., &amp; Falta, R. W. (2012). A Simple History-Dependent Nonwetting-Phase Trapping Model for the TOUGH Simulators. Illinois State Geological Survey.">Patterson &amp; Falta, 2012</a></span> has been implemented.
+The simple hysteresis model is invoked by setting both <code class="docutils literal notranslate"><span class="pre">IRP</span></code> and <code class="docutils literal notranslate"><span class="pre">ICP</span></code> to 13.
+Currently, this option is only available when ECO2N is being used.</p>
+<p>The capillary pressure is the <span id="id12"><a class="reference internal" href="../references.html#id107" title="Van Genuchten, M. T. (1980). A closed-form equation for predicting the hydraulic conductivity of unsaturated soils. Soil science society of America journal, 44(5), 892–898.">VanGenuchten, 1980</a></span> function</p>
+<div class="math notranslate nohighlight">
+\[P_{cap} = -P_0 \left( \bar{S}_{wn}^{-\frac{1}{m}} - 1 \right)^{1 - m}\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight">
+\[\bar{S}_{wn} = \frac{S_w - S_{wr}}{1 - S_{wr} - S_{nr}}\]</div>
+<p>and <span class="math notranslate nohighlight">\(S_{wr}\)</span> and <span class="math notranslate nohighlight">\(S_{nr}\)</span> are the residual saturations of the wetting phase and the non-wetting phase, respectively, and <span class="math notranslate nohighlight">\(S_{nr}\)</span> is a variable calculated as described in Section <a class="reference internal" href="relative_permeability_functions.html#relative-permeabilty-functions"><span class="std std-ref">Relative Permeability Functions</span></a> for <code class="docutils literal notranslate"><span class="pre">IRP</span></code> = 13.
+If <span class="math notranslate nohighlight">\(\bar{S}_{wn}\)</span> is greater than or equal to one, then the capillary pressure is set to zero.
+For <span class="math notranslate nohighlight">\(S_w \lt S_{wr} + \varepsilon\)</span>, <span class="math notranslate nohighlight">\(P_{cap}\)</span> is a linear extension that smoothly connects to the <span id="id13"><a class="reference internal" href="../references.html#id107" title="Van Genuchten, M. T. (1980). A closed-form equation for predicting the hydraulic conductivity of unsaturated soils. Soil science society of America journal, 44(5), 892–898.">VanGenuchten, 1980</a></span> function and is capped by <span class="math notranslate nohighlight">\(P_{max}\)</span>.</p>
+<p>Parameters:</p>
+<ul>
+<li><p><span class="math notranslate nohighlight">\(CP(1) = m\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(2) = S_{wr}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(3) = \frac{1}{P_0}\)</span> (Pa<sup>-1</sup>)</p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(4)\)</span></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>=0: <span class="math notranslate nohighlight">\(P_{max} = 10^{50}\)</span>, <span class="math notranslate nohighlight">\(\varepsilon = 10^{-5}\)</span></p></li>
+<li><p>&gt;1: <span class="math notranslate nohighlight">\(P_{max} = CP(4)\)</span>, <span class="math notranslate nohighlight">\(\varepsilon = 10^{-5}\)</span></p></li>
+<li><p>&lt;1: <span class="math notranslate nohighlight">\(P_{max} = 10^{50}\)</span>, <span class="math notranslate nohighlight">\(\varepsilon = CP(4)\)</span></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><span class="math notranslate nohighlight">\(CP(5) = S_{ls}\)</span> (recommend 1)</p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(6) = 0\)</span> unless Active Fracture Model is invoked (untested)</p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(7)\)</span></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>&lt;0: <span class="math notranslate nohighlight">\(= -f_{snr}\)</span> in linear trapping model</p></li>
+<li><p>&gt;0: <span class="math notranslate nohighlight">\(S_{nrmax}\)</span> in Land trapping model</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</section>
+<section id="three-phase-functions-of-parker-et-al-icp-31">
+<span id="icp31"></span><h2>Three-Phase Functions of Parker et al. (ICP=31)<a class="headerlink" href="#three-phase-functions-of-parker-et-al-icp-31" title="Link to this heading">#</a></h2>
+<p>After <span id="id14"><a class="reference internal" href="../references.html#id70" title="Parker, J., Lenhard, R., &amp; Kuppusamy, T. (1987). A parametric model for constitutive properties governing multiphase flow in porous media. Water Resources Research, 23(4), 618–624.">Parker et al., 1987</a></span>.</p>
+<div class="math notranslate nohighlight">
+\[P_{cgn} = -\frac{\rho_l g}{\alpha_{gn}} \left( \left( \bar{S}_n \right)^{-\frac{1}{m}} - 1 \right)^{\frac{1}{n}}\]</div>
+<div class="math notranslate nohighlight">
+\[P_{cgl} = -\frac{\rho_l g}{\alpha_{nl}} \left( \left( \bar{S}_l \right)^{-\frac{1}{m}} - 1 \right)^{\frac{1}{n}} - \frac{\rho_l g}{\alpha_{gn}} \left( \left( \bar{S}_n \right)^{-\frac{1}{m}} - 1 \right)^{\frac{1}{n}}\]</div>
+<p>with</p>
+<div class="math notranslate nohighlight">
+\[m = 1 - \frac{1}{n}\]</div>
+<div class="math notranslate nohighlight">
+\[\bar{S}_l = \frac{S_l - S_m}{1 - S_m}\]</div>
+<div class="math notranslate nohighlight">
+\[\bar{S}_n = \frac{S_l + S_n - S_m}{1 - S_m}\]</div>
+<p>Parameters:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(CP(1) = S_m\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(2) = n\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(3) = \alpha_{gn}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(4) = \alpha_{nl}\)</span></p></li>
+</ul>
+<p>These functions have been modified so that the capillary pressures remain finite at low aqueous saturations.
+This is done by calculating the slope of the capillary pressure functions at <span class="math notranslate nohighlight">\(\bar{S}_l\)</span> and <span class="math notranslate nohighlight">\(\bar{S}_n\)</span> = 0.1. If <span class="math notranslate nohighlight">\(\bar{S}_l\)</span> or <span class="math notranslate nohighlight">\(\bar{S}_n\)</span> is less than 0.1, the capillary pressures are calculated as linear functions in this region with slopes equal to those calculated at scaled saturations of 0.1.</p>
+</section>
+<section id="icp-32">
+<h2>ICP=32<a class="headerlink" href="#icp-32" title="Link to this heading">#</a></h2>
+<p>Same as <a class="reference internal" href="#icp31"><span class="std std-ref">Three-Phase Functions of Parker et al. (ICP=31)</span></a>, except that the strength coefficients are directly provided as inputs, rather than being calculated from the parameters <span class="math notranslate nohighlight">\(\alpha_{gn}\)</span> and <span class="math notranslate nohighlight">\(\alpha_{nl}\)</span>.
+The capillary pressure functions are then</p>
+<div class="math notranslate nohighlight">
+\[P_{cgn} = -P_{cgn, 0} \left( \left( \bar{S}_n \right)^{-\frac{1}{m}} - 1 \right)^{\frac{1}{n}}\]</div>
+<div class="math notranslate nohighlight">
+\[P_{cgl} = -P_{cnl, 0} \left( \left( \bar{S}_l \right)^{-\frac{1}{m}} - 1 \right)^{\frac{1}{n}} - P_{cgn, 0} \left( \left( \bar{S}_n \right)^{-\frac{1}{m}} - 1 \right)^{\frac{1}{n}}\]</div>
+<p>Parameters:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(CP(1) = S_m\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(2) = n\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(3) = P_{cgn, 0}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(CP(4) = P_{cnl, 0}\)</span></p></li>
+</ul>
+</section>
+<section id="icp-33">
+<h2>ICP=33<a class="headerlink" href="#icp-33" title="Link to this heading">#</a></h2>
+<p>Same as <a class="reference internal" href="#icp31"><span class="std std-ref">Three-Phase Functions of Parker et al. (ICP=31)</span></a>, except that the capillary pressures are modified for small gas saturations to reduce the derivative.</p>
+<p>If <span class="math notranslate nohighlight">\(S_l + S_n \gt 0.99\)</span></p>
+<div class="math notranslate nohighlight">
+\[P_{cgn} = P_{cgn} \frac{1 - S_l - S_n}{0.01}\]</div>
+<p>If <span class="math notranslate nohighlight">\(S_l \gt 0.99\)</span></p>
+<div class="math notranslate nohighlight">
+\[P_{cnl} = P_{cnl} \frac{1 - S_l}{0.01}\]</div>
+</section>
+<section id="icp-34">
+<h2>ICP=34<a class="headerlink" href="#icp-34" title="Link to this heading">#</a></h2>
+<p>Same as <a class="reference internal" href="#icp31"><span class="std std-ref">Three-Phase Functions of Parker et al. (ICP=31)</span></a>, except that the capillary pressures are smoothened out for small gas saturations.</p>
+<p>If <span class="math notranslate nohighlight">\(S_l + S_n \gt 0.99\)</span></p>
+<div class="math notranslate nohighlight">
+\[P_{cgn} = P_{cgn} \left( -10^6 \left( S_l + S_n - 0.99 \right)^3 + 1 \right)\]</div>
+<p>If <span class="math notranslate nohighlight">\(S_l \gt 0.99\)</span></p>
+<div class="math notranslate nohighlight">
+\[P_{cnl} = P_{cnl} \left( -10^6 \left( S_l - 0.99 \right)^3 + 1 \right)\]</div>
+</section>
+<section id="custom">
+<h2>Custom<a class="headerlink" href="#custom" title="Link to this heading">#</a></h2>
+<p>Additional capillary pressure functions can be programmed into subroutine <em>PCAP</em> in a fashion completely analogous to that for relative permeabilities (see Section <a class="reference internal" href="relative_permeability_functions.html#relative-permeabilty-custom"><span class="std std-ref">Custom Relative Permeability Functions</span></a>).</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="relative_permeability_functions.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Relative Permeability Functions</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../eos/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">EOS</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linear-function-icp-1">Linear Function (ICP=1)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#function-of-pickens-et-al-icp-2">Function of Pickens et al. (ICP=2)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#trust-capillary-pressure-icp-3">TRUST Capillary Pressure (ICP=3)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#milly-s-functions-icp-4">Milly’s Functions (ICP=4)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#leverett-s-function-icp-6">Leverett’s Function (ICP=6)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#van-genuchten-function-icp-7">van Genuchten Function (ICP=7)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#no-capillary-pressure-icp-8">No Capillary Pressure (ICP=8)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modified-brooks-corey-model-icp-10">Modified Brooks-Corey Model (ICP=10)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modified-van-genuchten-model">Modified van Genuchten Model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#regular-hysteresis-icp-12">Regular Hysteresis (ICP=12)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#simple-hysteresis-icp-13">Simple Hysteresis (ICP=13)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#three-phase-functions-of-parker-et-al-icp-31">Three-Phase Functions of Parker et al. (ICP=31)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#icp-32">ICP=32</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#icp-33">ICP=33</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#icp-34">ICP=34</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#custom">Custom</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/tough3/guide/capillary_pressure_functions.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023, Keurfon Luu.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,581 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>EOS3 &#8212; toughio 1.15.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=8fbebee6" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../../_static/documentation_options.js?v=70d5d4a5"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tough3/eos/eos3';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="EOS4" href="eos4.html" />
+    <link rel="prev" title="EOS2" href="eos2.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../_static/logo-light.png" class="logo__image only-light" alt="toughio 1.15.0 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="toughio 1.15.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        TOUGH3
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        TOUGH3
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../install/index.html">Installation</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../install/linux.html">Installation on Linux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../install/windows.html">Installation on Windows</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../guide/index.html">User Guide</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../guide/governing_equations.html">Governing Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guide/numerical_methods.html">Numerical Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guide/initial_and_boundary_conditions.html">Initial and Boundary Conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guide/preparation_of_input_data.html">Preparation of Input Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guide/output_from_tough3.html">Output from TOUGH3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guide/relative_permeability_functions.html">Relative Permeability Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guide/capillary_pressure_functions.html">Capillary Pressure Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">EOS</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="eos1.html">EOS1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos2.html">EOS2</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">EOS3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos4.html">EOS4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos5.html">EOS5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos7.html">EOS7</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos7r.html">EOS7R</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos8.html">EOS8</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos9.html">EOS9</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ewasg.html">EWASG</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eco2n.html">ECO2N</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">TOUGH3</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">EOS</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">EOS3</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="eos3">
+<span id="id1"></span><h1>EOS3<a class="headerlink" href="#eos3" title="Link to this heading">#</a></h1>
+<p>This module is an adaptation of the EOS module of the TOUGH simulator, and implements the same thermophysical properties model (<span id="id2"><a class="reference internal" href="../references.html#id80" title="Pruess, K. (1987). TOUGH user's guide. Lawrence Berkeley National Lab.(LBNL), Berkeley, CA (United States).">Pruess, 1987</a></span>).
+All water properties are represented by the steam table equations as given by the <span id="id3"><a class="reference internal" href="../references.html#id41" title="IFC, A. (1967). Formulation of the thermodynamic properties of ordinary water substance. International Formulation Committee (IFC) Secretariat, Dusseldorf, Germany.">IFC, 1967</a></span>.
+Air is approximated as an ideal gas, and additivity is assumed for air and vapor partial pressures in the gas phase, <span class="math notranslate nohighlight">\(P_g = P_a + P_v\)</span>.
+The viscosity of air-vapor mixtures is computed from a formulation given by <span id="id4"><a class="reference internal" href="../references.html#id40" title="Hirschfelder, J. O., Curtiss, C. F., &amp; Bird, R. B. (1964). Molecular theory of gases and liquids. Molecular theory of gases and liquids.">Hirschfelder et al., 1964</a></span>.
+The solubility of air in liquid water is represented by Henry’s law, as follows.</p>
+<div class="math notranslate nohighlight" id="equation-eq-eos3-1">
+<span class="eqno">(50)<a class="headerlink" href="#equation-eq-eos3-1" title="Link to this equation">#</a></span>\[P_a = K_h x_{aq}^a\]</div>
+<p>where <span class="math notranslate nohighlight">\(K_h\)</span> is Henry’s constant and <span class="math notranslate nohighlight">\(x_{aq}^a\)</span> is air mole fraction in the aqueous phase.
+Henry’s constant for air dissolution in water is a slowly varying function of temperature, varying from 6.7 x 10:<sup>9</sup> Pa at 20˚C to 1.0 x 10<sup>10</sup> Pa at 60˚C and 1.1 x 10<sup>10</sup> Pa at 100˚C (<span id="id5"><a class="reference internal" href="../references.html#id50" title="Loomis, A. (1928). Solubilities of Gases in Water, in: International Critical Tables, Vol. III, E. W. Washburn.">Loomis, 1928</a></span>).
+Because air solubility is small, this kind of variation is not expected to cause significant effects, and a constant <span class="math notranslate nohighlight">\(P_a\)</span> = 10<sup>10</sup> Pa was adopted.</p>
+<section id="specifications">
+<h2>Specifications<a class="headerlink" href="#specifications" title="Link to this heading">#</a></h2>
+<p>A summary of EOS3 specifications and parameters is given in <a class="reference internal" href="#tab-eos3"><span class="std std-numref">Table 69</span></a>.
+The default parameter settings are (<code class="docutils literal notranslate"><span class="pre">NK</span></code>, <code class="docutils literal notranslate"><span class="pre">NEQ</span></code>, <code class="docutils literal notranslate"><span class="pre">NPH</span></code>, <code class="docutils literal notranslate"><span class="pre">NB</span></code>) = (2, 3, 2, 6).
+The option <code class="docutils literal notranslate"><span class="pre">NEQ</span></code> = 2 is available for constant temperature conditions.
+The choice of primary thermodynamic variables is (<span class="math notranslate nohighlight">\(P\)</span>, <span class="math notranslate nohighlight">\(X\)</span>, <span class="math notranslate nohighlight">\(T\)</span>) for single-phase, (<span class="math notranslate nohighlight">\(P_g\)</span>, <span class="math notranslate nohighlight">\(S_g\)</span> + 10, <span class="math notranslate nohighlight">\(T\)</span>) for two-phase conditions.
+The rationale for the seemingly bizarre choice of <span class="math notranslate nohighlight">\(S_g\)</span> + 10 as a primary variable is as follows.
+As an option, we wish to be able to run isothermal two-phase flow problems with the specification <code class="docutils literal notranslate"><span class="pre">NEQ</span></code> = <code class="docutils literal notranslate"><span class="pre">NK</span></code>, so that the then superfluous heat balance equation needs not be engaged.
+This requires that temperature <span class="math notranslate nohighlight">\(T\)</span> be the third primary variable.
+The logical choice of primary variables would then appear to be (<span class="math notranslate nohighlight">\(P\)</span>, <span class="math notranslate nohighlight">\(X\)</span>, <span class="math notranslate nohighlight">\(T\)</span>) for single-phase and (<span class="math notranslate nohighlight">\(P_g\)</span>, <span class="math notranslate nohighlight">\(S_g\)</span>, <span class="math notranslate nohighlight">\(T\)</span>) for two-phase conditions.
+However, both <span class="math notranslate nohighlight">\(X\)</span> and <span class="math notranslate nohighlight">\(S_g\)</span> vary over the range (0, 1), so that this would not allow a distinction of single-phase from two-phase conditions solely from the numerical range of primary variables.
+By taking the second primary variable for two-phase conditions to be <span class="math notranslate nohighlight">\(X2\)</span> = 10 + <span class="math notranslate nohighlight">\(S_g\)</span>, the range of that variable is shifted to the interval (10, 11), and a distinction between single and two-phase conditions can be easily made.
+As a convenience to users, we retain the capability to optionally initialize flow problems with TOUGH-style primary variables by setting <code class="docutils literal notranslate"><span class="pre">MOP(19)</span></code> = 1.
+In TOUGH we have (<span class="math notranslate nohighlight">\(P\)</span>, <span class="math notranslate nohighlight">\(T\)</span>, <span class="math notranslate nohighlight">\(X\)</span>) for single-phase conditions, (<span class="math notranslate nohighlight">\(P_g\)</span>, <span class="math notranslate nohighlight">\(S_g\)</span>, <span class="math notranslate nohighlight">\(T\)</span>) for two-phase conditions.</p>
+<table class="table table-center" id="tab-eos3">
+<caption><span class="caption-number">Table 69 </span><span class="caption-text">Summary of EOS3.</span><a class="headerlink" href="#tab-eos3" title="Link to this table">#</a></caption>
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 75.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Components</p></td>
+<td><div class="line-block">
+<div class="line">#1: water</div>
+<div class="line">#2: air</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>Parameter choices</p></td>
+<td><div class="line-block">
+<div class="line">(<code class="docutils literal notranslate"><span class="pre">NK</span></code>, <code class="docutils literal notranslate"><span class="pre">NEQ</span></code>, <code class="docutils literal notranslate"><span class="pre">NPH</span></code>, <code class="docutils literal notranslate"><span class="pre">NB</span></code>) =</div>
+<div class="line">(2, 3, 2, 6) water and air, nonisothermal (default)</div>
+<div class="line">(2, 2, 2, 6) water and air, isothermal</div>
+<div class="line">Molecular diffusion can be modeled by setting <code class="docutils literal notranslate"><span class="pre">NB</span></code> = 8</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>Primary variables*</p></td>
+<td><div class="line-block">
+<div class="line">Single-phase conditions:</div>
+<div class="line">(<span class="math notranslate nohighlight">\(P\)</span>, <span class="math notranslate nohighlight">\(X\)</span>, <span class="math notranslate nohighlight">\(T\)</span>): (pressure, air mass fraction, temperature)</div>
+<div class="line">Two-phase conditions:</div>
+<div class="line">(<span class="math notranslate nohighlight">\(P_g\)</span>, <span class="math notranslate nohighlight">\(S_g\)</span> + 10, <span class="math notranslate nohighlight">\(T\)</span>): (gas phase pressure, gas saturation plus 10, temperature)</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>* By setting <code class="docutils literal notranslate"><span class="pre">MOP(19)</span></code> = 1, initialization can be made with TOUGH-style variables (<span class="math notranslate nohighlight">\(P\)</span>, <span class="math notranslate nohighlight">\(T\)</span>, <span class="math notranslate nohighlight">\(X\)</span>) for single-phase, (<span class="math notranslate nohighlight">\(P_g\)</span>, <span class="math notranslate nohighlight">\(S_g\)</span>, <span class="math notranslate nohighlight">\(T\)</span>) for two-phase.</p>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="eos2.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">EOS2</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="eos4.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">EOS4</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#specifications">Specifications</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/tough3/eos/eos3.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023, Keurfon Luu.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

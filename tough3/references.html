@@ -1,0 +1,924 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>References &#8212; toughio 1.15.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=8fbebee6" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../_static/documentation_options.js?v=70d5d4a5"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tough3/references';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="ECO2N" href="eos/eco2n.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../_static/logo-light.png" class="logo__image only-light" alt="toughio 1.15.0 documentation - Home"/>
+    <script>document.write(`<img src="../_static/logo.png" class="logo__image only-dark" alt="toughio 1.15.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
+                        TOUGH3
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
+                        TOUGH3
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="install/index.html">Installation</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="install/linux.html">Installation on Linux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install/windows.html">Installation on Windows</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="guide/index.html">User Guide</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="guide/governing_equations.html">Governing Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guide/numerical_methods.html">Numerical Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guide/initial_and_boundary_conditions.html">Initial and Boundary Conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guide/preparation_of_input_data.html">Preparation of Input Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guide/output_from_tough3.html">Output from TOUGH3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guide/relative_permeability_functions.html">Relative Permeability Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guide/capillary_pressure_functions.html">Capillary Pressure Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="eos/index.html">EOS</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="eos/eos1.html">EOS1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos/eos2.html">EOS2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos/eos3.html">EOS3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos/eos4.html">EOS4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos/eos5.html">EOS5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos/eos7.html">EOS7</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos/eos7r.html">EOS7R</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos/eos8.html">EOS8</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos/eos9.html">EOS9</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos/ewasg.html">EWASG</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos/eco2n.html">ECO2N</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">References</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">TOUGH3</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">References</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="references">
+<h1>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h1>
+<div class="docutils container" id="id1">
+<div role="list" class="citation-list">
+<div class="citation" id="id2" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Altunin, 1975<span class="fn-bracket">]</span></span>
+<p>Altunin, V. (1975). <em>Thermophysical properties of carbon dioxide</em>. Wellingborough, Collets.</p>
+</div>
+<div class="citation" id="id3" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Andersen et al., 1992<span class="fn-bracket">]</span></span>
+<p>Andersen, G., Probst, A., Murray, L., &amp; Butler, S. (1992). An accurate pvt model for geothermal fluids as represented by h2o-nacl-co2. <em>Mixtures, Proceedings 17th Workshop on Geothermal Reservoir Engineering</em>.</p>
+</div>
+<div class="citation" id="id4" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Atkinson et al., 1980<span class="fn-bracket">]</span></span>
+<p>Atkinson, P., Celati, R., Corsi, R., &amp; Kucuk, F. (1980). Behavior of the bagnore steam/co2 geothermal reservoir, italy. <em>Society of Petroleum Engineers Journal</em>, <em>20</em>(04), 228–238.</p>
+</div>
+<div class="citation" id="id6" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Aziz &amp; Settari, 1979<span class="fn-bracket">]</span></span>
+<p>Aziz, K., &amp; Settari, A. (1979). Petroleum reservoir simulation. 1979. <em>Applied Science Publ. Ltd., London, UK</em>.</p>
+</div>
+<div class="citation" id="id7" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Balay et al., 2016<span class="fn-bracket">]</span></span>
+<p>Balay, S., Abhyankar, S., Adams, M. F., Brown, J., Brune, P., Buschelman, K., … others. (2016). Petsc users manual (tech. rep. anl-95/11-revision 3.7). <em>Argonne National Laboratory</em>.</p>
+</div>
+<div class="citation" id="id10" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Battistelli, 2012<span class="fn-bracket">]</span></span>
+<p>Battistelli, A. (2012). Improving the treatment of saline brines in ewasg for the simulation of hydrothermal systems. <em>Proceedings of the TOUGH Symposium</em> (pp. 192–200).</p>
+</div>
+<div class="citation" id="id8" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Battistelli et al., 1997<span class="fn-bracket">]</span></span>
+<p>Battistelli, A., Calore, C., &amp; Pruess, K. (1997). The simulator tough2/ewasg for modelling geothermal reservoirs with brines and non-condensible gas. <em>Geothermics</em>, <em>26</em>(4), 437–464.</p>
+</div>
+<div class="citation" id="id11" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Brooks, 1965<span class="fn-bracket">]</span></span>
+<p>Brooks, R. H. (1965). <em>Hydraulic properties of porous media</em>. Colorado State University.</p>
+</div>
+<div class="citation" id="id12" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Carlslaw &amp; Jaeger, 1959<span class="fn-bracket">]</span></span>
+<p>Carlslaw, H., &amp; Jaeger, J. (1959). <em>Conduction of Heat in Solids, Oxford</em>. Oxford University Press.</p>
+</div>
+<div class="citation" id="id13" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Cass et al., 1984<span class="fn-bracket">]</span></span>
+<p>Cass, A., Campbell, G., &amp; Jones, T. (1984). Enhancement of thermal water vapor diffusion in soil. <em>Soil Science Society of America Journal</em>, <em>48</em>(1), 25–32.</p>
+</div>
+<div class="citation" id="id14" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Charbeneau, 2007<span class="fn-bracket">]</span></span>
+<p>Charbeneau, R. (2007). <em>Distribution and Recovery Model (LDRM) Volume 1: Distribution and Recovery of Petroleum Hydrocarbon Liquids in Porous Media</em>. American Petroleum Institute API.</p>
+</div>
+<div class="citation" id="id15" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Coats, 1977<span class="fn-bracket">]</span></span>
+<p>Coats, K. (1977). Geothermal reservoir modelling. <em>SPE Annual Fall Technical Conference and Exhibition</em>.</p>
+</div>
+<div class="citation" id="id16" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Coats &amp; Ramesh, 1982<span class="fn-bracket">]</span></span>
+<p>Coats, K., &amp; Ramesh, A. (1982). <em>Effects of grid type and difference scheme on pattern steamflood simulation results</em>. Intercomp Resource Dev. and Engr. Inc.</p>
+</div>
+<div class="citation" id="id17" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Corey, 1954<span class="fn-bracket">]</span></span>
+<p>Corey, A. T. (1954). The interrelation between gas and oil relative permeabilities. <em>Producers monthly</em>, pp. 38–41.</p>
+</div>
+<div class="citation" id="id18" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Cygan, 1991<span class="fn-bracket">]</span></span>
+<p>Cygan, R. T. (1991). <em>The solubility of gases in NaCl brine and a critical evaluation of available data</em>. Sandia National Laboratories Albuquerque.</p>
+</div>
+<div class="citation" id="id20" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>DeMarsily, 1986<span class="fn-bracket">]</span></span>
+<p>De Marsily, G. (1986). <em>Quantitative hydrogeology</em>. Paris School of Mines, Fontainebleau.</p>
+</div>
+<div class="citation" id="id19" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Dean, 1999<span class="fn-bracket">]</span></span>
+<p>Dean, J. A. (1999). Lange's handbook of chemistry. mcgraw-hill. <em>New York</em>.</p>
+</div>
+<div class="citation" id="id22" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Doughty, 2013<span class="fn-bracket">]</span></span>
+<p>Doughty, C. (2013). <em>User's Guide for Hysteretic Capillary Pressure and Relative Permeability Functions in TOUGH2 Earth Sciences Division Lawrence Berkeley National Laboratory</em>. Lawrence Berkeley National Lab.(LBNL), Berkeley, CA (United States).</p>
+</div>
+<div class="citation" id="id24" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Driesner, 2007<span class="fn-bracket">]</span></span>
+<p>Driesner, T. (2007). The system h2o–nacl. part ii: correlations for molar volume, enthalpy, and isobaric heat capacity from 0 to 1000 c, 1 to 5000 bar, and 0 to 1 xnacl. <em>Geochimica et Cosmochimica Acta</em>, <em>71</em>(20), 4902–4919.</p>
+</div>
+<div class="citation" id="id23" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Driesner &amp; Heinrich, 2007<span class="fn-bracket">]</span></span>
+<p>Driesner, T., &amp; Heinrich, C. A. (2007). The system h2o–nacl. part i: correlation formulae for phase relations in temperature–pressure–composition space from 0 to 1000 c, 0 to 5000 bar, and 0 to 1 xnacl. <em>Geochimica et Cosmochimica Acta</em>, <em>71</em>(20), 4880–4901.</p>
+</div>
+<div class="citation" id="id25" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Edlefsen et al., 1943<span class="fn-bracket">]</span></span>
+<p>Edlefsen, N., Anderson, A., &amp; others. (1943). Thermodynamics of soil moisture. <em>Hilgardia</em>, <em>15</em>(2), 31–298.</p>
+</div>
+<div class="citation" id="id27" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Evans, 1982<span class="fn-bracket">]</span></span>
+<p>Evans, R. (1982). <em>The atomic nucleus. Reprint edition</em>.</p>
+</div>
+<div class="citation" id="id28" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Fatt &amp; Klikoff, 1959<span class="fn-bracket">]</span></span>
+<p>Fatt, I., &amp; Klikoff, W. A. (1959). Effect of fractional wettability on multiphase flow through porous media. <em>Journal of Petroleum Technology</em>, <em>11</em>(10), 71–76.</p>
+</div>
+<div class="citation" id="id29" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Faust, 1985<span class="fn-bracket">]</span></span>
+<p>Faust, C. R. (1985). Transport of immiscible fluids within and below the unsaturated zone: a numerical model. <em>Water Resources Research</em>, <em>21</em>(4), 587–596.</p>
+</div>
+<div class="citation" id="id30" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Finley &amp; Reeves, 1982<span class="fn-bracket">]</span></span>
+<p>Finley, N., &amp; Reeves, M. (1982). Swift self-teaching curriculum. <em>Report SAND81-0410, Sandia National Laboratory, Albuquerque, NM</em>.</p>
+</div>
+<div class="citation" id="id31" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Garcia, 2001<span class="fn-bracket">]</span></span>
+<p>Garcia, J. E. (2001). <em>Density of aqueous solutions of CO2</em>. Lawrence Berkeley National Lab.(LBNL), Berkeley, CA (United States).</p>
+</div>
+<div class="citation" id="id32" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Garcia, 2003<span class="fn-bracket">]</span></span>
+<p>Garcia, J. E. (2003). <em>Fluid dynamics of carbon dioxide disposal into saline aquifers</em>. University of California, Berkeley.</p>
+</div>
+<div class="citation" id="id33" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Ghezzehei et al., 2004<span class="fn-bracket">]</span></span>
+<p>Ghezzehei, T., Trautz, R., Finsterle, S., Cook, P., &amp; Ahlers, C. (2004). Modeling coupled evaporation and seepage in ventilated cavities. <em>Vadose Zone Journal</em>, <em>3</em>(3), 806–818.</p>
+</div>
+<div class="citation" id="id34" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Grant, 1977<span class="fn-bracket">]</span></span>
+<p>Grant, M. (1977). Permeability reduction factors at wairakei, paper present at aiche asme heat transfer conference. <em>Am. Inst. of Chem. Eng., Am. Soc. of Mech. Eng., Salt Lake City, Utah, 1977</em>.</p>
+</div>
+<div class="citation" id="id37" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Haas, 1976<span class="fn-bracket">]</span></span>
+<p>Haas, J. L. (1976). Physical properties of the coexisting phases and thermochemical properties of the h2o component in boiling nacl solutions. <em>USGS Bulletin</em>.</p>
+</div>
+<div class="citation" id="id35" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Hadgu, 1990<span class="fn-bracket">]</span></span>
+<p>Hadgu, T. (1990). A multi-purpose wellbore simulator. <em>Geothermal Research Council. Trans.</em>, <em>14</em>, 1279–1286.</p>
+</div>
+<div class="citation" id="id36" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Hadgu et al., 1995<span class="fn-bracket">]</span></span>
+<p>Hadgu, T., Zimmerman, R. W., &amp; Bodvarsson, G. S. (1995). Coupled reservoir-wellbore simulation of geothermal reservoir behavior. <em>Geothermics</em>, <em>24</em>(2), 145–166.</p>
+</div>
+<div class="citation" id="id38" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Herbert et al., 1988<span class="fn-bracket">]</span></span>
+<p>Herbert, A., Jackson, C., &amp; Lever, D. (1988). Coupled groundwater flow and solute transport with fluid density strongly dependent upon concentration. <em>Water Resources Research</em>, <em>24</em>(10), 1781–1795.</p>
+</div>
+<div class="citation" id="id39" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Himmelblau, 1959<span class="fn-bracket">]</span></span>
+<p>Himmelblau, D. (1959). Partial molar heats and entropies of solution for gases dissolved in water from the freezing to near the critical point. <em>The Journal of Physical Chemistry</em>, <em>63</em>(11), 1803–1808.</p>
+</div>
+<div class="citation" id="id40" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Hirschfelder et al., 1964<span class="fn-bracket">]</span></span>
+<p>Hirschfelder, J. O., Curtiss, C. F., &amp; Bird, R. B. (1964). Molecular theory of gases and liquids. <em>Molecular theory of gases and liquids</em>.</p>
+</div>
+<div class="citation" id="id41" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>IFC, 1967<span class="fn-bracket">]</span></span>
+<p>IFC, A. (1967). Formulation of the thermodynamic properties of ordinary water substance. <em>International Formulation Committee (IFC) Secretariat, Dusseldorf, Germany</em>.</p>
+</div>
+<div class="citation" id="id43" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Klinkenberg, 1941<span class="fn-bracket">]</span></span>
+<p>Klinkenberg, L. (1941). The permeability of porous media to liquids and gases. <em>Am. Petrol. Inst., Drilling and Production Practice</em>, <em>2</em>, 200–213.</p>
+</div>
+<div class="citation" id="id45" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Lam et al., 1988<span class="fn-bracket">]</span></span>
+<p>Lam, S., Hunsbedt, A., Kruger, P., &amp; Pruess, K. (1988). Analysis of the stanford geothermal reservoir model experiments using the lbl reservoir simulator. <em>Geothermics</em>, <em>17</em>(4), 595–605.</p>
+</div>
+<div class="citation" id="id46" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Land, 1968<span class="fn-bracket">]</span></span>
+<p>Land, C. S. (1968). Calculation of imbibition relative permeability for two-and three-phase flow from rock properties. <em>Society of Petroleum Engineers Journal</em>, <em>8</em>(02), 149–156.</p>
+</div>
+<div class="citation" id="id47" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Lenhard &amp; Parker, 1987<span class="fn-bracket">]</span></span>
+<p>Lenhard, R., &amp; Parker, J. (1987). A model for hysteretic constitutive relations governing multiphase flow: 2. permeability-saturation relations. <em>Water Resources Research</em>, <em>23</em>(12), 2197–2206.</p>
+</div>
+<div class="citation" id="id48" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Leverett, 1941<span class="fn-bracket">]</span></span>
+<p>Leverett, M. (1941). Capillary behavior in porous solids. <em>Transactions of the AIME</em>, <em>142</em>(01), 152–169.</p>
+</div>
+<div class="citation" id="id50" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Loomis, 1928<span class="fn-bracket">]</span></span>
+<p>Loomis, A. (1928). <em>Solubilities of Gases in Water, in: International Critical Tables, Vol. III, E. W. Washburn</em>.</p>
+</div>
+<div class="citation" id="id51" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Lorenz et al., 2000<span class="fn-bracket">]</span></span>
+<p>Lorenz, S., Maric, D., &amp; Rirschl, C. (2000). Eine analytische funktion zur bestimmung der enthalpie wässriger nacl lösungen, draft report. <em>Institut für Sicherheitstechnologie, Köln, Germany</em>.</p>
+</div>
+<div class="citation" id="id52" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Luckner et al., 1989<span class="fn-bracket">]</span></span>
+<p>Luckner, L., Van Genuchten, M. T., &amp; Nielsen, D. (1989). A consistent set of parametric models for the two-phase flow of immiscible fluids in the subsurface. <em>Water Resources Research</em>, <em>25</em>(10), 2187–2193.</p>
+</div>
+<div class="citation" id="id53" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Mason &amp; AP, 1983<span class="fn-bracket">]</span></span>
+<p>Mason, E. A., &amp; AP, M. (1983). <em>Gas transportin porous media: the dusty-gas model</em>. Elsevier.</p>
+</div>
+<div class="citation" id="id54" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Millington &amp; Quirk, 1961<span class="fn-bracket">]</span></span>
+<p>Millington, R., &amp; Quirk, J. (1961). Permeability of porous solids. <em>Transactions of the Faraday Society</em>, <em>57</em>, 1200–1207.</p>
+</div>
+<div class="citation" id="id56" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Moridis, 1992<span class="fn-bracket">]</span></span>
+<p>Moridis, G. J. (1992). <em>TOUGH Simulations of the Updegraff's Set of Fluid and Heat Flow Problems</em>. Lawrence Berkeley National Lab.(LBNL), Berkeley, CA (United States).</p>
+</div>
+<div class="citation" id="id57" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Moridis &amp; Pruess, 1995<span class="fn-bracket">]</span></span>
+<p>Moridis, G. J., &amp; Pruess, K. (1995). <em>Flow and transport simulations using T2CG1, a package of conjugate gradient solvers for the TOUGH2 family of codes</em>. Lawrence Berkeley National Lab.(LBNL), Berkeley, CA (United States).</p>
+</div>
+<div class="citation" id="id58" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Moridis &amp; Pruess, 1998<span class="fn-bracket">]</span></span>
+<p>Moridis, G. J., &amp; Pruess, K. (1998). T2solv: an enhanced package of solvers for the tough2 family of reservoir simulation codes. <em>Geothermics</em>, <em>27</em>(4), 415–444.</p>
+</div>
+<div class="citation" id="id59" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Mualem, 1976<span class="fn-bracket">]</span></span>
+<p>Mualem, Y. (1976). A new model for predicting the hydraulic conductivity of unsaturated porous media. <em>Water resources research</em>, <em>12</em>(3), 513–522.</p>
+</div>
+<div class="citation" id="id60" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Murray, 1993<span class="fn-bracket">]</span></span>
+<p>Murray, L. (1993). Toward integrating geothermal reservoir and wellbore simulation: tetrad and wellsim. <em>Proceedings of the 15th New Zealand Geothermal Workshop 1993</em>.</p>
+</div>
+<div class="citation" id="id62" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Narasimhan &amp; Witherspoon, 1978<span class="fn-bracket">]</span></span>
+<p>Narasimhan, T. N., &amp; Witherspoon, P. (1978). Numerical model for saturated-unsaturated flow in deformable porous media: 3. applications. <em>Water Resources Research</em>, <em>14</em>(6), 1017–1034.</p>
+</div>
+<div class="citation" id="id61" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Narasimhan &amp; Witherspoon, 1976<span class="fn-bracket">]</span></span>
+<p>Narasimhan, T., &amp; Witherspoon, P. (1976). An integrated finite difference method for analyzing fluid flow in porous media. <em>Water Resources Research</em>, <em>12</em>(1), 57–64.</p>
+</div>
+<div class="citation" id="id66" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>OSullivan et al., 1985<span class="fn-bracket">]</span></span>
+<p>O'Sullivan, M., Bodvarsson, G., Pruess, K., &amp; Blakeley, M. (1985). Fluid and heat flow in gas-rich geothermal reservoirs. <em>Society of Petroleum Engineers Journal</em>, <em>25</em>(02), 215–226.</p>
+</div>
+<div class="citation" id="id65" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Oldenburg, 2015<span class="fn-bracket">]</span></span>
+<p>Oldenburg, C. M. (2015). <em>EOS7CA Version 1.0: TOUGH2 module for gas migration in shallow subsurface porous media systems</em>. Lawrence Berkeley National Lab.(LBNL), Berkeley, CA (United States).</p>
+</div>
+<div class="citation" id="id64" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Oldenburg et al., 2004<span class="fn-bracket">]</span></span>
+<p>Oldenburg, C. M., Moridis, G. J., Spycher, N., &amp; Pruess, K. (2004). <em>EOS7C Version 1.0: TOUGH2 Module for Carbon Dioxide or Nitrogen inNatural Gas (Methane) Reservoirs</em>. Lawrence Berkeley National Lab.(LBNL), Berkeley, CA (United States).</p>
+</div>
+<div class="citation" id="id63" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Oldenburg &amp; Pruess, 1995<span class="fn-bracket">]</span></span>
+<p>Oldenburg, C. M., &amp; Pruess, K. (1995). <em>EOS7R: Radionuclide transport for TOUGH2</em>. Lawrence Berkeley National Lab.(LBNL), Berkeley, CA (United States).</p>
+</div>
+<div class="citation" id="id67" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Pan &amp; Oldenburg, 2014<span class="fn-bracket">]</span></span>
+<p>Pan, L., &amp; Oldenburg, C. M. (2014). T2well—an integrated wellbore–reservoir simulator. <em>Computers &amp; Geosciences</em>, <em>65</em>, 46–55.</p>
+</div>
+<div class="citation" id="id68" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Pan et al., 2015<span class="fn-bracket">]</span></span>
+<p>Pan, L., Spycher, N., Doughty, C., &amp; Pruess, K. (2015). Eco2n v2. 0: a tough2 fluid property module for mixtures of water, nacl, and co2. <em>Scientific report LBNL-6930E</em>.</p>
+</div>
+<div class="citation" id="id69" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Parker &amp; Lenhard, 1987<span class="fn-bracket">]</span></span>
+<p>Parker, J., &amp; Lenhard, R. (1987). A model for hysteretic constitutive relations governing multiphase flow: 1. saturation-pressure relations. <em>Water Resources Research</em>, <em>23</em>(12), 2187–2196.</p>
+</div>
+<div class="citation" id="id70" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Parker et al., 1987<span class="fn-bracket">]</span></span>
+<p>Parker, J., Lenhard, R., &amp; Kuppusamy, T. (1987). A parametric model for constitutive properties governing multiphase flow in porous media. <em>Water Resources Research</em>, <em>23</em>(4), 618–624.</p>
+</div>
+<div class="citation" id="id71" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Patterson &amp; Falta, 2012<span class="fn-bracket">]</span></span>
+<p>Patterson, C. G., &amp; Falta, R. W. (2012). <em>A Simple History-Dependent Nonwetting-Phase Trapping Model for the TOUGH Simulators</em>. Illinois State Geological Survey.</p>
+</div>
+<div class="citation" id="id72" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Peaceman, 2000<span class="fn-bracket">]</span></span>
+<p>Peaceman, D. W. (2000). <em>Fundamentals of numerical reservoir simulation</em>. Elsevier.</p>
+</div>
+<div class="citation" id="id74" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Phillips, 1981<span class="fn-bracket">]</span></span>
+<p>Phillips, S. (1981). <em>A technical databook for geothermal energy utilization</em>. Lawrence Berkeley National Lab.(LBNL), Berkeley, CA (United States).</p>
+</div>
+<div class="citation" id="id75" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Pickens et al., 1979<span class="fn-bracket">]</span></span>
+<p>Pickens, J. F., Gillham, R. W., &amp; Cameron, D. R. (1979). Finite-element analysis of the transport of water and solutes in title-drained soils. <em>Journal of Hydrology</em>, <em>40</em>(3-4), 243–264.</p>
+</div>
+<div class="citation" id="id76" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Potter &amp; Brown, 1977<span class="fn-bracket">]</span></span>
+<p>Potter, J., &amp; Brown, D. L. (1977). The volumetric properties of aqueous sodium chloride solutions. <em>US Geological Survey, Bulletin</em>.</p>
+</div>
+<div class="citation" id="id77" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Prausnitz et al., 1998<span class="fn-bracket">]</span></span>
+<p>Prausnitz, J. M., Lichtenthaler, R. N., &amp; De Azevedo, E. G. (1998). <em>Molecular thermodynamics of fluid-phase equilibria</em>. Pearson Education.</p>
+</div>
+<div class="citation" id="id78" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Pritchett et al., 1981<span class="fn-bracket">]</span></span>
+<p>Pritchett, J., Rice, M., &amp; Riney, T. (1981). <em>Baca geothermal demonstration project. Equation-of-state for water-carbon dioxide mixtures: Implications for Baca reservoir</em>. Systems, Science and Software, La Jolla, CA (USA).</p>
+</div>
+<div class="citation" id="id81" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Pruess, 1991<span class="fn-bracket">]</span></span>
+<p>Pruess, K. (1991). <em>TOUGH2: A general-purpose numerical simulator for multiphase nonisothermal flows</em>. Lawrence Berkeley National Lab.(LBNL), Berkeley, CA (United States).</p>
+</div>
+<div class="citation" id="id79" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Pruess, 1983<span class="fn-bracket">]</span></span>
+<p>Pruess, K. (1983). <em>GMINC: A mesh generator for flow simulations in fractured reservoirs</em>. Lawrence Berkeley Lab., CA (USA).</p>
+</div>
+<div class="citation" id="id80" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Pruess, 1987<span class="fn-bracket">]</span></span>
+<p>Pruess, K. (1987). <em>TOUGH user's guide</em>. Lawrence Berkeley National Lab.(LBNL), Berkeley, CA (United States).</p>
+</div>
+<div class="citation" id="id84" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Pruess, 2004<span class="fn-bracket">]</span></span>
+<p>Pruess, K. (2004). The tough codes—a family of simulation tools for multiphase flow and transport processes in permeable media. <em>Vadose zone journal</em>, <em>3</em>(3), 738–746.</p>
+</div>
+<div class="citation" id="id85" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Pruess, 2005<span class="fn-bracket">]</span></span>
+<p>Pruess, K. (2005). <em>ECO2N: A TOUGH2 fluid property module for mixtures of water, NaCl, and CO2</em>. eScholarship, University of California.</p>
+</div>
+<div class="citation" id="id83" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Pruess, 2011<span class="fn-bracket">]</span></span>
+<p>Pruess, K. (2011). <em>ECO2M: a TOUGH2 fluid property module for mixtures of water, NaCl, and CO2, including super-and sub-critical conditions, and phase change between liquid and gaseous CO2</em>. Lawrence Berkeley National Lab.(LBNL), Berkeley, CA (United States).</p>
+</div>
+<div class="citation" id="id89" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Pruess &amp; Battistelli, 2002<span class="fn-bracket">]</span></span>
+<p>Pruess, K., &amp; Battistelli, A. (2002). <em>TMVOC, a numerical simulator for three-phase non-isothermal flows of multicomponent hydrocarbon mixtures in saturated-unsaturated heterogeneous media</em>. Lawrence Berkeley National Lab.(LBNL), Berkeley, CA (United States).</p>
+</div>
+<div class="citation" id="id87" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Pruess &amp; Bodvarsson, 1983<span class="fn-bracket">]</span></span>
+<p>Pruess, K., &amp; Bodvarsson, F. (1983). A seven-point finite difference method for improved grid orientation performance in pattern steamfloods. <em>SPE Reservoir Simulation Symposium</em>.</p>
+</div>
+<div class="citation" id="id90" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Pruess et al., 2002<span class="fn-bracket">]</span></span>
+<p>Pruess, K., Garcia, J., Kovscek, T., Oldenburg, C., Rutqvist, J., Steefel, C., &amp; Xu, T. (2002). <em>Intercomparison of numerical simulation codes for geologic disposal of CO2</em>. Lawrence Berkeley National Lab.(LBNL), Berkeley, CA (United States).</p>
+</div>
+<div class="citation" id="id86" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Pruess &amp; Narasimhan, 1982<span class="fn-bracket">]</span></span>
+<p>Pruess, K., &amp; Narasimhan, T. (1982). On fluid reserves and the production of superheated steam from fractured, vapor-dominated geothermal reservoirs. <em>Journal of Geophysical Research: Solid Earth</em>, <em>87</em>(B11), 9329–9339.</p>
+</div>
+<div class="citation" id="id88" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Pruess &amp; Narasimhan, 1985<span class="fn-bracket">]</span></span>
+<p>Pruess, K., &amp; Narasimhan, T. (1985). A practical method for modeling fluid and heat flow in fractured porous media. <em>Society of Petroleum Engineers Journal</em>, <em>25</em>(01), 14–26.</p>
+</div>
+<div class="citation" id="id82" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Pruess et al., 1999<span class="fn-bracket">]</span></span>
+<p>Pruess, K., Oldenburg, C. M., &amp; Moridis, G. (1999). <em>TOUGH2 user's guide version 2</em>. Lawrence Berkeley National Lab.(LBNL), Berkeley, CA (United States).</p>
+</div>
+<div class="citation" id="id92" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Reeves et al., 1986<span class="fn-bracket">]</span></span>
+<p>Reeves, M., Ward, D., Johns, N., &amp; Cranwell, R. (1986). Theory and implementation of swift ii, the sandia waste-isolation flow and transport model for fractured media. <em>Rep. SAND83-1159. Sandia Natl Lab., Albuquerque, NM</em>.</p>
+</div>
+<div class="citation" id="id93" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Richards, 1931<span class="fn-bracket">]</span></span>
+<p>Richards, L. A. (1931). Capillary conduction of liquids through porous mediums. <em>Physics</em>, <em>1</em>(5), 318–333.</p>
+</div>
+<div class="citation" id="id94" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Sleijpen &amp; Fokkema, 1993<span class="fn-bracket">]</span></span>
+<p>Sleijpen, G. L., &amp; Fokkema, D. R. (1993). Bicgstab (ell) for linear equations involving unsymmetric matrices with complex spectrum. <em>Electronic Transactions on Numerical Analysis.</em>, <em>1</em>, 11–32.</p>
+</div>
+<div class="citation" id="id95" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Span &amp; Wagner, 1996<span class="fn-bracket">]</span></span>
+<p>Span, R., &amp; Wagner, W. (1996). A new equation of state for carbon dioxide covering the fluid region from the triple-point temperature to 1100 k at pressures up to 800 mpa. <em>Journal of physical and chemical reference data</em>, <em>25</em>(6), 1509–1596.</p>
+</div>
+<div class="citation" id="id98" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Spycher &amp; Pruess, 2005<span class="fn-bracket">]</span></span>
+<p>Spycher, N., &amp; Pruess, K. (2005). Co2-h2o mixtures in the geological sequestration of co2. ii. partitioning in chloride brines at 12–100 c and up to 600 bar. <em>Geochimica et Cosmochimica Acta</em>, <em>69</em>(13), 3309–3320.</p>
+</div>
+<div class="citation" id="id97" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Spycher et al., 2003<span class="fn-bracket">]</span></span>
+<p>Spycher, N., Pruess, K., &amp; Ennis-King, J. (2003). Co2-h2o mixtures in the geological sequestration of co2. i. assessment and calculation of mutual solubilities from 12 to 100 c and up to 600 bar. <em>Geochimica et cosmochimica acta</em>, <em>67</em>(16), 3015–3031.</p>
+</div>
+<div class="citation" id="id96" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Spycher &amp; Reed, 1988<span class="fn-bracket">]</span></span>
+<p>Spycher, N. F., &amp; Reed, M. H. (1988). Fugacity coefficients of h2, co2, ch4, h2o and of h2o-co2-ch4 mixtures: a virial equation treatment for moderate pressures and temperatures applicable to calculations of hydrothermal boiling. <em>Geochimica et Cosmochimica Acta</em>, <em>52</em>(3), 739–749.</p>
+</div>
+<div class="citation" id="id100" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Stone, 1970<span class="fn-bracket">]</span></span>
+<p>Stone, H. (1970). Probability model for estimating three-phase relative permeability. <em>Journal of petroleum technology</em>, <em>22</em>(02), 214–218.</p>
+</div>
+<div class="citation" id="id101" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Sutton &amp; McNabb, 1977<span class="fn-bracket">]</span></span>
+<p>Sutton, F., &amp; McNabb, A. (1977). <em>Boiling Curves at Broadlands Field, New Zealand</em>. CNRS.</p>
+</div>
+<div class="citation" id="id103" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Tsang &amp; Pruess, 1990<span class="fn-bracket">]</span></span>
+<p>Tsang, Y., &amp; Pruess, K. (1990). <em>Further modeling studies of gas movement and moisture migration at Yucca Mountain, Nevada</em>. Lawrence Berkeley National Lab.(LBNL), Berkeley, CA (United States).</p>
+</div>
+<div class="citation" id="id104" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Tuminaro et al., 1999<span class="fn-bracket">]</span></span>
+<p>Tuminaro, R. S., Heroux, M., Hutchinson, S. A., &amp; Shadid, J. N. (1999). Official aztec user's guide: version 2.1. <em>Sandia National Laboratories, Albuquerque, NM</em>, <em>87185</em>.</p>
+</div>
+<div class="citation" id="id105" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Udell, 1985<span class="fn-bracket">]</span></span>
+<p>Udell, K. S. (1985). Heat transfer in porous media considering phase change and capillarity—the heat pipe effect. <em>International Journal of Heat and Mass Transfer</em>, <em>28</em>(2), 485–495.</p>
+</div>
+<div class="citation" id="id106" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Vorst, 1992<span class="fn-bracket">]</span></span>
+<p>van der Vorst, H. (1992). Bi-cgstab: a fast and smoothly converging variant of bicg in the presence of rounding errors. <em>SIAM J. Sci. Statist. Comput</em>, <em>13</em>, 631–644.</p>
+</div>
+<div class="citation" id="id107" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>VanGenuchten, 1980<span class="fn-bracket">]</span></span>
+<p>Van Genuchten, M. T. (1980). A closed-form equation for predicting the hydraulic conductivity of unsaturated soils. <em>Soil science society of America journal</em>, <em>44</em>(5), 892–898.</p>
+</div>
+<div class="citation" id="id108" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Vargaftik, 1975<span class="fn-bracket">]</span></span>
+<p>Vargaftik, N. B. (1975). <em>Tables on the thermophysical properties of liquids and gases</em>. Hemisphere Pub. Corp.</p>
+</div>
+<div class="citation" id="id109" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Vaughn, 1987<span class="fn-bracket">]</span></span>
+<p>Vaughn, P. (1987). Analysis of permeability reduction during flow of heated, aqueous fluid through westerly granite. <em>Coupled processes associated with nuclear waste repositories</em>.</p>
+</div>
+<div class="citation" id="id111" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Verma &amp; Pruess, 1988<span class="fn-bracket">]</span></span>
+<p>Verma, A., &amp; Pruess, K. (1988). Thermohydrological conditions and silica redistribution near high-level nuclear wastes emplaced in saturated geological formations. <em>Journal of Geophysical Research: Solid Earth</em>, <em>93</em>(B2), 1159–1173.</p>
+</div>
+<div class="citation" id="id110" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Verma, 1985<span class="fn-bracket">]</span></span>
+<p>Verma, A. (1985). <em>A study of two-phase concurrent flow of steam and water in an unconsolidated porous medium</em>. Lawrence Berkeley National Lab.(LBNL), Berkeley, CA (United States).</p>
+</div>
+<div class="citation" id="id112" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Vinsome &amp; Westerveld, 1980<span class="fn-bracket">]</span></span>
+<p>Vinsome, P., &amp; Westerveld, J. (1980). A simple method for predicting cap and base rock heat losses in'thermal reservoir simulators. <em>Journal of Canadian Petroleum Technology</em>, <em>19</em>(03).</p>
+</div>
+<div class="citation" id="id113" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Walker et al., 1981<span class="fn-bracket">]</span></span>
+<p>Walker, W. R., Sabey, J. D., &amp; Hampton, D. R. (1981). <em>Studies of heat transfer and water migration in soils. Final report</em>. Colorado State Univ., Fort Collins (USA). Solar Energy Applications Lab.</p>
+</div>
+<div class="citation" id="id114" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Warren &amp; Root, 1963<span class="fn-bracket">]</span></span>
+<p>Warren, J., &amp; Root, P. J. (1963). The behavior of naturally fractured reservoirs. <em>Society of Petroleum Engineers Journal</em>, <em>3</em>(03), 245–255.</p>
+</div>
+<div class="citation" id="id116" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Webb &amp; Ho, 1998a<span class="fn-bracket">]</span></span>
+<p>Webb, S. W., &amp; Ho, C. K. (1998). <em>Review of enhanced vapor diffusion in porous media</em>. Sandia National Lab.(SNL-NM), Albuquerque, NM (United States).</p>
+</div>
+<div class="citation" id="id117" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Webb &amp; Ho, 1998b<span class="fn-bracket">]</span></span>
+<p>Webb, S., &amp; Ho, C. (1998). Enhanced vapor diffusion in porous media-ldrd final report. <em>Sandia National Laboratories Report SAND98-2772, Albuquerque, NM</em>.</p>
+</div>
+<div class="citation" id="id118" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Wu et al., 1993<span class="fn-bracket">]</span></span>
+<p>Wu, Y.-S., Pruess, K., &amp; Chen, Z. (1993). Buckley-leverett flow in composite porous media. <em>SPE Advanced Technology Series</em>, <em>1</em>(02), 36–42.</p>
+</div>
+<div class="citation" id="id119" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Yanosik &amp; McCracken, 1979<span class="fn-bracket">]</span></span>
+<p>Yanosik, J., &amp; McCracken, T. (1979). A nine-point, finite-difference reservoir simulator for realistic prediction of adverse mobility ratio displacements. <em>Society of Petroleum Engineers Journal</em>, <em>19</em>(04), 253–262.</p>
+</div>
+<div class="citation" id="id120" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Zhang et al., 2008<span class="fn-bracket">]</span></span>
+<p>Zhang, K., Wu, Y.-S., Pruess, K., &amp; others (2008). <em>User's guide for TOUGH2-MP-a massively parallel version of the TOUGH2 code</em>. Ernest Orlando Lawrence Berkeley National Laboratory.</p>
+</div>
+<div class="citation" id="id121" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Zhang et al., 2011<span class="fn-bracket">]</span></span>
+<p>Zhang, Y., Pan, L., Pruess, K., &amp; Finsterle, S. (2011). A time-convolution approach for modeling heat exchange between a wellbore and surrounding formation. <em>Geothermics</em>, <em>40</em>(4), 261–266.</p>
+</div>
+</div>
+</div>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="eos/eco2n.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">ECO2N</p>
+      </div>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/tough3/references.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023, Keurfon Luu.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

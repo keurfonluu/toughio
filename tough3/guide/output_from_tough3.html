@@ -1,0 +1,707 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Output from TOUGH3 &#8212; toughio 1.15.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=8fbebee6" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../../_static/documentation_options.js?v=70d5d4a5"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tough3/guide/output_from_tough3';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Relative Permeability Functions" href="relative_permeability_functions.html" />
+    <link rel="prev" title="Preparation of Input Data" href="preparation_of_input_data.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../_static/logo-light.png" class="logo__image only-light" alt="toughio 1.15.0 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="toughio 1.15.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        TOUGH3
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        TOUGH3
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../install/index.html">Installation</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../install/linux.html">Installation on Linux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../install/windows.html">Installation on Windows</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">User Guide</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="governing_equations.html">Governing Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="numerical_methods.html">Numerical Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="initial_and_boundary_conditions.html">Initial and Boundary Conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="preparation_of_input_data.html">Preparation of Input Data</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Output from TOUGH3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="relative_permeability_functions.html">Relative Permeability Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capillary_pressure_functions.html">Capillary Pressure Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../eos/index.html">EOS</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos1.html">EOS1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos2.html">EOS2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos3.html">EOS3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos4.html">EOS4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos5.html">EOS5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos7.html">EOS7</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos7r.html">EOS7R</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos8.html">EOS8</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos9.html">EOS9</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/ewasg.html">EWASG</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eco2n.html">ECO2N</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">TOUGH3</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">User Guide</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Output from TOUGH3</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="output-from-tough3">
+<span id="id1"></span><h1>Output from TOUGH3<a class="headerlink" href="#output-from-tough3" title="Link to this heading">#</a></h1>
+<p>TOUGH3 produces a variety of printed output, most of which can be controlled by the user.
+In the initialization phase TOUGH3 writes out dimensions of problem-size dependent arrays and disk files in use to the standard output file (OUTPUT).
+This is followed by documentation on block-by-block permeability modification, on settings of the <code class="docutils literal notranslate"><span class="pre">MOP</span></code>- and <code class="docutils literal notranslate"><span class="pre">MOP2</span></code>-parameters for choosing program options, and on the EOS-module.
+During execution TOUGH3 can optionally generate a brief printout for Newtonian iterations and time steps.
+The file <em>OUTPUT</em> also includes the volume- and mass-balances at each specified printout times or time step.</p>
+<p>TOUGH3 generates a pre-defined selection of element, connection, or generation variables based on <code class="docutils literal notranslate"><span class="pre">KDATA</span></code> in block <strong>PARAM</strong> (see Table 9).
+The list is not EOS-specific, except biomass, which will be included when simulating biodegradation reactions using TMVOC.
+Separate output files in the selected format (either CSV for positive <code class="docutils literal notranslate"><span class="pre">KDATA</span></code> or TECPLOT for negative <code class="docutils literal notranslate"><span class="pre">KDATA</span></code>) will be generated for element-, connection-, and sinks/sources-related outputs at user-specified simulation times in block <strong>TIMES</strong> or time step frequencies in block <strong>PARAM</strong>.</p>
+<p>TOUGH3 allows the user to select the output variables to be printed using block <strong>OUTPU</strong>.
+The user can choose any number of element-, connection-, and generation-related output variables.
+A lumped set of primary variables or secondary parameters can be selected, and other information, such as grid-block or connection coordinates, index of elements, connection, or sinks/sources, and element names, can be included as well.
+The list of the output variables is shown in <a class="reference internal" href="preparation_of_input_data.html#tab-8"><span class="std std-numref">Table 50</span></a> in Section <a class="reference internal" href="preparation_of_input_data.html#tough3-input-format"><span class="std std-ref">TOUGH3 Input Format</span></a>. The header and unit of variables/parameters selected for printout will be generated accordingly.
+An example <strong>OUTPU</strong> block is shown in <a class="reference internal" href="#figure-11"><span class="std std-numref">Listing 5</span></a>; excerpts of resulting output files for element-, connection- and generation-related output variables are shown in <a class="reference internal" href="#figure-12"><span class="std std-numref">Listing 6</span></a>, <a class="reference internal" href="#figure-13"><span class="std std-numref">Listing 7</span></a> and <a class="reference internal" href="#figure-14"><span class="std std-numref">Listing 8</span></a>, respectively.</p>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-number">Listing 4 </span><span class="caption-text">Example CSV output file.</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&quot;              ELEM&quot;,&quot;            SOURCE&quot;,&quot;               GEN&quot;
+&quot;                  &quot;,&quot;                  &quot;,&quot;               (W)&quot;
+&quot;TIME [sec]  0.31557600E+08&quot;
+&quot;             A1001&quot;,&quot;             HTR 1&quot;,  0.300000000000E+04
+&quot;TIME [sec]  0.12559000E+09&quot;
+&quot;             A1001&quot;,&quot;             HTR 1&quot;,  0.300000000000E+04
+...
+</pre></div>
+</div>
+</div>
+<table class="table table-center" id="tab-kdata1">
+<caption><span class="caption-number">Table 63 </span><span class="caption-text">Standard output based on absolute value of <code class="docutils literal notranslate"><span class="pre">KDATA</span></code>. abs(<code class="docutils literal notranslate"><span class="pre">KDATA</span></code>) = 1: a selection of element variables.</span><a class="headerlink" href="#tab-kdata1" title="Link to this table">#</a></caption>
+<colgroup>
+<col style="width: 33.3%" />
+<col style="width: 66.7%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Output variable</p></th>
+<th class="head"><p>Comment</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Pressure</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Temperature</p></td>
+<td><p>Only in nonisothermal mode</p></td>
+</tr>
+<tr class="row-even"><td><p>Saturation</p></td>
+<td><p>Saturation of all phases</p></td>
+</tr>
+<tr class="row-odd"><td><p>Mass fraction</p></td>
+<td><p>Mass fraction of all components in all mobile phases</p></td>
+</tr>
+<tr class="row-even"><td><p>Relative permeability</p></td>
+<td><p>Relative permeability of all mobile phases</p></td>
+</tr>
+<tr class="row-odd"><td><p>Capillary pressure</p></td>
+<td><p>Between mobile phases</p></td>
+</tr>
+<tr class="row-even"><td><p>Density</p></td>
+<td><p>Density of all mobile phases</p></td>
+</tr>
+<tr class="row-odd"><td><p>Porosity</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Biomass</p></td>
+<td><p>Biomass of all microbial populations (only for TMVOC)</p></td>
+</tr>
+</tbody>
+</table>
+<table class="table table-center" id="tab-kdata2">
+<caption><span class="caption-number">Table 64 </span><span class="caption-text">Standard output based on absolute value of <code class="docutils literal notranslate"><span class="pre">KDATA</span></code>. abs(<code class="docutils literal notranslate"><span class="pre">KDATA</span></code>) = 2: in addition, a selection of connection variables.</span><a class="headerlink" href="#tab-kdata2" title="Link to this table">#</a></caption>
+<colgroup>
+<col style="width: 33.3%" />
+<col style="width: 66.7%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Output variable</p></th>
+<th class="head"><p>Comment</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Heat flow</p></td>
+<td><p>Only in nonisothermal mode</p></td>
+</tr>
+<tr class="row-odd"><td><p>Total flow</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Phase flow</p></td>
+<td><p>Flow of all mobile phases</p></td>
+</tr>
+<tr class="row-odd"><td><p>Diffusive flow</p></td>
+<td><p>Only when <code class="docutils literal notranslate"><span class="pre">NB</span></code> = 8</p></td>
+</tr>
+</tbody>
+</table>
+<table class="table table-center" id="tab-kdata3">
+<caption><span class="caption-number">Table 65 </span><span class="caption-text">Standard output based on absolute value of <code class="docutils literal notranslate"><span class="pre">KDATA</span></code>. abs(<code class="docutils literal notranslate"><span class="pre">KDATA</span></code>) = 3: in addition, a selection of connection variables.</span><a class="headerlink" href="#tab-kdata3" title="Link to this table">#</a></caption>
+<colgroup>
+<col style="width: 33.3%" />
+<col style="width: 66.7%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Output variable</p></th>
+<th class="head"><p>Comment</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Generation rate</p></td>
+<td><p>Mass (kg/s) or energy (J/s) rate depending on generation type</p></td>
+</tr>
+<tr class="row-odd"><td><p>Flowing enthalpy</p></td>
+<td><p>Only in nonisothermal mode</p></td>
+</tr>
+<tr class="row-even"><td><p>Fractional flow</p></td>
+<td><p>Only for production</p></td>
+</tr>
+<tr class="row-odd"><td><p>Wellbore pressure</p></td>
+<td><p>Only for production wells operated on deliverability against specified bottomhole pressure</p></td>
+</tr>
+</tbody>
+</table>
+<div class="literal-block-wrapper docutils container" id="id3">
+<span id="figure-11"></span><div class="code-block-caption"><span class="caption-number">Listing 5 </span><span class="caption-text">Example data block OUTPU.</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>OUTPU----1----*----2----*----3----*----4----*----5----*----6
+8
+PRESSURE
+SECONDARY               2    6
+SECONDARY               1    4
+MASS FRACTION           2    2
+FLOW                    1
+VELOCITY                1
+HEAT FLOW
+GENERATION RATE
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id4">
+<span id="figure-12"></span><div class="code-block-caption"><span class="caption-number">Listing 6 </span><span class="caption-text">Element-related output variables in CSV format based on <strong>OUTPU</strong> block shown in <a class="reference internal" href="#figure-11"><span class="std std-numref">Listing 5</span></a>.</span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&quot;              ELEM&quot;,&quot;            PRES_G&quot;,&quot;            PCAP_L&quot;,&quot;             DEN_G&quot;,&quot;           X_AIR_L&quot;
+&quot;                  &quot;,&quot;              (PA)&quot;,&quot;              (PA)&quot;,&quot;         (KG/M**3)&quot;,&quot;               (-)&quot;
+&quot;TIME [sec]  0.31557600E+08&quot;
+&quot;             A1001&quot;,  0.145733984563E+06, -0.500000000000E+09,  0.729984424325E+00,  0.000000000000E+00
+&quot;             A1002&quot;,  0.145733992876E+06, -0.333270877952E+08,  0.839804437107E+00,  0.000000000000E+00
+&quot;             A1003&quot;,  0.130069098208E+06, -0.149548290610E+06,  0.755041253102E+00,  0.000000000000E+00
+&quot;             A1004&quot;,  0.118768201640E+06, -0.375912049570E+05,  0.693490433326E+00,  0.000000000000E+00
+&quot;             A1005&quot;,  0.109739217020E+06, -0.199789863209E+05,  0.644044319825E+00,  0.293927428376E-15
+&quot;             A1006&quot;,  0.102044115154E+06, -0.109444612669E+05,  0.601696773695E+00,  0.274267136463E-10
+&quot;             A1007&quot;,  0.100043502582E+06, -0.877952984850E+04,  0.676573675262E+00,  0.349785972071E-05
+…
+&quot;TIME [sec]  0.12559000E+09&quot;
+&quot;             A1001&quot;,  0.131667455445E+06, -0.500000000000E+09,  0.579679135438E+00,  0.000000000000E+00
+&quot;             A1002&quot;,  0.131667427270E+06, -0.500000000000E+09,  0.652436733809E+00,  0.000000000000E+00
+&quot;             A1003&quot;,  0.131667376616E+06, -0.500000000000E+09,  0.697207803100E+00,  0.000000000000E+00
+&quot;             A1004&quot;,  0.131667303336E+06, -0.500000000000E+09,  0.731317756019E+00,  0.000000000000E+00
+&quot;             A1005&quot;,  0.131667206441E+06, -0.500000000000E+09,  0.759680036685E+00,  0.000000000000E+00
+&quot;             A1006&quot;,  0.125971775053E+06, -0.385373109044E+06,  0.732766156518E+00,  0.000000000000E+00
+&quot;             A1007&quot;,  0.120105966675E+06, -0.609113801028E+05,  0.700795547905E+00,  0.000000000000E+00
+...
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id5">
+<span id="figure-13"></span><div class="code-block-caption"><span class="caption-number">Listing 7 </span><span class="caption-text">Connection-related output variables in CSV format based on <strong>OUTPU</strong> block shown in <a class="reference internal" href="#figure-11"><span class="std std-numref">Listing 5</span></a>.</span><a class="headerlink" href="#id5" title="Link to this code">#</a></div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&quot;             ELEM1&quot;,&quot;             ELEM2&quot;,&quot;            FLOW_G&quot;,&quot;             VEL_G&quot;,&quot;              HEAT&quot;
+&quot;                  &quot;,&quot;                  &quot;,&quot;            (KG/S)&quot;,&quot;             (M/S)&quot;,&quot;               (W)&quot;
+&quot;TIME [sec]  0.31557600E+08&quot;
+&quot;             A1001&quot;,&quot;             A1002&quot;,  0.314097500713E-09,  0.442085908383E-09, -0.299974415519E+04
+&quot;             A1002&quot;,&quot;             A1003&quot;, -0.117124968441E-02, -0.815791410995E-03, -0.299910711963E+04
+&quot;             A1003&quot;,&quot;             A1004&quot;, -0.113996116095E-02, -0.668855689283E-03, -0.300203907460E+04
+&quot;             A1004&quot;,&quot;             A1005&quot;, -0.111083200985E-02, -0.743130677782E-03, -0.300533553035E+04
+&quot;             A1005&quot;,&quot;             A1006&quot;, -0.107980321381E-02, -0.905005010191E-03, -0.300885963338E+04
+&quot;             A1006&quot;,&quot;             A1007&quot;, -0.292168383775E-03, -0.394691197242E-03, -0.301452215868E+04
+&quot;             A1007&quot;,&quot;             A1008&quot;, -0.296897257092E-07, -0.400951136232E-07, -0.297658449442E+04
+…
+&quot;TIME [sec]  0.12559000E+09&quot;
+&quot;             A1001&quot;,&quot;             A1002&quot;, -0.536396107829E-09, -0.109093702349E-08, -0.299835837082E+04
+&quot;             A1002&quot;,&quot;             A1003&quot;, -0.246742921890E-08, -0.220645706376E-08, -0.299318958181E+04
+&quot;             A1003&quot;,&quot;             A1004&quot;, -0.612573151962E-08, -0.338056616113E-08, -0.298393647773E+04
+&quot;             A1004&quot;,&quot;             A1005&quot;, -0.118590967237E-07, -0.463183822453E-08, -0.296972471428E+04
+&quot;             A1005&quot;,&quot;             A1006&quot;, -0.937133136787E-03, -0.278903292626E-03, -0.294927355061E+04
+&quot;             A1006&quot;,&quot;             A1007&quot;, -0.111723414932E-02, -0.302832717904E-03, -0.295107682950E+04
+...
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id6">
+<span id="figure-14"></span><div class="code-block-caption"><span class="caption-number">Listing 8 </span><span class="caption-text">Generation-related output variables in CSV format based on <strong>OUTPU</strong> block shown in <a class="reference internal" href="#figure-11"><span class="std std-numref">Listing 5</span></a>.</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&quot;              ELEM&quot;,&quot;            SOURCE&quot;,&quot;               GEN&quot;
+&quot;                  &quot;,&quot;                  &quot;,&quot;               (W)&quot;
+&quot;TIME [sec]  0.31557600E+08&quot;
+&quot;             A1001&quot;,&quot;             HTR 1&quot;,  0.300000000000E+04
+&quot;TIME [sec]  0.12559000E+09&quot;
+&quot;             A1001&quot;,&quot;             HTR 1&quot;,  0.300000000000E+04
+...
+</pre></div>
+</div>
+</div>
+<p>By default, outputs are printed to both the default standard output file (OUTPUT) and the CSV format files.
+Users may opt out printing output variables to the standard output file, particularly for large-scale simulations, to avoid creating a very big file.
+TOUGH3 also offers an option to generate a file in a format suitable for TECPLOT.
+The output variables written to the standard output file can be extracted for visualization using a reformatting program (such as EXT, a free post-processing program downloadable from the TOUGH website, which parses the standard output file along with spatial information provided in the <em>MESH</em> file and then generates a plot file in a format suitable for visualization, for instance, using TECPLOT).
+It should be noted that EXT calculates the components of flow vectors at the centers of grid blocks; in the current version of the <strong>OUTPU</strong> feature, flow rates and velocities are simply printed for each connection.</p>
+<p>Time series of some parameters for plotting can optionally be written to files in the CSV file format using blocks <strong>FOFT</strong> (for elements), <strong>COFT</strong> (for connections), and <strong>GOFT</strong> (for sinks and sources).
+TOUGH3 will generate separate files for each element, connection, and sink/source.
+While TOUGH3 has several input options to select the parameters to be written out, users desiring different parameters than what is coded in <em>FGTAB</em> should modify that subroutine.</p>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="preparation_of_input_data.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Preparation of Input Data</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="relative_permeability_functions.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Relative Permeability Functions</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/tough3/guide/output_from_tough3.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023, Keurfon Luu.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

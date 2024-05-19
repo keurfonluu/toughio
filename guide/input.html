@@ -1,0 +1,1446 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Input file &#8212; toughio 1.15.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=8fbebee6" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../_static/documentation_options.js?v=70d5d4a5"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'guide/input';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Examples" href="../examples/index.html" />
+    <link rel="prev" title="Installation" href="installation.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../_static/logo-light.png" class="logo__image only-light" alt="toughio 1.15.0 documentation - Home"/>
+    <script>document.write(`<img src="../_static/logo.png" class="logo__image only-dark" alt="toughio 1.15.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../tough3/index.html">
+                        TOUGH3
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../tough3/index.html">
+                        TOUGH3
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Input file</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">User Guide</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Input file</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="input-file">
+<h1>Input file<a class="headerlink" href="#input-file" title="Link to this heading">#</a></h1>
+<p>A TOUGH input file is defined in a single human-readable and JSONable dictionary where each parameter is defined by an explicit keyword and associated a value. For instance, to define the title of the simulation:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;My simulation&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><code class="xref py py-mod docutils literal notranslate"><span class="pre">toughio</span></code> provides the function <a class="reference internal" href="../api/io.html#toughio.read_input" title="toughio.read_input"><code class="xref py py-func docutils literal notranslate"><span class="pre">toughio.read_input()</span></code></a> to read TOUGH input files.
+Simply pass the input file name to the function as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">toughio</span>
+<span class="n">parameters</span> <span class="o">=</span> <span class="n">toughio</span><span class="o">.</span><span class="n">read_input</span><span class="p">(</span><span class="s2">&quot;my_input_file.inp&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Similarly, the input file can be written using the function <a class="reference internal" href="../api/io.html#toughio.write_input" title="toughio.write_input"><code class="xref py py-func docutils literal notranslate"><span class="pre">toughio.write_input()</span></code></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">toughio</span>
+<span class="n">toughio</span><span class="o">.</span><span class="n">write_input</span><span class="p">(</span><span class="s2">&quot;my_input_file.inp&quot;</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Optional arguments can be passed to both <a class="reference internal" href="../api/io.html#toughio.read_input" title="toughio.read_input"><code class="xref py py-func docutils literal notranslate"><span class="pre">toughio.read_input()</span></code></a> and <a class="reference internal" href="../api/io.html#toughio.write_input" title="toughio.write_input"><code class="xref py py-func docutils literal notranslate"><span class="pre">toughio.write_input()</span></code></a>, in particular <code class="docutils literal notranslate"><span class="pre">file_format</span></code> that tells the function how to correctly parse the input file. The following file formats are supported:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;tough&quot;</span></code>: TOUGH main input file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;toughreact-flow&quot;</span></code>: TOUGHREACT flow input file (same as <code class="docutils literal notranslate"><span class="pre">&quot;tough&quot;</span></code> with additional parameters)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;toughreact-solute&quot;</span></code>: TOUGHREACT solute input file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;toughreact-chemical&quot;</span></code>: TOUGHREACT chemical input file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;json&quot;</span></code>: any of the above exported to JSON format</p></li>
+</ul>
+</div></blockquote>
+<p>If the file format is not provided, it will be inferred from the file name and default to <code class="docutils literal notranslate"><span class="pre">&quot;tough&quot;</span></code> if the format cannot be guessed:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;tough&quot;</span></code>: if the file name is <code class="docutils literal notranslate"><span class="pre">&quot;*/INFILE&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;*/MESH&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;*/GENER&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;*/INCON&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;toughreact-flow&quot;</span></code>: if the file name is <code class="docutils literal notranslate"><span class="pre">&quot;*/flow.inp&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;toughsolute-flow&quot;</span></code>: if the file name is <code class="docutils literal notranslate"><span class="pre">&quot;*/solute.inp&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;toughchemical-flow&quot;</span></code>: if the file name is <code class="docutils literal notranslate"><span class="pre">&quot;*/chemical.inp&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;json&quot;</span></code>: if the file name is <code class="docutils literal notranslate"><span class="pre">&quot;**/*.json&quot;</span></code></p></li>
+</ul>
+</div></blockquote>
+<p>Note that both <a class="reference internal" href="../api/io.html#toughio.read_input" title="toughio.read_input"><code class="xref py py-func docutils literal notranslate"><span class="pre">toughio.read_input()</span></code></a> and <a class="reference internal" href="../api/io.html#toughio.write_input" title="toughio.write_input"><code class="xref py py-func docutils literal notranslate"><span class="pre">toughio.write_input()</span></code></a> merely act as file parsing functions and do not check the validity of the parameters which is left to the discretion of the user.</p>
+<section id="tough-main">
+<h2>TOUGH (main)<a class="headerlink" href="#tough-main" title="Link to this heading">#</a></h2>
+<p>A TOUGH input file is defined as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="s2">&quot;eos&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="s2">&quot;isothermal&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="s2">&quot;n_component&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;n_phase&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;do_diffusion&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="s2">&quot;n_component_incon&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;rocks&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="s2">&quot;solver&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="s2">&quot;extra_options&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="s2">&quot;more_options&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="s2">&quot;selections&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="s2">&quot;generators&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>
+    <span class="s2">&quot;boundary_conditions&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>
+    <span class="s2">&quot;diffusion&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
+    <span class="s2">&quot;times&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="s2">&quot;element_history&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="s2">&quot;connection_history&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="s2">&quot;generator_history&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="s2">&quot;rock_history&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+    <span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="s2">&quot;elements&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="s2">&quot;connections&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="s2">&quot;initial_conditions&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="s2">&quot;meshmaker&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="s2">&quot;minc&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="s2">&quot;chemical_properties&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="s2">&quot;non_condensible_gas&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="s2">&quot;nover&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="s2">&quot;array_dimensions&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The equation-of-state (EOS, block MULTI) is defined by the keyword <code class="docutils literal notranslate"><span class="pre">&quot;eos&quot;</span></code> which accepts any of these values:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;eos1&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;eos2&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;eos3&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;eos4&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;eos5&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;eos7&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;eos8&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;eos9&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;ewasg&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;eco2n&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;eco2n_v2&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;eco2m&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;tmvoc&quot;</span></code></p></li>
+</ul>
+</div></blockquote>
+<p><a class="reference internal" href="../api/io.html#toughio.write_input" title="toughio.write_input"><code class="xref py py-func docutils literal notranslate"><span class="pre">toughio.write_input()</span></code></a> will use the default EOS parameters (i.e., number of components and phases).
+Alternatively, the number of components and phases can be set individually by the keywords <code class="docutils literal notranslate"><span class="pre">&quot;n_component&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;n_phase&quot;</span></code>, respectively. These keywords supersede the values set by <code class="docutils literal notranslate"><span class="pre">&quot;eos&quot;</span></code>.
+Isothermal simulations can be carried out by setting <code class="docutils literal notranslate"><span class="pre">&quot;isothermal&quot;</span></code> to <code class="docutils literal notranslate"><span class="pre">True</span></code>. In that case, the number of equations is equal to the number of components.</p>
+<section id="rock-properties">
+<span id="id1"></span><h3>Rock properties<a class="headerlink" href="#rock-properties" title="Link to this heading">#</a></h3>
+<p>Rock properties (block ROCKS) are defined using the keyword <code class="docutils literal notranslate"><span class="pre">&quot;rocks&quot;</span></code> as a dictionary where keys refer to the names of the rocks and the values to their properties.
+Domainwise initial conditions (block INDOM) can also be defined by providing the keyword <code class="docutils literal notranslate"><span class="pre">&quot;initial_condition&quot;</span></code>.
+For ECO2M and TMVOC, an additional keyword <code class="docutils literal notranslate"><span class="pre">&quot;phase_composition&quot;</span></code> can be used to define phase composition materialwise (block ROCKS), domainwise (block INDOM) or elementwise (block INCON).
+For instance, for a rock called <code class="docutils literal notranslate"><span class="pre">&quot;rock1&quot;</span></code>, its properties are defined as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;rock1&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;density&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;porosity&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;permeability&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="s2">&quot;conductivity&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;specific_heat&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;compressibility&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;expansivity&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;conductivity_dry&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;tortuosity&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;klinkenberg_parameter&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;distribution_coefficient_3&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;distribution_coefficient_4&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;phase_composition&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;initial_condition&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="s2">&quot;relative_permeability&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;capillarity&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Default rock parameters can be set using the keyword <code class="docutils literal notranslate"><span class="pre">&quot;default&quot;</span></code>. In that case, the default rock properties are used if they are not defined for a given rock.
+Default relative permeability and capillary pressure models (block RPCAP) can also be defined in <code class="docutils literal notranslate"><span class="pre">&quot;default&quot;</span></code> using the keywords <code class="docutils literal notranslate"><span class="pre">&quot;relative_permeability&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;capillarity&quot;</span></code>, respectively.
+Note that the default initial conditions for all grid blocks correspond to the last record of block PARAM.</p>
+</section>
+<section id="options">
+<h3>Options<a class="headerlink" href="#options" title="Link to this heading">#</a></h3>
+<p>Computational parameters are simply defined in <code class="docutils literal notranslate"><span class="pre">&quot;options&quot;</span></code> as a dictionary organized as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;n_iteration&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;n_cycle&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;n_second&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;n_cycle_print&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;verbosity&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;temperature_dependence_gas&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;effective_strength_vapor&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;t_ini&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;t_max&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;t_steps&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="s2">&quot;t_step_max&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;t_reduce_factor&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;gravity&quot;</span><span class="p">:</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;mesh_scale_factor&quot;</span><span class="p">:</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;eps1&quot;</span><span class="p">:</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;eps2&quot;</span><span class="p">:</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;w_upstream&quot;</span><span class="p">:</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;w_newton&quot;</span><span class="p">:</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;derivative_factor&quot;</span><span class="p">:</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Additional options can be defined in <code class="docutils literal notranslate"><span class="pre">&quot;extra_options&quot;</span></code> (MOP) and <code class="docutils literal notranslate"><span class="pre">&quot;more_options&quot;</span></code> (block MOMOP) as dictionaries as well:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="mi">1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="mi">2</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="o">...</span>
+    <span class="n">N</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">N</span></code> denotes the maximum number of additional options in either <code class="docutils literal notranslate"><span class="pre">&quot;extra_options&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;more_options&quot;</span></code>.</p>
+<p>For some EOS, the keyword <code class="docutils literal notranslate"><span class="pre">&quot;selections&quot;</span></code> can be used to define integer and floating point options specific to an EOS:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;integers&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="s2">&quot;floats&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">&quot;integers&quot;</span></code> is defined as above (with <code class="docutils literal notranslate"><span class="pre">N</span> <span class="pre">=</span> <span class="pre">16</span></code>).</p>
+</section>
+<section id="sources-and-sinks">
+<h3>Sources and sinks<a class="headerlink" href="#sources-and-sinks" title="Link to this heading">#</a></h3>
+<p>Sources and sinks (generators, block GENER) are defined in <code class="docutils literal notranslate"><span class="pre">&quot;generators&quot;</span></code> as a list of dictionaries repeated for each generator.
+A generator is defined as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="s2">&quot;nseq&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;nadd&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;nads&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="s2">&quot;times&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="s2">&quot;rates&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="s2">&quot;specific_enthalpy&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="s2">&quot;layer_thickness&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;n_layer&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>If <code class="docutils literal notranslate"><span class="pre">&quot;times&quot;</span></code> is provided, <code class="docutils literal notranslate"><span class="pre">&quot;rates&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;specific_enthalpy&quot;</span></code> must be provided as well as lists of equal length.</p>
+</section>
+<section id="time-dependent-boundary-conditions">
+<h3>Time-dependent boundary conditions<a class="headerlink" href="#time-dependent-boundary-conditions" title="Link to this heading">#</a></h3>
+<p>Time-dependent boundary conditions (block TIMBC) are defined in <code class="docutils literal notranslate"><span class="pre">&quot;boundary_conditions&quot;</span></code> as a list of dictionaries repeated for each fixed variable and element.
+A time-dependent boundary condition is defined as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="s2">&quot;variable&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;times&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="diffusion">
+<h3>Diffusion<a class="headerlink" href="#diffusion" title="Link to this heading">#</a></h3>
+<p>Diffusion is enabled when the keyword <code class="docutils literal notranslate"><span class="pre">&quot;do_diffusion&quot;</span></code> is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>.
+In that case, the number of secondary parameters in block MULTI is automatically set to 8 (6 otherwise).
+Diffusion data is defined using the keyword <code class="docutils literal notranslate"><span class="pre">&quot;diffusion&quot;</span></code> as an array (i.e., list of lists) of shape <code class="docutils literal notranslate"><span class="pre">(n_component,</span> <span class="pre">n_phase)</span></code>.</p>
+</section>
+<section id="history">
+<h3>History<a class="headerlink" href="#history" title="Link to this heading">#</a></h3>
+<p>Outputs can be generated at specific time steps in <code class="docutils literal notranslate"><span class="pre">&quot;times&quot;</span></code> (block TIMES) defined as a list where each value corresponds to a time step at which an output is desired.
+Time-dependent outputs at specific element, connection or generator can be requested in <code class="docutils literal notranslate"><span class="pre">&quot;element_history&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;connection_history&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;generator_history&quot;</span></code> as a list where each value is the label associated to the desired elements/connections. For TOUGH3 v1.1 and above, <code class="docutils literal notranslate"><span class="pre">&quot;rock_history&quot;</span></code> can be used to generate rock to rock flow data.</p>
+</section>
+<section id="hysteresis-options">
+<h3>Hysteresis options<a class="headerlink" href="#hysteresis-options" title="Link to this heading">#</a></h3>
+<p>Hysteresis options are defined in <code class="docutils literal notranslate"><span class="pre">&quot;hysteresis_options&quot;</span></code> as a dictionary:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="mi">1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="mi">2</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="mi">3</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="output">
+<h3>Output<a class="headerlink" href="#output" title="Link to this heading">#</a></h3>
+<p>For TOUGH3/iTOUGH2, outputs can be customized in <code class="docutils literal notranslate"><span class="pre">&quot;output&quot;</span></code> (block OUTPU):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>where the desired variables to output are defined a list of dictionaries repeated for each variable. An output variable is defined as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="elements">
+<h3>Elements<a class="headerlink" href="#elements" title="Link to this heading">#</a></h3>
+<p>Elements (block ELEME) are defined by keyword <code class="docutils literal notranslate"><span class="pre">&quot;elements&quot;</span></code> as a dictionary where keys refer to the labels of the elements and the values to their parameters.
+For instance, for an element called <code class="docutils literal notranslate"><span class="pre">&quot;AAA00&quot;</span></code>, its parameters are defined as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;AAA00&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;nseq&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;nadd&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;material&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;volume&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;heat_exchange_area&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;permeability_modifier&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;center&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="connections">
+<h3>Connections<a class="headerlink" href="#connections" title="Link to this heading">#</a></h3>
+<p>Connections (block CONNE) are defined by keyword <code class="docutils literal notranslate"><span class="pre">&quot;connections&quot;</span></code> as a dictionary where keys refer to the labels of the connections and the values to their parameters.
+For instance, for a connection called <code class="docutils literal notranslate"><span class="pre">&quot;AAA00AAA01&quot;</span></code>, its parameters are defined as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;AAA00AAA01&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;nseq&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;nadd&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;permeability_direction&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;nodal_distances&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="s2">&quot;interface_area&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;gravity_cosine_angle&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;radiant_emittance_factor&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="initial-conditions">
+<h3>Initial conditions<a class="headerlink" href="#initial-conditions" title="Link to this heading">#</a></h3>
+<p>Elementwise initial conditions (block INCON) are defined by keyword <code class="docutils literal notranslate"><span class="pre">&quot;initial_conditions&quot;</span></code> as a dictionary where keys refer to the labels of the elements and the values to their parameters.
+For instance, for an element called <code class="docutils literal notranslate"><span class="pre">&quot;AAA00&quot;</span></code>, its initial conditions are defined as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;AAA00&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;porosity&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;userx&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="meshmaker">
+<h3>Meshmaker<a class="headerlink" href="#meshmaker" title="Link to this heading">#</a></h3>
+<p>Meshmaker parameters (block MESHM) are simply defined in <code class="docutils literal notranslate"><span class="pre">&quot;meshmaker&quot;</span></code> as a dictionary:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>
+    <span class="s2">&quot;angle&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The keyword <code class="docutils literal notranslate"><span class="pre">&quot;type&quot;</span></code> denotes the type of mesh to generate. The following values are accepted:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;xyz&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;rz2d&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;rz2dl&quot;</span></code></p></li>
+</ul>
+</div></blockquote>
+<p>Note that the keyword <code class="docutils literal notranslate"><span class="pre">&quot;angle&quot;</span></code> is only used when <code class="docutils literal notranslate"><span class="pre">&quot;type&quot;</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;xyz&quot;</span></code>.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">&quot;type&quot;</span></code> is set to <code class="docutils literal notranslate"><span class="pre">&quot;xyz&quot;</span></code>, each dictionary in <code class="docutils literal notranslate"><span class="pre">&quot;parameters&quot;</span></code> is defined as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="s2">&quot;n_increment&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;sizes&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Otherwise, for <code class="docutils literal notranslate"><span class="pre">&quot;rz2d&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;rz2dl&quot;</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="s2">&quot;radii&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="s2">&quot;n_increment&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;radius&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;radius_ref&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;thicknesses&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The keyword <code class="docutils literal notranslate"><span class="pre">&quot;type&quot;</span></code> denotes here the type of increments to generate. The following values are accepted:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;radii&quot;</span></code>: keyword <code class="docutils literal notranslate"><span class="pre">&quot;radii&quot;</span></code> is required</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;equid&quot;</span></code>: keywords <code class="docutils literal notranslate"><span class="pre">&quot;n_increment&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;size&quot;</span></code> are required</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;logar&quot;</span></code>: keywords <code class="docutils literal notranslate"><span class="pre">&quot;n_increment&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;radius&quot;</span></code> are required, <code class="docutils literal notranslate"><span class="pre">&quot;radius_ref&quot;</span></code> is optional</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;layer&quot;</span></code>: keyword <code class="docutils literal notranslate"><span class="pre">&quot;thicknesses&quot;</span></code> is required</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="minc">
+<h3>MINC<a class="headerlink" href="#minc" title="Link to this heading">#</a></h3>
+<p>MINC parameters are defined in a separate dictionary from <code class="docutils literal notranslate"><span class="pre">&quot;meshmaker&quot;</span></code> by the keyword <code class="docutils literal notranslate"><span class="pre">&quot;minc&quot;</span></code>, and is organized as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="s2">&quot;dual&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="s2">&quot;n_minc&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;where&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="s2">&quot;volumes&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="tmvoc">
+<h3>TMVOC<a class="headerlink" href="#tmvoc" title="Link to this heading">#</a></h3>
+<p>In addition to <code class="docutils literal notranslate"><span class="pre">&quot;phase_composition&quot;</span></code> (see <a class="reference internal" href="#rock-properties"><span class="std std-ref">Rock properties</span></a>), two other keywords can be set to define parameters specific to TMVOC.</p>
+<p>Chemical properties (block CHEMP) are defined using the keyword <code class="docutils literal notranslate"><span class="pre">&quot;chemical_properties&quot;</span></code> as a dictionary where keys refer to the names of the chemical species and the values to their properties.
+For instance, for a chemical specie called <code class="docutils literal notranslate"><span class="pre">&quot;my_chemical&quot;</span></code>, its properties are defined as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;my_chemical&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;temperature_crit&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;pressure_crit&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;compressibility_crit&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;pitzer_factor&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;dipole_moment&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;boiling_point&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;vapor_pressure_a&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;vapor_pressure_b&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;vapor_pressure_c&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;vapor_pressure_d&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;molecular_weight&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;heat_capacity_a&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;heat_capacity_b&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;heat_capacity_c&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;heat_capacity_d&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;napl_density_ref&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;napl_temperature_ref&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;gas_diffusivity_ref&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;gas_temperature_ref&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;exponent&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;napl_viscosity_a&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;napl_viscosity_b&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;napl_viscosity_c&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;napl_viscosity_d&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;volume_crit&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;solubility_a&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;solubility_b&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;solubility_c&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;solubility_d&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;oc_coeff&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;oc_fraction&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;oc_decay&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Non-condensible gases (block NCGAS) can be listed using keyword <code class="docutils literal notranslate"><span class="pre">&quot;non_condensible_gas&quot;</span></code> as a list where each value is the name of a non-condensible gas.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For TMVOC input files, the argument <code class="docutils literal notranslate"><span class="pre">eos=&quot;tmvoc&quot;</span></code> <strong>must</strong> be provided to the functions <a class="reference internal" href="../api/io.html#toughio.read_input" title="toughio.read_input"><code class="xref py py-func docutils literal notranslate"><span class="pre">toughio.read_input()</span></code></a> and <a class="reference internal" href="../api/io.html#toughio.write_input" title="toughio.write_input"><code class="xref py py-func docutils literal notranslate"><span class="pre">toughio.write_input()</span></code></a>.</p>
+</div>
+</section>
+<section id="array-dimensions-itough2">
+<h3>Array dimensions (iTOUGH2)<a class="headerlink" href="#array-dimensions-itough2" title="Link to this heading">#</a></h3>
+<p>iTOUGH2 allows users to provide array dimensions if an array is insufficiently dimensioned. An additional keyword <code class="docutils literal notranslate"><span class="pre">&quot;array_dimensions&quot;</span></code> can be used to specify such values, as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;array_dimensions&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;n_rocks&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;n_times&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;n_generators&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;n_rates&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;n_increment_x&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;n_increment_y&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;n_increment_z&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;n_increment_rad&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;n_properties&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;n_properties_times&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;n_regions&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;n_regions_parameters&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;n_ltab&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;n_rpcap&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;n_elements_timbc&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;n_timbc&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="toughreact-flow-inp">
+<h2>TOUGHREACT (flow.inp)<a class="headerlink" href="#toughreact-flow-inp" title="Link to this heading">#</a></h2>
+<p>TOUGHREACT flow input file is similar to TOUGH main input file but with additional keywords.
+In particular, a new keyword <code class="docutils literal notranslate"><span class="pre">&quot;react&quot;</span></code> is used to define options specific to TOUGHREACT.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;react&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+        <span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="s2">&quot;shape&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;poiseuille&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+            <span class="s2">&quot;end&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+            <span class="s2">&quot;aperture&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">&quot;options&quot;</span></code> represents the block REACT and is comparable to <code class="docutils literal notranslate"><span class="pre">&quot;more_options&quot;</span></code> (i.e., dictionary with integers as keys).
+Note that <code class="docutils literal notranslate"><span class="pre">&quot;output&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;poiseuille&quot;</span></code> represent the blocks OUTPT and POISE, while <code class="docutils literal notranslate"><span class="pre">&quot;wdata&quot;</span></code> is written in block PARAM.</p>
+<section id="id2">
+<h3>Rock properties<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
+<p>Additional properties are available in <code class="docutils literal notranslate"><span class="pre">&quot;rocks&quot;</span></code>. For a rock called <code class="docutils literal notranslate"><span class="pre">&quot;rock1&quot;</span></code>, the new properties are defined as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;rock1&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;porosity_crit&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;tortuosity_exponent&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;react_tp&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;react_hcplaw&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="id3">
+<h3>Options<a class="headerlink" href="#id3" title="Link to this heading">#</a></h3>
+<p>An additional keyword <code class="docutils literal notranslate"><span class="pre">&quot;react_wdata&quot;</span></code> can be used in <code class="docutils literal notranslate"><span class="pre">&quot;options&quot;</span></code> to write out flow data at selected elements.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;wdata&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="id4">
+<h3>Sources and sinks<a class="headerlink" href="#id4" title="Link to this heading">#</a></h3>
+<p>Two additional parameters can be defined in <code class="docutils literal notranslate"><span class="pre">&quot;generators&quot;</span></code> for each generator to set up time-dependent thermal conductivity:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;conductivity_times&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="s2">&quot;conductivity_factors&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The two lists must have the same length.</p>
+</section>
+<section id="id5">
+<h3>Initial conditions<a class="headerlink" href="#id5" title="Link to this heading">#</a></h3>
+<p>An additional keyword <code class="docutils literal notranslate"><span class="pre">&quot;permeability&quot;</span></code> can be used in <code class="docutils literal notranslate"><span class="pre">&quot;initial_conditions&quot;</span></code> to define elementwise permeability.
+The permeability of an element called <code class="docutils literal notranslate"><span class="pre">&quot;AAA00&quot;</span></code> is defined as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;AAA00&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;permeability&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="toughreact-solute-inp">
+<h2>TOUGHREACT (solute.inp)<a class="headerlink" href="#toughreact-solute-inp" title="Link to this heading">#</a></h2>
+<p>A TOUGHREACT solute input file is defined as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="s2">&quot;files&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="s2">&quot;zones&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The functions <a class="reference internal" href="../api/io.html#toughio.read_input" title="toughio.read_input"><code class="xref py py-func docutils literal notranslate"><span class="pre">toughio.read_input()</span></code></a> and <a class="reference internal" href="../api/io.html#toughio.write_input" title="toughio.write_input"><code class="xref py py-func docutils literal notranslate"><span class="pre">toughio.write_input()</span></code></a> require <code class="docutils literal notranslate"><span class="pre">MOPR(10)</span></code> and <code class="docutils literal notranslate"><span class="pre">MOPR(11)</span></code> (defined in flow.inp) to correctly parse the file.</p>
+<section id="id6">
+<h3>Options<a class="headerlink" href="#id6" title="Link to this heading">#</a></h3>
+<p>Options are simply defined in <code class="docutils literal notranslate"><span class="pre">&quot;options&quot;</span></code> as a dictionary organized as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;sl_min&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;rcour&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;ionic_strength_max&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;mineral_gas_factor&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;w_time&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;w_upstream&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;aqueous_diffusion_coefficient&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;molecular_diffusion_coefficient&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;n_iteration_tr&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;eps_tr&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;n_iteration_ch&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;eps_ch&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;eps_mb&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;eps_dc&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;eps_dr&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;n_cycle_print&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>If <code class="docutils literal notranslate"><span class="pre">MOPR(10)</span> <span class="pre">==</span> <span class="pre">2</span></code>, additional keywords can be set to define convergence bounds:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;n_iteration_1&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;n_iteration_2&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;n_iteration_3&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;n_iteration_4&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;t_increase_factor_1&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;t_increase_factor_2&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;t_increase_factor_3&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;t_reduce_factor_1&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;t_reduce_factor_2&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;t_reduce_factor_3&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="flags">
+<h3>Flags<a class="headerlink" href="#flags" title="Link to this heading">#</a></h3>
+<p>Flag options (i.e., chosen among a finite number of integer values) are defined using the keyword <code class="docutils literal notranslate"><span class="pre">&quot;flags&quot;</span></code> as a dictionary:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;iteration_scheme&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;reactive_surface_area&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;solver&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;n_subiteration&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;gas_transport&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;verbosity&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;feedback&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;coupling&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;aqueous_concentration_unit&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;mineral_unit&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;gas_concentration_unit&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="files">
+<h3>Files<a class="headerlink" href="#files" title="Link to this heading">#</a></h3>
+<p>Simulation input and output files are defined in <code class="docutils literal notranslate"><span class="pre">&quot;files&quot;</span></code> as a dictionary organized as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;thermodynamic_input&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="s2">&quot;iteration_output&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="s2">&quot;plot_output&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="s2">&quot;solid_output&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="s2">&quot;gas_output&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="s2">&quot;time_output&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="id7">
+<h3>Output<a class="headerlink" href="#id7" title="Link to this heading">#</a></h3>
+<p>The list of names or indices of the chemical species for which to output results can be provided using keyword <code class="docutils literal notranslate"><span class="pre">&quot;output&quot;</span></code> as a dictionary:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;elements&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+    <span class="s2">&quot;components&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+    <span class="s2">&quot;minerals&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+    <span class="s2">&quot;aqueous_species&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+    <span class="s2">&quot;surface_complexes&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+    <span class="s2">&quot;exchange_species&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="zones">
+<h3>Zones<a class="headerlink" href="#zones" title="Link to this heading">#</a></h3>
+<p>Indices of chemical property zones are defined using the keyword <code class="docutils literal notranslate"><span class="pre">&quot;zones&quot;</span></code> as a dictionary where keys refer to the labels of the elements and the values to the zone indices associated.
+For instance, for an element called <code class="docutils literal notranslate"><span class="pre">&quot;AAA00&quot;</span></code>, its indices are defined as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;AAA00&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;initial_water&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;injection_water&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;mineral&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;initial_gas&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;adsorption&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;cation_exchange&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;permeability_porosity&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;linear_kd&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;injection_gas&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;element&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>  <span class="c1"># Optional</span>
+    <span class="s2">&quot;sedimentation_velocity&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>If <code class="docutils literal notranslate"><span class="pre">MOPR(11)</span> <span class="pre">==</span> <span class="pre">2</span></code>, keyword <code class="docutils literal notranslate"><span class="pre">&quot;element&quot;</span></code> can be optionally used to set the water composition of this element to be recirculated as an injection water into the element specified by <code class="docutils literal notranslate"><span class="pre">&quot;injection_water&quot;</span></code>.
+If <code class="docutils literal notranslate"><span class="pre">MOPR(11)</span> <span class="pre">==</span> <span class="pre">1</span></code>, keyword <code class="docutils literal notranslate"><span class="pre">&quot;sedimentation_velocity&quot;</span></code> must be set.</p>
+<p>Default zone indices are defined in a similar dictionary in <code class="docutils literal notranslate"><span class="pre">&quot;default&quot;</span></code>.</p>
+</section>
+</section>
+<section id="toughreact-chemical-inp">
+<h2>TOUGHREACT (chemical.inp)<a class="headerlink" href="#toughreact-chemical-inp" title="Link to this heading">#</a></h2>
+<p>A TOUGHREACT chemical input file is defined as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="s2">&quot;primary_species&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>
+    <span class="s2">&quot;aqueous_kinetic&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>
+    <span class="s2">&quot;aqueous_species&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="s2">&quot;minerals&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>
+    <span class="s2">&quot;gaseous_species&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>
+    <span class="s2">&quot;surface_complexes&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="s2">&quot;kd_decay&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>
+    <span class="s2">&quot;exchanged_species&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>
+    <span class="s2">&quot;exchange_sites_id&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;zones&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;initial_waters&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>
+        <span class="s2">&quot;injection_waters&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>
+        <span class="s2">&quot;minerals&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>
+        <span class="s2">&quot;initial_gases&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]],</span>
+        <span class="s2">&quot;injection_gases&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]],</span>
+        <span class="s2">&quot;permeability_porosity&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>
+        <span class="s2">&quot;adsorption&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>
+        <span class="s2">&quot;linear_kd&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]],</span>
+        <span class="s2">&quot;cation_exchange&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Sections that are not required may be skipped (i.e., not defined). Similarly, within all sections, some parameters depend on other parameters and can be ignored as well. If a keyword is indeed required yet undefined, default values will be used (0 for integers, 0.0 for floats, <code class="docutils literal notranslate"><span class="pre">&quot;''&quot;</span></code> for strings), and a warning will be prompted in the console.</p>
+<section id="primary-species">
+<h3>Primary species<a class="headerlink" href="#primary-species" title="Link to this heading">#</a></h3>
+<p>Primary species are defined by keyword <code class="docutils literal notranslate"><span class="pre">&quot;primary_species&quot;</span></code> as a list of dictionaries repeated for each primary specie. A specie is defined as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="s2">&quot;transport&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="aqueous-kinetics">
+<h3>Aqueous kinetics<a class="headerlink" href="#aqueous-kinetics" title="Link to this heading">#</a></h3>
+<p>Aqueous kinetics are defined by keyword <code class="docutils literal notranslate"><span class="pre">&quot;aqueous_kinetics&quot;</span></code> as a list of dictionaries for each kinetic reaction. A reaction is defined as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;n_mechanism&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;species&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="s2">&quot;stoichiometric_coeff&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="c1"># Repeat for each specie</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;product&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;specie&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="s2">&quot;power&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="c1"># Repeat for each specie</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;monod&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;specie&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="s2">&quot;half_saturation&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="c1"># Repeat for each specie</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;inhibition&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;specie&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="s2">&quot;constant&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="c1"># Repeat for each specie</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;reaction_affinity&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="s2">&quot;cf&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="s2">&quot;logK&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="secondary-aqueous-species">
+<h3>Secondary aqueous species<a class="headerlink" href="#secondary-aqueous-species" title="Link to this heading">#</a></h3>
+<p>Secondary aqueous species are defined by keyword <code class="docutils literal notranslate"><span class="pre">&quot;aqueous_species&quot;</span></code> as a list of strings repeated for each aqueous specie. Each string is the name of a secondary aqueous specie.</p>
+</section>
+<section id="minerals">
+<h3>Minerals<a class="headerlink" href="#minerals" title="Link to this heading">#</a></h3>
+<p>Minerals are defined by keyword <code class="docutils literal notranslate"><span class="pre">&quot;minerals&quot;</span></code> as a list of dictionaries repeated for each mineral. A mineral is defined as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;kinetic_constraint&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;solid_solution&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;precipitation_dry&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;gap&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;temp1&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;temp2&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;dissolution&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;k25&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="s2">&quot;rate_ph_dependence&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="s2">&quot;eta&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="s2">&quot;theta&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="s2">&quot;activation_energy&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="s2">&quot;ph1&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="s2">&quot;slope1&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="s2">&quot;ph2&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="s2">&quot;slope2&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;precipitation&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;k25&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="s2">&quot;rate_ph_dependence&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="s2">&quot;eta&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="s2">&quot;theta&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="s2">&quot;activation_energy&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="s2">&quot;volume_fraction_ini&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="s2">&quot;extra_mechanisms&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;ki&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                <span class="s2">&quot;activation_energy&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                <span class="s2">&quot;species&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="p">{</span>
+                        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                        <span class="s2">&quot;power&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                    <span class="p">}</span>
+                    <span class="c1"># Repeat for each specie</span>
+                <span class="p">]</span>
+            <span class="p">}</span>
+            <span class="c1"># Repeat for each mechanism</span>
+        <span class="p">],</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="gaseous-species">
+<h3>Gaseous species<a class="headerlink" href="#gaseous-species" title="Link to this heading">#</a></h3>
+<p>Gaseous species are defined by keyword <code class="docutils literal notranslate"><span class="pre">&quot;gaseous_species&quot;</span></code> as a list of dictionaries repeated for each gaseous specie. A specie is defined as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="s2">&quot;fugacity&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="surface-complexes">
+<h3>Surface complexes<a class="headerlink" href="#surface-complexes" title="Link to this heading">#</a></h3>
+<p>Surface complexes are defined by keyword <code class="docutils literal notranslate"><span class="pre">&quot;surface_complexes&quot;</span></code> as a list of strings repeated for each surface complex. Each string is the name of a surface complex.</p>
+</section>
+<section id="primary-and-gas-species-with-kd-and-decay">
+<h3>Primary and gas species with Kd and decay<a class="headerlink" href="#primary-and-gas-species-with-kd-and-decay" title="Link to this heading">#</a></h3>
+<p>Primary aqueous and gas species with Kd and decay are defined by keyword <code class="docutils literal notranslate"><span class="pre">&quot;kd_decay&quot;</span></code> as a list of dictionaries repeated for each specie. A specie is defined as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="s2">&quot;decay_constant&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="exchanged-species">
+<h3>Exchanged species<a class="headerlink" href="#exchanged-species" title="Link to this heading">#</a></h3>
+<p>Exchangeable species are defined by keyword <code class="docutils literal notranslate"><span class="pre">&quot;exchanged_species&quot;</span></code> as a list of dictionaries repeated for each specie. A specie is defined as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="s2">&quot;reference&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;site_coeffs&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>An additional keyword <code class="docutils literal notranslate"><span class="pre">&quot;exchange_sites_id&quot;</span></code> is used to define the model for the dependence of exchange sites on water saturation.</p>
+</section>
+<section id="initial-and-injection-water-zones">
+<h3>Initial and injection water zones<a class="headerlink" href="#initial-and-injection-water-zones" title="Link to this heading">#</a></h3>
+<p>Initial and injection water zones are defined in <code class="docutils literal notranslate"><span class="pre">&quot;zones&quot;</span></code> by keyword <code class="docutils literal notranslate"><span class="pre">&quot;initial_waters&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;injection_waters&quot;</span></code>, respectively, as a list of lists repeated for each zone. Each zone is defined by a list of dictionaries for each specie:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;pressure&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;rock&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="s2">&quot;species&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="s2">&quot;guess&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+            <span class="s2">&quot;ctot&quot;</span><span class="p">:</span> <span class="nb">float</span>
+            <span class="s2">&quot;log_fugacity&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+            <span class="s2">&quot;nameq&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="c1"># Repeat for each specie</span>
+    <span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="initial-mineral-zones">
+<h3>Initial mineral zones<a class="headerlink" href="#initial-mineral-zones" title="Link to this heading">#</a></h3>
+<p>Initial mineral zones are defined in <code class="docutils literal notranslate"><span class="pre">&quot;zones&quot;</span></code> by keyword <code class="docutils literal notranslate"><span class="pre">&quot;minerals&quot;</span></code> as a list of lists repeated for each zone. Each zone is defined by a list of dictionaries for each specie:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;rock&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="s2">&quot;species&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="s2">&quot;volume_fraction_ini&quot;</span><span class="p">:</span> <span class="nb">float</span>
+            <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="s2">&quot;radius&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+            <span class="s2">&quot;area_ini&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+            <span class="s2">&quot;area_unit&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="c1"># Repeat for each specie</span>
+    <span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="initial-and-injection-gas-zones">
+<h3>Initial and injection gas zones<a class="headerlink" href="#initial-and-injection-gas-zones" title="Link to this heading">#</a></h3>
+<p>Initial and injection gas zones are defined in <code class="docutils literal notranslate"><span class="pre">&quot;zones&quot;</span></code> by keyword <code class="docutils literal notranslate"><span class="pre">&quot;initial_gases&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;injection_gases&quot;</span></code>, respectively, as a list of lists repeated for each zone. Each zone is defined by a list of dictionaries for each specie:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="s2">&quot;partial_pressure&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>  <span class="c1"># If initial gas</span>
+    <span class="s2">&quot;mole_fraction&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>  <span class="c1"># If injection gas</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="permeability-porosity-law-zones">
+<h3>Permeability-porosity law zones<a class="headerlink" href="#permeability-porosity-law-zones" title="Link to this heading">#</a></h3>
+<p>Permeability-porosity law zones are defined in <code class="docutils literal notranslate"><span class="pre">&quot;zones&quot;</span></code> by keyword <code class="docutils literal notranslate"><span class="pre">&quot;permeability_porosity&quot;</span></code> as a list of lists repeated for each zone. Each zone is defined by a list of dictionaries for each specie:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="surface-adsorption-zones">
+<h3>Surface adsorption zones<a class="headerlink" href="#surface-adsorption-zones" title="Link to this heading">#</a></h3>
+<p>Surface adsorption zones are defined in <code class="docutils literal notranslate"><span class="pre">&quot;zones&quot;</span></code> by keyword <code class="docutils literal notranslate"><span class="pre">&quot;surface_adsorption&quot;</span></code> as a list of lists repeated for each zone. Each zone is defined by a list of dictionaries for each specie:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;species&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="s2">&quot;area_unit&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="s2">&quot;area&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="c1"># Repeat for each specie</span>
+    <span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="linear-kd-zones">
+<h3>Linear Kd zones<a class="headerlink" href="#linear-kd-zones" title="Link to this heading">#</a></h3>
+<p>Linear Kd zones are defined in <code class="docutils literal notranslate"><span class="pre">&quot;zones&quot;</span></code> by keyword <code class="docutils literal notranslate"><span class="pre">&quot;linear_kd&quot;</span></code> as a list of lists repeated for each zone. Each zone is defined by a list of dictionaries for each specie:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="s2">&quot;solid_density&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="cation-exchange-zones">
+<h3>Cation exchange zones<a class="headerlink" href="#cation-exchange-zones" title="Link to this heading">#</a></h3>
+<p>Cation exchange zones are defined in <code class="docutils literal notranslate"><span class="pre">&quot;zones&quot;</span></code> by keyword <code class="docutils literal notranslate"><span class="pre">&quot;cation_exchange&quot;</span></code> as a list of lists repeated for each zone. Each zone is defined by a list of cation exchange capacity values for each exchange site.</p>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="installation.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Installation</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../examples/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Examples</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tough-main">TOUGH (main)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#rock-properties">Rock properties</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#options">Options</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sources-and-sinks">Sources and sinks</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#time-dependent-boundary-conditions">Time-dependent boundary conditions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diffusion">Diffusion</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#history">History</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hysteresis-options">Hysteresis options</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#output">Output</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#elements">Elements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#connections">Connections</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#initial-conditions">Initial conditions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#meshmaker">Meshmaker</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#minc">MINC</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tmvoc">TMVOC</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#array-dimensions-itough2">Array dimensions (iTOUGH2)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#toughreact-flow-inp">TOUGHREACT (flow.inp)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Rock properties</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">Options</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">Sources and sinks</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">Initial conditions</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#toughreact-solute-inp">TOUGHREACT (solute.inp)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">Options</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#flags">Flags</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#files">Files</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">Output</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#zones">Zones</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#toughreact-chemical-inp">TOUGHREACT (chemical.inp)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#primary-species">Primary species</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#aqueous-kinetics">Aqueous kinetics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#secondary-aqueous-species">Secondary aqueous species</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#minerals">Minerals</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaseous-species">Gaseous species</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#surface-complexes">Surface complexes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#primary-and-gas-species-with-kd-and-decay">Primary and gas species with Kd and decay</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#exchanged-species">Exchanged species</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#initial-and-injection-water-zones">Initial and injection water zones</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#initial-mineral-zones">Initial mineral zones</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#initial-and-injection-gas-zones">Initial and injection gas zones</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#permeability-porosity-law-zones">Permeability-porosity law zones</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#surface-adsorption-zones">Surface adsorption zones</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#linear-kd-zones">Linear Kd zones</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cation-exchange-zones">Cation exchange zones</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/guide/input.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023, Keurfon Luu.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

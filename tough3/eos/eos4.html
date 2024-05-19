@@ -1,0 +1,601 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>EOS4 &#8212; toughio 1.15.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=8fbebee6" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../../_static/documentation_options.js?v=70d5d4a5"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tough3/eos/eos4';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="EOS5" href="eos5.html" />
+    <link rel="prev" title="EOS3" href="eos3.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../_static/logo-light.png" class="logo__image only-light" alt="toughio 1.15.0 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="toughio 1.15.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        TOUGH3
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        TOUGH3
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../install/index.html">Installation</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../install/linux.html">Installation on Linux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../install/windows.html">Installation on Windows</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../guide/index.html">User Guide</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../guide/governing_equations.html">Governing Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guide/numerical_methods.html">Numerical Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guide/initial_and_boundary_conditions.html">Initial and Boundary Conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guide/preparation_of_input_data.html">Preparation of Input Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guide/output_from_tough3.html">Output from TOUGH3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guide/relative_permeability_functions.html">Relative Permeability Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guide/capillary_pressure_functions.html">Capillary Pressure Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">EOS</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="eos1.html">EOS1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos2.html">EOS2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos3.html">EOS3</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">EOS4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos5.html">EOS5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos7.html">EOS7</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos7r.html">EOS7R</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos8.html">EOS8</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos9.html">EOS9</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ewasg.html">EWASG</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eco2n.html">ECO2N</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">TOUGH3</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">EOS</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">EOS4</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="eos4">
+<span id="id1"></span><h1>EOS4<a class="headerlink" href="#eos4" title="Link to this heading">#</a></h1>
+<p>This module is an adaptation of the <a class="reference internal" href="eos3.html#eos3"><span class="std std-ref">EOS3</span></a> module, and implements vapor pressure lowering effects.
+Vapor pressure <span class="math notranslate nohighlight">\(P_v\)</span> is expressed by Kelvin’s equation,
+Eq. <a class="reference internal" href="#equation-eq-eos4-1">(51)</a> (<span id="id2"><a class="reference internal" href="../references.html#id25" title="Edlefsen, N., Anderson, A., &amp; others. (1943). Thermodynamics of soil moisture. Hilgardia, 15(2), 31–298.">Edlefsen et al., 1943</a></span>); it is a function not only of temperature, but depends also on capillary pressure, which in turn is a function of saturation.</p>
+<div class="math notranslate nohighlight" id="equation-eq-eos4-1">
+<span class="eqno">(51)<a class="headerlink" href="#equation-eq-eos4-1" title="Link to this equation">#</a></span>\[P_v (T, S_l) = f_{VPL} (T, S_l) P_{sat} (T)\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight" id="equation-eq-eos4-2">
+<span class="eqno">(52)<a class="headerlink" href="#equation-eq-eos4-2" title="Link to this equation">#</a></span>\[f_{VPL} = \exp \left( \frac{M_w P_{cl}(S_l)}{\rho_l R \left( T + 273.15 \right)} \right)\]</div>
+<p>is the vapor pressure lowering factor.
+<span class="math notranslate nohighlight">\(P_{sat}\)</span> is the saturated vapor pressure of bulk aqueous phase, <span class="math notranslate nohighlight">\(T\)</span> is temperature, <span class="math notranslate nohighlight">\(S_l\)</span> is the liquid (water) saturation, <span class="math notranslate nohighlight">\(P_{cl}\)</span> is the capillary pressure (i.e., the difference between aqueous and gas phase pressures), <span class="math notranslate nohighlight">\(M_w\)</span> is the molecular weight of water, <span class="math notranslate nohighlight">\(rho_l\)</span> is the liquid density, and <span class="math notranslate nohighlight">\(R\)</span> is the universal gas constant.</p>
+<section id="specifications">
+<h2>Specifications<a class="headerlink" href="#specifications" title="Link to this heading">#</a></h2>
+<p>A summary of EOS4 specifications and parameters is given in <a class="reference internal" href="#tab-eos4"><span class="std std-numref">Table 70</span></a>.
+The default parameter settings are (<code class="docutils literal notranslate"><span class="pre">NK</span></code>, <code class="docutils literal notranslate"><span class="pre">NEQ</span></code>, <code class="docutils literal notranslate"><span class="pre">NPH</span></code>, <code class="docutils literal notranslate"><span class="pre">NB</span></code>) = (2, 3, 2, 6).
+The option for single-component mode of water only, no air (<code class="docutils literal notranslate"><span class="pre">NK</span></code> = 1) is available for nonisothermal conditions (<code class="docutils literal notranslate"><span class="pre">NEQ</span></code> = 2).
+The specification of thermophysical properties in this EOS differs from <a class="reference internal" href="eos3.html#eos3"><span class="std std-ref">EOS3</span></a> in that provision is made for vapor pressure lowering effects.
+The primary variables are (<span class="math notranslate nohighlight">\(P\)</span>, <span class="math notranslate nohighlight">\(T\)</span>, <span class="math notranslate nohighlight">\(P_a\)</span>) for single-phase conditions and (<span class="math notranslate nohighlight">\(P_g\)</span>, <span class="math notranslate nohighlight">\(S_g\)</span>, <span class="math notranslate nohighlight">\(P_a\)</span>) for two-phase conditions, where <span class="math notranslate nohighlight">\(P_a\)</span> is the partial pressure of air.
+Note that in two-phase conditions temperature is not among the primary variables.
+It is implicitly determined from the relationship <span class="math notranslate nohighlight">\(P_g - P_a = P_v\)</span>, with <span class="math notranslate nohighlight">\(P_v = P_v(T, S_l)\)</span> as given in Eq. <a class="reference internal" href="#equation-eq-eos4-1">(51)</a>.</p>
+<p>It would be possible to use other sets of primary variables; in particular, temperature could be used also in two-phase conditions.
+Our test calculations for a number of examples indicated, however, that the choice (<span class="math notranslate nohighlight">\(P_g\)</span>, <span class="math notranslate nohighlight">\(S_g\)</span>, <span class="math notranslate nohighlight">\(P_a\)</span>) usually leads to better convergence behavior than the choice (<span class="math notranslate nohighlight">\(P_g\)</span>, <span class="math notranslate nohighlight">\(S_g\)</span>, <span class="math notranslate nohighlight">\(T\)</span>).
+The reason for the numerically inferior behavior of the latter set is in the air mass balance.
+With the variables (<span class="math notranslate nohighlight">\(P_g\)</span>, <span class="math notranslate nohighlight">\(S_g\)</span>, <span class="math notranslate nohighlight">\(T\)</span>), the amount of air present in a grid block becomes controlled by the difference between total gas pressure <span class="math notranslate nohighlight">\(P_g\)</span> and effective vapor pressure <span class="math notranslate nohighlight">\(P_v = P_{sat}(T) f_{VPL}(T, S_l)\)</span> (Eq. <a class="reference internal" href="#equation-eq-eos4-1">(51)</a>), which can be subject to very severe numerical cancellation.
+From the applications viewpoint, however, initialization of a flow problem with the set (<span class="math notranslate nohighlight">\(P_g\)</span>, <span class="math notranslate nohighlight">\(S_g\)</span>, <span class="math notranslate nohighlight">\(T\)</span>) may be much more physical and convenient.
+EOS4 allows the initialization of two-phase points as (<span class="math notranslate nohighlight">\(P_g\)</span>, <span class="math notranslate nohighlight">\(S_g\)</span>, <span class="math notranslate nohighlight">\(T\)</span>); this capability can be selected by specifying <code class="docutils literal notranslate"><span class="pre">MOP(19)</span></code> = 1.
+When using <code class="docutils literal notranslate"><span class="pre">MOP(19)</span></code> = 1, the second primary variable upon initialization can also be relative humidity <span class="math notranslate nohighlight">\(RH\)</span>, expressed as a fraction (0 &lt; <span class="math notranslate nohighlight">\(RH\)</span> ≤ 1); this choice is made by entering the second primary variable as a negative number, which will serve as a flag to indicate that it means (negative of) relative humidity, and will be internally converted to saturation in the initialization phase.
+The conversion consists of iteratively solving Kelvin’s equation for given <span class="math notranslate nohighlight">\(RH = f_{VPL}(T, S_l)\)</span> for <span class="math notranslate nohighlight">\(S_l\)</span>.
+Users need to beware that relative humidity specifications must be within the range that is feasible for the capillary pressure functions used.
+If maximum capillary pressures are not strong enough to accommodate a chosen value of <span class="math notranslate nohighlight">\(RH\)</span>, a diagnostic will be printed and execution will terminate.</p>
+<table class="table table-center" id="tab-eos4">
+<caption><span class="caption-number">Table 70 </span><span class="caption-text">Summary of EOS4.</span><a class="headerlink" href="#tab-eos4" title="Link to this table">#</a></caption>
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 75.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Components</p></td>
+<td><div class="line-block">
+<div class="line">#1: water</div>
+<div class="line">#2: air</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>Parameter choices</p></td>
+<td><div class="line-block">
+<div class="line">(<code class="docutils literal notranslate"><span class="pre">NK</span></code>, <code class="docutils literal notranslate"><span class="pre">NEQ</span></code>, <code class="docutils literal notranslate"><span class="pre">NPH</span></code>, <code class="docutils literal notranslate"><span class="pre">NB</span></code>) =</div>
+<div class="line">(2, 3, 2, 6) water and air, nonisothermal (default)</div>
+<div class="line">(1, 2, 2, 6) water only (no air), nonisothermal</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">MOP(20)</span></code> = 1 optionally suppresses vapor pressure lowering effects</div>
+<div class="line">Molecular diffusion can be modeled by setting <code class="docutils literal notranslate"><span class="pre">NB</span></code> = 8</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>Primary variables*†</p></td>
+<td><div class="line-block">
+<div class="line">Single-phase conditions:</div>
+<div class="line">(<span class="math notranslate nohighlight">\(P_g\)</span>, <span class="math notranslate nohighlight">\(S_g\)</span>, <span class="math notranslate nohighlight">\(P_a\)</span>): (pressure, temperature, air partial pressure)</div>
+<div class="line">Two-phase conditions:</div>
+<div class="line"><span class="math notranslate nohighlight">\(P_g\)</span>, <span class="math notranslate nohighlight">\(S_g\)</span>, <span class="math notranslate nohighlight">\(P_a\)</span>: (gas phase pressure, gas saturation, air partial pressure)</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<div class="line-block">
+<div class="line">* By setting <code class="docutils literal notranslate"><span class="pre">MOP(19)</span></code> = 1, initialization of two-phase conditions can be made with (<span class="math notranslate nohighlight">\(P_g\)</span>, <span class="math notranslate nohighlight">\(S_g\)</span>, <span class="math notranslate nohighlight">\(T\)</span>), or with (<span class="math notranslate nohighlight">\(P_g\)</span>, <span class="math notranslate nohighlight">\(-RH\)</span>, <span class="math notranslate nohighlight">\(T\)</span>), where <span class="math notranslate nohighlight">\(RH\)</span> is relative humidity (0 &lt; <span class="math notranslate nohighlight">\(RH\)</span> ≤ 1).</div>
+<div class="line">† By setting <code class="docutils literal notranslate"><span class="pre">MOP(19)</span></code> = 2, initialization can be made with EOS3-style variables (<span class="math notranslate nohighlight">\(P\)</span>, <span class="math notranslate nohighlight">\(X\)</span>, <span class="math notranslate nohighlight">\(T\)</span>) for single-phase (<span class="math notranslate nohighlight">\(X\)</span> is air mass fraction), (<span class="math notranslate nohighlight">\(P_g\)</span>, <span class="math notranslate nohighlight">\(S_g\)</span> + 10, <span class="math notranslate nohighlight">\(T\)</span>) for two-phase.</div>
+</div>
+</div>
+<p>As a further convenience to users, the choice <code class="docutils literal notranslate"><span class="pre">MOP(19)</span></code> = 2 allows EOS4 to be initialized with <a class="reference internal" href="eos3.html#eos3"><span class="std std-ref">EOS3</span></a> variables of (<span class="math notranslate nohighlight">\(P\)</span>, <span class="math notranslate nohighlight">\(X\)</span>, <span class="math notranslate nohighlight">\(T\)</span>) for single-phase, (<span class="math notranslate nohighlight">\(P_g\)</span>, <span class="math notranslate nohighlight">\(S_g\)</span> + 10, <span class="math notranslate nohighlight">\(T\)</span>) for two-phase.
+This way continuation runs with EOS4 can be made from <a class="reference internal" href="eos3.html#eos3"><span class="std std-ref">EOS3</span></a>-generated conditions.
+Note that, when using <code class="docutils literal notranslate"><span class="pre">MOP(19)</span></code> ≠ 0 options, data block or file INCON must terminate on a blank record.
+If <code class="docutils literal notranslate"><span class="pre">+++</span></code> is encountered in <em>INCON</em>, it is assumed that primary variables are provided in agreement with internal usage; <code class="docutils literal notranslate"><span class="pre">MOP(19)</span></code> is then reset to zero and an informative message is printed.</p>
+<p>Vapor pressure lowering effects raise new issues because they make it possible for a liquid phase to exist under conditions where vapor partial pressure and gas phase total pressure are less than the saturation pressure.
+What is the appropriate pressure at which liquid phase density, enthalpy and viscosity are to be evaluated?
+We believe that a physically plausible choice is to take <span class="math notranslate nohighlight">\(P_1 = \max(P_g, P_{sat})\)</span>, and this has been implemented in EOS4.
+The implementation faces a difficulty, however, because temperature is not among the primary variables in two-phase conditions, so that <span class="math notranslate nohighlight">\(P_{sat}\)</span> is only implicitly known; moreover, vapor pressure lowering effects are functionally dependent on liquid phase density, which is also a function of temperature.
+This leads to a potentially unstable situation with regard to the choice of liquid phase pressure under conditions where <span class="math notranslate nohighlight">\(P_g \approx P_{sat}\)</span>, which happens to be a common occurrence in boiling regions. In order to avoid this problem we evaluate liquid water density in the Kelvin equation for vapor pressure lowering (Eq. <a class="reference internal" href="#equation-eq-eos4-1">(51)</a>) always at <span class="math notranslate nohighlight">\(P_l = P_{sat}\)</span>, which will be an excellent approximation due to the small compressibility of liquid water.
+In all accumulation and flow terms the density of liquid water is evaluated at <span class="math notranslate nohighlight">\(P_l = \max(P_g, P_{sat})\)</span>.
+Vapor pressure lowering can be optionally suppressed by setting <code class="docutils literal notranslate"><span class="pre">MOP(20)</span></code> = 1.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="eos3.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">EOS3</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="eos5.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">EOS5</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#specifications">Specifications</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/tough3/eos/eos4.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023, Keurfon Luu.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

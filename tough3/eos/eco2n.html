@@ -1,0 +1,1114 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>ECO2N &#8212; toughio 1.15.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=8fbebee6" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../../_static/documentation_options.js?v=70d5d4a5"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tough3/eos/eco2n';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="References" href="../references.html" />
+    <link rel="prev" title="EWASG" href="ewasg.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../_static/logo-light.png" class="logo__image only-light" alt="toughio 1.15.0 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="toughio 1.15.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        TOUGH3
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        TOUGH3
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../install/index.html">Installation</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../install/linux.html">Installation on Linux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../install/windows.html">Installation on Windows</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../guide/index.html">User Guide</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../guide/governing_equations.html">Governing Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guide/numerical_methods.html">Numerical Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guide/initial_and_boundary_conditions.html">Initial and Boundary Conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guide/preparation_of_input_data.html">Preparation of Input Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guide/output_from_tough3.html">Output from TOUGH3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guide/relative_permeability_functions.html">Relative Permeability Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guide/capillary_pressure_functions.html">Capillary Pressure Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">EOS</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="eos1.html">EOS1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos2.html">EOS2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos3.html">EOS3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos4.html">EOS4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos5.html">EOS5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos7.html">EOS7</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos7r.html">EOS7R</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos8.html">EOS8</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos9.html">EOS9</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ewasg.html">EWASG</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">ECO2N</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">TOUGH3</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">EOS</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">ECO2N</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  
+<style>
+  .ss-layout-default-AB { grid-template-areas: 'A B'; }
+@media (max-width: 576px) {
+  .ss-layout-sm-A_B { grid-template-areas: 'A' 'B'; }
+}
+</style>
+<section id="eco2n">
+<span id="id1"></span><h1>ECO2N<a class="headerlink" href="#eco2n" title="Link to this heading">#</a></h1>
+<p>Injection of CO<sub>2</sub> into saline formations has been proposed as a means whereby emissions of heat-trapping greenhouse gases into the atmosphere may be reduced.
+Such injection would induce coupled processes of multiphase fluid flow, heat transfer, chemical reactions, and mechanical deformation.
+Several groups have developed simulation models for subsets of these processes.
+The present report describes a fluid property module “ECO2N” for the general-purpose reservoir simulator TOUGH2 (<span id="id2"><a class="reference internal" href="../references.html#id84" title="Pruess, K. (2004). The tough codes—a family of simulation tools for multiphase flow and transport processes in permeable media. Vadose zone journal, 3(3), 738–746.">Pruess, 2004</a>, <a class="reference internal" href="../references.html#id82" title="Pruess, K., Oldenburg, C. M., &amp; Moridis, G. (1999). TOUGH2 user's guide version 2. Lawrence Berkeley National Lab.(LBNL), Berkeley, CA (United States).">Pruess et al., 1999</a></span>), that can be used to model non-isothermal multiphase flow in the system H<sub>2</sub>O - NaCl - CO<sub>2</sub>. TOUGH2/ECO2N represents fluids as
+consisting of two phases: a water-rich aqueous phase, herein often referred to as “liquid”, and a CO<sub>2</sub>-rich phase referred to as “gas”.
+In addition, solid salt may also be present.
+The only chemical reactions modeled by ECO2N include equilibrium phase partitioning of water and carbon dioxide between the liquid and gaseous phases, and precipitation and dissolution of solid salt.
+The partitioning of H<sub>2</sub>O and CO<sub>2</sub> between liquid and gas phases is modeled as a function of temperature, pressure, and salinity, using the recently developed correlations of <span id="id3"><a class="reference internal" href="../references.html#id97" title="Spycher, N., Pruess, K., &amp; Ennis-King, J. (2003). Co2-h2o mixtures in the geological sequestration of co2. i. assessment and calculation of mutual solubilities from 12 to 100 c and up to 600 bar. Geochimica et cosmochimica acta, 67(16), 3015–3031.">Spycher et al., 2003</a></span>.
+Dissolution and precipitation of salt is treated by means of local equilibrium solubility.
+Associated changes in fluid porosity and permeability may also be modeled.
+All phases - gas, liquid, solid - may appear or disappear in any grid block during the course of a simulation.
+Thermodynamic conditions covered include a temperature range from ambient to 100˚C (approximately), pressures up to 600 bar, and salinity from zero to fully saturated.
+These parameter ranges should be adequate for most conditions encountered during disposal of CO<sub>2</sub> into deep saline aquifers.</p>
+<section id="theoretical-background">
+<h2>Theoretical Background<a class="headerlink" href="#theoretical-background" title="Link to this heading">#</a></h2>
+<section id="fluid-phases-and-thermodynamic-variables-in-the-system-water-nacl-co2">
+<h3>Fluid Phases and Thermodynamic Variables in the System Water-NaCl-CO<sub>2</sub><a class="headerlink" href="#fluid-phases-and-thermodynamic-variables-in-the-system-water-nacl-co2" title="Link to this heading">#</a></h3>
+<p>In the two-component system water-CO<sub>2</sub>, at temperatures above the freezing point of water and not considering hydrate phases, three different fluid phases may be present: an aqueous phase that is mostly water but may contain some dissolved CO<sub>2</sub>, a liquid CO<sub>2</sub>-rich phase that may contain some water, and a gaseous CO<sub>2</sub>-rich phase that also may contain some water.
+Altogether there may be seven different phase combinations (<a class="reference internal" href="#fig-eco2n-1"><span class="std std-numref">Figure 10</span></a>).
+If NaCl (“salt”) is added as a third fluid component, the number of possible phase combinations doubles, as in each of the seven phase combinations depicted in <a class="reference internal" href="#fig-eco2n-1"><span class="std std-numref">Figure 10</span></a> there may or may not be an additional phase consisting of solid salt.
+Liquid and gaseous CO<sub>2</sub> may coexist along the saturated vapor pressure curve of CO<sub>2</sub>, which ends at the critical point (<span class="math notranslate nohighlight">\(T_{crit}\)</span>, <span class="math notranslate nohighlight">\(P_{crit}\)</span>) = (31.04˚C, 73.82 bar; <span id="id4"><a class="reference internal" href="../references.html#id108" title="Vargaftik, N. B. (1975). Tables on the thermophysical properties of liquids and gases. Hemisphere Pub. Corp.">Vargaftik, 1975</a></span>), see <a class="reference internal" href="#fig-eco2n-2"><span class="std std-numref">Figure 11</span></a>.
+At supercritical temperatures or pressures there is just a single CO<sub>2</sub>-rich phase.</p>
+<figure class="align-default" id="fig-eco2n-1">
+<a class="reference internal image-reference" href="../../_images/figure_eco2n_1.png"><img alt="../../_images/figure_eco2n_1.png" src="../../_images/figure_eco2n_1.png" style="width: 50%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Figure 10 </span><span class="caption-text">Possible phase combinations in the system water-CO<sub>2</sub>. The phase designations are a - aqueous, l - liquid CO<sub>2</sub>, g - gaseous CO<sub>2</sub>. Separate liquid and gas phases exist only at subcritical conditions.</span><a class="headerlink" href="#fig-eco2n-1" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>The present version of ECO2N can only represent a limited subset of the phase conditions depicted in <a class="reference internal" href="#fig-eco2n-1"><span class="std std-numref">Figure 10</span></a>.
+Thermophysical properties are accurately calculated for gaseous as well as for liquid CO<sub>2</sub>, but no distinction between gaseous and liquid CO<sub>2</sub> phases is made in the treatment of flow, and no phase change between liquid and gaseous CO<sub>2</sub> is treated.
+Accordingly, of the seven phase combinations shown in <a class="reference internal" href="#fig-eco2n-1"><span class="std std-numref">Figure 10</span></a>, ECO2N can represent the ones numbered 1 (single-phase aqueous with or without dissolved CO<sub>2</sub> and salt), 2 and 3 (a single CO<sub>2</sub>-rich phase that may be either liquid or gaseous CO<sub>2</sub>, and may include dissolved water), and 4 and 5 (two-phase conditions consisting of an aqueous and a single CO<sub>2</sub>-rich phase, with no distinction being made as to whether the CO<sub>2</sub>-rich phase is liquid or gas).
+ECO2N cannot represent conditions 6 (two-phase mixture of liquid and gaseous CO<sub>2</sub>) and 7 (three-phase).
+All sub- and super-critical CO<sub>2</sub> is considered as a single non-wetting phase, that will henceforth be referred to as “gas”.
+ECO2N may be applied to sub- as well as super-critical temperature and pressure conditions, but applications that involve sub-critical conditions are limited to systems in which there is no change of phase between liquid and gaseous CO<sub>2</sub>, and in which no mixtures of liquid and gaseous CO<sub>2</sub> occur.</p>
+<figure class="align-default" id="fig-eco2n-2">
+<a class="reference internal image-reference" href="../../_images/figure_eco2n_2.png"><img alt="../../_images/figure_eco2n_2.png" src="../../_images/figure_eco2n_2.png" style="width: 75%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Figure 11 </span><span class="caption-text">Phase states of CO<sub>2</sub>.</span><a class="headerlink" href="#fig-eco2n-2" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>Numerical modeling of the flow of brine and CO<sub>2</sub> requires a coupling of the phase behavior of water-salt-CO<sub>2</sub> mixtures with multiphase flow simulation techniques.
+Among the various issues raised by such coupling is the choice of notation. There are long-established notational conventions in both fields, which may lead to conflicts and misunderstandings when they are combined.
+In an effort to avoid confusion, we will briefly discuss notational issues pertaining to partitioning of CO<sub>2</sub> between an aqueous and a gaseous phase.</p>
+<p>Phase partitioning is usually described in terms of mole fractions of the two components, which are denoted by <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span>, respectively, where <span class="math notranslate nohighlight">\(x_1\)</span> = <span class="math notranslate nohighlight">\(x_{H_2O}\)</span> and <span class="math notranslate nohighlight">\(x_2\)</span> = <span class="math notranslate nohighlight">\(x_{CO_2}\)</span> specify mole fractions in the aqueous phase, while <span class="math notranslate nohighlight">\(y_1\)</span> = <span class="math notranslate nohighlight">\(y_{H_2O}\)</span> and <span class="math notranslate nohighlight">\(y_2\)</span> = <span class="math notranslate nohighlight">\(y_{CO_2}\)</span> give mole fractions in the gas phase (<span id="id5"><a class="reference internal" href="../references.html#id77" title="Prausnitz, J. M., Lichtenthaler, R. N., &amp; De Azevedo, E. G. (1998). Molecular thermodynamics of fluid-phase equilibria. Pearson Education.">Prausnitz et al., 1998</a>, <a class="reference internal" href="../references.html#id97" title="Spycher, N., Pruess, K., &amp; Ennis-King, J. (2003). Co2-h2o mixtures in the geological sequestration of co2. i. assessment and calculation of mutual solubilities from 12 to 100 c and up to 600 bar. Geochimica et cosmochimica acta, 67(16), 3015–3031.">Spycher et al., 2003</a></span>).
+We follow this notation, except that we add the subscript “eq” to emphasize that these mole fractions pertain to equilibrium partitioning of water and CO<sub>2</sub> between co-existing aqueous and gas phases.
+Accordingly, we denote the various mole fractions pertaining to equilibrium phase partitioning as <span class="math notranslate nohighlight">\(x_{1, eq}\)</span>, <span class="math notranslate nohighlight">\(x_{2, eq}\)</span>, <span class="math notranslate nohighlight">\(y_{1, eq}\)</span>, and <span class="math notranslate nohighlight">\(y_{2, eq}\)</span>, while the corresponding mass fractions are denoted using upper-case X and Y.
+Mass fractions corresponding to single-phase conditions, where water and CO<sub>2</sub> concentrations are not constrained by phase equilibrium relations, are denoted by <span class="math notranslate nohighlight">\(X_1\)</span> (for water) and <span class="math notranslate nohighlight">\(X_2\)</span> (for CO<sub>2</sub>) in the aqueous phase, and by <span class="math notranslate nohighlight">\(Y_1\)</span> and <span class="math notranslate nohighlight">\(Y_2\)</span> in the gas phase.</p>
+<p>In the numerical simulation of brine-CO<sub>2</sub> flows, we will be concerned with the fundamental thermodynamic variables that characterize the brine-CO<sub>2</sub> system, and their change with time in different subdomains (grid blocks) of the flow system.
+Four “primary variables” are required to define the state of water-NaCl-CO<sub>2</sub> mixtures, which according to conventional TOUGH2 useage are denoted by <span class="math notranslate nohighlight">\(X_1\)</span>, <span class="math notranslate nohighlight">\(X_2\)</span>, <span class="math notranslate nohighlight">\(X_3\)</span>, and <span class="math notranslate nohighlight">\(X_4\)</span>.
+A summary of the fluid components and phases modeled by ECO2N, and the choice of primary thermodynamic variables, appears in <a class="reference internal" href="#tab-eco2n-1"><span class="std std-numref">Table 100</span></a>.
+Different variables are used for different phase conditions, but two of the four primary variables are the same, regardless of the number and nature of phases present.
+This includes the first primary variable <span class="math notranslate nohighlight">\(X_1\)</span>, denoting pressure, and the fourth primary variable <span class="math notranslate nohighlight">\(X_4\)</span> which is temperature.
+The second primary variable pertains to salt and is denoted <span class="math notranslate nohighlight">\(X_{sm}\)</span> rather than <span class="math notranslate nohighlight">\(X_2\)</span> to avoid confusion with <span class="math notranslate nohighlight">\(X_2\)</span>, the CO<sub>2</sub> mass fraction in the liquid phase.
+Depending upon whether or not a precipitated salt phase is present, the variable <span class="math notranslate nohighlight">\(X_{sm}\)</span> has different meaning.
+When no solid salt is present, <span class="math notranslate nohighlight">\(X_{sm}\)</span> denotes <span class="math notranslate nohighlight">\(X_s\)</span>, the salt mass fraction referred to the two-component system water-salt.
+When solid salt is present, <span class="math notranslate nohighlight">\(X_s\)</span> is no longer an independent variable, as it is determined by the equilibrium solubility of NaCl, which is a function of temperature.
+In the presence of solid salt, for reasons that are explained below, we use as second primary variable the quantity “solid saturation plus ten”, <span class="math notranslate nohighlight">\(X_{sm}\)</span> = <span class="math notranslate nohighlight">\(S_s\)</span> + 10.
+Here, <span class="math notranslate nohighlight">\(S_s\)</span> is defined in analogy to fluid saturations and denotes the fraction of void space occupied by solid salt.</p>
+<p>The physical range of both <span class="math notranslate nohighlight">\(X_s\)</span> and <span class="math notranslate nohighlight">\(S_s\)</span> is (0, 1); the reason for defining <span class="math notranslate nohighlight">\(X_{sm}\)</span> by adding a number 10 to <span class="math notranslate nohighlight">\(S_s\)</span> is to enable the presence or absence of solid salt to be recognized simply from the numerical value of the second primary variable.
+As had been mentioned above, the salt concentration variable <span class="math notranslate nohighlight">\(X_s\)</span> is defined with respect to the two-component system H<sub>2</sub>O - NaCl.
+This choice makes the salt concentration variable independent of CO<sub>2</sub> concentration, which simplifies the calculation of the partitioning of the H<sub>2</sub>O and CO<sub>2</sub> components between the aqueous and gas phases (see below).
+In the three-component system H<sub>2</sub>O - NaCl - CO<sub>2</sub>, the total salt mass fraction in the aqueous phase will for given <span class="math notranslate nohighlight">\(X_s\)</span> of course depend on CO<sub>2</sub> concentration.
+Salt mass fraction in the two-component system H<sub>2</sub>O - NaCl can be expressed in terms of salt molality (moles m of salt per kg of water) as follows</p>
+<div class="math notranslate nohighlight" id="equation-eq-eco2n-1">
+<span class="eqno">(75)<a class="headerlink" href="#equation-eq-eco2n-1" title="Link to this equation">#</a></span>\[X_s = \frac{m M_{NaCl}}{1000 + m M_{NaCl}}\]</div>
+<p>Here <span class="math notranslate nohighlight">\(M_{NaCl}\)</span> = 58.448 is the molecular weight of NaCl, and the number 1000 appears in the denominator because molality is defined as moles per 1000 g of water.
+For convenience we also list the inverse of Eq. <a class="reference internal" href="#equation-eq-eco2n-1">(75)</a>.</p>
+<div class="math notranslate nohighlight" id="equation-eq-eco2n-2">
+<span class="eqno">(76)<a class="headerlink" href="#equation-eq-eco2n-2" title="Link to this equation">#</a></span>\[m = \frac{1000 \frac{X_s}{M_{NaCl}}}{1 - X_s}\]</div>
+<p>The third primary variable X3 is CO<sub>2</sub> mass fraction (<span class="math notranslate nohighlight">\(X_2\)</span>) for single-phase conditions (only aqueous, or only gas) and is “gas saturation plus ten” (<span class="math notranslate nohighlight">\(S_g\)</span> + 10) for two-phase (aqueous and gas) conditions.
+The reason for adding 10 to <span class="math notranslate nohighlight">\(S_g\)</span> is analogous to the conventions adopted for the second primary variable, namely, to be able to distinguish single-phase conditions (0 ≤ <span class="math notranslate nohighlight">\(X_3\)</span> ≤ 1) from two-phase conditions (10 ≤ <span class="math notranslate nohighlight">\(X_3\)</span> ≤ 11).
+In single-phase conditions, the CO<sub>2</sub> concentration variable <span class="math notranslate nohighlight">\(X_2\)</span> is “free”, i.e., it can vary continuously within certain parameter ranges, while in two-phase aqueous-gas conditions, <span class="math notranslate nohighlight">\(X_2\)</span> has a fixed value <span class="math notranslate nohighlight">\(X_{2, eq}\)</span> that is a function of temperature, pressure, and salinity (see below).
+Accordingly, for single-phase conditions <span class="math notranslate nohighlight">\(X_2\)</span> is included among the independent primary variables (= <span class="math notranslate nohighlight">\(X_3\)</span>), while for two-phase conditions, <span class="math notranslate nohighlight">\(X_2\)</span> becomes a “secondary” parameter that is dependent upon primary variables (<span class="math notranslate nohighlight">\(T\)</span>, <span class="math notranslate nohighlight">\(P\)</span>, <span class="math notranslate nohighlight">\(X_s\)</span>).
+“Switching” primary variables according to phase conditions present provides a very robust and stable technique for dealing with changing phase compositions.</p>
+<p>Initialization of a simulation with TOUGH2/ECO2N would normally be made with the internally used primary variables as listed in <a class="reference internal" href="#tab-eco2n-1"><span class="std std-numref">Table 100</span></a>.
+For convenience of the user, additional choices are available for initializing a flow problem.</p>
+<table class="table table-center" id="tab-eco2n-1">
+<caption><span class="caption-number">Table 100 </span><span class="caption-text">Summary of ECO2N.</span><a class="headerlink" href="#tab-eco2n-1" title="Link to this table">#</a></caption>
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 75.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Components</p></td>
+<td><div class="line-block">
+<div class="line">#1: water</div>
+<div class="line">#2: NaCl</div>
+<div class="line">#3: CO<sub>2</sub></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>Parameter choices</p></td>
+<td><div class="line-block">
+<div class="line">(<code class="docutils literal notranslate"><span class="pre">NK</span></code>, <code class="docutils literal notranslate"><span class="pre">NEQ</span></code>, <code class="docutils literal notranslate"><span class="pre">NPH</span></code>, <code class="docutils literal notranslate"><span class="pre">NB</span></code>) =</div>
+<div class="line">(3, 4, 3, 6) water, air, oil, nonisothermal (default)</div>
+<div class="line">(3, 3, 3, 6) water, air, oil, isothermal</div>
+<div class="line">Molecular diffusion can be modeled by setting <code class="docutils literal notranslate"><span class="pre">NB</span></code> = 8</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>Primary variables</p></td>
+<td><div class="line-block">
+<div class="line">Single-phase conditions (only aqueous, or only gas)*:</div>
+<div class="line">(<span class="math notranslate nohighlight">\(P\)</span>, <span class="math notranslate nohighlight">\(X_{sm}\)</span>, <span class="math notranslate nohighlight">\(X_3\)</span>, <span class="math notranslate nohighlight">\(T\)</span>): (pressure, salt mass fraction in two-component water-salt system or solid saturation plus ten, CO<sub>2</sub> mass fraction in the aqueous phase or in the gas phase, in the three-component system water-salt-CO<sub>2</sub>, temperature)</div>
+<div class="line">Two-phase conditions (aqueous and gas)*:</div>
+<div class="line">(<span class="math notranslate nohighlight">\(P\)</span>, <span class="math notranslate nohighlight">\(X_{sm}\)</span> + 10, <span class="math notranslate nohighlight">\(S_g\)</span>, <span class="math notranslate nohighlight">\(T\)</span>): (pressure, salt mass fraction in two-component water-salt system or solid saturation plus ten, gas phase saturation, temperature)</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>* When discussing fluid phase conditions, we refer to the potentially mobile (aqueous and gas) phases only; in all cases solid salt may precipitate or dissolve, adding another active phase to the system.</p>
+</div>
+<section id="phase-composition">
+<h4>Phase Composition<a class="headerlink" href="#phase-composition" title="Link to this heading">#</a></h4>
+<p>The partitioning of H<sub>2</sub>O and CO<sub>2</sub> among co-existing aqueous and gas phases is calculated from a slightly modified version of the correlations developed in (<span id="id6"><a class="reference internal" href="../references.html#id98" title="Spycher, N., &amp; Pruess, K. (2005). Co2-h2o mixtures in the geological sequestration of co2. ii. partitioning in chloride brines at 12–100 c and up to 600 bar. Geochimica et Cosmochimica Acta, 69(13), 3309–3320.">Spycher &amp; Pruess, 2005</a></span>).
+These correlations were derived from the requirement that chemical potentials of all components must be equal in different phases.
+For two-phase conditions, they predict the equilibrium composition of liquid (aqueous) and gas (CO<sub>2</sub>-rich) phases as functions of temperature, pressure, and salinity, and are valid in the temperature range 12˚C ≤ <span class="math notranslate nohighlight">\(T\)</span> ≤ 110˚C, for pressures up to 600 bar, and salinity up to saturated NaCl brines.
+In the indicated parameter range, mutual solubilities of H<sub>2</sub>O and CO<sub>2</sub> are calculated with an accuracy typically within experimental uncertainties.
+The modification made in ECO2N is that CO<sub>2</sub> molar volumes are calculated using a tabular EOS based on Altunin’s correlation (<span id="id7"><a class="reference internal" href="../references.html#id2" title="Altunin, V. (1975). Thermophysical properties of carbon dioxide. Wellingborough, Collets.">Altunin, 1975</a></span>), instead of the Redlich-Kwong equation of state used in (<span id="id8"><a class="reference internal" href="../references.html#id98" title="Spycher, N., &amp; Pruess, K. (2005). Co2-h2o mixtures in the geological sequestration of co2. ii. partitioning in chloride brines at 12–100 c and up to 600 bar. Geochimica et Cosmochimica Acta, 69(13), 3309–3320.">Spycher &amp; Pruess, 2005</a></span>).
+This was done to maintain consistency with the temperature and pressure conditions for phase change between liquid and gaseous conditions used elsewhere in ECO2N.
+Altunin’s correlations yield slightly different molar volumes than the Redlich-Kwong EOS whose parameters were fitted by <span id="id9"><a class="reference internal" href="../references.html#id98" title="Spycher, N., &amp; Pruess, K. (2005). Co2-h2o mixtures in the geological sequestration of co2. ii. partitioning in chloride brines at 12–100 c and up to 600 bar. Geochimica et Cosmochimica Acta, 69(13), 3309–3320.">Spycher &amp; Pruess, 2005</a></span> to obtain the best overall match between observed and predicted CO<sub>2</sub> concentrations in the aqueous phase.
+The (small) differences in Altunin’s molar volumes cause predictions for the mutual solubility of water and CO<sub>2</sub> to be somewhat different also. However, the differences are generally small, see <a class="reference internal" href="#fig-eco2n-3"><span class="std std-numref">Figure 12</span></a> to <a class="reference internal" href="#fig-eco2n-5"><span class="std std-numref">Figure 14</span></a>.</p>
+<figure class="align-default" id="fig-eco2n-3">
+<a class="reference internal image-reference" href="../../_images/figure_eco2n_3.png"><img alt="../../_images/figure_eco2n_3.png" src="../../_images/figure_eco2n_3.png" style="width: 75%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Figure 12 </span><span class="caption-text">Dissolved CO<sub>2</sub> mass fractions in two-phase system at <span class="math notranslate nohighlight">\(T\)</span> = 30˚C for pure water (0m) and 4-molal NaCl brine. Lines represent the original correlation of <span id="id10"><a class="reference internal" href="../references.html#id98" title="Spycher, N., &amp; Pruess, K. (2005). Co2-h2o mixtures in the geological sequestration of co2. ii. partitioning in chloride brines at 12–100 c and up to 600 bar. Geochimica et Cosmochimica Acta, 69(13), 3309–3320.">Spycher &amp; Pruess, 2005</a></span> that uses a Redlich-Kwong EOS for molar volume of CO<sub>2</sub>. Symbols represent data calculated by ECO2N in which the molar volume of CO<sub>2</sub> is obtained from the correlations of <span id="id11"><a class="reference internal" href="../references.html#id2" title="Altunin, V. (1975). Thermophysical properties of carbon dioxide. Wellingborough, Collets.">Altunin, 1975</a></span>.</span><a class="headerlink" href="#fig-eco2n-3" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<figure class="align-default" id="fig-eco2n-4">
+<a class="reference internal image-reference" href="../../_images/figure_eco2n_4.png"><img alt="../../_images/figure_eco2n_4.png" src="../../_images/figure_eco2n_4.png" style="width: 75%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Figure 13 </span><span class="caption-text">H<sub>2</sub>O mass fractions in gas in two-phase system at <span class="math notranslate nohighlight">\(T\)</span> = 30˚C for pure water (0m) and 4-molal NaCl brine. Lines represent the original correlation of <span id="id12"><a class="reference internal" href="../references.html#id98" title="Spycher, N., &amp; Pruess, K. (2005). Co2-h2o mixtures in the geological sequestration of co2. ii. partitioning in chloride brines at 12–100 c and up to 600 bar. Geochimica et Cosmochimica Acta, 69(13), 3309–3320.">Spycher &amp; Pruess, 2005</a></span> that uses a Redlich-Kwong EOS for molar volume of CO<sub>2</sub>. Symbols represent data calculated by ECO2N in which the molar volume of CO<sub>2</sub> is obtained from the correlations of <span id="id13"><a class="reference internal" href="../references.html#id2" title="Altunin, V. (1975). Thermophysical properties of carbon dioxide. Wellingborough, Collets.">Altunin, 1975</a></span>.</span><a class="headerlink" href="#fig-eco2n-4" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<figure class="align-default" id="fig-eco2n-5">
+<a class="reference internal image-reference" href="../../_images/figure_eco2n_5.png"><img alt="../../_images/figure_eco2n_5.png" src="../../_images/figure_eco2n_5.png" style="width: 75%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Figure 14 </span><span class="caption-text">Concentration of water in gas and CO<sub>2</sub> in the liquid (aqueous) phase at (<span class="math notranslate nohighlight">\(T\)</span>, <span class="math notranslate nohighlight">\(P\)</span>) = (45˚C, 216.18 bar), for salinities ranging from zero to fully saturated. Lines were calculated from the correlation of <span id="id14"><a class="reference internal" href="../references.html#id98" title="Spycher, N., &amp; Pruess, K. (2005). Co2-h2o mixtures in the geological sequestration of co2. ii. partitioning in chloride brines at 12–100 c and up to 600 bar. Geochimica et Cosmochimica Acta, 69(13), 3309–3320.">Spycher &amp; Pruess, 2005</a></span> that uses a Redlich-Kwong EOS for molar volume of CO<sub>2</sub>. Symbols represent data calculated by ECO2N from a modified correlation in which the molar volume of CO<sub>2</sub> is obtained from the correlations of <span id="id15"><a class="reference internal" href="../references.html#id2" title="Altunin, V. (1975). Thermophysical properties of carbon dioxide. Wellingborough, Collets.">Altunin, 1975</a></span>.</span><a class="headerlink" href="#fig-eco2n-5" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>For conditions of interest to geologic dispoal of CO<sub>2</sub>, equilibrium between aqueous and gas phases corresponds to a dissolved CO<sub>2</sub> mass fraction in the aqueous phase, <span class="math notranslate nohighlight">\(X_{2, eq}\)</span>, on the order of a few percent, while the mass fraction of water in the gas phase, <span class="math notranslate nohighlight">\(Y_{1, eq}\)</span>, is a fraction of a percent, so that gas phase CO<sub>2</sub> mass fraction <span class="math notranslate nohighlight">\(Y_{2, eq}\)</span> = 1 - <span class="math notranslate nohighlight">\(Y_{1, eq}\)</span> is larger than 0.99.
+The relationship between CO<sub>2</sub> mass fraction <span class="math notranslate nohighlight">\(X_3\)</span> and phase composition of the fluid mixture is as follows (see <a class="reference internal" href="#fig-eco2n-6"><span class="std std-numref">Figure 15</span></a>):</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(X_3\)</span> &lt; <span class="math notranslate nohighlight">\(X_{2, eq}\)</span> corresponds to single-phase liquid conditions;</p></li>
+<li><p><span class="math notranslate nohighlight">\(X_3\)</span> &gt; <span class="math notranslate nohighlight">\(X_{2, eq}\)</span> corresponds to single-phase gas;</p></li>
+<li><p>intermediate values <span class="math notranslate nohighlight">\(X_{2, eq}\)</span> ≤ <span class="math notranslate nohighlight">\(X_3\)</span> ≤ <span class="math notranslate nohighlight">\(Y_{2, eq}\)</span> correspond to two-phase conditions with different proportions of aqueous and gas phases.</p></li>
+</ul>
+<p>Dissolved NaCl concentrations may for typical sequestration conditions range as high as 6.25 molal.
+This corresponds to mass fractions of up to <span class="math notranslate nohighlight">\(X_{sm}\)</span> = 26.7% in the two-component system water-salt.
+Phase conditions as a function of <span class="math notranslate nohighlight">\(X_{sm}\)</span> are as follows:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(X_{sm}\)</span> ≤ <span class="math notranslate nohighlight">\(XEQ\)</span> corresponds to dissolved salt only;</p></li>
+<li><p><span class="math notranslate nohighlight">\(X_{sm}\)</span> &gt; <span class="math notranslate nohighlight">\(XEQ\)</span> corresponds to conditions of a saturated NaCl brine and solid salt.</p></li>
+</ul>
+<figure class="align-default" id="fig-eco2n-6">
+<a class="reference internal image-reference" href="../../_images/figure_eco2n_6.png"><img alt="../../_images/figure_eco2n_6.png" src="../../_images/figure_eco2n_6.png" style="width: 75%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Figure 15 </span><span class="caption-text">CO<sub>2</sub> phase partitioning in the system H<sub>2</sub>O - NaCl - CO<sub>2</sub>. The CO<sub>2</sub> mass fraction in brine-CO<sub>2</sub> mixtures can vary in the range from 0 (no CO<sub>2</sub>) to 1 (no brine). <span class="math notranslate nohighlight">\(X_{2, eq}\)</span> and <span class="math notranslate nohighlight">\(Y_{2, eq}\)</span> denote, respectively, the CO<sub>2</sub> mass fractions in aqueous and gas phases corresponding to equilibrium phase partitioning in two-phase conditions. Mass fractions less than <span class="math notranslate nohighlight">\(X_{2, eq}\)</span> correspond to conditions in which only an aqueous phase is present, while mass fractions larger than <span class="math notranslate nohighlight">\(Y_{2, eq}\)</span> correspond to single-phase gas conditions. Mass fractions intermediate between <span class="math notranslate nohighlight">\(X_{2, eq}\)</span> and <span class="math notranslate nohighlight">\(Y_{2, eq}\)</span> correspond to two-phase conditions with different proportions of aqueous and gas phases.</span><a class="headerlink" href="#fig-eco2n-6" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="phase-change">
+<h4>Phase Change<a class="headerlink" href="#phase-change" title="Link to this heading">#</a></h4>
+<p>In single-phase (aqueous or gas) conditions, the third primary variable X3 is the CO<sub>2</sub> mass fraction in that phase.
+In single-phase aqueous conditions, we must have <span class="math notranslate nohighlight">\(X_3\)</span> ≤ <span class="math notranslate nohighlight">\(X_{2, eq}\)</span>, while in single-phase gas conditions, we must have <span class="math notranslate nohighlight">\(X_3\)</span> ≥ <span class="math notranslate nohighlight">\(Y_{2, eq}\)</span>.
+The possibility of phase change is evaluated during a simulation by monitoring <span class="math notranslate nohighlight">\(X_3\)</span> in each grid block.
+The criteria for phase change from single-phase to two-phase conditions may be written as follow:</p>
+<ul class="simple">
+<li><p>single-phase aqueous conditions: a transition to two-phase conditions (evolution of a gas phase) will occur when <span class="math notranslate nohighlight">\(X_3\)</span> &gt; <span class="math notranslate nohighlight">\(X_{2, eq}\)</span>;</p></li>
+<li><p>single-phase gas conditions: a transition to two-phase conditions (evolution of an aqueous phase) will occur when <span class="math notranslate nohighlight">\(X_3\)</span> &lt; <span class="math notranslate nohighlight">\(Y_{2, eq}\)</span> = 1 - <span class="math notranslate nohighlight">\(Y_{1, eq}\)</span>.</p></li>
+</ul>
+<p>When two-phase conditions evolve in a previously single-phase grid block, the third primary variable is switched to <span class="math notranslate nohighlight">\(X_3\)</span> = <span class="math notranslate nohighlight">\(S_g\)</span> + 10.
+If the transition occurred from single-phase liquid conditions, the starting value of <span class="math notranslate nohighlight">\(S_g\)</span> is chosen as 10<sup>-6</sup>; if the transition occurred from single-phase gas, the starting value is chosen as 1 - 10<sup>-6</sup>.</p>
+<p>In two-phase conditions, the third primary variable is <span class="math notranslate nohighlight">\(X_3\)</span> = <span class="math notranslate nohighlight">\(S_g\)</span> + 10.
+For two-phase conditions to persist, <span class="math notranslate nohighlight">\(X_3\)</span> must remain in the range (10, 11 - <span class="math notranslate nohighlight">\(S_s\)</span>).
+Transitions to single-phase conditions are recognized as follows:</p>
+<ul class="simple">
+<li><p>if <span class="math notranslate nohighlight">\(X_3\)</span> &lt; 10 (i.e., <span class="math notranslate nohighlight">\(S_g\)</span> &lt; 0): gas phase disappears; make a transition to single-phase liquid conditions;</p></li>
+<li><p>if <span class="math notranslate nohighlight">\(X_3\)</span> &gt; 11 - <span class="math notranslate nohighlight">\(S_s\)</span> (i.e., <span class="math notranslate nohighlight">\(S_g\)</span> &gt; 1 - <span class="math notranslate nohighlight">\(S_s\)</span>): liquid phase disappears; make a transition to single-phase gas conditions.</p></li>
+</ul>
+<p>Phase change involving (dis-)appearance of solid salt is recognized as follows.
+When no solid salt is present, the second primary variable <span class="math notranslate nohighlight">\(X_{sm}\)</span> is the concentration (mass fraction referred to total water plus salt) of dissolved salt in the aqueous phase.
+The possibility of precipitation starting is evaluated by comparing <span class="math notranslate nohighlight">\(X_{sm}\)</span> with <span class="math notranslate nohighlight">\(XEQ\)</span>, the equilibrium solubility of NaCl at prevailing temperature.
+If <span class="math notranslate nohighlight">\(X_{sm}\)</span> ≤ <span class="math notranslate nohighlight">\(XEQ\)</span> no precipitation occurs, whereas for <span class="math notranslate nohighlight">\(X_{sm}\)</span> &gt; <span class="math notranslate nohighlight">\(XEQ\)</span> precipitation starts.
+In the latter case, variable <span class="math notranslate nohighlight">\(X_{sm}\)</span> is switched to <span class="math notranslate nohighlight">\(S_s\)</span> + 10, where solid saturation <span class="math notranslate nohighlight">\(S_s\)</span> is initialized with a small non-zero value (10<sup>-6</sup>).
+If a solid phase is present, the variable <span class="math notranslate nohighlight">\(X_{sm}\)</span> = <span class="math notranslate nohighlight">\(S_s\)</span> + 10 is monitored.
+Solid phase disappears if <span class="math notranslate nohighlight">\(X_{sm}\)</span> &lt; 10, in which case primary variable <span class="math notranslate nohighlight">\(X_{sm}\)</span> is switched to salt concentration, and is initialized as slightly below saturation, <span class="math notranslate nohighlight">\(X_{sm}\)</span> = <span class="math notranslate nohighlight">\(XEQ\)</span> - 10<sup>-6</sup>.</p>
+</section>
+<section id="conversion-of-units">
+<h4>Conversion of Units<a class="headerlink" href="#conversion-of-units" title="Link to this heading">#</a></h4>
+<p>The <span id="id16"><a class="reference internal" href="../references.html#id98" title="Spycher, N., &amp; Pruess, K. (2005). Co2-h2o mixtures in the geological sequestration of co2. ii. partitioning in chloride brines at 12–100 c and up to 600 bar. Geochimica et Cosmochimica Acta, 69(13), 3309–3320.">Spycher &amp; Pruess, 2005</a></span> model for phase partitioning in the system H<sub>2</sub>O-NaCl-CO<sub>2</sub> is formulated in molar quantities (mole fractions and molalities), while TOUGH2/ECO2N describes phase compositions in terms of mass fractions.
+This section presents the equations and parameters needed for conversion between the two sets of units.
+The conversion between various concentration variables (mole fractions, molalities, mass fractions) does not depend upon whether or not concentrations correspond to equilibrium between liquid and gas phases; accordingly, the
+relations given below are valid regardless of the magnitude of concentrations.</p>
+<p>Let us consider an aqueous phase with dissolved NaCl and CO<sub>2</sub>. For a solution that is m-molal in NaCl and n-molal in CO<sub>2</sub>, total mass per kg of water is</p>
+<div class="math notranslate nohighlight" id="equation-eq-eco2n-3">
+<span class="eqno">(77)<a class="headerlink" href="#equation-eq-eco2n-3" title="Link to this equation">#</a></span>\[M = 1000 (g H_2 O) + m M_{NaCl} (g NaCl) + n M_{CO_2} (g CO_2)\]</div>
+<p>where <span class="math notranslate nohighlight">\(M_{NaCl}\)</span> and M_{CO_2} are the molecular weights of NaCl and CO<sub>2</sub>, respectively (see <a class="reference internal" href="#tab-eco2n-2"><span class="std std-numref">Table 101</span></a>).
+Assuming NaCl to be completely dissociated, the total moles per kg of water are</p>
+<div class="math notranslate nohighlight" id="equation-eq-eco2n-4">
+<span class="eqno">(78)<a class="headerlink" href="#equation-eq-eco2n-4" title="Link to this equation">#</a></span>\[m_T = \frac{1000}{M_{H_2 O}} + 2m + n\]</div>
+<p>The <span id="id17"><a class="reference internal" href="../references.html#id98" title="Spycher, N., &amp; Pruess, K. (2005). Co2-h2o mixtures in the geological sequestration of co2. ii. partitioning in chloride brines at 12–100 c and up to 600 bar. Geochimica et Cosmochimica Acta, 69(13), 3309–3320.">Spycher &amp; Pruess, 2005</a></span> correlations provide CO<sub>2</sub> mole fraction <span class="math notranslate nohighlight">\(x_2\)</span> in the aqueous phase and H<sub>2</sub>O mole fraction <span class="math notranslate nohighlight">\(y_1\)</span> in the gas phase as functions of temperature, pressure, and salt concentration (molality).
+For a CO<sub>2</sub> mole fraction x2 we have <span class="math notranslate nohighlight">\(n\)</span> = <span class="math notranslate nohighlight">\(x_2 m_T\)</span> from which, using Eq. <a class="reference internal" href="#equation-eq-eco2n-4">(78)</a>, we obtain</p>
+<div class="math notranslate nohighlight" id="equation-eq-eco2n-5">
+<span class="eqno">(79)<a class="headerlink" href="#equation-eq-eco2n-5" title="Link to this equation">#</a></span>\[n = \frac{x_2 \left( 2 m + \frac{1000}{M_{H_2 O}} \right)}{1 - x_2}\]</div>
+<p>CO<sub>2</sub> mass fraction <span class="math notranslate nohighlight">\(X_2\)</span> in the aqueous phase is obtained by dividing the CO<sub>2</sub> mass in <span class="math notranslate nohighlight">\(n\)</span> moles by the total mass</p>
+<div class="math notranslate nohighlight" id="equation-eq-eco2n-6">
+<span class="eqno">(80)<a class="headerlink" href="#equation-eq-eco2n-6" title="Link to this equation">#</a></span>\[X_2 = \frac{n M_{CO_2}}{1000 + m M_{NaCl} + n M_{CO_2}}\]</div>
+<p>Water mass fraction <span class="math notranslate nohighlight">\(Y_1\)</span> in the CO<sub>2</sub>-rich phase is simply</p>
+<div class="math notranslate nohighlight" id="equation-eq-eco2n-7">
+<span class="eqno">(81)<a class="headerlink" href="#equation-eq-eco2n-7" title="Link to this equation">#</a></span>\[Y_1 = \frac{y1 M_{H_2 O}}{y1 M_{H_2 O} + \left( 1 - y_1 \right) M_{CO_2}}\]</div>
+<p>The molecular weights of the various species are listed in <a class="reference internal" href="#tab-eco2n-2"><span class="std std-numref">Table 101</span></a> (<span id="id18"><a class="reference internal" href="../references.html#id27" title="Evans, R. (1982). The atomic nucleus. Reprint edition.">Evans, 1982</a></span>).</p>
+<table class="table table-center" id="tab-eco2n-2">
+<caption><span class="caption-number">Table 101 </span><span class="caption-text">Molecular weights in the system H<sub>2</sub>O-NaCl-CO<sub>2</sub>.</span><a class="headerlink" href="#tab-eco2n-2" title="Link to this table">#</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Species</p></th>
+<th class="head"><p>Mol. weight</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>H<sub>2</sub>O</p></td>
+<td><p>18.016</p></td>
+</tr>
+<tr class="row-odd"><td><p>Na</p></td>
+<td><p>22.991</p></td>
+</tr>
+<tr class="row-even"><td><p>Cl</p></td>
+<td><p>35.457</p></td>
+</tr>
+<tr class="row-odd"><td><p>NaCl</p></td>
+<td><p>58.448</p></td>
+</tr>
+<tr class="row-even"><td><p>CO<sub>2</sub></p></td>
+<td><p>44.0</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="thermophysical-properties-of-water-nacl-co2-mixtures">
+<h3>Thermophysical Properties of Water-NaCl-CO<sub>2</sub> Mixtures<a class="headerlink" href="#thermophysical-properties-of-water-nacl-co2-mixtures" title="Link to this heading">#</a></h3>
+<p>Thermophysical properties needed to model the flow of water-salt-CO<sub>2</sub> mixtures in porous media include density, viscosity, and specific enthalpy of the fluid phases as functions of temperature, pressure, and composition, and partitioning of components among the fluid phases.
+Many of the needed parameters are obtained from the same correlations as were used in the EWASG property module of TOUGH2 (<span id="id19"><a class="reference internal" href="../references.html#id8" title="Battistelli, A., Calore, C., &amp; Pruess, K. (1997). The simulator tough2/ewasg for modelling geothermal reservoirs with brines and non-condensible gas. Geothermics, 26(4), 437–464.">Battistelli et al., 1997</a></span>).
+EWASG was developed for geothermal applications, and consequently considered conditions of elevated temperatures &gt; 100˚C, and modest CO<sub>2</sub> partial pressures of order 1-10 bar.
+The present ECO2N module targets the opposite end of the temperature and pressure range, namely, modest temperatures below 110˚C, and high CO<sub>2</sub> pressures up to several hundred bar.</p>
+<p>Water properties in TOUGH2/ECO2N are calculated, as in other members of the TOUGH family of codes, from the steam table equations as given by the International Formulation Committee (<span id="id20"><a class="reference internal" href="../references.html#id41" title="IFC, A. (1967). Formulation of the thermodynamic properties of ordinary water substance. International Formulation Committee (IFC) Secretariat, Dusseldorf, Germany.">IFC, 1967</a></span>).
+Properties of pure CO<sub>2</sub> are obtained from correlations developed by <span id="id21"><a class="reference internal" href="../references.html#id2" title="Altunin, V. (1975). Thermophysical properties of carbon dioxide. Wellingborough, Collets.">Altunin, 1975</a></span>.
+We began using Altunin’s correlations in 1999 when a computer program implementingthem was conveniently made available to us by Victor Malkovsky of the Institute of Geology of Ore Deposits, Petrography, Mineralogy and Geochemistry (IGEM) of the Russian Academy of Sciences, Moscow.
+Altunin’s correlations were subsequently extensively cross-checked against experimental data and alternative PVT formulations, such as <span id="id22"><a class="reference internal" href="../references.html#id95" title="Span, R., &amp; Wagner, W. (1996). A new equation of state for carbon dioxide covering the fluid region from the triple-point temperature to 1100 k at pressures up to 800 mpa. Journal of physical and chemical reference data, 25(6), 1509–1596.">Span &amp; Wagner, 1996</a></span>.
+They were found to be very accurate (<span id="id23">[<a class="reference internal" href="../references.html#id32" title="Garcia, J. E. (2003). Fluid dynamics of carbon dioxide disposal into saline aquifers. University of California, Berkeley.">Garcia, 2003</a>]</span>), so there is no need to change to a different formulation.</p>
+<p>Altunin’s correlations are not used directly in the code, but are used ahead of a TOUGH2/ECO2N simulation to tabulate density, viscosity, and specific enthalpy of pure CO<sub>2</sub> on a regular grid of (<span class="math notranslate nohighlight">\(T\)</span>, <span class="math notranslate nohighlight">\(P\)</span>)-values.
+These tabular data are provided to the ECO2N module in a file called
+“CO2TAB”, and property values are obtained during the simulation by means of bivariate interpolation.
+<a class="reference internal" href="#fig-eco2n-7"><span class="std std-numref">Figure 16</span></a> shows the manner in which CO<sub>2</sub> properties are tabulated, intentionally showing a coarse (<span class="math notranslate nohighlight">\(T\)</span>, <span class="math notranslate nohighlight">\(P\)</span>)-grid so that pertinent features of the tabulation may be better seen.
+(For actual calculations, we use finer grid spacings; the CO2TAB data file distributed with ECO2N covers the range 3.04 ˚C ≤ <span class="math notranslate nohighlight">\(T\)</span> ≤ 103.04 ˚C with <span class="math notranslate nohighlight">\(\Delta T\)</span> = 2˚C and 1 bar ≤ <span class="math notranslate nohighlight">\(P\)</span> ≤ 600 bar with <span class="math notranslate nohighlight">\(\Delta T\)</span> ≤ 4 bar in most cases.
+The ECO2N distribution includes a utility program for generating CO2TAB files if users desire a different (<span class="math notranslate nohighlight">\(T\)</span>, <span class="math notranslate nohighlight">\(P\)</span>)-range or different increments).
+As shown in <a class="reference internal" href="#fig-eco2n-7"><span class="std std-numref">Figure 16</span></a>, the tabulation is made in such a way that for sub-critical conditions the saturation line is given by diagonals of the interpolation quadrangles.
+On the saturation line, two sets of data are provided, for liquid and gaseous CO<sub>2</sub>, respectively, and in quadrangles that include points on both sides of the saturation line, points on the “wrong” side are excluded from the interpolation.
+This scheme provides for an efficient and accurate determination of thermophysical properties of CO<sub>2</sub>.</p>
+<figure class="align-default" id="fig-eco2n-7">
+<a class="reference internal image-reference" href="../../_images/figure_eco2n_7.png"><img alt="../../_images/figure_eco2n_7.png" src="../../_images/figure_eco2n_7.png" style="width: 75%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Figure 16 </span><span class="caption-text">Schematic of the temperature-pressure tabulation of CO<sub>2</sub> properties. The saturation line (dashed) is given by the diagonals of interpolation rectangles.</span><a class="headerlink" href="#fig-eco2n-7" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>An earlier version of ECO2N explicitly associated partial pressures of water (vapor) and CO<sub>2</sub> with the gas phase, and calculated CO<sub>2</sub> dissolution in the aqueous phase from the CO<sub>2</sub> partial pressure, using an extended version of Henry’s law (<span id="id24"><a class="reference internal" href="../references.html#id90" title="Pruess, K., Garcia, J., Kovscek, T., Oldenburg, C., Rutqvist, J., Steefel, C., &amp; Xu, T. (2002). Intercomparison of numerical simulation codes for geologic disposal of CO2. Lawrence Berkeley National Lab.(LBNL), Berkeley, CA (United States).">Pruess et al., 2002</a></span>).
+The present version uses a methodology for calculating mutual solubilities of water and CO<sub>2</sub> (<span id="id25"><a class="reference internal" href="../references.html#id98" title="Spycher, N., &amp; Pruess, K. (2005). Co2-h2o mixtures in the geological sequestration of co2. ii. partitioning in chloride brines at 12–100 c and up to 600 bar. Geochimica et Cosmochimica Acta, 69(13), 3309–3320.">Spycher &amp; Pruess, 2005</a></span>) that is much more accurate, but has a drawback insofar as no partial pressures are associated with the individual fluid components.
+This makes it less straightforward to calculate thermophysical properties of the gas phase in terms of individual fluid components.
+We are primarily interested in the behavior of water-salt-CO<sub>2</sub> mixtures at moderate temperatures, <span class="math notranslate nohighlight">\(T\)</span> &lt; 100˚C, say, where water vapor pressure is a negligibly small fraction of total pressure.
+Under these conditions the amount of water present in the CO<sub>2</sub>-rich phase, henceforth referred to as “gas”, is small.
+Accordingly, we approximate density, viscosity, and specific enthalpy of the gas phase by the corresponding properties of pure CO<sub>2</sub>, without water present.</p>
+<section id="density">
+<h4>Density<a class="headerlink" href="#density" title="Link to this heading">#</a></h4>
+<p>Brine density <span class="math notranslate nohighlight">\(\rho_b\)</span> for the binary system water-salt is calculated as in <span id="id26"><a class="reference internal" href="../references.html#id8" title="Battistelli, A., Calore, C., &amp; Pruess, K. (1997). The simulator tough2/ewasg for modelling geothermal reservoirs with brines and non-condensible gas. Geothermics, 26(4), 437–464.">Battistelli et al., 1997</a></span> from the correlations of <span id="id27"><a class="reference internal" href="../references.html#id37" title="Haas, J. L. (1976). Physical properties of the coexisting phases and thermochemical properties of the h2o component in boiling nacl solutions. USGS Bulletin.">Haas, 1976</a></span> and <span id="id28"><a class="reference internal" href="../references.html#id3" title="Andersen, G., Probst, A., Murray, L., &amp; Butler, S. (1992). An accurate pvt model for geothermal fluids as represented by h2o-nacl-co2. Mixtures, Proceedings 17th Workshop on Geothermal Reservoir Engineering.">Andersen et al., 1992</a></span>.
+The calculation starts from aqueous phase density without salinity at vapor-saturated conditions, which is obtained from the correlations given by the International Formulation Committee (<span id="id29"><a class="reference internal" href="../references.html#id41" title="IFC, A. (1967). Formulation of the thermodynamic properties of ordinary water substance. International Formulation Committee (IFC) Secretariat, Dusseldorf, Germany.">IFC, 1967</a></span>).
+Corrections are then applied to account for effects of salinity and pressure.
+The density of aqueous phase with dissolved CO<sub>2</sub> is calculated assuming additivity of the volumes of brine and dissolved CO<sub>2</sub>.</p>
+<div class="math notranslate nohighlight" id="equation-eq-eco2n-8">
+<span class="eqno">(82)<a class="headerlink" href="#equation-eq-eco2n-8" title="Link to this equation">#</a></span>\[\frac{1}{\rho_{aq}} = \frac{1 - X_2}{\rho_b} + \frac{X_2}{\rho_{CO_2}}\]</div>
+<p>where <span class="math notranslate nohighlight">\(X_2\)</span> is the mass fraction of CO<sub>2</sub> in the aqueous phase.
+Partial density of dissolved CO<sub>2</sub>, <span class="math notranslate nohighlight">\(\rho_{CO_2}\)</span>, is calculated as a function of temperature from the correlation for molar volume of dissolved CO<sub>2</sub> at infinite dilution developed by <span id="id30"><a class="reference internal" href="../references.html#id31" title="Garcia, J. E. (2001). Density of aqueous solutions of CO2. Lawrence Berkeley National Lab.(LBNL), Berkeley, CA (United States).">Garcia, 2001</a></span>.</p>
+<div class="math notranslate nohighlight" id="equation-eq-eco2n-9">
+<span class="eqno">(83)<a class="headerlink" href="#equation-eq-eco2n-9" title="Link to this equation">#</a></span>\[V_{\phi} = a + b T + c T^2 + d T^3\]</div>
+<p>In Eq. <a class="reference internal" href="#equation-eq-eco2n-9">(83)</a>, molar volume of CO<sub>2</sub> is in units of cm<sup>3</sup> per gram-mole, temperature <span class="math notranslate nohighlight">\(T\)</span> is in ˚C, and <span class="math notranslate nohighlight">\(a\)</span>, <span class="math notranslate nohighlight">\(b\)</span>, <span class="math notranslate nohighlight">\(c\)</span>, and <span class="math notranslate nohighlight">\(d\)</span> are fit parameters given in <a class="reference internal" href="#tab-eco2n-3"><span class="std std-numref">Table 102</span></a>.</p>
+<table class="table table-center" id="tab-eco2n-3">
+<caption><span class="caption-number">Table 102 </span><span class="caption-text">Parameters for molar volume of dissolved CO<sub>2</sub> <a class="reference internal" href="#equation-eq-eco2n-9">(83)</a>.</span><a class="headerlink" href="#tab-eco2n-3" title="Link to this table">#</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>a</p></td>
+<td><p>37.51</p></td>
+</tr>
+<tr class="row-odd"><td><p>b</p></td>
+<td><p>-9.585 × 10<sup>-2</sup></p></td>
+</tr>
+<tr class="row-even"><td><p>c</p></td>
+<td><p>8.740 × 10<sup>-4</sup></p></td>
+</tr>
+<tr class="row-odd"><td><p>d</p></td>
+<td><p>-5.044 × 10<sup>-7</sup></p></td>
+</tr>
+</tbody>
+</table>
+<p>Partial density of dissolved CO<sub>2</sub> in units of kg/m<sup>3</sup> is then</p>
+<div class="math notranslate nohighlight" id="equation-eq-eco2n-10">
+<span class="eqno">(84)<a class="headerlink" href="#equation-eq-eco2n-10" title="Link to this equation">#</a></span>\[\rho_{CO_2} = \frac{M_{CO_2}}{V_{\phi}} \times 10^{-3}\]</div>
+<p>where <span class="math notranslate nohighlight">\(M_{CO_2}\)</span> = 44.0 is the molecular weight of CO<sub>2</sub>.</p>
+<p>Dissolved CO<sub>2</sub> amounts at most to a few percent of total aqueous density. Accordingly, dissolved CO<sub>2</sub> is always dilute, regardless of total fluid pressure.
+It is then permissible to neglect the pressure dependence of partial density of dissolved CO<sub>2</sub>, and to use the density corresponding to infinite dilution.</p>
+<p>As had been mentioned above, the density of the CO<sub>2</sub>-rich (gas) phase is obtained by neglecting effects of water, and approximating the density by that of pure CO<sub>2</sub> at the same temperature and pressure conditions.
+Density is obtained through bivariate interpolation from a tabulation of CO<sub>2</sub> densities as function of temperature and pressure, that is based on the correlations developed by <span id="id31"><a class="reference internal" href="../references.html#id2" title="Altunin, V. (1975). Thermophysical properties of carbon dioxide. Wellingborough, Collets.">Altunin, 1975</a></span>.</p>
+</section>
+<section id="viscosity">
+<h4>Viscosity<a class="headerlink" href="#viscosity" title="Link to this heading">#</a></h4>
+<p>Brine viscosity is obtained as in EWASG from a correlation presented by <span id="id32"><a class="reference internal" href="../references.html#id74" title="Phillips, S. (1981). A technical databook for geothermal energy utilization. Lawrence Berkeley National Lab.(LBNL), Berkeley, CA (United States).">Phillips, 1981</a></span>, that reproduces experimental data in the temperature range from 10-350˚C for salinities up to 5 molal and pressures up to 500 bar within 2%.
+No allowance is made for dependence of brine viscosity on the concentration of dissolved CO<sub>2</sub>.
+Viscosity of the CO<sub>2</sub>-rich phase is approximated as being equal to pure CO<sub>2</sub>, and is obtained through tabular interpolation from the correlations of <span id="id33"><a class="reference internal" href="../references.html#id2" title="Altunin, V. (1975). Thermophysical properties of carbon dioxide. Wellingborough, Collets.">Altunin, 1975</a></span>.</p>
+</section>
+<section id="specific-enthalpy">
+<h4>Specific Enthalpy<a class="headerlink" href="#specific-enthalpy" title="Link to this heading">#</a></h4>
+<p>Specific enthalpy of brine is calculated from the correlations developed by <span id="id34"><a class="reference internal" href="../references.html#id51" title="Lorenz, S., Maric, D., &amp; Rirschl, C. (2000). Eine analytische funktion zur bestimmung der enthalpie wässriger nacl lösungen, draft report. Institut für Sicherheitstechnologie, Köln, Germany.">Lorenz et al., 2000</a></span>, which are valid for all salt concentrations in the temperature range from 25˚C ≤ <span class="math notranslate nohighlight">\(T\)</span> ≤ 300˚C.
+The enthalpy of aqueous phase with dissolved CO<sub>2</sub> is obtained by adding the enthalpies of the CO<sub>2</sub> and brine (pseudo-) components, and accounting for the enthalpy of dissolution of CO<sub>2</sub>.</p>
+<div class="math notranslate nohighlight" id="equation-eq-eco2n-11">
+<span class="eqno">(85)<a class="headerlink" href="#equation-eq-eco2n-11" title="Link to this equation">#</a></span>\[h_{aq} = \left( 1 - X_2 \right) h_b + X_2 h_{CO_2, aq}\]</div>
+<p><span class="math notranslate nohighlight">\(h_{CO_2, aq} = h_{CO_2} + h_{dis}\)</span> is the specific enthalpy of aqueous (dissolved) CO<sub>2</sub>, which includes heat of dissolution effects that are a function of temperature and salinity.
+For gas-like (low pressure) CO<sub>2</sub>, the specific enthalpy of dissolved CO<sub>2</sub> is</p>
+<div class="math notranslate nohighlight" id="equation-eq-eco2n-12">
+<span class="eqno">(86)<a class="headerlink" href="#equation-eq-eco2n-12" title="Link to this equation">#</a></span>\[h_{CO_2, aq} (T, P, X_s) = h_{CO_2, g} (T, P) + h_{dis, g} (T, X_s)\]</div>
+<p>where <span class="math notranslate nohighlight">\(h_{dis, g}\)</span> is obtained as in <span id="id35"><a class="reference internal" href="../references.html#id8" title="Battistelli, A., Calore, C., &amp; Pruess, K. (1997). The simulator tough2/ewasg for modelling geothermal reservoirs with brines and non-condensible gas. Geothermics, 26(4), 437–464.">Battistelli et al., 1997</a></span> from an equation due to <span id="id36"><a class="reference internal" href="../references.html#id39" title="Himmelblau, D. (1959). Partial molar heats and entropies of solution for gases dissolved in water from the freezing to near the critical point. The Journal of Physical Chemistry, 63(11), 1803–1808.">Himmelblau, 1959</a></span>.
+For geologic sequestration we are primarily interested in liquid-like (high-pressure) CO<sub>2</sub>, for which the specific enthalpy of dissolved CO<sub>2</sub> may be written</p>
+<div class="math notranslate nohighlight" id="equation-eq-eco2n-13">
+<span class="eqno">(87)<a class="headerlink" href="#equation-eq-eco2n-13" title="Link to this equation">#</a></span>\[h_{CO_2, aq} (T, P, X_s) = h_{CO_2, l} (T, P) + h_{dis, l} (T, X_s)\]</div>
+<p>Here <span class="math notranslate nohighlight">\(h_{dis, l}\)</span> is the specific heat of dissolution for liquid-like CO<sub>2</sub>.
+Along the CO<sub>2</sub> saturation line, liquid and gaseous CO<sub>2</sub> phases may co-exist, and the expressions Eqs. <a class="reference internal" href="#equation-eq-eco2n-12">(86)</a> and <a class="reference internal" href="#equation-eq-eco2n-13">(87)</a> must be equal there.
+We obtain</p>
+<div class="math notranslate nohighlight" id="equation-eq-eco2n-14">
+<span class="eqno">(88)<a class="headerlink" href="#equation-eq-eco2n-14" title="Link to this equation">#</a></span>\[h_{dis, l} (T, X_s) = h_{dis, g} (T, X_s) + h_{CO_2, gl} (T)\]</div>
+<p>where <span class="math notranslate nohighlight">\(h_{CO_2, gl} (T) = h_{CO_2, g} (T, P_s) - h_{CO_2, l} (T, P_s)\)</span> is the specific enthalpy of vaporization of CO<sub>2</sub>, and <span class="math notranslate nohighlight">\(P_s = P_s (T)\)</span> is the saturated vapor pressure of CO<sub>2</sub> at temperature <span class="math notranslate nohighlight">\(T\)</span>.
+Depending upon whether CO<sub>2</sub> is in gas or liquid conditions, we use Eq. <a class="reference internal" href="#equation-eq-eco2n-12">(86)</a> or <a class="reference internal" href="#equation-eq-eco2n-13">(87)</a> in Eq. <a class="reference internal" href="#equation-eq-eco2n-11">(85)</a> to calculate the specific enthalpy of dissolved CO<sub>2</sub>.
+At the temperatures of interest here, <span class="math notranslate nohighlight">\(h_{dis, g}\)</span> is a negative quantity, so that dissolution of low-pressure CO<sub>2</sub> is accompanied by an increase in temperature.
+<span class="math notranslate nohighlight">\(h_{CO_2, gl}\)</span> is a positive quantity, which will reduce or cancel out the heat-of-dissolution effects.
+This indicates that dissolution of liquid CO<sub>2</sub> will produce less temperature increase than dissolution of gaseous CO<sub>2</sub>, and may even cause a temperature decline if <span class="math notranslate nohighlight">\(h_{CO_2, gl}\)</span> is sufficiently large.</p>
+<p>Application of Eq. <a class="reference internal" href="#equation-eq-eco2n-11">(85)</a> is straightforward for single-phase gas and two-phase conditions, where <span class="math notranslate nohighlight">\(h_{CO_2}\)</span> is obtained as a function of temperature and pressure through bivariate interpolation from a tabulation of Altunin’s correlation (<span id="id37"><a class="reference internal" href="../references.html#id2" title="Altunin, V. (1975). Thermophysical properties of carbon dioxide. Wellingborough, Collets.">Altunin, 1975</a></span>).
+A complication arises in evaluating <span class="math notranslate nohighlight">\(h_{CO_2}\)</span> for single-phase aqueous conditions.
+We make the assumption that <span class="math notranslate nohighlight">\(h_{CO_2} (P, X_s, X_2, T)\)</span> for single-phase liquid is identical to the value in a two-phase system with the same composition of the aqueous phase.
+To determine <span class="math notranslate nohighlight">\(h_{CO_2}\)</span>, it is then necessary to invert the <span id="id38"><a class="reference internal" href="../references.html#id98" title="Spycher, N., &amp; Pruess, K. (2005). Co2-h2o mixtures in the geological sequestration of co2. ii. partitioning in chloride brines at 12–100 c and up to 600 bar. Geochimica et Cosmochimica Acta, 69(13), 3309–3320.">Spycher &amp; Pruess, 2005</a></span> phase partitioning relation <span class="math notranslate nohighlight">\(X_2 = X_2 (P, T, X_s)\)</span>, in order to obtain the pressure <span class="math notranslate nohighlight">\(P\)</span> in a two-phase aqueous-gas system that would correspond to a dissolved CO<sub>2</sub> mass fraction <span class="math notranslate nohighlight">\(X_2\)</span> in the aqueous phase, <span class="math notranslate nohighlight">\(P = P(X_2, X_s, T)\)</span>.
+The inversion is accomplished by Newtonian iteration, using a starting guess <span class="math notranslate nohighlight">\(P_0\)</span> for <span class="math notranslate nohighlight">\(P\)</span> that is obtained from Henry’s law.
+Specific enthalpy of gaseous CO<sub>2</sub> in the two-phase system is then calculated as <span class="math notranslate nohighlight">\(h_{CO_2} = h_{CO_2} (T, P)\)</span>, and specific enthalpy of dissolved CO<sub>2</sub> is <span class="math notranslate nohighlight">\(h_{CO_2} + h_{dis}\)</span>.</p>
+</section>
+</section>
+</section>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Link to this heading">#</a></h2>
+<section id="initialization-choices">
+<h3>Initialization Choices<a class="headerlink" href="#initialization-choices" title="Link to this heading">#</a></h3>
+<p>Flow problems in TOUGH2/ECO2N will generally be initialized with the primary
+thermodynamic variables as used in the code, but some additional choices are available for the convenience of users.
+The internally used variables are (<span class="math notranslate nohighlight">\(P\)</span>, <span class="math notranslate nohighlight">\(X_{sm}\)</span>, <span class="math notranslate nohighlight">\(X_3\)</span>, <span class="math notranslate nohighlight">\(T\)</span>) for grid blocks in single-phase (liquid or gas) conditions and (<span class="math notranslate nohighlight">\(P\)</span>, <span class="math notranslate nohighlight">\(X_{sm}\)</span>, <span class="math notranslate nohighlight">\(S_g\)</span> + 10, <span class="math notranslate nohighlight">\(T\)</span>) for two-phase (liquid and gas) grid blocks (see <a class="reference internal" href="#tab-eco2n-1"><span class="std std-numref">Table 100</span></a>).
+Here <span class="math notranslate nohighlight">\(X_3\)</span> is the mass fraction of CO<sub>2</sub> in the fluid.
+As had been discussed above, for conditions of interest to geologic sequestration of CO<sub>2</sub>, <span class="math notranslate nohighlight">\(X_3\)</span> is restricted to small values 0 ≤ <span class="math notranslate nohighlight">\(X_3\)</span> ≤ <span class="math notranslate nohighlight">\(X_{2, eq}\)</span> (a few percent) for single-phase liquid conditions, or to values near 1 (<span class="math notranslate nohighlight">\(Y_{2, eq}\)</span> ≤ <span class="math notranslate nohighlight">\(X_3\)</span> ≤ 1, with <span class="math notranslate nohighlight">\(Y_{2, eq}\)</span> &gt; 0.99 typically) for single-phase gas (<a class="reference internal" href="#fig-eco2n-6"><span class="std std-numref">Figure 15</span></a>).
+Intermediate values <span class="math notranslate nohighlight">\(X_{2, eq}\)</span> &lt; <span class="math notranslate nohighlight">\(X_3\)</span> &lt; <span class="math notranslate nohighlight">\(Y_{2, eq}\)</span> correspond to two-phase conditions, and thus should be initialized by specifying <span class="math notranslate nohighlight">\(S_g\)</span> + 10 as third primary variable.
+As a convenience to users, ECO2N allows initial conditions to be specified in the full range 0 ≤ <span class="math notranslate nohighlight">\(X_3\)</span> ≤ 1.
+During the initialization phase of a simulation, a check is made whether <span class="math notranslate nohighlight">\(X_3\)</span> is in fact within the range of mass fractions that correspond to single-phase (liquid or gas) conditions.
+If this is found not to be the case, the conditions are recognized as being two-phase, and the corresponding gas saturation is calculated from the phase equilibrium constraint.</p>
+<div class="math notranslate nohighlight" id="equation-eq-eco2n-15">
+<span class="eqno">(89)<a class="headerlink" href="#equation-eq-eco2n-15" title="Link to this equation">#</a></span>\[X_3 \left( S_l \rho_l + S_g \rho_g \right) = S_l \rho_l X_{2, eq} + S_g \rho_g Y_{2, eq}\]</div>
+<p>Using <span class="math notranslate nohighlight">\(S_l = 1 - S_g - S_s\)</span>, with Ss the “solid saturation” (fraction of pore space occupied by solid salt), we obtain</p>
+<div class="math notranslate nohighlight" id="equation-eq-eco2n-16">
+<span class="eqno">(90)<a class="headerlink" href="#equation-eq-eco2n-16" title="Link to this equation">#</a></span>\[S_g = A \left( 1 - S_s \right)\]</div>
+<p>and the third primary variable is reset internally to <span class="math notranslate nohighlight">\(X_3\)</span> = <span class="math notranslate nohighlight">\(S_g\)</span> + 10.
+Here the parameter <span class="math notranslate nohighlight">\(A\)</span> is given by</p>
+<div class="math notranslate nohighlight" id="equation-eq-eco2n-17">
+<span class="eqno">(91)<a class="headerlink" href="#equation-eq-eco2n-17" title="Link to this equation">#</a></span>\[A = \frac{\left( X_3 - X_{2, eq} \right) \rho_l}{\left( X_3 - X_{2, eq} \right) \rho_l + \left( Y_{2, eq} - X_3 \right) \rho_g}\]</div>
+<p>Users may think of specifying single-phase liquid (aqueous) conditions by setting <span class="math notranslate nohighlight">\(X_3\)</span> = 10 (corresponding to <span class="math notranslate nohighlight">\(S_g\)</span> = 0), and single-phase gas conditions by setting <span class="math notranslate nohighlight">\(X_3\)</span> = 11 - <span class="math notranslate nohighlight">\(S_s\)</span> (corresponding to <span class="math notranslate nohighlight">\(Sl\)</span> = 0).
+Strictly speaking this is not permissible, because two-phase initialization requires that both <span class="math notranslate nohighlight">\(S_g\)</span> &gt; 0 and <span class="math notranslate nohighlight">\(S_l\)</span> &gt; 0.
+Single-phase states should instead be initialized by specifying primary
+variable <span class="math notranslate nohighlight">\(X_3\)</span> as CO<sub>2</sub> mass fraction.
+However, as a user convenience, ECO2N accepts initialization of single-phase liquid conditions by specifying <span class="math notranslate nohighlight">\(X_3\)</span> = 10 (<span class="math notranslate nohighlight">\(S_g\)</span> = 0).
+Such specification will be converted internally to two-phase in the initialization phase by adding a small number (10<sup>-11</sup>) to the third
+primary variable, changing conditions to two-phase with a small gas saturation <span class="math notranslate nohighlight">\(S_g\)</span> = 10<sup>-11</sup>.</p>
+<p>Salt concentration or saturation of solid salt, if present, is characterized in ECO2N by means of the second primary variable <span class="math notranslate nohighlight">\(X_{sm}\)</span>.
+When no solid phase is present, <span class="math notranslate nohighlight">\(X_{sm}\)</span> denotes <span class="math notranslate nohighlight">\(X_s\)</span>, the mass fraction of NaCl referred to the two-component system water-NaCl.
+This is restricted to the range 0 ≤ <span class="math notranslate nohighlight">\(X_{sm}\)</span> ≤ <span class="math notranslate nohighlight">\(XEQ\)</span>, where <span class="math notranslate nohighlight">\(XEQ = XEQ(T)\)</span> is the solubility of salt.
+For <span class="math notranslate nohighlight">\(X_{sm}\)</span> &gt; 10 this variable means <span class="math notranslate nohighlight">\(S_s\)</span> + 10, solid saturation plus 10.
+Users also have the option to specify salt concentration by means of molality <span class="math notranslate nohighlight">\(m\)</span> by assigning <span class="math notranslate nohighlight">\(X_{sm} = -m\)</span>.
+Such specification will in the initialization phase be internally converted to <span class="math notranslate nohighlight">\(X_s\)</span> by using Eq. <a class="reference internal" href="#equation-eq-eco2n-1">(75)</a>.
+When salt concentration (as a fraction of total H<sub>2</sub>O + NaCl mass) exceeds <span class="math notranslate nohighlight">\(XEQ\)</span>, this corresponds to conditions in which solid salt will be present in addition to dissolved salt in the aqueous phase.
+Such states should be initialized with a second primary variable <span class="math notranslate nohighlight">\(X_{sm}\)</span> = <span class="math notranslate nohighlight">\(S_s\)</span> + 10.
+However, ECO2N accepts initialization with <span class="math notranslate nohighlight">\(X_{sm}\)</span> &gt; <span class="math notranslate nohighlight">\(XEQ\)</span>, recognizes this as corresponding to presence of solid salt, and converts the second primary variable internally to the appropriate solid saturation that will result in total salt mass fraction in the binary system water-salt being equal to <span class="math notranslate nohighlight">\(X_{sm}\)</span>.
+The conversion starts from the following equation.</p>
+<div class="math notranslate nohighlight" id="equation-eq-eco2n-18">
+<span class="eqno">(92)<a class="headerlink" href="#equation-eq-eco2n-18" title="Link to this equation">#</a></span>\[X_{sm} = \frac{XEQ \times S_l \rho_l \left( 1 - X_2 \right) + S_s \rho_s}{S_l \rho_l \left( 1 - X_2 \right) + S_s \rho_s}\]</div>
+<p>where the numerator gives the total salt mass per unit volume, in liquid and solid phases, while the denominator gives the total mass of salt plus water.
+Substituting <span class="math notranslate nohighlight">\(S_l = 1 - S_g - S_s\)</span>, this can be solved for <span class="math notranslate nohighlight">\(S_s\)</span> to yield</p>
+<div class="math notranslate nohighlight" id="equation-eq-eco2n-19">
+<span class="eqno">(93)<a class="headerlink" href="#equation-eq-eco2n-19" title="Link to this equation">#</a></span>\[S_s = \frac{B \left( 1 - S_g \right)}{1 + B}\]</div>
+<p>where the parameter <span class="math notranslate nohighlight">\(B\)</span> is given by</p>
+<div class="math notranslate nohighlight" id="equation-eq-eco2n-20">
+<span class="eqno">(94)<a class="headerlink" href="#equation-eq-eco2n-20" title="Link to this equation">#</a></span>\[B = \frac{\left( X_{sm} - XEQ \right) \rho_l \left( 1 - X_2 \right)}{\rho_s \left( 1 - X_{sm} \right)}\]</div>
+<p>The most general conditions arise when both the second and third primary variables are initialized as mass fractions, nominally corresponding to single-phase fluid conditions with no solid phase present, but both mass fractions being in the range corresponding to two-phase fluid conditions
+with precipitated salt.
+Under these conditions, Eqs. <a class="reference internal" href="#equation-eq-eco2n-16">(90)</a> and <a class="reference internal" href="#equation-eq-eco2n-19">(93)</a> are solved simultaneously in ECO2N for <span class="math notranslate nohighlight">\(S_s\)</span> and <span class="math notranslate nohighlight">\(S_g\)</span>, yielding</p>
+<div class="math notranslate nohighlight" id="equation-eq-eco2n-21">
+<span class="eqno">(95)<a class="headerlink" href="#equation-eq-eco2n-21" title="Link to this equation">#</a></span>\[S_g = \frac{A}{1 + B - A \times B}\]</div>
+<div class="math notranslate nohighlight" id="equation-eq-eco2n-22">
+<span class="eqno">(96)<a class="headerlink" href="#equation-eq-eco2n-22" title="Link to this equation">#</a></span>\[S_s = \frac{B \times \left( 1 - A \right)}{1 + B - A \times B}\]</div>
+<p>Then both second and third primary variables are converted to phase saturations, <span class="math notranslate nohighlight">\(S_s\)</span> + 10 and <span class="math notranslate nohighlight">\(S_g\)</span> + 10, respectively.</p>
+</section>
+<section id="permeability-change-from-precipitation-and-dissolution-of-salt">
+<h3>Permeability Change from Precipitation and Dissolution of Salt<a class="headerlink" href="#permeability-change-from-precipitation-and-dissolution-of-salt" title="Link to this heading">#</a></h3>
+<p>ECO2N offers several choices for the functional dependence of relative change in permeability, <span class="math notranslate nohighlight">\(\frac{k}{k_0}\)</span>, on relative change in active flow porosity.</p>
+<div class="math notranslate nohighlight" id="equation-eq-eco2n-23">
+<span class="eqno">(97)<a class="headerlink" href="#equation-eq-eco2n-23" title="Link to this equation">#</a></span>\[\frac{k}{k_0} = f \left( \frac{\phi_f}{\phi_0} \right) \equiv f \left( 1 - S_s \right)\]</div>
+<p>The simplest model that can capture the converging-diverging nature of natural pore channels consists of alternating segments of capillary tubes with larger and smaller radii, respectively; see <a class="reference internal" href="#fig-eco2n-8"><span class="std std-numref">Figure 17</span></a>.
+While in straight capillary tube models permeability remains finite as long as porosity is non-zero, in models of tubes with different radii in series, permeability is reduced to zero at a finite porosity.</p>
+<figure class="sphinx-subfigure align-default" id="fig-eco2n-8">
+<div class="sphinx-subfigure-grid ss-layout-default-AB ss-layout-sm-A_B" style="display: grid; gap: 32px; grid-gap: 32px;">
+<div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: A;">
+<span class="caption">Conceptual model</span>
+<img alt="Conceptual model" src="../../_images/pore_conceptual_model.png" />
+</div>
+<div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: B;">
+<span class="caption">Tubes-in-series</span>
+<img alt="Tubes-in-series" src="../../_images/pore_tubes_in_series.png" />
+</div>
+</div>
+<figcaption>
+<p><span class="caption-number">Figure 17 </span><span class="caption-text">Model for converging-diverging pore channels.</span><a class="headerlink" href="#fig-eco2n-8" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>From the tubes-in-series model shown in <a class="reference internal" href="#fig-eco2n-8"><span class="std std-numref">Figure 17</span></a>, the following relationship can be derived (<span id="id39"><a class="reference internal" href="../references.html#id111" title="Verma, A., &amp; Pruess, K. (1988). Thermohydrological conditions and silica redistribution near high-level nuclear wastes emplaced in saturated geological formations. Journal of Geophysical Research: Solid Earth, 93(B2), 1159–1173.">Verma &amp; Pruess, 1988</a></span>)</p>
+<div class="math notranslate nohighlight" id="equation-eq-eco2n-24">
+<span class="eqno">(98)<a class="headerlink" href="#equation-eq-eco2n-24" title="Link to this equation">#</a></span>\[\frac{k}{k_0} = \theta^2 \frac{1 - \Gamma + \frac{\Gamma}{\omega^2}}{1 - \Gamma + \Gamma \left( \frac{\theta}{\theta + \omega - 1} \right)^2}\]</div>
+<p>Here</p>
+<div class="math notranslate nohighlight" id="equation-eq-eco2n-25">
+<span class="eqno">(99)<a class="headerlink" href="#equation-eq-eco2n-25" title="Link to this equation">#</a></span>\[\theta = \frac{1 - S_s - \phi_r}{1 - \phi_r}\]</div>
+<p>depends on the fraction <span class="math notranslate nohighlight">\(1 - S_s\)</span> of original pore space that remains available to fluids, and on a parameter <span class="math notranslate nohighlight">\(\phi_r\)</span>, which denotes the fraction of original porosity at which permeability is reduced to zero.
+<span class="math notranslate nohighlight">\(\Gamma\)</span> is the fractional length of the pore bodies, and the parameter <span class="math notranslate nohighlight">\(\omega\)</span> is given by</p>
+<div class="math notranslate nohighlight" id="equation-eq-eco2n-26">
+<span class="eqno">(100)<a class="headerlink" href="#equation-eq-eco2n-26" title="Link to this equation">#</a></span>\[\omega = 1 + \frac{\frac{1}{\Gamma}}{\frac{1}{\phi_r} - 1}\]</div>
+<p>Therefore, Eq. <a class="reference internal" href="#equation-eq-eco2n-24">(98)</a> has only two independent geometric parameters that need to be specified, <span class="math notranslate nohighlight">\(\phi_r\)</span> and <span class="math notranslate nohighlight">\(\Gamma\)</span>.
+As an example, <a class="reference internal" href="#fig-eco2n-9"><span class="std std-numref">Figure 18</span></a> shows the permeability reduction factor from Eq. <a class="reference internal" href="#equation-eq-eco2n-24">(98)</a>, plotted against <span class="math notranslate nohighlight">\(\frac{\phi}{\phi_0} \equiv \left( 1 - S_s \right)\)</span>, for parameters of <span class="math notranslate nohighlight">\(\phi_r\)</span> = <span class="math notranslate nohighlight">\(\Gamma\)</span> = 0.8.</p>
+<figure class="align-default" id="fig-eco2n-9">
+<a class="reference internal image-reference" href="../../_images/porosity_permeability.png"><img alt="../../_images/porosity_permeability.png" src="../../_images/porosity_permeability.png" style="width: 75%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Figure 18 </span><span class="caption-text">Porosity-permeability relationship for tubes-in-series model, after <span id="id40"><a class="reference internal" href="../references.html#id111" title="Verma, A., &amp; Pruess, K. (1988). Thermohydrological conditions and silica redistribution near high-level nuclear wastes emplaced in saturated geological formations. Journal of Geophysical Research: Solid Earth, 93(B2), 1159–1173.">Verma &amp; Pruess, 1988</a></span>.</span><a class="headerlink" href="#fig-eco2n-9" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>For parallel-plate fracture segments of different aperture in series, a relationship similar to Eq. <a class="reference internal" href="#equation-eq-eco2n-24">(98)</a> is obtained, the only difference being that the exponent 2 is replaced everywhere by 3 (<span id="id41"><a class="reference internal" href="../references.html#id111" title="Verma, A., &amp; Pruess, K. (1988). Thermohydrological conditions and silica redistribution near high-level nuclear wastes emplaced in saturated geological formations. Journal of Geophysical Research: Solid Earth, 93(B2), 1159–1173.">Verma &amp; Pruess, 1988</a></span>).
+If only straight capillary tubes of uniform radius are considered, we have <span class="math notranslate nohighlight">\(\phi_r\)</span> = 0, <span class="math notranslate nohighlight">\(\Gamma\)</span> = 0, and Eq. <a class="reference internal" href="ewasg.html#equation-eq-ewasg-2">(71)</a> simplifies to</p>
+<div class="math notranslate nohighlight" id="equation-eq-eco2n-27">
+<span class="eqno">(101)<a class="headerlink" href="#equation-eq-eco2n-27" title="Link to this equation">#</a></span>\[\frac{k}{k_0} = \left( 1 - S_s \right)^2\]</div>
+</section>
+</section>
+<section id="selections">
+<h2>Selections<a class="headerlink" href="#selections" title="Link to this heading">#</a></h2>
+<p>Various options for ECO2N can be selected through parameter specifications in data block <strong>SELEC</strong>.
+Default choices corresponding to various selection parameters set equal to zero provide the most comprehensive thermophysical property model.
+Certain functional dependencies can be turned off or replaced by simpler and less accurate models, see below.
+These options are offered to enable users to identify the role of different effects in a flow problem, and to facilitate comparison with other simulation programs that may not include full dependencies of thermophysical properties.</p>
+<table class="table table-center" id="tab-eco2n-selec-1">
+<caption><span class="caption-number">Table 103 </span><span class="caption-text">Record <strong>SELEC.1</strong>.</span><a class="headerlink" href="#tab-eco2n-selec-1" title="Link to this table">#</a></caption>
+<colgroup>
+<col style="width: 12.5%" />
+<col style="width: 12.5%" />
+<col style="width: 75.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Format</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IE(1)</span></code></p></td>
+<td><p>I5</p></td>
+<td><p>set equal to 1, to read one additional data record (a larger value with more data records is acceptable, but only one additional record will be used by ECO2N).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IE(11)</span></code></p></td>
+<td><p>I5</p></td>
+<td><div class="line-block">
+<div class="line">selects dependence of permeability on the fraction <span class="math notranslate nohighlight">\(\frac{\phi_f}{\phi_0} = \left( 1 - S_s \right)\)</span> of original pore space that remains available to fluids:</div>
+<div class="line">0: permeability does not vary with <span class="math notranslate nohighlight">\(\phi_f\)</span>.</div>
+<div class="line">1: <span class="math notranslate nohighlight">\(\frac{k}{k_0} = \left( 1 - S_s \right)^{\gamma}\)</span>, with <span class="math notranslate nohighlight">\(\gamma\)</span> = <code class="docutils literal notranslate"><span class="pre">FE(1)</span></code>.</div>
+<div class="line">2: fractures in series, i.e., Eq. <a class="reference internal" href="#equation-eq-eco2n-24">(98)</a> with exponent 2 everywhere replaced by 3.</div>
+<div class="line">3: tubes-in-series, i.e., Eq. <a class="reference internal" href="#equation-eq-eco2n-24">(98)</a>.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IE(12)</span></code></p></td>
+<td><p>I5</p></td>
+<td><div class="line-block">
+<div class="line">allows choice of model for water solubility in CO<sub>2</sub>:</div>
+<div class="line">0: after Spycher and Pruess (2005).</div>
+<div class="line">1: evaporation model; i.e., water density in the CO<sub>2</sub>-rich phase is calculated as density of saturated water vapor at prevailing temperature and salinity.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IE(13)</span></code></p></td>
+<td><p>I5</p></td>
+<td><div class="line-block">
+<div class="line-block">
+<div class="line">allows choice of dependence of brine density on dissolved CO<sub>2</sub>:</div>
+</div>
+<div class="line">0: brine density varies with dissolved CO<sub>2</sub> concentration, according to García’s (2001) correlation for temperature dependence of molar volume of dissolved CO<sub>2</sub>.</div>
+<div class="line">1: brine density is independent of CO<sub>2</sub> concentration.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IE(14)</span></code></p></td>
+<td><p>I5</p></td>
+<td><div class="line-block">
+<div class="line">allows choice of treatment of thermophysical properties as a function of salinity:</div>
+<div class="line">0: full dependence.</div>
+<div class="line">1: no salinity dependence of thermophysical properties (except for brine enthalpy; salt solubility constraints are maintained).</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IE(15)</span></code></p></td>
+<td><p>I5</p></td>
+<td><div class="line-block">
+<div class="line">allows choice of correlation for brine enthalpy at saturated vapor pressure:</div>
+<div class="line">0: after Lorenz et al. (2000).</div>
+<div class="line">1: after Michaelides (1981).</div>
+<div class="line">2: after Miller (1978).</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<table class="table table-center" id="tab-eco2n-selec-2">
+<caption><span class="caption-number">Table 104 </span><span class="caption-text">Record <strong>SELEC.2</strong>.</span><a class="headerlink" href="#tab-eco2n-selec-2" title="Link to this table">#</a></caption>
+<colgroup>
+<col style="width: 12.5%" />
+<col style="width: 12.5%" />
+<col style="width: 75.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Format</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">FE(1)</span></code></p></td>
+<td><p>E10.4</p></td>
+<td><p>parameter <span class="math notranslate nohighlight">\(\gamma\)</span> (for <code class="docutils literal notranslate"><span class="pre">IE(11)</span></code> = 1); parameter <span class="math notranslate nohighlight">\(\phi_r\)</span> (for <code class="docutils literal notranslate"><span class="pre">IE(11)</span></code> = 2, 3).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">FE(2)</span></code></p></td>
+<td><p>E10.4</p></td>
+<td><p>parameter <span class="math notranslate nohighlight">\(\Gamma\)</span> (for <code class="docutils literal notranslate"><span class="pre">IE(11)</span></code> = 2, 3).</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="ewasg.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">EWASG</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../references.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">References</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theoretical-background">Theoretical Background</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fluid-phases-and-thermodynamic-variables-in-the-system-water-nacl-co2">Fluid Phases and Thermodynamic Variables in the System Water-NaCl-CO<sub>2</sub></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#phase-composition">Phase Composition</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#phase-change">Phase Change</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#conversion-of-units">Conversion of Units</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermophysical-properties-of-water-nacl-co2-mixtures">Thermophysical Properties of Water-NaCl-CO<sub>2</sub> Mixtures</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#density">Density</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#viscosity">Viscosity</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#specific-enthalpy">Specific Enthalpy</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#description">Description</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#initialization-choices">Initialization Choices</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#permeability-change-from-precipitation-and-dissolution-of-salt">Permeability Change from Precipitation and Dissolution of Salt</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#selections">Selections</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/tough3/eos/eco2n.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023, Keurfon Luu.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

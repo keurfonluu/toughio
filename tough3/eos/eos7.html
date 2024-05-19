@@ -1,0 +1,687 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>EOS7 &#8212; toughio 1.15.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=8fbebee6" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../../_static/documentation_options.js?v=70d5d4a5"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tough3/eos/eos7';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="EOS7R" href="eos7r.html" />
+    <link rel="prev" title="EOS5" href="eos5.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../_static/logo-light.png" class="logo__image only-light" alt="toughio 1.15.0 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="toughio 1.15.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        TOUGH3
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        TOUGH3
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../install/index.html">Installation</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../install/linux.html">Installation on Linux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../install/windows.html">Installation on Windows</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../guide/index.html">User Guide</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../guide/governing_equations.html">Governing Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guide/numerical_methods.html">Numerical Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guide/initial_and_boundary_conditions.html">Initial and Boundary Conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guide/preparation_of_input_data.html">Preparation of Input Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guide/output_from_tough3.html">Output from TOUGH3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guide/relative_permeability_functions.html">Relative Permeability Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guide/capillary_pressure_functions.html">Capillary Pressure Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">EOS</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="eos1.html">EOS1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos2.html">EOS2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos3.html">EOS3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos4.html">EOS4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos5.html">EOS5</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">EOS7</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos7r.html">EOS7R</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos8.html">EOS8</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos9.html">EOS9</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ewasg.html">EWASG</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eco2n.html">ECO2N</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">TOUGH3</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">EOS</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">EOS7</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="eos7">
+<span id="id1"></span><h1>EOS7<a class="headerlink" href="#eos7" title="Link to this heading">#</a></h1>
+<p>An extension of the <a class="reference internal" href="eos3.html#eos3"><span class="std std-ref">EOS3</span></a> module for water/air mixtures, EOS7 represents the aqueous phase as a mixture of (pure) water and brine.
+This approach is very useful for flow problems in which salinity does not reach saturated levels (<span id="id2"><a class="reference internal" href="../references.html#id38" title="Herbert, A., Jackson, C., &amp; Lever, D. (1988). Coupled groundwater flow and solute transport with fluid density strongly dependent upon concentration. Water Resources Research, 24(10), 1781–1795.">Herbert et al., 1988</a>, <a class="reference internal" href="../references.html#id92" title="Reeves, M., Ward, D., Johns, N., &amp; Cranwell, R. (1986). Theory and implementation of swift ii, the sandia waste-isolation flow and transport model for fractured media. Rep. SAND83-1159. Sandia Natl Lab., Albuquerque, NM.">Reeves et al., 1986</a></span>).
+The salinity of the aqueous phase is described by means of the brine mass fraction, Xb, and density and viscosity are interpolated from the values for the water and brine endmembers.
+Salinity-dependent air solubility is also taken into account, but no allowance is made for reduction of vapor pressure with salinity.
+The brine is modeled as NaCl solution, while the non-condensible gas is air, although the treatment could be adapted, with minor modifications, to other brines and gases.
+The representation of the temperature and pressure dependence of thermophysical properties is somewhat more general than that of <span id="id3"><a class="reference internal" href="../references.html#id92" title="Reeves, M., Ward, D., Johns, N., &amp; Cranwell, R. (1986). Theory and implementation of swift ii, the sandia waste-isolation flow and transport model for fractured media. Rep. SAND83-1159. Sandia Natl Lab., Albuquerque, NM.">Reeves et al., 1986</a></span>, retaining the flexibility of the TOUGH3 formulation for nonisothermal processes.</p>
+<p>EOS7 can describe phase conditions ranging from single-phase liquid to two-phase to single-phase gas.
+However, the approach of describing variably saline fluids not as mixtures of water and salt but as mixtures of water and brine has specific limitations which need to be considered in applications.
+For example, in problems with significant boiling it would be possible for salinity to reach saturated levels, corresponding to brine mass fraction <span class="math notranslate nohighlight">\(X_b\)</span> = 1 (supposing that the brine component was chosen as fully saturated salt solution).
+Upon further boiling solid salt would precipitate, but solubility limits and solids precipitation are not taken into account in the approach used in EOS7 (these can be modeled with the EWASG module, see the addendum for EWASG).
+As evaporation continues from a saline aqueous phase, eventually brine mass fraction would increase beyond <span class="math notranslate nohighlight">\(X_b\)</span> = 1, in which case other mass fractions would become negative, and non-physical results would be obtained.
+From a physical viewpoint brine mass fraction in the gas phase should always be equal to zero, but the only way the brine mass balance can be maintained during phase transitions from two-phase to single-phase vapor conditions is by allowing <span class="math notranslate nohighlight">\(X_b\)</span>, gas to vary freely.
+Users need to carefully examine problem setups and results to guard against unphysical results in applications that involve boiling.</p>
+<p>We now briefly summarize the treatment of thermophysical properties in EOS7.
+The density of the aqueous phase is calculated from the assumption, shown to be very accurate by <span id="id4"><a class="reference internal" href="../references.html#id38" title="Herbert, A., Jackson, C., &amp; Lever, D. (1988). Coupled groundwater flow and solute transport with fluid density strongly dependent upon concentration. Water Resources Research, 24(10), 1781–1795.">Herbert et al., 1988</a></span>, that fluid volume is conserved when water and brine are mixed.
+Mixture density <span class="math notranslate nohighlight">\(\rho_m\)</span> can then be expressed in terms of water and brine densities as follows</p>
+<div class="math notranslate nohighlight" id="equation-eq-eos7-1">
+<span class="eqno">(53)<a class="headerlink" href="#equation-eq-eos7-1" title="Link to this equation">#</a></span>\[\frac{1}{\rho_m} = \frac{1 - X_b}{\rho_w} + \frac{X_b}{\rho_b}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\rho_w\)</span> and <span class="math notranslate nohighlight">\(\rho_b\)</span> are water and brine density, respectively.
+Eq. <a class="reference internal" href="#equation-eq-eos7-1">(53)</a> applies to densities at fixed pressure and temperature conditions.
+In order to achieve a simple approximation for fluid density at variable temperatures and pressures, EOS7 takes compressibility and expansivity of brine to be equal to those of water.
+This will provide a reasonable approximation at least for a limited range of temperatures and pressures around the reference conditions (<span class="math notranslate nohighlight">\(P_0\)</span>, <span class="math notranslate nohighlight">\(T_0\)</span>).
+The default reference brine has a density of 1185.1 kg/m<sup>3</sup> at reference conditions of <span class="math notranslate nohighlight">\(P_0\)</span> = 1 bar, <span class="math notranslate nohighlight">\(T_0\)</span> = 25˚C, corresponding to an NaCl solution of 24.98 wt-%, or 5.06 molar (<span id="id5"><a class="reference internal" href="../references.html#id76" title="Potter, J., &amp; Brown, D. L. (1977). The volumetric properties of aqueous sodium chloride solutions. US Geological Survey, Bulletin.">Potter &amp; Brown, 1977</a></span>; cited after <span id="id6"><a class="reference internal" href="../references.html#id30" title="Finley, N., &amp; Reeves, M. (1982). Swift self-teaching curriculum. Report SAND81-0410, Sandia National Laboratory, Albuquerque, NM.">Finley &amp; Reeves, 1982</a></span>).
+The user may specify different reference conditions and brine densities.
+Effects of salinity on the enthalpy of the aqueous phase are ignored.</p>
+<p>Following <span id="id7"><a class="reference internal" href="../references.html#id38" title="Herbert, A., Jackson, C., &amp; Lever, D. (1988). Coupled groundwater flow and solute transport with fluid density strongly dependent upon concentration. Water Resources Research, 24(10), 1781–1795.">Herbert et al., 1988</a></span>, salinity effects on aqueous phase viscosity are modeled with a polynomial correction to the viscosity of pure water.
+Mixture viscosity <span class="math notranslate nohighlight">\(\mu_m\)</span> is represented as follows</p>
+<div class="math notranslate nohighlight" id="equation-eq-eos7-2">
+<span class="eqno">(54)<a class="headerlink" href="#equation-eq-eos7-2" title="Link to this equation">#</a></span>\[\mu_m (P, T, X_b) = \mu_w (P, T) f(X_b)\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight" id="equation-eq-eos7-3">
+<span class="eqno">(55)<a class="headerlink" href="#equation-eq-eos7-3" title="Link to this equation">#</a></span>\[f(X_b) = 1 + \nu_1 X_b + \nu_2 X_b^2 + \nu_3 X_b^3\]</div>
+<p>with default values of <span class="math notranslate nohighlight">\(\nu_1\)</span> = 0.4819, <span class="math notranslate nohighlight">\(\nu_2\)</span> = -0.2774, and <span class="math notranslate nohighlight">\(\nu_3\)</span> = 0.7814.
+Different values for the coefficients may be specified by the user.</p>
+<p>Gas (air) dissolution in the aqueous phase is modeled by Henry’s law, as follows</p>
+<div class="math notranslate nohighlight" id="equation-eq-eos7-4">
+<span class="eqno">(56)<a class="headerlink" href="#equation-eq-eos7-4" title="Link to this equation">#</a></span>\[P_a = K_h x_{aq}^a\]</div>
+<p>where <span class="math notranslate nohighlight">\(K_h\)</span> is Henry’s constant and <span class="math notranslate nohighlight">\(x_{aq}^a\)</span> is air mole fraction in the aqueous phase.
+In saline solutions, gases are generally less soluble than in water (“salting out” effect).
+For a 5 <span class="math notranslate nohighlight">\(N\)</span> (molar) NaCl solution, nitrogen solubility is virtually independent of temperature in the range 0˚C ≤ <span class="math notranslate nohighlight">\(T\)</span> ≤ 100˚C, and corresponds to a Henry’s constant of <span class="math notranslate nohighlight">\(K_h\)</span> = 4.0 x 10<sup>10</sup> Pa (<span id="id8"><a class="reference internal" href="../references.html#id18" title="Cygan, R. T. (1991). The solubility of gases in NaCl brine and a critical evaluation of available data. Sandia National Laboratories Albuquerque.">Cygan, 1991</a></span>).</p>
+<p>We retain the value of <span class="math notranslate nohighlight">\(K_h\)</span> = 10<sup>10</sup> Pa for pure water, and represent air solubility (inverse of Henry’s constant) as a linear function of mixture molarity <span class="math notranslate nohighlight">\(N_m\)</span>, as follows</p>
+<div class="math notranslate nohighlight" id="equation-eq-eos7-5">
+<span class="eqno">(57)<a class="headerlink" href="#equation-eq-eos7-5" title="Link to this equation">#</a></span>\[\frac{1}{K_h} = 1.0 \times 10^{-10} + \frac{N_m}{5} \left( \frac{1}{4.0 \times 10^{10}} - 10^{-10} \right)\]</div>
+<section id="specifications">
+<h2>Specifications<a class="headerlink" href="#specifications" title="Link to this heading">#</a></h2>
+<p>A summary of EOS7 specifications and parameters appears in <a class="reference internal" href="#tab-eos7"><span class="std std-numref">Table 75</span></a>.
+The default parameter settings are (<code class="docutils literal notranslate"><span class="pre">NK</span></code>, <code class="docutils literal notranslate"><span class="pre">NEQ</span></code>, <code class="docutils literal notranslate"><span class="pre">NPH</span></code>, <code class="docutils literal notranslate"><span class="pre">NB</span></code>) = (3, 3, 2, 6).
+The <code class="docutils literal notranslate"><span class="pre">NK</span></code> = 2 (no air) option may only be used for problems with single-phase liquid conditions throughout.
+The primary variables are (<span class="math notranslate nohighlight">\(P\)</span>, <span class="math notranslate nohighlight">\(X_b\)</span>, <span class="math notranslate nohighlight">\(X\)</span>, <span class="math notranslate nohighlight">\(T\)</span>) for single-phase conditions and (<span class="math notranslate nohighlight">\(P\)</span>, <span class="math notranslate nohighlight">\(X_b\)</span>, <span class="math notranslate nohighlight">\(S\)</span> + 10, <span class="math notranslate nohighlight">\(T\)</span>) for two-phase conditions, where <span class="math notranslate nohighlight">\(X\)</span> is air mass fraction.</p>
+<table class="table table-center" id="tab-eos7">
+<caption><span class="caption-number">Table 75 </span><span class="caption-text">Summary of EOS7.</span><a class="headerlink" href="#tab-eos7" title="Link to this table">#</a></caption>
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 75.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Components</p></td>
+<td><div class="line-block">
+<div class="line">#1: water</div>
+<div class="line">#2: brine</div>
+<div class="line">#3: air (optional)*</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>Parameter choices</p></td>
+<td><div class="line-block">
+<div class="line">(<code class="docutils literal notranslate"><span class="pre">NK</span></code>, <code class="docutils literal notranslate"><span class="pre">NEQ</span></code>, <code class="docutils literal notranslate"><span class="pre">NPH</span></code>, <code class="docutils literal notranslate"><span class="pre">NB</span></code>) =</div>
+<div class="line">(3, 3, 2, 6) water, brine, air, isothermal (default)</div>
+<div class="line">(3, 4, 2, 6) water, brine, air, nonisothermal</div>
+<div class="line">(2, 2, 2, 6) water, brine, isothermal*</div>
+<div class="line">(2, 3, 2, 6) water, brine, nonisothermal*</div>
+<div class="line">Molecular diffusion can be modeled by setting <code class="docutils literal notranslate"><span class="pre">NB</span></code> = 8</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>Primary variables</p></td>
+<td><div class="line-block">
+<div class="line">Single-phase conditions:</div>
+<div class="line">(<span class="math notranslate nohighlight">\(P\)</span>, <span class="math notranslate nohighlight">\(X_b\)</span>, <span class="math notranslate nohighlight">\(X\)</span>, <span class="math notranslate nohighlight">\(T\)</span>): (pressure, brine mass fraction, air mass fraction, temperature)</div>
+<div class="line">Two-phase conditions:</div>
+<div class="line">(<span class="math notranslate nohighlight">\(P\)</span>, <span class="math notranslate nohighlight">\(X_b\)</span>, <span class="math notranslate nohighlight">\(S\)</span> + 10, <span class="math notranslate nohighlight">\(T\)</span>): (gas phase pressure, brine mass fraction, gas saturation plus ten, temperature)</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>* The <code class="docutils literal notranslate"><span class="pre">NK</span></code> = 2 (no air) option may only be used for problems with single-phase liquid conditions throughout.</p>
+</div>
+</section>
+<section id="selections">
+<h2>Selections<a class="headerlink" href="#selections" title="Link to this heading">#</a></h2>
+<p>Users may specify parameters for reference brine in the TOUGH3 input file by means of an optional data block <strong>SELEC</strong>, as follows</p>
+<table class="table table-center" id="tab-eos7-selec-1">
+<caption><span class="caption-number">Table 76 </span><span class="caption-text">Record <strong>SELEC.1</strong>.</span><a class="headerlink" href="#tab-eos7-selec-1" title="Link to this table">#</a></caption>
+<colgroup>
+<col style="width: 12.5%" />
+<col style="width: 12.5%" />
+<col style="width: 75.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Format</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IE(1)</span></code></p></td>
+<td><p>I5</p></td>
+<td><p>set equal to 2, to read two additional data records (a larger value with more additional data records is acceptable, but only the first two will be used by EOS7).</p></td>
+</tr>
+</tbody>
+</table>
+<table class="table table-center" id="tab-eos7-selec-2">
+<caption><span class="caption-number">Table 77 </span><span class="caption-text">Record <strong>SELEC.2</strong>.</span><a class="headerlink" href="#tab-eos7-selec-2" title="Link to this table">#</a></caption>
+<colgroup>
+<col style="width: 12.5%" />
+<col style="width: 12.5%" />
+<col style="width: 75.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Format</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(P_0\)</span>*</p></td>
+<td><p>E10.4</p></td>
+<td><p>reference pressure (Pa).</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(T_0\)</span>*</p></td>
+<td><p>E10.4</p></td>
+<td><p>reference temperature (˚C).</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\rho_b\)</span>*</p></td>
+<td><p>E10.4</p></td>
+<td><p>brine density at (<span class="math notranslate nohighlight">\(P_0\)</span>, <span class="math notranslate nohighlight">\(T_0\)</span>) (kg/m<sup>3</sup>).</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>* If any of these parameters is entered as zero, default values of <span class="math notranslate nohighlight">\(P_0\)</span> = 1 bar, <span class="math notranslate nohighlight">\(T_0\)</span> = 25˚C, <span class="math notranslate nohighlight">\(\rho_b\)</span> = 1185.1 kg/m<sup>3</sup> will be used.
+For <span class="math notranslate nohighlight">\(P_0\)</span> &lt; 0, brine properties will be assumed identical to water.</p>
+</div>
+<table class="table table-center" id="tab-eos7-selec-3">
+<caption><span class="caption-number">Table 78 </span><span class="caption-text">Record <strong>SELEC.3</strong>.</span><a class="headerlink" href="#tab-eos7-selec-3" title="Link to this table">#</a></caption>
+<colgroup>
+<col style="width: 12.5%" />
+<col style="width: 12.5%" />
+<col style="width: 75.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Format</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\nu_1\)</span>, <span class="math notranslate nohighlight">\(\nu_2\)</span>, <span class="math notranslate nohighlight">\(\nu_3\)</span></p></td>
+<td><p>3E10.4</p></td>
+<td><p>coefficients for salinity correction of aqueous phase viscosity, see Eq. <a class="reference internal" href="#equation-eq-eos7-3">(55)</a>.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="eos5.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">EOS5</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="eos7r.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">EOS7R</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#specifications">Specifications</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#selections">Selections</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/tough3/eos/eos7.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023, Keurfon Luu.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

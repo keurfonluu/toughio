@@ -1,0 +1,1248 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Relative permeability and capillarity models &#8212; toughio 1.15.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=8fbebee6" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../_static/documentation_options.js?v=70d5d4a5"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/rpcap';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Command line programs" href="cli.html" />
+    <link rel="prev" title="Run" href="run.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../_static/logo-light.png" class="logo__image only-light" alt="toughio 1.15.0 documentation - Home"/>
+    <script>document.write(`<img src="../_static/logo.png" class="logo__image only-dark" alt="toughio 1.15.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../tough3/index.html">
+                        TOUGH3
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../tough3/index.html">
+                        TOUGH3
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="io.html">Input and output files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mesh.html">Meshing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run.html">Run</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Relative permeability and capillarity models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command line programs</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">API Reference</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Relative...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="relative-permeability-and-capillarity-models">
+<h1>Relative permeability and capillarity models<a class="headerlink" href="#relative-permeability-and-capillarity-models" title="Link to this heading">#</a></h1>
+<section id="relative-permeability">
+<h2>Relative permeability<a class="headerlink" href="#relative-permeability" title="Link to this heading">#</a></h2>
+<section id="linear">
+<h3>Linear<a class="headerlink" href="#linear" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="toughio.relative_permeability.Linear">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">toughio.relative_permeability.</span></span><span class="sig-name descname"><span class="pre">Linear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slmin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sgmin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sgmax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/relative_permeability/_linear.html#Linear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.relative_permeability.Linear" title="Link to this definition">#</a></dt>
+<dd><p>Linear function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>slmin</strong> (<em>scalar</em>) – Lower liquid saturation threshold (RP(1)).</p></li>
+<li><p><strong>sgmin</strong> (<em>scalar</em>) – Lower gas saturation threshold (RP(2)).</p></li>
+<li><p><strong>slmax</strong> (<em>scalar</em>) – Upper liquid saturation threshold (RP(3)).</p></li>
+<li><p><strong>sgmax</strong> (<em>scalar</em>) – Upper gas saturation threshold (RP(4)).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.relative_permeability.Linear.id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#toughio.relative_permeability.Linear.id" title="Link to this definition">#</a></dt>
+<dd><p>Return relative permeability model ID in TOUGH.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.relative_permeability.Linear.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#toughio.relative_permeability.Linear.name" title="Link to this definition">#</a></dt>
+<dd><p>Return relative permeability model name.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.relative_permeability.Linear.parameters">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parameters</span></span><a class="headerlink" href="#toughio.relative_permeability.Linear.parameters" title="Link to this definition">#</a></dt>
+<dd><p>Return model parameters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toughio.relative_permeability.Linear.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(10,</span> <span class="pre">8)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plt_kws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toughio.relative_permeability.Linear.plot" title="Link to this definition">#</a></dt>
+<dd><p>Plot relative permeability curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default 100</em>) – Number of saturation points.</p></li>
+<li><p><strong>ax</strong> (<em>matplotlib.pyplot.Axes</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Matplotlib axes. If <cite>None</cite>, a new figure and axe is created.</p></li>
+<li><p><strong>figsize</strong> (<em>array_like</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – New figure size if <cite>ax</cite> is <cite>None</cite>.</p></li>
+<li><p><strong>plt_kws</strong> (<em>dict</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Additional keywords passed to <code class="xref py py-func docutils literal notranslate"><span class="pre">matplotlib.pyplot.plot()</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="pickens">
+<h3>Pickens<a class="headerlink" href="#pickens" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="toughio.relative_permeability.Pickens">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">toughio.relative_permeability.</span></span><span class="sig-name descname"><span class="pre">Pickens</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/relative_permeability/_pickens.html#Pickens"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.relative_permeability.Pickens" title="Link to this definition">#</a></dt>
+<dd><p>Gas perfect mobile function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>scalar</em>) – RP(1).</p>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.relative_permeability.Pickens.id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#toughio.relative_permeability.Pickens.id" title="Link to this definition">#</a></dt>
+<dd><p>Return relative permeability model ID in TOUGH.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.relative_permeability.Pickens.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#toughio.relative_permeability.Pickens.name" title="Link to this definition">#</a></dt>
+<dd><p>Return relative permeability model name.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.relative_permeability.Pickens.parameters">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parameters</span></span><a class="headerlink" href="#toughio.relative_permeability.Pickens.parameters" title="Link to this definition">#</a></dt>
+<dd><p>Return model parameters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toughio.relative_permeability.Pickens.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(10,</span> <span class="pre">8)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plt_kws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toughio.relative_permeability.Pickens.plot" title="Link to this definition">#</a></dt>
+<dd><p>Plot relative permeability curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default 100</em>) – Number of saturation points.</p></li>
+<li><p><strong>ax</strong> (<em>matplotlib.pyplot.Axes</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Matplotlib axes. If <cite>None</cite>, a new figure and axe is created.</p></li>
+<li><p><strong>figsize</strong> (<em>array_like</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – New figure size if <cite>ax</cite> is <cite>None</cite>.</p></li>
+<li><p><strong>plt_kws</strong> (<em>dict</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Additional keywords passed to <code class="xref py py-func docutils literal notranslate"><span class="pre">matplotlib.pyplot.plot()</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="corey">
+<h3>Corey<a class="headerlink" href="#corey" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="toughio.relative_permeability.Corey">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">toughio.relative_permeability.</span></span><span class="sig-name descname"><span class="pre">Corey</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sgr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/relative_permeability/_corey.html#Corey"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.relative_permeability.Corey" title="Link to this definition">#</a></dt>
+<dd><p>Corey’s curve.</p>
+<p>After Corey (1954).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>slr</strong> (<em>scalar</em>) – Irreducible liquid saturation (RP(1)).</p></li>
+<li><p><strong>sgr</strong> (<em>scalar</em>) – Irreducible gas saturation (RP(2)).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.relative_permeability.Corey.id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#toughio.relative_permeability.Corey.id" title="Link to this definition">#</a></dt>
+<dd><p>Return relative permeability model ID in TOUGH.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.relative_permeability.Corey.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#toughio.relative_permeability.Corey.name" title="Link to this definition">#</a></dt>
+<dd><p>Return relative permeability model name.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.relative_permeability.Corey.parameters">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parameters</span></span><a class="headerlink" href="#toughio.relative_permeability.Corey.parameters" title="Link to this definition">#</a></dt>
+<dd><p>Return model parameters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toughio.relative_permeability.Corey.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(10,</span> <span class="pre">8)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plt_kws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toughio.relative_permeability.Corey.plot" title="Link to this definition">#</a></dt>
+<dd><p>Plot relative permeability curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default 100</em>) – Number of saturation points.</p></li>
+<li><p><strong>ax</strong> (<em>matplotlib.pyplot.Axes</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Matplotlib axes. If <cite>None</cite>, a new figure and axe is created.</p></li>
+<li><p><strong>figsize</strong> (<em>array_like</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – New figure size if <cite>ax</cite> is <cite>None</cite>.</p></li>
+<li><p><strong>plt_kws</strong> (<em>dict</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Additional keywords passed to <code class="xref py py-func docutils literal notranslate"><span class="pre">matplotlib.pyplot.plot()</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="grant">
+<h3>Grant<a class="headerlink" href="#grant" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="toughio.relative_permeability.Grant">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">toughio.relative_permeability.</span></span><span class="sig-name descname"><span class="pre">Grant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sgr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/relative_permeability/_grant.html#Grant"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.relative_permeability.Grant" title="Link to this definition">#</a></dt>
+<dd><p>Grant’s curve.</p>
+<p>After Grant (1977).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>slr</strong> (<em>scalar</em>) – Irreducible liquid saturation (RP(1)).</p></li>
+<li><p><strong>sgr</strong> (<em>scalar</em>) – Irreducible gas saturation (RP(2)).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.relative_permeability.Grant.id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#toughio.relative_permeability.Grant.id" title="Link to this definition">#</a></dt>
+<dd><p>Return relative permeability model ID in TOUGH.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.relative_permeability.Grant.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#toughio.relative_permeability.Grant.name" title="Link to this definition">#</a></dt>
+<dd><p>Return relative permeability model name.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.relative_permeability.Grant.parameters">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parameters</span></span><a class="headerlink" href="#toughio.relative_permeability.Grant.parameters" title="Link to this definition">#</a></dt>
+<dd><p>Return model parameters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toughio.relative_permeability.Grant.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(10,</span> <span class="pre">8)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plt_kws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toughio.relative_permeability.Grant.plot" title="Link to this definition">#</a></dt>
+<dd><p>Plot relative permeability curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default 100</em>) – Number of saturation points.</p></li>
+<li><p><strong>ax</strong> (<em>matplotlib.pyplot.Axes</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Matplotlib axes. If <cite>None</cite>, a new figure and axe is created.</p></li>
+<li><p><strong>figsize</strong> (<em>array_like</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – New figure size if <cite>ax</cite> is <cite>None</cite>.</p></li>
+<li><p><strong>plt_kws</strong> (<em>dict</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Additional keywords passed to <code class="xref py py-func docutils literal notranslate"><span class="pre">matplotlib.pyplot.plot()</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="fatt-klikoff">
+<h3>Fatt-Klikoff<a class="headerlink" href="#fatt-klikoff" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="toughio.relative_permeability.FattKlikoff">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">toughio.relative_permeability.</span></span><span class="sig-name descname"><span class="pre">FattKlikoff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/relative_permeability/_fatt_klikoff.html#FattKlikoff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.relative_permeability.FattKlikoff" title="Link to this definition">#</a></dt>
+<dd><p>Fatt and Klikoff’s function.</p>
+<p>After Fatt and Klikoff (1959).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>slr</strong> (<em>scalar</em>) – Irreducible liquid saturation (RP(1)).</p>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.relative_permeability.FattKlikoff.id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#toughio.relative_permeability.FattKlikoff.id" title="Link to this definition">#</a></dt>
+<dd><p>Return relative permeability model ID in TOUGH.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.relative_permeability.FattKlikoff.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#toughio.relative_permeability.FattKlikoff.name" title="Link to this definition">#</a></dt>
+<dd><p>Return relative permeability model name.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.relative_permeability.FattKlikoff.parameters">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parameters</span></span><a class="headerlink" href="#toughio.relative_permeability.FattKlikoff.parameters" title="Link to this definition">#</a></dt>
+<dd><p>Return model parameters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toughio.relative_permeability.FattKlikoff.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(10,</span> <span class="pre">8)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plt_kws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toughio.relative_permeability.FattKlikoff.plot" title="Link to this definition">#</a></dt>
+<dd><p>Plot relative permeability curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default 100</em>) – Number of saturation points.</p></li>
+<li><p><strong>ax</strong> (<em>matplotlib.pyplot.Axes</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Matplotlib axes. If <cite>None</cite>, a new figure and axe is created.</p></li>
+<li><p><strong>figsize</strong> (<em>array_like</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – New figure size if <cite>ax</cite> is <cite>None</cite>.</p></li>
+<li><p><strong>plt_kws</strong> (<em>dict</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Additional keywords passed to <code class="xref py py-func docutils literal notranslate"><span class="pre">matplotlib.pyplot.plot()</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="van-genuchten-mualem">
+<h3>van Genuchten-Mualem<a class="headerlink" href="#van-genuchten-mualem" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="toughio.relative_permeability.vanGenuchtenMualem">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">toughio.relative_permeability.</span></span><span class="sig-name descname"><span class="pre">vanGenuchtenMualem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sgr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/relative_permeability/_van_genuchten_mualem.html#vanGenuchtenMualem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.relative_permeability.vanGenuchtenMualem" title="Link to this definition">#</a></dt>
+<dd><p>Van Genuchten-Mualem function.</p>
+<p>After Mualem (1976) and van Genuchten (1980).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>m</strong> (<em>scalar</em>) – Related to pore size distribution (RP(1)).</p></li>
+<li><p><strong>slr</strong> (<em>scalar</em>) – Irreducible liquid saturation (RP(2)).</p></li>
+<li><p><strong>sls</strong> (<em>scalar</em>) – Maximum liquid saturation (RP(3)).</p></li>
+<li><p><strong>sgr</strong> (<em>scalar</em>) – Irreducible gas saturation (RP(4)).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.relative_permeability.vanGenuchtenMualem.id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#toughio.relative_permeability.vanGenuchtenMualem.id" title="Link to this definition">#</a></dt>
+<dd><p>Return relative permeability model ID in TOUGH.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.relative_permeability.vanGenuchtenMualem.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#toughio.relative_permeability.vanGenuchtenMualem.name" title="Link to this definition">#</a></dt>
+<dd><p>Return relative permeability model name.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.relative_permeability.vanGenuchtenMualem.parameters">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parameters</span></span><a class="headerlink" href="#toughio.relative_permeability.vanGenuchtenMualem.parameters" title="Link to this definition">#</a></dt>
+<dd><p>Return model parameters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toughio.relative_permeability.vanGenuchtenMualem.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(10,</span> <span class="pre">8)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plt_kws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toughio.relative_permeability.vanGenuchtenMualem.plot" title="Link to this definition">#</a></dt>
+<dd><p>Plot relative permeability curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default 100</em>) – Number of saturation points.</p></li>
+<li><p><strong>ax</strong> (<em>matplotlib.pyplot.Axes</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Matplotlib axes. If <cite>None</cite>, a new figure and axe is created.</p></li>
+<li><p><strong>figsize</strong> (<em>array_like</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – New figure size if <cite>ax</cite> is <cite>None</cite>.</p></li>
+<li><p><strong>plt_kws</strong> (<em>dict</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Additional keywords passed to <code class="xref py py-func docutils literal notranslate"><span class="pre">matplotlib.pyplot.plot()</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="verma">
+<h3>Verma<a class="headerlink" href="#verma" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="toughio.relative_permeability.Verma">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">toughio.relative_permeability.</span></span><span class="sig-name descname"><span class="pre">Verma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.895</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.259</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1.7615</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5089</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/relative_permeability/_verma.html#Verma"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.relative_permeability.Verma" title="Link to this definition">#</a></dt>
+<dd><p>Verma’s function.</p>
+<p>After Verma et al. (1985).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>slr</strong> (<em>scalar</em>) – Irreducible liquid saturation (RP(1)).</p></li>
+<li><p><strong>sls</strong> (<em>scalar</em>) – Maximum liquid saturation (RP(2)).</p></li>
+<li><p><strong>a</strong> (<em>scalar</em>) – A (RP(3)).</p></li>
+<li><p><strong>b</strong> (<em>scalar</em>) – B (RP(4)).</p></li>
+<li><p><strong>c</strong> (<em>scalar</em>) – C (RP(5)).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.relative_permeability.Verma.id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#toughio.relative_permeability.Verma.id" title="Link to this definition">#</a></dt>
+<dd><p>Return relative permeability model ID in TOUGH.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.relative_permeability.Verma.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#toughio.relative_permeability.Verma.name" title="Link to this definition">#</a></dt>
+<dd><p>Return relative permeability model name.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.relative_permeability.Verma.parameters">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parameters</span></span><a class="headerlink" href="#toughio.relative_permeability.Verma.parameters" title="Link to this definition">#</a></dt>
+<dd><p>Return model parameters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toughio.relative_permeability.Verma.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(10,</span> <span class="pre">8)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plt_kws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toughio.relative_permeability.Verma.plot" title="Link to this definition">#</a></dt>
+<dd><p>Plot relative permeability curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default 100</em>) – Number of saturation points.</p></li>
+<li><p><strong>ax</strong> (<em>matplotlib.pyplot.Axes</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Matplotlib axes. If <cite>None</cite>, a new figure and axe is created.</p></li>
+<li><p><strong>figsize</strong> (<em>array_like</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – New figure size if <cite>ax</cite> is <cite>None</cite>.</p></li>
+<li><p><strong>plt_kws</strong> (<em>dict</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Additional keywords passed to <code class="xref py py-func docutils literal notranslate"><span class="pre">matplotlib.pyplot.plot()</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+<section id="capillarity">
+<h2>Capillarity<a class="headerlink" href="#capillarity" title="Link to this heading">#</a></h2>
+<section id="id1">
+<h3>Linear<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="toughio.capillarity.Linear">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">toughio.capillarity.</span></span><span class="sig-name descname"><span class="pre">Linear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/capillarity/_linear.html#Linear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.capillarity.Linear" title="Link to this definition">#</a></dt>
+<dd><p>Linear function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pmax</strong> (<em>scalar</em>) – Maximum pressure (CP(1)).</p></li>
+<li><p><strong>smin</strong> (<em>scalar</em>) – Lower liquid saturation threshold (CP(2)).</p></li>
+<li><p><strong>smax</strong> (<em>scalar</em>) – Upper liquid saturation threshold (CP(3)).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.capillarity.Linear.id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#toughio.capillarity.Linear.id" title="Link to this definition">#</a></dt>
+<dd><p>Return capillarity model ID in TOUGH.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.capillarity.Linear.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#toughio.capillarity.Linear.name" title="Link to this definition">#</a></dt>
+<dd><p>Return capillarity model name.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.capillarity.Linear.parameters">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parameters</span></span><a class="headerlink" href="#toughio.capillarity.Linear.parameters" title="Link to this definition">#</a></dt>
+<dd><p>Return model parameters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toughio.capillarity.Linear.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(10,</span> <span class="pre">8)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plt_kws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toughio.capillarity.Linear.plot" title="Link to this definition">#</a></dt>
+<dd><p>Plot capillary pressure curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default 100</em>) – Number of saturation points.</p></li>
+<li><p><strong>ax</strong> (<em>matplotlib.pyplot.Axes</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Matplotlib axes. If <cite>None</cite>, a new figure and axe is created.</p></li>
+<li><p><strong>figsize</strong> (<em>array_like</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – New figure size if <cite>ax</cite> is <cite>None</cite>.</p></li>
+<li><p><strong>plt_kws</strong> (<em>dict</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Additional keywords passed to <code class="xref py py-func docutils literal notranslate"><span class="pre">matplotlib.pyplot.semilogy()</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="id2">
+<h3>Pickens<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="toughio.capillarity.Pickens">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">toughio.capillarity.</span></span><span class="sig-name descname"><span class="pre">Pickens</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sl0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/capillarity/_pickens.html#Pickens"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.capillarity.Pickens" title="Link to this definition">#</a></dt>
+<dd><p>Pickens et al. function.</p>
+<p>After Pickens et al. (1979).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p0</strong> (<em>scalar</em>) – Capillary pressure strength (CP(1)).</p></li>
+<li><p><strong>slr</strong> (<em>scalar</em>) – Irreducible liquid saturation (CP(2)).</p></li>
+<li><p><strong>sl0</strong> (<em>scalar</em>) – Initial liquid saturation (CP(3)).</p></li>
+<li><p><strong>x</strong> (<em>scalar</em>) – CP(4).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.capillarity.Pickens.id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#toughio.capillarity.Pickens.id" title="Link to this definition">#</a></dt>
+<dd><p>Return capillarity model ID in TOUGH.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.capillarity.Pickens.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#toughio.capillarity.Pickens.name" title="Link to this definition">#</a></dt>
+<dd><p>Return capillarity model name.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.capillarity.Pickens.parameters">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parameters</span></span><a class="headerlink" href="#toughio.capillarity.Pickens.parameters" title="Link to this definition">#</a></dt>
+<dd><p>Return model parameters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toughio.capillarity.Pickens.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(10,</span> <span class="pre">8)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plt_kws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toughio.capillarity.Pickens.plot" title="Link to this definition">#</a></dt>
+<dd><p>Plot capillary pressure curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default 100</em>) – Number of saturation points.</p></li>
+<li><p><strong>ax</strong> (<em>matplotlib.pyplot.Axes</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Matplotlib axes. If <cite>None</cite>, a new figure and axe is created.</p></li>
+<li><p><strong>figsize</strong> (<em>array_like</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – New figure size if <cite>ax</cite> is <cite>None</cite>.</p></li>
+<li><p><strong>plt_kws</strong> (<em>dict</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Additional keywords passed to <code class="xref py py-func docutils literal notranslate"><span class="pre">matplotlib.pyplot.semilogy()</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="trust">
+<h3>TRUST<a class="headerlink" href="#trust" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="toughio.capillarity.TRUST">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">toughio.capillarity.</span></span><span class="sig-name descname"><span class="pre">TRUST</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pmax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/capillarity/_trust.html#TRUST"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.capillarity.TRUST" title="Link to this definition">#</a></dt>
+<dd><p>TRUST capillary pressure.</p>
+<p>After Narasimhan et al. (1978).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p0</strong> (<em>scalar</em>) – Capillary pressure strength (CP(1)).</p></li>
+<li><p><strong>slr</strong> (<em>scalar</em>) – Irreducible liquid saturation (CP(2)).</p></li>
+<li><p><strong>eta</strong> (<em>scalar</em>) – CP(3).</p></li>
+<li><p><strong>pe</strong> (<em>scalar</em>) – Capillary entry pressure (CP(4)).</p></li>
+<li><p><strong>pmax</strong> (<em>scalar</em>) – Maximum pressure (CP(5)).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.capillarity.TRUST.id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#toughio.capillarity.TRUST.id" title="Link to this definition">#</a></dt>
+<dd><p>Return capillarity model ID in TOUGH.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.capillarity.TRUST.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#toughio.capillarity.TRUST.name" title="Link to this definition">#</a></dt>
+<dd><p>Return capillarity model name.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.capillarity.TRUST.parameters">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parameters</span></span><a class="headerlink" href="#toughio.capillarity.TRUST.parameters" title="Link to this definition">#</a></dt>
+<dd><p>Return model parameters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toughio.capillarity.TRUST.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(10,</span> <span class="pre">8)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plt_kws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toughio.capillarity.TRUST.plot" title="Link to this definition">#</a></dt>
+<dd><p>Plot capillary pressure curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default 100</em>) – Number of saturation points.</p></li>
+<li><p><strong>ax</strong> (<em>matplotlib.pyplot.Axes</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Matplotlib axes. If <cite>None</cite>, a new figure and axe is created.</p></li>
+<li><p><strong>figsize</strong> (<em>array_like</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – New figure size if <cite>ax</cite> is <cite>None</cite>.</p></li>
+<li><p><strong>plt_kws</strong> (<em>dict</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Additional keywords passed to <code class="xref py py-func docutils literal notranslate"><span class="pre">matplotlib.pyplot.semilogy()</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="milly">
+<h3>Milly<a class="headerlink" href="#milly" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="toughio.capillarity.Milly">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">toughio.capillarity.</span></span><span class="sig-name descname"><span class="pre">Milly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/capillarity/_milly.html#Milly"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.capillarity.Milly" title="Link to this definition">#</a></dt>
+<dd><p>Milly’s function.</p>
+<p>After Milly (1982).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>slr</strong> (<em>scalar</em>) – Irreducible liquid saturation (CP(1)).</p>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.capillarity.Milly.id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#toughio.capillarity.Milly.id" title="Link to this definition">#</a></dt>
+<dd><p>Return capillarity model ID in TOUGH.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.capillarity.Milly.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#toughio.capillarity.Milly.name" title="Link to this definition">#</a></dt>
+<dd><p>Return capillarity model name.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.capillarity.Milly.parameters">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parameters</span></span><a class="headerlink" href="#toughio.capillarity.Milly.parameters" title="Link to this definition">#</a></dt>
+<dd><p>Return model parameters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toughio.capillarity.Milly.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(10,</span> <span class="pre">8)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plt_kws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toughio.capillarity.Milly.plot" title="Link to this definition">#</a></dt>
+<dd><p>Plot capillary pressure curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default 100</em>) – Number of saturation points.</p></li>
+<li><p><strong>ax</strong> (<em>matplotlib.pyplot.Axes</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Matplotlib axes. If <cite>None</cite>, a new figure and axe is created.</p></li>
+<li><p><strong>figsize</strong> (<em>array_like</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – New figure size if <cite>ax</cite> is <cite>None</cite>.</p></li>
+<li><p><strong>plt_kws</strong> (<em>dict</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Additional keywords passed to <code class="xref py py-func docutils literal notranslate"><span class="pre">matplotlib.pyplot.semilogy()</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="van-genuchten">
+<h3>van Genuchten<a class="headerlink" href="#van-genuchten" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="toughio.capillarity.vanGenuchten">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">toughio.capillarity.</span></span><span class="sig-name descname"><span class="pre">vanGenuchten</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sls</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/capillarity/_van_genuchten.html#vanGenuchten"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.capillarity.vanGenuchten" title="Link to this definition">#</a></dt>
+<dd><p>Van Genuchten function.</p>
+<p>After van Genuchten (1980).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>m</strong> (<em>scalar</em>) – Related to pore size distribution (CP(1)).</p></li>
+<li><p><strong>slr</strong> (<em>scalar</em>) – Irreducible liquid saturation (CP(2)).</p></li>
+<li><p><strong>alpha</strong> (<em>scalar</em>) – Inverse of capillary pressure strength 1/P0 (CP(3)).</p></li>
+<li><p><strong>pmax</strong> (<em>scalar</em>) – Maximum pressure (CP(4)).</p></li>
+<li><p><strong>sls</strong> (<em>scalar</em>) – Maximum liquid saturation (CP(5)).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.capillarity.vanGenuchten.id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#toughio.capillarity.vanGenuchten.id" title="Link to this definition">#</a></dt>
+<dd><p>Return capillarity model ID in TOUGH.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.capillarity.vanGenuchten.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#toughio.capillarity.vanGenuchten.name" title="Link to this definition">#</a></dt>
+<dd><p>Return capillarity model name.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.capillarity.vanGenuchten.parameters">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parameters</span></span><a class="headerlink" href="#toughio.capillarity.vanGenuchten.parameters" title="Link to this definition">#</a></dt>
+<dd><p>Return model parameters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toughio.capillarity.vanGenuchten.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(10,</span> <span class="pre">8)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plt_kws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toughio.capillarity.vanGenuchten.plot" title="Link to this definition">#</a></dt>
+<dd><p>Plot capillary pressure curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default 100</em>) – Number of saturation points.</p></li>
+<li><p><strong>ax</strong> (<em>matplotlib.pyplot.Axes</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Matplotlib axes. If <cite>None</cite>, a new figure and axe is created.</p></li>
+<li><p><strong>figsize</strong> (<em>array_like</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – New figure size if <cite>ax</cite> is <cite>None</cite>.</p></li>
+<li><p><strong>plt_kws</strong> (<em>dict</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Additional keywords passed to <code class="xref py py-func docutils literal notranslate"><span class="pre">matplotlib.pyplot.semilogy()</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="run.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Run</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="cli.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Command line programs</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#relative-permeability">Relative permeability</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#linear">Linear</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.Linear"><code class="docutils literal notranslate"><span class="pre">Linear</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.Linear.id"><code class="docutils literal notranslate"><span class="pre">Linear.id</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.Linear.name"><code class="docutils literal notranslate"><span class="pre">Linear.name</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.Linear.parameters"><code class="docutils literal notranslate"><span class="pre">Linear.parameters</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.Linear.plot"><code class="docutils literal notranslate"><span class="pre">Linear.plot()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pickens">Pickens</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.Pickens"><code class="docutils literal notranslate"><span class="pre">Pickens</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.Pickens.id"><code class="docutils literal notranslate"><span class="pre">Pickens.id</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.Pickens.name"><code class="docutils literal notranslate"><span class="pre">Pickens.name</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.Pickens.parameters"><code class="docutils literal notranslate"><span class="pre">Pickens.parameters</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.Pickens.plot"><code class="docutils literal notranslate"><span class="pre">Pickens.plot()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#corey">Corey</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.Corey"><code class="docutils literal notranslate"><span class="pre">Corey</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.Corey.id"><code class="docutils literal notranslate"><span class="pre">Corey.id</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.Corey.name"><code class="docutils literal notranslate"><span class="pre">Corey.name</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.Corey.parameters"><code class="docutils literal notranslate"><span class="pre">Corey.parameters</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.Corey.plot"><code class="docutils literal notranslate"><span class="pre">Corey.plot()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grant">Grant</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.Grant"><code class="docutils literal notranslate"><span class="pre">Grant</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.Grant.id"><code class="docutils literal notranslate"><span class="pre">Grant.id</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.Grant.name"><code class="docutils literal notranslate"><span class="pre">Grant.name</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.Grant.parameters"><code class="docutils literal notranslate"><span class="pre">Grant.parameters</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.Grant.plot"><code class="docutils literal notranslate"><span class="pre">Grant.plot()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fatt-klikoff">Fatt-Klikoff</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.FattKlikoff"><code class="docutils literal notranslate"><span class="pre">FattKlikoff</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.FattKlikoff.id"><code class="docutils literal notranslate"><span class="pre">FattKlikoff.id</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.FattKlikoff.name"><code class="docutils literal notranslate"><span class="pre">FattKlikoff.name</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.FattKlikoff.parameters"><code class="docutils literal notranslate"><span class="pre">FattKlikoff.parameters</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.FattKlikoff.plot"><code class="docutils literal notranslate"><span class="pre">FattKlikoff.plot()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#van-genuchten-mualem">van Genuchten-Mualem</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.vanGenuchtenMualem"><code class="docutils literal notranslate"><span class="pre">vanGenuchtenMualem</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.vanGenuchtenMualem.id"><code class="docutils literal notranslate"><span class="pre">vanGenuchtenMualem.id</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.vanGenuchtenMualem.name"><code class="docutils literal notranslate"><span class="pre">vanGenuchtenMualem.name</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.vanGenuchtenMualem.parameters"><code class="docutils literal notranslate"><span class="pre">vanGenuchtenMualem.parameters</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.vanGenuchtenMualem.plot"><code class="docutils literal notranslate"><span class="pre">vanGenuchtenMualem.plot()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#verma">Verma</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.Verma"><code class="docutils literal notranslate"><span class="pre">Verma</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.Verma.id"><code class="docutils literal notranslate"><span class="pre">Verma.id</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.Verma.name"><code class="docutils literal notranslate"><span class="pre">Verma.name</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.Verma.parameters"><code class="docutils literal notranslate"><span class="pre">Verma.parameters</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.relative_permeability.Verma.plot"><code class="docutils literal notranslate"><span class="pre">Verma.plot()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#capillarity">Capillarity</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Linear</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.capillarity.Linear"><code class="docutils literal notranslate"><span class="pre">Linear</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.capillarity.Linear.id"><code class="docutils literal notranslate"><span class="pre">Linear.id</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.capillarity.Linear.name"><code class="docutils literal notranslate"><span class="pre">Linear.name</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.capillarity.Linear.parameters"><code class="docutils literal notranslate"><span class="pre">Linear.parameters</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.capillarity.Linear.plot"><code class="docutils literal notranslate"><span class="pre">Linear.plot()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Pickens</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.capillarity.Pickens"><code class="docutils literal notranslate"><span class="pre">Pickens</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.capillarity.Pickens.id"><code class="docutils literal notranslate"><span class="pre">Pickens.id</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.capillarity.Pickens.name"><code class="docutils literal notranslate"><span class="pre">Pickens.name</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.capillarity.Pickens.parameters"><code class="docutils literal notranslate"><span class="pre">Pickens.parameters</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.capillarity.Pickens.plot"><code class="docutils literal notranslate"><span class="pre">Pickens.plot()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#trust">TRUST</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.capillarity.TRUST"><code class="docutils literal notranslate"><span class="pre">TRUST</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.capillarity.TRUST.id"><code class="docutils literal notranslate"><span class="pre">TRUST.id</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.capillarity.TRUST.name"><code class="docutils literal notranslate"><span class="pre">TRUST.name</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.capillarity.TRUST.parameters"><code class="docutils literal notranslate"><span class="pre">TRUST.parameters</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.capillarity.TRUST.plot"><code class="docutils literal notranslate"><span class="pre">TRUST.plot()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#milly">Milly</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.capillarity.Milly"><code class="docutils literal notranslate"><span class="pre">Milly</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.capillarity.Milly.id"><code class="docutils literal notranslate"><span class="pre">Milly.id</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.capillarity.Milly.name"><code class="docutils literal notranslate"><span class="pre">Milly.name</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.capillarity.Milly.parameters"><code class="docutils literal notranslate"><span class="pre">Milly.parameters</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.capillarity.Milly.plot"><code class="docutils literal notranslate"><span class="pre">Milly.plot()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#van-genuchten">van Genuchten</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.capillarity.vanGenuchten"><code class="docutils literal notranslate"><span class="pre">vanGenuchten</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.capillarity.vanGenuchten.id"><code class="docutils literal notranslate"><span class="pre">vanGenuchten.id</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.capillarity.vanGenuchten.name"><code class="docutils literal notranslate"><span class="pre">vanGenuchten.name</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.capillarity.vanGenuchten.parameters"><code class="docutils literal notranslate"><span class="pre">vanGenuchten.parameters</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.capillarity.vanGenuchten.plot"><code class="docutils literal notranslate"><span class="pre">vanGenuchten.plot()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/api/rpcap.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023, Keurfon Luu.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

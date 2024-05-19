@@ -1,0 +1,605 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Initial and Boundary Conditions &#8212; toughio 1.15.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=8fbebee6" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../../_static/documentation_options.js?v=70d5d4a5"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tough3/guide/initial_and_boundary_conditions';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Preparation of Input Data" href="preparation_of_input_data.html" />
+    <link rel="prev" title="Numerical Methods" href="numerical_methods.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../_static/logo-light.png" class="logo__image only-light" alt="toughio 1.15.0 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="toughio 1.15.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        TOUGH3
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        TOUGH3
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../install/index.html">Installation</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../install/linux.html">Installation on Linux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../install/windows.html">Installation on Windows</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">User Guide</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="governing_equations.html">Governing Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="numerical_methods.html">Numerical Methods</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Initial and Boundary Conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="preparation_of_input_data.html">Preparation of Input Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="output_from_tough3.html">Output from TOUGH3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="relative_permeability_functions.html">Relative Permeability Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capillary_pressure_functions.html">Capillary Pressure Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../eos/index.html">EOS</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos1.html">EOS1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos2.html">EOS2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos3.html">EOS3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos4.html">EOS4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos5.html">EOS5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos7.html">EOS7</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos7r.html">EOS7R</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos8.html">EOS8</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos9.html">EOS9</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/ewasg.html">EWASG</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eco2n.html">ECO2N</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">TOUGH3</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">User Guide</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Initial and...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="initial-and-boundary-conditions">
+<span id="id1"></span><h1>Initial and Boundary Conditions<a class="headerlink" href="#initial-and-boundary-conditions" title="Link to this heading">#</a></h1>
+<section id="initial-conditions-and-restarting">
+<h2>Initial Conditions and Restarting<a class="headerlink" href="#initial-conditions-and-restarting" title="Link to this heading">#</a></h2>
+<p>Flow systems are initialized by assigning a complete set of primary thermodynamic variables to all grid blocks into which the flow domain is discretized.
+Various options are available in a hierarchical system, as follows.
+During the initialization of a TOUGH3 run, all grid blocks are first assigned to default thermodynamic conditions specified in data block <strong>PARAM.4</strong>.
+The defaults can be overwritten for selected reservoir domains by assigning domain-specific conditions in data block <strong>INDOM</strong>. These in turn may be superseded by thermodynamic conditions assigned to individual grid blocks in data block <strong>INCON</strong>. A disk file <em>INCON</em> written to the same
+specifications as data block <strong>INCON</strong> may also be used.</p>
+<p>Different EOS modules use different sets of primary variables, and some EOS modules allow different choices of primary variables for initialization.
+For a given EOS module, the primary variables used depend on the fluid phase composition. During phase change, primary variables will be automatically switched from one set to another.
+In multiphase flow systems, therefore, different grid blocks will in general have different sets of primary variables, and must be initialized accordingly.</p>
+<p>For many applications, special initial conditions are needed, such as gravity-capillary equilibrium, or steady state corresponding to certain mass and heat flows.
+This can be realized by performing a series of TOUGH3 runs, in which thermodynamic conditions obtained in one run, and written to disk file <em>SAVE</em>, are used as initial conditions in a subsequent continuation run.
+For example, in a geothermal reservoir simulation, a first run may be made to obtain hydrostatic pressure conditions.
+These may subsequently be used as boundary conditions in a second run segment to simulate undisturbed natural state conditions with throughflow of mass and heat.
+This could be followed by a third run segment with fluid production and injection.
+Restarting of a TOUGH3 run is accomplished by providing file <em>SAVE</em> generated in a previous run as file <em>INCON</em> for initialization.
+Usually additional (often minor) adjustments will be made for a restart.
+For example, different specifications for the number of time steps and desired printout times may be made.
+Some editing of the <em>SAVE</em> and/or <em>MESH</em> files may be needed to implement boundary conditions on certain grid blocks.
+Then, previously calculated pressures on those grid blocks can serve as boundary conditions.
+In a continuation run, simulation time and time step counters may be continuously incremented, or they may be reset to zero.
+For example, the latter option will be used when simulating production and injection operations following preparation of a “natural” initial state, which may correspond to a large simulation time.</p>
+<p>As far as the internal workings of the code is concerned, there is no difference between a fresh start of a simulation and a restart.
+The only feature that makes a simulation a continuation run is that the INCON data were generated by a previous TOUGH3 run, rather than having them explicitly provided by the user.
+File <em>SAVE</em> always ends with a data record with <code class="docutils literal notranslate"><span class="pre">+++</span></code> in the first three columns, followed by one record with restart information (time step and iteration counters, simulation time).
+To reset all counters to zero, users should simply replace the <code class="docutils literal notranslate"><span class="pre">+++</span></code> with a blank record when using <em>SAVE</em> as file <em>INCON</em> for another TOUGH3 run.</p>
+</section>
+<section id="neumann-boundary-conditions">
+<h2>Neumann Boundary Conditions<a class="headerlink" href="#neumann-boundary-conditions" title="Link to this heading">#</a></h2>
+<p>Neumann conditions prescribe fluxes of mass or heat crossing boundary surfaces.
+A special case of Neumann boundary conditions is “no flux”, which in the integral finite difference framework is handled simply by not specifying any flow connections across the boundary.
+More general flux conditions are prescribed by introducing sinks or sources of appropriate strength into the elements adjacent to the boundary.
+Time-dependent Neumann conditions can be specified by making sink and source rates time dependent.</p>
+</section>
+<section id="dirichlet-boundary-conditions">
+<h2>Dirichlet Boundary Conditions<a class="headerlink" href="#dirichlet-boundary-conditions" title="Link to this heading">#</a></h2>
+<p>Dirichlet conditions prescribe fixed thermodynamic conditions, such as pressure, temperature, or saturation.
+Dirichlet conditions can be implemented by assigning very large volumes (e.g., <span class="math notranslate nohighlight">\(V\)</span> = 1050 m<sup>3</sup>) to grid blocks adjacent to the boundary, so that their thermodynamic conditions do not change at all from fluid or heat exchange with finite-size blocks in the flow domain.
+For those elements with very large volumes, no mass or energy balance equations are set up, and their primary thermodynamic variables are not included in the list of unknowns.
+In addition, a small value (such as <span class="math notranslate nohighlight">\(D`\)</span> = 10<sup>-9</sup> m) should be specified for the nodal distance of such blocks, so that boundary conditions are in fact maintained in close proximity to the surface where they are desired, and not at some distance from it.</p>
+<p>TOUGH3 no longer supports the so-called “inactive” elements allowed in TOUGH2.
+If an element with a zero or negative volume is used to indicate that the element and all subsequent elements are to be used for Dirichlet boundary conditions, then the code will internally assign a very large volume for that and all subsequent elements (to be backward compatible with TOUGH2) and print out a warning message.
+However, if a dummy element with no volume and no material name is used just to separate boundary elements, the code will generate an error message and stop the simulation.
+In TOUGH3, the user must specify a material name for every element.</p>
+<p>Time-dependent Dirichlet conditions can be implemented using two different approaches. The first method consists of placing appropriate, large sinks or sources in boundary elements with large volumes (<span id="id2"><a class="reference internal" href="../references.html#id56" title="Moridis, G. J. (1992). TOUGH Simulations of the Updegraff's Set of Fluid and Heat Flow Problems. Lawrence Berkeley National Lab.(LBNL), Berkeley, CA (United States).">Moridis, 1992</a></span>).
+As an example, consider a laboratory experiment reported by Kruger and Ramey (1974) that involved flashing (vaporizing) flow from a sandstone core, with a time-dependent gas pressure boundary condition</p>
+<div class="math notranslate nohighlight" id="equation-eq-42">
+<span class="eqno">(42)<a class="headerlink" href="#equation-eq-42" title="Link to this equation">#</a></span>\[P_b = P_0 + P_1 t + P_2 t^2\]</div>
+<p>maintained at the outflow end.
+According to the ideal gas law, the pressure behavior of Eq. <a class="reference internal" href="#equation-eq-42">(42)</a> can be associated with a time-dependent gas inventory of mass <span class="math notranslate nohighlight">\(M_b\)</span> in a volume <span class="math notranslate nohighlight">\(V\)</span> as follows:</p>
+<div class="math notranslate nohighlight" id="equation-eq-43">
+<span class="eqno">(43)<a class="headerlink" href="#equation-eq-43" title="Link to this equation">#</a></span>\[M_b = P_b \frac{m V}{R T}\]</div>
+<p>where <span class="math notranslate nohighlight">\(m\)</span> is the molar weight of the gas, <span class="math notranslate nohighlight">\(R\)</span> the universal gas constant, and <span class="math notranslate nohighlight">\(T\)</span> absolute temperature.
+The required time dependence of <span class="math notranslate nohighlight">\(M_b\)</span> can be realized by means of a sink/source rate of</p>
+<div class="math notranslate nohighlight" id="equation-eq-44">
+<span class="eqno">(44)<a class="headerlink" href="#equation-eq-44" title="Link to this equation">#</a></span>\[Q_b = \frac{dM_b}{dt} = \frac{m V}{R T} \frac{dP_b}{dT} = \frac{m V}{R T} \left( P_1 + P_2 t \right)\]</div>
+<p>Therefore, the desired boundary condition can be implemented by means of a grid block with volume <span class="math notranslate nohighlight">\(V\)</span> that is initialized in single-phase gas (e.g., air) conditions, with pressure <span class="math notranslate nohighlight">\(P_0\)</span>, and with a time-dependent sink/source term given by Eq. <a class="reference internal" href="#equation-eq-44">(44)</a> that would be specified through tabular generation data in data block <strong>GENER</strong>.
+In order for the pressure conditions in this block to be negligibly affected by heat and mass exchange with the flow domain, the volume <span class="math notranslate nohighlight">\(V\)</span> should be
+made very large, e.g., <span class="math notranslate nohighlight">\(V\)</span> = 1050 m<sup>3</sup>, just as for time-independent Dirichlet boundary conditions.
+The time-dependent generation rates from Eq. <a class="reference internal" href="#equation-eq-44">(44)</a> will then also be very large.
+The same approach as just outlined for a time-dependent gas pressure boundary can be used to realize other time-dependent Dirichlet conditions, such as prescribed temporal variation of temperature, capillary pressure, and others.</p>
+<p>The second, newly implemented method to specify time-dependent Dirichlet boundary conditions is to read a set of time and primary variable data at boundary elements from the input file or a file whose name is given in data block <strong>TIMBC</strong>.
+Boundary values will be linearly interpolated between table entries.
+The volume for these elements should be made very large as well.</p>
+</section>
+<section id="atmospheric-boundary-conditions">
+<h2>Atmospheric Boundary Conditions<a class="headerlink" href="#atmospheric-boundary-conditions" title="Link to this heading">#</a></h2>
+<p>Often flow models need to include the atmosphere as the top boundary.
+The atmospheric boundary conditions can be specified using Dirichlet boundary elements with very large volumes.
+For EOS9, no atmospheric boundary element is needed since EOS9 uses Richards’ equation to describe variably saturated flow of a single aqueous phase and treats the gas phase as a passive bystander at constant pressure.
+A single atmospheric element can be connected to all elements at the ground surface, and users may use <em>AddBound.exe</em> for this purpose (free software available from the TOUGH website).</p>
+<p>Atmospheric pressure and temperature are used as initial condition in atmospheric elements.
+A relative humidity of 100% is conveniently specified by initializing the atmospheric block as a two-phase point with a liquid saturation smaller than the residual liquid saturation (so relative permeability is zero, preventing liquid flow into soil).
+For relative humidities less than 100%, a single-phase gas point must be specified with an appropriate air mass fraction (1.0 for dry air; the minimum value depends on vapor pressure, which is a function of temperature; intermediate values determine relative humidity).
+The material properties, such as relative permeability and capillary pressure functions, for the atmospheric boundary element should be appropriately selected so that (1) liquid relative permeability is zero, (2) gas relative permeability is one, and (3) capillary pressure is zero.
+In addition, mobilities need to be upstream weighted.</p>
+<p>Infiltration can be simulated by specifying the infiltration rate in a row of elements below the atmospheric boundary element using the <strong>GENER</strong> block. Evaporation can be simulated (a) as a binary diffusion process (atmosphere at &lt; 100% relative humidity), (b) by specifying the evaporation rate in a row of elements below the atmospheric boundary element using the <strong>GENER</strong> block, or (c) by assigning a capillary pressure according to Kelvin’s equation in the atmospheric element (<span id="id3"><a class="reference internal" href="../references.html#id33" title="Ghezzehei, T., Trautz, R., Finsterle, S., Cook, P., &amp; Ahlers, C. (2004). Modeling coupled evaporation and seepage in ventilated cavities. Vadose Zone Journal, 3(3), 806–818.">Ghezzehei et al., 2004</a></span>).</p>
+</section>
+<section id="constant-temperature-boundary-conditions">
+<h2>Constant Temperature Boundary Conditions<a class="headerlink" href="#constant-temperature-boundary-conditions" title="Link to this heading">#</a></h2>
+<p>Constant temperature boundary conditions but variable pressure, saturation, and mass fractions can be specified by setting rock grain density (<code class="docutils literal notranslate"><span class="pre">DROK</span></code>) to a very large value (e.g., 1.0E50).
+This option is useful for cases where the temperature of the injected fluid is maintained constant while the other primary variables defining the system state may vary with time.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="numerical_methods.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Numerical Methods</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="preparation_of_input_data.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Preparation of Input Data</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#initial-conditions-and-restarting">Initial Conditions and Restarting</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#neumann-boundary-conditions">Neumann Boundary Conditions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dirichlet-boundary-conditions">Dirichlet Boundary Conditions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#atmospheric-boundary-conditions">Atmospheric Boundary Conditions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#constant-temperature-boundary-conditions">Constant Temperature Boundary Conditions</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/tough3/guide/initial_and_boundary_conditions.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023, Keurfon Luu.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

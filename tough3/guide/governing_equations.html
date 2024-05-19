@@ -1,0 +1,754 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Governing Equations &#8212; toughio 1.15.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=8fbebee6" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../../_static/documentation_options.js?v=70d5d4a5"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tough3/guide/governing_equations';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Numerical Methods" href="numerical_methods.html" />
+    <link rel="prev" title="User Guide" href="index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../_static/logo-light.png" class="logo__image only-light" alt="toughio 1.15.0 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="toughio 1.15.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        TOUGH3
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        TOUGH3
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../install/index.html">Installation</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../install/linux.html">Installation on Linux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../install/windows.html">Installation on Windows</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">User Guide</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Governing Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="numerical_methods.html">Numerical Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="initial_and_boundary_conditions.html">Initial and Boundary Conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="preparation_of_input_data.html">Preparation of Input Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="output_from_tough3.html">Output from TOUGH3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="relative_permeability_functions.html">Relative Permeability Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capillary_pressure_functions.html">Capillary Pressure Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../eos/index.html">EOS</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos1.html">EOS1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos2.html">EOS2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos3.html">EOS3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos4.html">EOS4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos5.html">EOS5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos7.html">EOS7</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos7r.html">EOS7R</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos8.html">EOS8</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos9.html">EOS9</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/ewasg.html">EWASG</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eco2n.html">ECO2N</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">TOUGH3</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">User Guide</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Governing Equations</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="governing-equations">
+<span id="id1"></span><h1>Governing Equations<a class="headerlink" href="#governing-equations" title="Link to this heading">#</a></h1>
+<section id="mass-balance-equations">
+<h2>Mass-Balance Equations<a class="headerlink" href="#mass-balance-equations" title="Link to this heading">#</a></h2>
+<p>Here we describe the basic mass- and energy-balance equations solved by TOUGH3.
+The equations for nonisothermal, multiphase, multicomponent flows in porous and fractured media can be written in the general form</p>
+<div class="math notranslate nohighlight" id="equation-eq-1">
+<span class="eqno">(1)<a class="headerlink" href="#equation-eq-1" title="Link to this equation">#</a></span>\[\frac{d}{dt} \int_{V_n} M^{\kappa} dV_n = \int_{\Gamma_n} \boldsymbol{\mathrm{F}}^{\kappa} \cdot \boldsymbol{\mathrm{n}} d\Gamma_n + \int_{V_n} q^{\kappa} dV_n\]</div>
+<p>The integration is over an arbitrary subdomain Vn of the flow system under study, which is bounded by the closed surface <span class="math notranslate nohighlight">\(\Gamma_n\)</span>.
+The quantity M appearing in the accumulation term (left-hand side) represents the mass of component <span class="math notranslate nohighlight">\(\kappa\)</span> (e.g., water, brine, air, CO<sub>2</sub>, tracer, radionuclides, VOC) or energy (<span class="math notranslate nohighlight">\(\kappa = h\)</span>) per volume. <span class="math notranslate nohighlight">\(\boldsymbol{\mathrm{F}}\)</span> denotes mass or heat flux, and <span class="math notranslate nohighlight">\(q\)</span> denotes sinks and sources.
+<span class="math notranslate nohighlight">\(\boldsymbol{\mathrm{n}}\)</span> is a normal vector on the surface element <span class="math notranslate nohighlight">\(d\Gamma_n\)</span>, pointing inward into <span class="math notranslate nohighlight">\(V_n\)</span>.
+Each term constituting the equations is described in detail in the following subsections.</p>
+</section>
+<section id="accumulation-terms">
+<h2>Accumulation Terms<a class="headerlink" href="#accumulation-terms" title="Link to this heading">#</a></h2>
+<p>The general form of the mass accumulation term that includes equilibrium sorption on the solid grains is</p>
+<div class="math notranslate nohighlight" id="equation-eq-2">
+<span class="eqno">(2)<a class="headerlink" href="#equation-eq-2" title="Link to this equation">#</a></span>\[M^{\kappa} = \phi \sum_{\beta} S_{\beta} \rho_{\beta} X_{\beta}^{\kappa} + \left( 1 - \phi \right) \rho_R \rho_l X_l^{\kappa} K_d\]</div>
+<p>where <span class="math notranslate nohighlight">\(\phi\)</span> is porosity, <span class="math notranslate nohighlight">\(S_{\beta}\)</span> is the saturation of phase <span class="math notranslate nohighlight">\(\beta\)</span> (e.g., <span class="math notranslate nohighlight">\(\beta\)</span> = gas, aqueous, non-aqueous phase liquid), <span class="math notranslate nohighlight">\(\rho_{\beta}\)</span> is the density of phase <span class="math notranslate nohighlight">\(\beta\)</span>, and <span class="math notranslate nohighlight">\(X_{\beta}^{\kappa}`\)</span> is the mass fraction of component <span class="math notranslate nohighlight">\(\kappa\)</span> in phase <span class="math notranslate nohighlight">\(\beta\)</span>.
+<span class="math notranslate nohighlight">\(\rho_R\)</span> is the rock grain density, and <span class="math notranslate nohighlight">\(K_d\)</span> is the aqueous (liquid) phase distribution coefficient.
+The total mass of component <span class="math notranslate nohighlight">\(\kappa\)</span> is obtained by summing over the fluid phases <span class="math notranslate nohighlight">\(\beta\)</span>.
+The heat accumulation term in a multiphase system is</p>
+<div class="math notranslate nohighlight" id="equation-eq-3">
+<span class="eqno">(3)<a class="headerlink" href="#equation-eq-3" title="Link to this equation">#</a></span>\[M^h = \left( 1 - \phi \right) \rho_R C_R T + \phi \sum_{\beta} S_{\beta} \rho_{\beta} u_{\beta}\]</div>
+<p>where <span class="math notranslate nohighlight">\(C_R\)</span> is the specific heat of the rock grains, <span class="math notranslate nohighlight">\(T\)</span> is temperature, and <span class="math notranslate nohighlight">\(u_{\beta}\)</span> is the specific internal energy of phase <span class="math notranslate nohighlight">\(\beta\)</span>.</p>
+</section>
+<section id="flux-terms">
+<h2>Flux Terms<a class="headerlink" href="#flux-terms" title="Link to this heading">#</a></h2>
+<p>Advective mass flux is a sum of phase fluxes,</p>
+<div class="math notranslate nohighlight" id="equation-eq-4">
+<span class="eqno">(4)<a class="headerlink" href="#equation-eq-4" title="Link to this equation">#</a></span>\[\boldsymbol{\mathrm{F}}^{\kappa} \vert_{adv} = \sum_{\beta} X_{\beta}^{\kappa} \boldsymbol{\mathrm{F}}_{\beta}\]</div>
+<p>where individual phase fluxes are given by a multiphase version of Darcy’s law:</p>
+<div class="math notranslate nohighlight" id="equation-eq-5">
+<span class="eqno">(5)<a class="headerlink" href="#equation-eq-5" title="Link to this equation">#</a></span>\[\boldsymbol{\mathrm{F}}_{\beta} = \rho_{\beta} \boldsymbol{\mathrm{u}}_{\beta} = -k \frac{k_{r \beta} \rho_{\beta}}{\mu_{\beta}} \left( \nabla P_{\beta} - \rho_{\beta} \boldsymbol{\mathrm{g}} \right)\]</div>
+<p>Here, <span class="math notranslate nohighlight">\(u_{\beta}\)</span> is the Darcy velocity (volume flux) of phase <span class="math notranslate nohighlight">\(\beta\)</span>, <span class="math notranslate nohighlight">\(k\)</span> is absolute permeability, <span class="math notranslate nohighlight">\(k_{r \beta}\)</span> is relative permeability to phase <span class="math notranslate nohighlight">\(\beta\)</span>, <span class="math notranslate nohighlight">\(\mu_{\beta}\)</span> is dynamic viscosity, and</p>
+<div class="math notranslate nohighlight" id="equation-eq-6">
+<span class="eqno">(6)<a class="headerlink" href="#equation-eq-6" title="Link to this equation">#</a></span>\[P_{\beta} = P + P_{c \beta}\]</div>
+<p>is the fluid pressure in phase <span class="math notranslate nohighlight">\(\beta\)</span>, which is the sum of the pressure <span class="math notranslate nohighlight">\(P\)</span> of a reference phase (usually taken to be the gas phase) and the capillary pressure <span class="math notranslate nohighlight">\(P_{c \beta}\)</span> (<span class="math notranslate nohighlight">\(\le 0\)</span>).
+<span class="math notranslate nohighlight">\(\boldsymbol{\mathrm{g}}\)</span> is the vector of gravitational acceleration.
+Vapor pressure lowering due to capillary and phase adsorption effects can be considered, and is modeled by Kelvin’s equation (<span id="id2"><a class="reference internal" href="../references.html#id25" title="Edlefsen, N., Anderson, A., &amp; others. (1943). Thermodynamics of soil moisture. Hilgardia, 15(2), 31–298.">Edlefsen et al., 1943</a></span>),</p>
+<div class="math notranslate nohighlight" id="equation-eq-7">
+<span class="eqno">(7)<a class="headerlink" href="#equation-eq-7" title="Link to this equation">#</a></span>\[P_v \left( T, S_l \right) = f_{VPL} \left( T, S_l \right) P_{sat} \left( T \right)\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight" id="equation-eq-8">
+<span class="eqno">(8)<a class="headerlink" href="#equation-eq-8" title="Link to this equation">#</a></span>\[f_{VPL} = \exp \left( \frac{M_w P_{cl}\left( S_l \right)}{\rho_l R \left( T + 273.15 \right)} \right)\]</div>
+<p>is the vapor pressure lowering factor.
+<span class="math notranslate nohighlight">\(P_v\)</span> is the vapor pressure, <span class="math notranslate nohighlight">\(P_{sat}\)</span> is the saturated vapor pressure of bulk aqueous phase, <span class="math notranslate nohighlight">\(P_{cl}\)</span> is the capillary pressure (i.e., the difference between aqueous and gas phase pressures), <span class="math notranslate nohighlight">\(M_w\)</span> is the molecular weight of water, and <span class="math notranslate nohighlight">\(R\)</span> is the universal gas constant.</p>
+<p>Absolute permeability of the gas phase increases at low pressures according to the relation given by <span id="id3"><a class="reference internal" href="../references.html#id43" title="Klinkenberg, L. (1941). The permeability of porous media to liquids and gases. Am. Petrol. Inst., Drilling and Production Practice, 2, 200–213.">Klinkenberg, 1941</a></span></p>
+<div class="math notranslate nohighlight" id="equation-eq-9">
+<span class="eqno">(9)<a class="headerlink" href="#equation-eq-9" title="Link to this equation">#</a></span>\[k = k_{\infty} \left( 1 + \frac{b}{P} \right)\]</div>
+<p>where <span class="math notranslate nohighlight">\(k_{\infty}\)</span> is the permeability at “infinite” pressure, and <span class="math notranslate nohighlight">\(b\)</span> is the Klinkenberg parameter.</p>
+<p>In addition to Darcy flow, mass transport can also occur by diffusion.
+Diffusive flux is modeled as follows:</p>
+<div class="math notranslate nohighlight" id="equation-eq-10">
+<span class="eqno">(10)<a class="headerlink" href="#equation-eq-10" title="Link to this equation">#</a></span>\[\boldsymbol{\mathrm{f}}_{\beta}^{\kappa} = -\phi \tau_0 \tau_{\beta} \rho_{\beta} d_{\beta}^{\kappa} \nabla X_{\beta}^{\kappa}\]</div>
+<p>here <span class="math notranslate nohighlight">\(d_{\beta}^{\kappa}\)</span> is the molecular diffusion coefficient for component <span class="math notranslate nohighlight">\(\kappa\)</span> in phase <span class="math notranslate nohighlight">\(\beta\)</span>, and <span class="math notranslate nohighlight">\(\tau_0 \tau_{\beta}\)</span> is the tortuosity, which includes a porous medium dependent factor <span class="math notranslate nohighlight">\(\tau_0\)</span> and a coefficient that depends on phase saturation <span class="math notranslate nohighlight">\(S_{\beta}\)</span>, <span class="math notranslate nohighlight">\(\tau_{\beta} = \tau_{\beta} \left( S_{\beta} \right)\)</span>.
+For general two-phase conditions, the total diffusive flux is then given by</p>
+<div class="math notranslate nohighlight" id="equation-eq-11">
+<span class="eqno">(11)<a class="headerlink" href="#equation-eq-11" title="Link to this equation">#</a></span>\[\boldsymbol{\mathrm{f}}^{\kappa} = -\Sigma_l^{\kappa} \nabla X_l^{\kappa} - \Sigma_g^{\kappa} \nabla X_g^{\kappa}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\Sigma_{\beta}^{\kappa} = \phi \tau_0 \tau_{\beta} \rho_{\beta} d_{\beta}^{\kappa}\)</span> is an effective diffusion coefficient in phase <span class="math notranslate nohighlight">\(\beta\)</span>.
+We have used this pragmatic approach because it is not possible to formulate a model for multiphase diffusion that would be accurate under all circumstances.
+The basic Fick law works well for diffusion of tracer solutes that are present at low concentrations in a single-phase aqueous solution at rest with respect to the porous medium <a class="footnote-reference brackets" href="#id8" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
+<p>Several models are available to describe the dependence of tortuosity on porous medium properties and phase saturation.
+For the relative permeability model, tortuosity will be taken as <span class="math notranslate nohighlight">\(\tau_0 \tau_{\beta} \left( S_{\beta} \right) = \tau_0 k_{r \beta} \left( S_{\beta} \right)\)</span> with the user-specified porous medium dependent factor <span class="math notranslate nohighlight">\(\tau_0\)</span>.
+The <span id="id5"><a class="reference internal" href="../references.html#id54" title="Millington, R., &amp; Quirk, J. (1961). Permeability of porous solids. Transactions of the Faraday Society, 57, 1200–1207.">Millington &amp; Quirk, 1961</a></span> model, which has frequently been used for soils, yields non-zero tortuosity coefficients as long as phase saturation is non-zero <a class="footnote-reference brackets" href="#id11" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
+<div class="math notranslate nohighlight" id="equation-eq-12">
+<span class="eqno">(12)<a class="headerlink" href="#equation-eq-12" title="Link to this equation">#</a></span>\[\tau_0 \tau_{\beta} = \phi^{1/3} S_{\beta}^{10/3}\]</div>
+<p>For the constant diffusivity formulation, <span class="math notranslate nohighlight">\(\tau_0 \tau_{\beta} = S_{\beta}\)</span> will be used.
+This alternative corresponds to the formulation for gas diffusion in the original version of TOUGH2.
+In the absence of phase partitioning and adsorptive effects, it amounts to effective diffusivity being approximately equal to <span class="math notranslate nohighlight">\(d_{\beta}^{\kappa}\)</span>, independent of saturation. This can be seen by noting that the accumulation term in the phase <span class="math notranslate nohighlight">\(\beta\)</span> contribution to the mass balance equation for component <span class="math notranslate nohighlight">\(\kappa\)</span> is given by <span class="math notranslate nohighlight">\(\phi S_{\beta} \rho_{\beta} X_{\beta}^{\kappa}\)</span>, approximately canceling out the <span class="math notranslate nohighlight">\(\phi S_{\beta} \rho_{\beta}\)</span> coefficient in the diffusive flux.</p>
+<p>TOUGH3 can model the pressure and temperature dependence of gas phase diffusion coefficients by the following equation (<span id="id7"><a class="reference internal" href="../references.html#id108" title="Vargaftik, N. B. (1975). Tables on the thermophysical properties of liquids and gases. Hemisphere Pub. Corp.">Vargaftik, 1975</a>, <a class="reference internal" href="../references.html#id113" title="Walker, W. R., Sabey, J. D., &amp; Hampton, D. R. (1981). Studies of heat transfer and water migration in soils. Final report. Colorado State Univ., Fort Collins (USA). Solar Energy Applications Lab.">Walker et al., 1981</a></span>).</p>
+<div class="math notranslate nohighlight" id="equation-eq-13">
+<span class="eqno">(13)<a class="headerlink" href="#equation-eq-13" title="Link to this equation">#</a></span>\[d_g^{\kappa} \left( P, T \right) = d_g^{\kappa} \left( P_0, T_0 \right) \frac{P_0}{P} \left( \frac{T + 273.15}{273.15} \right)^{\theta}\]</div>
+<p>At standard conditions of <span class="math notranslate nohighlight">\(P_0\)</span> = 1 atm = 1.01325 bar and <span class="math notranslate nohighlight">\(T_0\)</span> = 0˚C, the diffusion coefficient for vapor-air mixtures has a value of 2.13 x 10<sup>-5</sup> m<sup>2</sup>/s; parameter <span class="math notranslate nohighlight">\(\theta\)</span> for the temperature dependence is 1.80.
+Presently there are no provisions for inputting different values for the parameter <span class="math notranslate nohighlight">\(\theta\)</span> of temperature dependence for different gas phase components.
+Diffusion coefficients for the non-gaseous phases are taken as constants, with no provisions for temperature dependence of these parameters.</p>
+<p>Heat flux includes conductive, convective, and radiative components:</p>
+<div class="math notranslate nohighlight" id="equation-eq-14">
+<span class="eqno">(14)<a class="headerlink" href="#equation-eq-14" title="Link to this equation">#</a></span>\[\boldsymbol{\mathrm{F}}^h = -\lambda \nabla T + \sum_{\beta} h_{\beta} \boldsymbol{\mathrm{F}}_{\beta} + f_{\sigma} \sigma_0 \nabla T^4\]</div>
+<p>where <span class="math notranslate nohighlight">\(\lambda\)</span> is the effective thermal conductivity, and <span class="math notranslate nohighlight">\(h_{\beta}\)</span> is the specific enthalpy in phase <span class="math notranslate nohighlight">\(\beta\)</span>, <span class="math notranslate nohighlight">\(f_{\sigma}\)</span> is the radiant emittance factor, and <span class="math notranslate nohighlight">\(\sigma_0\)</span> is the Stefan-Boltzmann constant.</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id8" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">1</a><span class="fn-bracket">]</span></span>
+<p>Many subtleties and complications can arise when multiple components diffuse in a multiphase flow system. Effective diffusivities in general may depend on all concentration variables, leading to nonlinear behavior especially when some components are present in significant (non-tracer) concentrations. Additional nonlinear effects arise from the dependence of tortuosity on phase saturations, and from coupling between advective and diffusive transport. For gases, the Fickian model has serious limitations even at low concentrations, which prompted the development of the “dusty gas” model that entails a strong coupling between advective and diffusive transport (<span id="id9"><a class="reference internal" href="../references.html#id53" title="Mason, E. A., &amp; AP, M. (1983). Gas transportin porous media: the dusty-gas model. Elsevier.">Mason &amp; AP, 1983</a>, <a class="reference internal" href="../references.html#id116" title="Webb, S. W., &amp; Ho, C. K. (1998). Review of enhanced vapor diffusion in porous media. Sandia National Lab.(SNL-NM), Albuquerque, NM (United States).">Webb &amp; Ho, 1998a</a></span>) and accounts for molecular streaming effects (Knudsen diffusion) that become very important when the mean free path of gas molecules is comparable to pore sizes. Further complications arise for components that are both soluble and volatile, in which case diffusion in aqueous and gaseous phases may be strongly coupled via phase partitioning effects. An extreme case is the well-known enhancement of vapor diffusion in partially saturated media, which is attributed to pore-level phase change effects (<span id="id10"><a class="reference internal" href="../references.html#id13" title="Cass, A., Campbell, G., &amp; Jones, T. (1984). Enhancement of thermal water vapor diffusion in soil. Soil Science Society of America Journal, 48(1), 25–32.">Cass et al., 1984</a>, <a class="reference internal" href="../references.html#id116" title="Webb, S. W., &amp; Ho, C. K. (1998). Review of enhanced vapor diffusion in porous media. Sandia National Lab.(SNL-NM), Albuquerque, NM (United States).">Webb &amp; Ho, 1998a</a>, <a class="reference internal" href="../references.html#id117" title="Webb, S., &amp; Ho, C. (1998). Enhanced vapor diffusion in porous media-ldrd final report. Sandia National Laboratories Report SAND98-2772, Albuquerque, NM.">Webb &amp; Ho, 1998b</a></span>). These alternative models are not implemented in TOUGH3.</p>
+</aside>
+<aside class="footnote brackets" id="id11" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id6">2</a><span class="fn-bracket">]</span></span>
+<p>It stands to reason that diffusive flux should vanish when a phase becomes discontinuous at low saturations, suggesting that saturation-dependent tortuosity should be related to relative permeability, i.e., <span class="math notranslate nohighlight">\(\tau_{\beta} \left( S_{\beta} \right) \approx k_{r \beta} \left( S_{\beta} \right)\)</span>. However, for components that partition between liquid and gas phases, a more complex behavior may be expected. For example, consider the case of a volatile and water-soluble compound diffusing under conditions of low gas saturation where the gas phase is discontinuous. In this case we have <span class="math notranslate nohighlight">\(k_{rg} \left( S_g \right) = 0\)</span> (because <span class="math notranslate nohighlight">\(S_g \lt S_{gr}\)</span>), and <span class="math notranslate nohighlight">\(k_rl \left( S_l = 1 - S_g \right) &lt; 1\)</span>, so that a model equating saturation-dependent tortuosity to relative permeability would predict weaker diffusion than in single-phase liquid conditions. For compounds with “significant” volatility this would be unrealistic, as diffusion through isolated gas pockets would tend to enhance overall diffusion relative to single-phase liquid conditions.</p>
+</aside>
+</aside>
+</section>
+<section id="sink-and-source-terms">
+<h2>Sink and Source Terms<a class="headerlink" href="#sink-and-source-terms" title="Link to this heading">#</a></h2>
+<p>Sinks and sources are introduced by specifying the mass production (<span class="math notranslate nohighlight">\(q \lt 0\)</span>) or injection (<span class="math notranslate nohighlight">\(q \gt 0\)</span>) rates of fluids as well as heat flow.
+Any of the mass components may be injected in an element at a constant or time-dependent mass rate, and the specific enthalpy of the injected fluid may be specified as well.Heat sources/sinks (with no mass injection) may be either constant or time dependent.</p>
+<p>In the case of fluid production, a total mass production rate needs to be specified.
+The phase composition of the produced fluid may be determined by the relative phase mobilities in the source element.
+Alternatively, the produced phase composition may be specified to be the same as the phase composition in the producing element.
+In either case, the mass fractions of the components in the produced phases are determined by the corresponding component mass fractions in the producing element.</p>
+<p>TOUGH3 also includes different options for considering wellbore flow effects: a well on deliverability against specified bottomhole or wellhead pressure, or coupled wellbore flow.
+Details are discussed below.</p>
+<section id="deliverability-model">
+<h3>Deliverability Model<a class="headerlink" href="#deliverability-model" title="Link to this heading">#</a></h3>
+<p>Production wells may operate on deliverability against a prescribed flowing bottomhole pressure, <span class="math notranslate nohighlight">\(P_{wb}\)</span>, with a productivity index PI (<span id="id12"><a class="reference internal" href="../references.html#id15" title="Coats, K. (1977). Geothermal reservoir modelling. SPE Annual Fall Technical Conference and Exhibition.">Coats, 1977</a></span>).
+With this option, the mass production rate of phase <span class="math notranslate nohighlight">\(\beta\)</span> from a grid block with phase pressure <span class="math notranslate nohighlight">\(P_{\beta} \gt P_{wb}\)</span> is</p>
+<div class="math notranslate nohighlight" id="equation-eq-15">
+<span class="eqno">(15)<a class="headerlink" href="#equation-eq-15" title="Link to this equation">#</a></span>\[q_{\beta} = \frac{k_{r \beta}}{\mu_{\beta}} \rho_{\beta} \cdot PI \cdot \left( P_{\beta} - P_{wb} \right)\]</div>
+<p>For steady radial flow, the productivity index of layer l is given by (Coats, 1977; Thomas, 1982)</p>
+<div class="math notranslate nohighlight" id="equation-eq-16">
+<span class="eqno">(16)<a class="headerlink" href="#equation-eq-16" title="Link to this equation">#</a></span>\[(PI)_l = \frac{2 \pi \left( k \Delta z_l \right)}{\log \left( r_e / r_w \right) + s - 1/2}\]</div>
+<p>Here, <span class="math notranslate nohighlight">\(\Delta z_l\)</span> denotes the layer thickness, <span class="math notranslate nohighlight">\(\left( k \Delta z_l \right)\)</span> is the permeability-thickness product in layer <span class="math notranslate nohighlight">\(l\)</span>, <span class="math notranslate nohighlight">\(r_e\)</span> is the grid block radius, <span class="math notranslate nohighlight">\(r_w\)</span> is the well radius, and <span class="math notranslate nohighlight">\(s\)</span> is the skin factor. If the well is producing from a grid block which does not have cylindrical shape, an approximate PI can be computed by using an
+effective radius</p>
+<div class="math notranslate nohighlight" id="equation-eq-17">
+<span class="eqno">(17)<a class="headerlink" href="#equation-eq-17" title="Link to this equation">#</a></span>\[r_e = \sqrt{A / \pi}\]</div>
+<p>where <span class="math notranslate nohighlight">\(A\)</span> is the grid block area; e.g., <span class="math notranslate nohighlight">\(A = \Delta x \cdot \Delta y\)</span> for an areal Cartesian grid.
+More accurate expressions for specific well patterns and grid block shapes have been given in the literature (e.g., <span id="id13"><a class="reference internal" href="../references.html#id16" title="Coats, K., &amp; Ramesh, A. (1982). Effects of grid type and difference scheme on pattern steamflood simulation results. Intercomp Resource Dev. and Engr. Inc.">Coats &amp; Ramesh, 1982</a>, <a class="reference internal" href="../references.html#id72" title="Peaceman, D. W. (2000). Fundamentals of numerical reservoir simulation. Elsevier.">Peaceman, 2000</a></span>).</p>
+<p>The rate of production for mass component <span class="math notranslate nohighlight">\(\kappa\)</span> is</p>
+<div class="math notranslate nohighlight" id="equation-eq-18">
+<span class="eqno">(18)<a class="headerlink" href="#equation-eq-18" title="Link to this equation">#</a></span>\[\hat{q}^{\kappa} = \sum_{\beta} X_{\beta}^{\kappa} q_{\beta}\]</div>
+<p>For wells that are screened in more than one layer (element), the flowing wellbore pressure <span class="math notranslate nohighlight">\(P_{wb}\)</span> can be corrected to approximately account for gravity effects according to the depth-dependent flowing density in the wellbore.
+Assuming that the open interval extends from layer <span class="math notranslate nohighlight">\(l = ` at the
+bottom to :math:`l = L`\)</span> at the top, the flowing wellbore pressure in layer <span class="math notranslate nohighlight">\(l\)</span>, <span class="math notranslate nohighlight">\(P_{wb, l}\)</span>, is obtained from the wellbore pressure in layer <span class="math notranslate nohighlight">\(l + 1`\)</span> immediately above it by means of the following recursion formula</p>
+<div class="math notranslate nohighlight" id="equation-eq-19">
+<span class="eqno">(19)<a class="headerlink" href="#equation-eq-19" title="Link to this equation">#</a></span>\[P_{wb, l} = P_{wb, l + 1} + \frac{g}{2} \left( \rho_l^f \Delta z_l + \rho_{l + 1}^f \Delta z_{l + 1}\right)\]</div>
+<p>Here, <span class="math notranslate nohighlight">\(g\)</span> is acceleration of gravity, and <span class="math notranslate nohighlight">\(\rho_l^f\)</span> is the flowing density in the tubing opposite layer <span class="math notranslate nohighlight">\(l\)</span>.
+Flowing densities are computed using a procedure given by Coats (private communication, 1982).
+If wellbore pressure were zero, we would obtain the following volumetric production rate of phase <span class="math notranslate nohighlight">\(\beta\)</span> from layer <span class="math notranslate nohighlight">\(l\)</span>.</p>
+<div class="math notranslate nohighlight" id="equation-eq-20">
+<span class="eqno">(20)<a class="headerlink" href="#equation-eq-20" title="Link to this equation">#</a></span>\[r_{l, \beta} = \left( \frac{k_{r \beta}}{\mu_{\beta}} \right)_l \left( PI \right)_l P_{l, \beta}\]</div>
+<p>The total volumetric flow rate of phase <span class="math notranslate nohighlight">\(\beta\)</span> opposite layer <span class="math notranslate nohighlight">\(l\)</span> is, for zero wellbore pressure</p>
+<div class="math notranslate nohighlight" id="equation-eq-21">
+<span class="eqno">(21)<a class="headerlink" href="#equation-eq-21" title="Link to this equation">#</a></span>\[r_{l, \beta}^T = \sum_{m=1}^l r_{m, \beta}\]</div>
+<p>From this, we obtain an approximate expression for flowing density opposite layer <span class="math notranslate nohighlight">\(l\)</span> which can be used in Eq. <a class="reference internal" href="#equation-eq-19">(19)</a>.</p>
+<div class="math notranslate nohighlight" id="equation-eq-22">
+<span class="eqno">(22)<a class="headerlink" href="#equation-eq-22" title="Link to this equation">#</a></span>\[\rho_l^f = \frac{\sum_{\beta} \rho_{l, \beta} r_{l, \beta}^T}{\sum_{\beta} r_{l, \beta}^T}\]</div>
+<p>During fluid production or injection, the rate of heat removal or injection is determined by</p>
+<div class="math notranslate nohighlight" id="equation-eq-23">
+<span class="eqno">(23)<a class="headerlink" href="#equation-eq-23" title="Link to this equation">#</a></span>\[\hat{q}^h = \sum_{\beta} q_{\beta} h_{\beta}\]</div>
+<p>where <span class="math notranslate nohighlight">\(h_{\beta}\)</span> is the specific enthalpy of phase <span class="math notranslate nohighlight">\(\beta\)</span>.</p>
+</section>
+<section id="coupled-wellbore-flow">
+<h3>Coupled Wellbore Flow<a class="headerlink" href="#coupled-wellbore-flow" title="Link to this heading">#</a></h3>
+<p>Geothermal production wells typically operate at (nearly) constant wellhead pressures.
+However, as flow rate and flowing enthalpy change with time, wellbore pressure gradients and flowing bottomhole pressures will also change.
+TOUGH3 cannot directly describe production from geothermal wells by solving equations for flow in the reservoir and flow in the wellbore in a fully coupled manner <a class="footnote-reference brackets" href="#id16" id="id14" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>.
+TOUGH3 uses an alternative approach (<span id="id15"><a class="reference internal" href="../references.html#id60" title="Murray, L. (1993). Toward integrating geothermal reservoir and wellbore simulation: tetrad and wellsim. Proceedings of the 15th New Zealand Geothermal Workshop 1993.">Murray, 1993</a></span>) in which the wellbore and reservoir simulations are performed separately.
+This can be accomplished by running a wellbore flow simulator prior to the reservoir simulation for a range of flow rates <span class="math notranslate nohighlight">\(q\)</span> and
+flowing enthalpies <span class="math notranslate nohighlight">\(h\)</span> in order to generate a table of flowing bottomhole pressures <span class="math notranslate nohighlight">\(P_{wb}\)</span>.</p>
+<div class="math notranslate nohighlight" id="equation-eq-24">
+<span class="eqno">(24)<a class="headerlink" href="#equation-eq-24" title="Link to this equation">#</a></span>\[P_{wb} = P_{wb} \left( q, h; P_{wh}, z, r_w \right)\]</div>
+<p>In addition to the functional dependence on <span class="math notranslate nohighlight">\(q\)</span> and <span class="math notranslate nohighlight">\(h\)</span>, flowing bottomhole pressure is dependent on a number of well parameters.
+These include wellhead pressure :math`P_{wh}`, feed zone depth <span class="math notranslate nohighlight">\(z\)</span>, wellbore radius <span class="math notranslate nohighlight">\(r_w\)</span>, friction factors, and possibly others.
+By interpolating on these tabular data, Eq. <a class="reference internal" href="#equation-eq-24">(24)</a> can
+be directly inserted into the well source term, Eq. <a class="reference internal" href="#equation-eq-15">(15)</a>.
+Reservoir flow equations that include a quasi-steady approximation to wellbore flow can then be solved with little added computational expense compared to the case where no wellbore flow effects are considered.
+Advantages of representing wellbore flow effects through tabular data include increased robustness and computational efficiency.
+It also makes it possible to use different wellbore simulators and two-phase flow correlations without any programming changes in the reservoir simulation code.</p>
+<p>We have incorporated a tabular interpolation scheme for dynamic changes of flowing bottomhole pressure into TOUGH3.
+Flowing enthalpy at the feed zone is known from phase mobilities and enthalpies calculated by the reservoir simulator.
+The unknown well flow rate and flowing bottomhole pressure are obtained by Newton-Raphson iteration on</p>
+<div class="math notranslate nohighlight" id="equation-eq-25">
+<span class="eqno">(25)<a class="headerlink" href="#equation-eq-25" title="Link to this equation">#</a></span>\[R \left( q \right) = q - \left( \sum \frac{k_{r \beta}}{\mu_{\beta}} \rho_{\beta} \right) \cdot PI \cdot \left( P - P_{wb} \left( q, h \right )\right) = 0\]</div>
+<p>The iterative solution of Eq. <a class="reference internal" href="#equation-eq-25">(25)</a> was embedded in the outer (Newtonian) iteration performed by TOUGH3 on the coupled mass and heat balance equations.
+Additional computational work in comparison to conventional simulations with constant downhole pressure is insignificant.</p>
+<p>The coupled wellbore flow capability as coded in TOUGH3 is limited to wells with a single feed zone and can only handle wellbore pressure effects from changing flow rates and enthalpies.
+Effects from changing fluid composition, as, e.g., variable non-condensible gas content, are not modeled at present.</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id16" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id14">3</a><span class="fn-bracket">]</span></span>
+<p>The fully coupled approach was taken by <span id="id17"><a class="reference internal" href="../references.html#id36" title="Hadgu, T., Zimmerman, R. W., &amp; Bodvarsson, G. S. (1995). Coupled reservoir-wellbore simulation of geothermal reservoir behavior. Geothermics, 24(2), 145–166.">Hadgu et al., 1995</a></span> who coupled the reservoir simulator TOUGH (<span id="id18"><a class="reference internal" href="../references.html#id80" title="Pruess, K. (1987). TOUGH user's guide. Lawrence Berkeley National Lab.(LBNL), Berkeley, CA (United States).">Pruess, 1987</a></span>) with the wellbore simulator WFSA (<span id="id19"><a class="reference internal" href="../references.html#id35" title="Hadgu, T. (1990). A multi-purpose wellbore simulator. Geothermal Research Council. Trans., 14, 1279–1286.">Hadgu, 1990</a></span>). T2Well (<span id="id20"><a class="reference internal" href="../references.html#id67" title="Pan, L., &amp; Oldenburg, C. M. (2014). T2well—an integrated wellbore–reservoir simulator. Computers &amp; Geosciences, 65, 46–55.">Pan &amp; Oldenburg, 2014</a></span>) is also a coupled wellbore-reservoir simulator, which extends TOUGH2 to calculate the flow in both the wellbore and the reservoir simultaneously by introducing a special wellbore sub-domain. T2Well uses the drift-flux model and related conservation equations for describing transient two-phase nonisothermal flow in the wellbore sub-domain. T2Well will be implemented in TOUGH3 at a future date.</p>
+</aside>
+</aside>
+</section>
+</section>
+<section id="semi-analytical-conductive-heat-exchange">
+<h2>Semi-Analytical Conductive Heat Exchange<a class="headerlink" href="#semi-analytical-conductive-heat-exchange" title="Link to this heading">#</a></h2>
+<p>TOUGH3 provides options for modeling linear or radial conductive heat exchange with geologic formations where no fluid exchange is considered, using semi-analytical methods.
+This is a much more efficient alternative to the approach that simply extends the computational grid into those formations and assigns small or vanishing permeability to them.
+Even to achieve modest accuracy, the number of grid blocks in the heat flow domain could easily become comparable to, or even larger than, the number of grid blocks in the fluid flow domain, leading to a very inefficient calculation.
+The semi-analytical methods require no grid blocks outside of the fluid flow domain, and permit better accuracy for short- and long-term heat exchange.
+Note that radial and linear semi-analytical heat exchange cannot be combined in the current version of TOUGH3.</p>
+<section id="linear-heat-exchange-between-a-reservoir-and-confining-beds">
+<h3>Linear Heat Exchange between a Reservoir and Confining Beds<a class="headerlink" href="#linear-heat-exchange-between-a-reservoir-and-confining-beds" title="Link to this heading">#</a></h3>
+<p>TOUGH3 uses the method of <span id="id21"><a class="reference internal" href="../references.html#id112" title="Vinsome, P., &amp; Westerveld, J. (1980). A simple method for predicting cap and base rock heat losses in'thermal reservoir simulators. Journal of Canadian Petroleum Technology, 19(03).">Vinsome &amp; Westerveld, 1980</a></span>, which gives excellent
+accuracy for heat exchange between reservoir fluids and confining beds <a class="footnote-reference brackets" href="#id23" id="id22" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a> such as may arise in geothermal injection and production operations.
+Observing that the process of heat conduction tends to dampen out temperature variations, Vinsome and Westerveld suggested that caprock or baserock temperatures would vary smoothly even for strong and rapid temperature changes at the boundary of the conduction zone.
+Arguing that heat conduction perpendicular to the conductive boundary is more important than parallel to it, they proposed to represent the temperature profile in a semi-infinite conductive layer by means of a simple trial function, as follows:</p>
+<div class="math notranslate nohighlight" id="equation-eq-26">
+<span class="eqno">(26)<a class="headerlink" href="#equation-eq-26" title="Link to this equation">#</a></span>\[T \left( x, t \right) - T_i = \left( T_f - T_i + px + qx^2 \right) \exp \left( -\frac{x}{d}\right)\]</div>
+<p>Here, <span class="math notranslate nohighlight">\(x\)</span> is the distance from the boundary, <span class="math notranslate nohighlight">\(T_i\)</span> is initial temperature in the cap- or base-rock (assumed uniform), <span class="math notranslate nohighlight">\(T_f\)</span> is the time-varying temperature at the cap- or base-rock boundary, <span class="math notranslate nohighlight">\(p\)</span> and <span class="math notranslate nohighlight">\(q\)</span> are time-varying fit parameters, and <span class="math notranslate nohighlight">\(d\)</span> is the penetration depth for heat conduction, given by</p>
+<div class="math notranslate nohighlight" id="equation-eq-27">
+<span class="eqno">(27)<a class="headerlink" href="#equation-eq-27" title="Link to this equation">#</a></span>\[d = \frac{\sqrt{\Theta t}}{2}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\Theta = \lambda / \rho C\)</span> is the thermal diffusivity, <span class="math notranslate nohighlight">\(\lambda\)</span> the thermal conductivity, <span class="math notranslate nohighlight">\(\rho\)</span> the density of the medium, and <span class="math notranslate nohighlight">\(C\)</span> the specific heat.
+In the context of a finite-difference simulation of nonisothermal flow, each
+grid block in the top and bottom layers of the computational grid will have an associated temperature profile in the adjacent impermeable rock as given by Eq. <a class="reference internal" href="#equation-eq-26">(26)</a>.
+The coefficients <span class="math notranslate nohighlight">\(p\)</span> and <span class="math notranslate nohighlight">\(q\)</span> will be different for each grid block; they are determined concurrently with the flow simulation from the physical constraints of (1) continuity of heat flux across the boundary, and (2) energy conservation for the reservoir/confining layer system.</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id23" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id22">4</a><span class="fn-bracket">]</span></span>
+<p>This method is developed for calculating heat losses from the reservoir to caprock or baserock and predicting the temperature profile in a semi-infinite, homogeneous, conductive half-space confining bed.</p>
+</aside>
+</aside>
+</section>
+<section id="radial-heat-exchange-between-fluids-in-a-wellbore-and-the-surrounding-formation">
+<h3>Radial Heat Exchange between Fluids in a Wellbore and the Surrounding Formation<a class="headerlink" href="#radial-heat-exchange-between-fluids-in-a-wellbore-and-the-surrounding-formation" title="Link to this heading">#</a></h3>
+<p>Radial, conductive heat exchange between fluids in a discretized wellbore and the formation is calculated using a semi-analytical, time-convolution method.
+Note that the time-dependent temperature evolution in the fully-discretized wellbore is calculated numerically.
+At each time step, radial heat transfer with the formation is calculated by superposition of analytical solutions of heat flow that are dependent on the temperature differences between subsequent time steps.</p>
+<p><span id="id24"><a class="reference internal" href="../references.html#id12" title="Carlslaw, H., &amp; Jaeger, J. (1959). Conduction of Heat in Solids, Oxford. Oxford University Press.">Carlslaw &amp; Jaeger, 1959</a></span> provided an approximate solution for heat conduction between a cylinder and surrounding media where the temperature of the cylinder is maintained constant.
+If the initial temperature difference between the two domains is <span class="math notranslate nohighlight">\(\Delta T = T_w - T_f\)</span> (where <span class="math notranslate nohighlight">\(T_w\)</span> and <span class="math notranslate nohighlight">\(T_f\)</span> are the temperatures in the well and the formation, respectively), the heat flux <span class="math notranslate nohighlight">\(q\)</span> from the wellbore to the formation can be calculated das the product of a heat transfer function and the temperature using Eq. <a class="reference internal" href="#equation-eq-28">(28)</a> for small values of the dimensionless time <span class="math notranslate nohighlight">\(t_d = \alpha t / r_0^2\)</span>, where <span class="math notranslate nohighlight">\(\alpha\)</span> is the thermal diffusivity and <span class="math notranslate nohighlight">\(r_0\)</span> is the wellbore radius (m), and Eq. <a class="reference internal" href="#equation-eq-29">(29)</a> for large values of <span class="math notranslate nohighlight">\(t_d\)</span>:</p>
+<div class="math notranslate nohighlight" id="equation-eq-28">
+<span class="eqno">(28)<a class="headerlink" href="#equation-eq-28" title="Link to this equation">#</a></span>\[q = f_1 \left( t_d \right) \cdot \Delta T = \frac{\lambda \Delta T}{r_0} \left( \left( \pi t_d \right)^{-0.5} + \frac{1}{2} - \frac{1}{4} \left( \frac{t_d}{\pi} \right)^{0.5} + \frac{1}{8} t_d - ... \right)\]</div>
+<div class="math notranslate nohighlight" id="equation-eq-29">
+<span class="eqno">(29)<a class="headerlink" href="#equation-eq-29" title="Link to this equation">#</a></span>\[q = f_2 \left( t_d \right) \cdot \Delta T = \frac{2 \lambda \Delta T}{r_0} \left( \frac{1}{\log \left( 4 t_d \right) - 2 \gamma} - \frac{\gamma}{\left( \log \left( 4 t_d \right) - 2 \gamma \right)^2} - ... \right)\]</div>
+<p>Here, <span class="math notranslate nohighlight">\(\lambda\)</span> is the thermal conductivity (W m<sup>-1</sup> K<sup>-1</sup>), and <span class="math notranslate nohighlight">\(\gamma\)</span> is the Euler constant (0.57722).
+The heat transfer functions <span class="math notranslate nohighlight">\(f_1\)</span> and <span class="math notranslate nohighlight">\(f_2\)</span> express the amount of heat flux with time due a unit temperature difference.
+As shown in <span id="id25"><a class="reference internal" href="../references.html#id121" title="Zhang, Y., Pan, L., Pruess, K., &amp; Finsterle, S. (2011). A time-convolution approach for modeling heat exchange between a wellbore and surrounding formation. Geothermics, 40(4), 261–266.">Zhang et al., 2011</a></span>, the heat transfer functions <span class="math notranslate nohighlight">\(f_1\)</span> and <span class="math notranslate nohighlight">\(f_2\)</span> are approximately the same at the dimensionless time <span class="math notranslate nohighlight">\(t_d\)</span> = 2.8.
+Therefore, <span class="math notranslate nohighlight">\(t_d\)</span> = 2.8 is considered the critical dimensionless time to switch from <span class="math notranslate nohighlight">\(f_1\)</span> to <span class="math notranslate nohighlight">\(f_2\)</span>.</p>
+<p>During fluid injection and production, and as a result of the heat exchange processes, temperature changes continuously over time at any point within the wellbore and at the wellbore-formation interface.
+Based on superposition, the radial heat flux across each wellbore element to the surrounding formation is a time-convolution result of varying temperature. The discretized form at each time step can be expressed as</p>
+<div class="math notranslate nohighlight" id="equation-eq-30">
+<span class="eqno">(30)<a class="headerlink" href="#equation-eq-30" title="Link to this equation">#</a></span>\[q_{total} = \sum_{i=1}^{d-1} f \left( t_d - t_i \right) \cdot \Delta T \left( t_i \right)\]</div>
+<p>Here, <span class="math notranslate nohighlight">\(t_d\)</span> represents the current time after <span class="math notranslate nohighlight">\(d\)</span> time steps, and <span class="math notranslate nohighlight">\(t_i\)</span> represents the time after <span class="math notranslate nohighlight">\(i\)</span> time steps; the function <span class="math notranslate nohighlight">\(f\)</span> is <span class="math notranslate nohighlight">\(f_1\)</span> if <span class="math notranslate nohighlight">\(t_d - t_i \le 2.8\)</span>, and <span class="math notranslate nohighlight">\(f_2\)</span> if <span class="math notranslate nohighlight">\(t_d - t_i \gt 2.8\)</span>.
+The temperature difference <span class="math notranslate nohighlight">\(\Delta T \left( t_i \right)\)</span> is the temperature in the well at time step <span class="math notranslate nohighlight">\(i\)</span>, minus the formation temperature at the interface at the previous time step, i.e., <span class="math notranslate nohighlight">\(\Delta T \left( t_i \right) = T_w \left( t_i \right) - T_f \left( t_{i - 1} \right)\)</span>.</p>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">User Guide</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="numerical_methods.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Numerical Methods</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mass-balance-equations">Mass-Balance Equations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#accumulation-terms">Accumulation Terms</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#flux-terms">Flux Terms</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sink-and-source-terms">Sink and Source Terms</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#deliverability-model">Deliverability Model</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#coupled-wellbore-flow">Coupled Wellbore Flow</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#semi-analytical-conductive-heat-exchange">Semi-Analytical Conductive Heat Exchange</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#linear-heat-exchange-between-a-reservoir-and-confining-beds">Linear Heat Exchange between a Reservoir and Confining Beds</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#radial-heat-exchange-between-fluids-in-a-wellbore-and-the-surrounding-formation">Radial Heat Exchange between Fluids in a Wellbore and the Surrounding Formation</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/tough3/guide/governing_equations.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023, Keurfon Luu.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

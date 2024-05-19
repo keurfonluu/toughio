@@ -1,0 +1,1240 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Meshing &#8212; toughio 1.15.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=8fbebee6" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../_static/documentation_options.js?v=70d5d4a5"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/mesh';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Run" href="run.html" />
+    <link rel="prev" title="Input and output files" href="io.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../_static/logo-light.png" class="logo__image only-light" alt="toughio 1.15.0 documentation - Home"/>
+    <script>document.write(`<img src="../_static/logo.png" class="logo__image only-dark" alt="toughio 1.15.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../tough3/index.html">
+                        TOUGH3
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../tough3/index.html">
+                        TOUGH3
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="io.html">Input and output files</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Meshing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run.html">Run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rpcap.html">Relative permeability and capillarity models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command line programs</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">API Reference</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Meshing</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="meshing">
+<h1>Meshing<a class="headerlink" href="#meshing" title="Link to this heading">#</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="toughio.Mesh">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">toughio.</span></span><span class="sig-name descname"><span class="pre">Mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cells</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">point_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">point_sets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_sets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/_mesh/_mesh.html#Mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.Mesh" title="Link to this definition">#</a></dt>
+<dd><p>Unstructured toughio mesh.</p>
+<p>This class is updated following the latest <code class="xref py py-mod docutils literal notranslate"><span class="pre">meshio</span></code> version and
+brings backward compatibility with its previous versions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>points</strong> (<em>array_like</em><em> (</em><em>n_points</em><em>, </em><em>3</em><em>)</em>) – Cooordinates of points.</p></li>
+<li><p><strong>cells</strong> (<em>list</em><em> of </em><em>tuples</em><em> (</em><em>cell_type</em><em>, </em><em>data</em><em>)</em>) – Connectivity of cells.</p></li>
+<li><p><strong>point_data</strong> (<em>dict</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Point data arrays.</p></li>
+<li><p><strong>cell_data</strong> (<em>dict</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Cell data arrays.</p></li>
+<li><p><strong>field_data</strong> (<em>dict</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Field data names.</p></li>
+<li><p><strong>point_sets</strong> (<em>dict</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Sets of points.</p></li>
+<li><p><strong>cell_sets</strong> (<em>dict</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Sets of cells.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="toughio.Mesh.add_cell_data">
+<span class="sig-name descname"><span class="pre">add_cell_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/_mesh/_mesh.html#Mesh.add_cell_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.Mesh.add_cell_data" title="Link to this definition">#</a></dt>
+<dd><p>Add a new cell data array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> (<em>str</em>) – Cell data array name.</p></li>
+<li><p><strong>data</strong> (<em>array_like</em>) – Cell data array.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toughio.Mesh.add_material">
+<span class="sig-name descname"><span class="pre">add_material</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imat</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/_mesh/_mesh.html#Mesh.add_material"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.Mesh.add_material" title="Link to this definition">#</a></dt>
+<dd><p>Add a material name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> (<em>str</em>) – Material name.</p></li>
+<li><p><strong>imat</strong> (<em>int</em>) – Material ID.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toughio.Mesh.add_point_data">
+<span class="sig-name descname"><span class="pre">add_point_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/_mesh/_mesh.html#Mesh.add_point_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.Mesh.add_point_data" title="Link to this definition">#</a></dt>
+<dd><p>Add a new point data array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> (<em>str</em>) – Point data array name.</p></li>
+<li><p><strong>data</strong> (<em>array_like</em>) – Point data array.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.Mesh.cell_data">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cell_data</span></span><a class="headerlink" href="#toughio.Mesh.cell_data" title="Link to this definition">#</a></dt>
+<dd><p>Return cell data arrays.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toughio.Mesh.cell_data_to_point_data">
+<span class="sig-name descname"><span class="pre">cell_data_to_point_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/_mesh/_mesh.html#Mesh.cell_data_to_point_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.Mesh.cell_data_to_point_data" title="Link to this definition">#</a></dt>
+<dd><p>Interpolate cell data to point data.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.Mesh.cell_sets">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cell_sets</span></span><a class="headerlink" href="#toughio.Mesh.cell_sets" title="Link to this definition">#</a></dt>
+<dd><p>Return sets of cells.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.Mesh.cells">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cells</span></span><a class="headerlink" href="#toughio.Mesh.cells" title="Link to this definition">#</a></dt>
+<dd><p>Return connectivity of cells.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.Mesh.centers">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">centers</span></span><a class="headerlink" href="#toughio.Mesh.centers" title="Link to this definition">#</a></dt>
+<dd><p>Return node centers of cell in mesh.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.Mesh.connections">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">connections</span></span><a class="headerlink" href="#toughio.Mesh.connections" title="Link to this definition">#</a></dt>
+<dd><p>Return mesh connections.</p>
+<p>Assume conformity and that points and cells are uniquely defined in mesh.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only for 3D meshes and first order cells.</p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.Mesh.dim">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dim</span></span><a class="headerlink" href="#toughio.Mesh.dim" title="Link to this definition">#</a></dt>
+<dd><p>Return mesh dimension.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toughio.Mesh.extrude_to_3d">
+<span class="sig-name descname"><span class="pre">extrude_to_3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/_mesh/_mesh.html#Mesh.extrude_to_3d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.Mesh.extrude_to_3d" title="Link to this definition">#</a></dt>
+<dd><p>Convert a 2D mesh to 3D by extruding cells along given axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>height</strong> (<em>scalar</em><em> or </em><em>array_like</em><em>, </em><em>optional</em><em>, </em><em>default 1.0</em>) – Height of extrusion.</p></li>
+<li><p><strong>axis</strong> (<em>int</em><em> (</em><em>0</em><em>, </em><em>1</em><em> or </em><em>2</em><em>)</em><em>, </em><em>optional</em><em>, </em><em>default 2</em>) – Axis along which extrusion is performed.</p></li>
+<li><p><strong>inplace</strong> (<em>bool</em><em>, </em><em>optional</em><em>, </em><em>default True</em>) – If <cite>False</cite>, return a new <a class="reference internal" href="#toughio.Mesh" title="toughio.Mesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">toughio.Mesh</span></code></a>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Extruded mesh (only if <code class="docutils literal notranslate"><span class="pre">inplace</span> <span class="pre">==</span> <span class="pre">False</span></code>).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#toughio.Mesh" title="toughio.Mesh">toughio.Mesh</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.Mesh.face_areas">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">face_areas</span></span><a class="headerlink" href="#toughio.Mesh.face_areas" title="Link to this definition">#</a></dt>
+<dd><p>Return areas of faces in mesh.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.Mesh.face_normals">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">face_normals</span></span><a class="headerlink" href="#toughio.Mesh.face_normals" title="Link to this definition">#</a></dt>
+<dd><p>Return normal vectors of faces in mesh.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.Mesh.faces">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">faces</span></span><a class="headerlink" href="#toughio.Mesh.faces" title="Link to this definition">#</a></dt>
+<dd><p>Return connectivity of faces of cell in mesh.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.Mesh.field_data">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">field_data</span></span><a class="headerlink" href="#toughio.Mesh.field_data" title="Link to this definition">#</a></dt>
+<dd><p>Return field data names.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.Mesh.filter">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">filter</span></span><a class="headerlink" href="#toughio.Mesh.filter" title="Link to this definition">#</a></dt>
+<dd><p>Filter mesh.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filter</strong> (<em>str</em><em>, </em><em>optional</em><em>, </em><em>default 'box'</em>) – Filter method.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Indices of cells filtered.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array_like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.Mesh.label_length">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">label_length</span></span><a class="headerlink" href="#toughio.Mesh.label_length" title="Link to this definition">#</a></dt>
+<dd><p>Return length of labels.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.Mesh.labels">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">labels</span></span><a class="headerlink" href="#toughio.Mesh.labels" title="Link to this definition">#</a></dt>
+<dd><p>Return labels of cell in mesh.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.Mesh.materials">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">materials</span></span><a class="headerlink" href="#toughio.Mesh.materials" title="Link to this definition">#</a></dt>
+<dd><p>Return materials of cell in mesh.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.Mesh.n_cells">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_cells</span></span><a class="headerlink" href="#toughio.Mesh.n_cells" title="Link to this definition">#</a></dt>
+<dd><p>Return number of cells.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.Mesh.n_points">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_points</span></span><a class="headerlink" href="#toughio.Mesh.n_points" title="Link to this definition">#</a></dt>
+<dd><p>Return number of points.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toughio.Mesh.near">
+<span class="sig-name descname"><span class="pre">near</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/_mesh/_mesh.html#Mesh.near"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.Mesh.near" title="Link to this definition">#</a></dt>
+<dd><p>Return indices of cells nearest to query points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>points</strong> (<em>array_like</em>) – Coordinates of points to query.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Index of cell or indices of cells.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int or array_like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toughio.Mesh.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/_mesh/_mesh.html#Mesh.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.Mesh.plot" title="Link to this definition">#</a></dt>
+<dd><p>Display mesh using <code class="xref py py-meth docutils literal notranslate"><span class="pre">pyvista.UnstructuredGrid.plot()</span></code>.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.Mesh.point_data">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">point_data</span></span><a class="headerlink" href="#toughio.Mesh.point_data" title="Link to this definition">#</a></dt>
+<dd><p>Return point data arrays.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toughio.Mesh.point_data_to_cell_data">
+<span class="sig-name descname"><span class="pre">point_data_to_cell_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/_mesh/_mesh.html#Mesh.point_data_to_cell_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.Mesh.point_data_to_cell_data" title="Link to this definition">#</a></dt>
+<dd><p>Interpolate point data to cell data.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.Mesh.point_sets">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">point_sets</span></span><a class="headerlink" href="#toughio.Mesh.point_sets" title="Link to this definition">#</a></dt>
+<dd><p>Return sets of points.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.Mesh.points">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">points</span></span><a class="headerlink" href="#toughio.Mesh.points" title="Link to this definition">#</a></dt>
+<dd><p>Return coordinates of points.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toughio.Mesh.prune_duplicates">
+<span class="sig-name descname"><span class="pre">prune_duplicates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/_mesh/_mesh.html#Mesh.prune_duplicates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.Mesh.prune_duplicates" title="Link to this definition">#</a></dt>
+<dd><p>Delete duplicate points and cells.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>inplace</strong> (<em>bool</em><em>, </em><em>optional</em><em>, </em><em>default True</em>) – If <cite>False</cite>, return a new <a class="reference internal" href="#toughio.Mesh" title="toughio.Mesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">toughio.Mesh</span></code></a>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Pruned mesh (only if <code class="docutils literal notranslate"><span class="pre">inplace</span> <span class="pre">==</span> <span class="pre">False</span></code>).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#toughio.Mesh" title="toughio.Mesh">toughio.Mesh</a></p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Does not preserve points order from original array in mesh.</p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.Mesh.qualities">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">qualities</span></span><a class="headerlink" href="#toughio.Mesh.qualities" title="Link to this definition">#</a></dt>
+<dd><p>Return qualities of cells in mesh.</p>
+<p>The quality of a cell is measured as the minimum cosine angle between the
+connection line and the interface normal vectors.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toughio.Mesh.read_output">
+<span class="sig-name descname"><span class="pre">read_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_or_output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/_mesh/_mesh.html#Mesh.read_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.Mesh.read_output" title="Link to this definition">#</a></dt>
+<dd><p>Import TOUGH results to the mesh.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_or_output</strong> (str, pathlike, buffer, <code class="xref py py-class docutils literal notranslate"><span class="pre">toughio.ElementOutput</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">toughio.ConnectionOutput</span></code>, sequence of <code class="xref py py-class docutils literal notranslate"><span class="pre">toughio.ElementOutput</span></code> or sequence of <code class="xref py py-class docutils literal notranslate"><span class="pre">toughio.ConnectionOutput</span></code>) – Input file name or buffer, or output data.</p></li>
+<li><p><strong>time_step</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default -1</em>) – Data for given time step to import. Default is last time step.</p></li>
+<li><p><strong>labels_order</strong> (<em>sequence</em><em> of </em><em>array_like</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – List of labels. If None, output will be assumed ordered.</p></li>
+<li><p><strong>connection</strong> (<em>bool</em><em>, </em><em>optional</em><em>, </em><em>default False</em>) – Only for standard TOUGH output file. If <cite>True</cite>, read data related to connections.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toughio.Mesh.set_cell_labels">
+<span class="sig-name descname"><span class="pre">set_cell_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/_mesh/_mesh.html#Mesh.set_cell_labels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.Mesh.set_cell_labels" title="Link to this definition">#</a></dt>
+<dd><p>Set labels to cells.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>labels</strong> (<em>array_like</em>) – Cell labels.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If labels are not set, a custom labeler with a naming convention different that of TOUGH is used.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toughio.Mesh.set_material">
+<span class="sig-name descname"><span class="pre">set_material</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">material</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cells</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/_mesh/_mesh.html#Mesh.set_material"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.Mesh.set_material" title="Link to this definition">#</a></dt>
+<dd><p>Set material to cells.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>material</strong> (<em>str</em>) – Material name.</p></li>
+<li><p><strong>cells</strong> (<em>array_like</em>) – Indices of cells or array of booleans.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toughio.Mesh.split">
+<span class="sig-name descname"><span class="pre">split</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/_mesh/_mesh.html#Mesh.split"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.Mesh.split" title="Link to this definition">#</a></dt>
+<dd><p>Split input array into subarrays for each cell block in mesh.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>arr</strong> (<em>array_like</em>) – Input array.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of subarrays.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of array_like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toughio.Mesh.to_meshio">
+<span class="sig-name descname"><span class="pre">to_meshio</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/_mesh/_mesh.html#Mesh.to_meshio"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.Mesh.to_meshio" title="Link to this definition">#</a></dt>
+<dd><p>Convert mesh to <code class="xref py py-class docutils literal notranslate"><span class="pre">meshio.Mesh</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Output mesh.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>meshio.Mesh</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toughio.Mesh.to_pyvista">
+<span class="sig-name descname"><span class="pre">to_pyvista</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/_mesh/_mesh.html#Mesh.to_pyvista"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.Mesh.to_pyvista" title="Link to this definition">#</a></dt>
+<dd><p>Convert mesh to <code class="xref py py-class docutils literal notranslate"><span class="pre">pyvista.UnstructuredGrid</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Output mesh.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>pyvista.UnstructuredGrid</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="toughio.Mesh.volumes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">volumes</span></span><a class="headerlink" href="#toughio.Mesh.volumes" title="Link to this definition">#</a></dt>
+<dd><p>Return volumes of cell in mesh.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toughio.Mesh.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/_mesh/_mesh.html#Mesh.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.Mesh.write" title="Link to this definition">#</a></dt>
+<dd><p>Write mesh to file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>pathlike</em><em> or </em><em>buffer</em>) – Output file name or buffer.</p></li>
+<li><p><strong>file_format</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Output file format. If <cite>None</cite>, it will be guessed from file’s
+extension. To write TOUGH MESH, <cite>file_format</cite> must be specified
+as ‘tough’ (no specific extension exists for TOUGH MESH).</p></li>
+<li><p><strong>nodal_distance</strong> (<em>str</em><em> (</em><em>'line'</em><em> or </em><em>'orthogonal'</em><em>)</em><em>, </em><em>optional</em><em>, </em><em>default 'line'</em>) – Only if <code class="docutils literal notranslate"><span class="pre">file_format</span> <span class="pre">=</span> <span class="pre">&quot;tough&quot;</span></code>. Method to calculate connection
+nodal distances:
+- ‘line’: distance between node and common face along connecting
+line (distance is not normal),
+- ‘orthogonal’ : distance between node and its orthogonal
+projection onto common face (shortest distance).</p></li>
+<li><p><strong>material_name</strong> (<em>dict</em><em> or </em><em>None</em><em>, </em><em>default None</em>) – Only if <code class="docutils literal notranslate"><span class="pre">file_format</span> <span class="pre">=</span> <span class="pre">&quot;tough&quot;</span></code>. Rename cell material.</p></li>
+<li><p><strong>material_end</strong> (<em>str</em><em>, </em><em>array_like</em><em> or </em><em>None</em><em>, </em><em>default None</em>) – Only if <code class="docutils literal notranslate"><span class="pre">file_format</span> <span class="pre">=</span> <span class="pre">&quot;tough&quot;</span></code>. Move cells to bottom of block
+‘ELEME’ if their materials is in <cite>material_end</cite>.</p></li>
+<li><p><strong>incon</strong> (<em>bool</em><em>, </em><em>optional</em><em>, </em><em>default False</em>) – Only if <code class="docutils literal notranslate"><span class="pre">file_format</span> <span class="pre">=</span> <span class="pre">&quot;tough&quot;</span></code>. If <cite>True</cite>, initial conditions will be written in file <cite>INCON</cite>.</p></li>
+<li><p><strong>protocol</strong> (integer, optional, default <cite>pickle.HIGHEST_PROTOCOL</cite>) – Only if <code class="docutils literal notranslate"><span class="pre">file_format</span> <span class="pre">=</span> <span class="pre">&quot;pickle&quot;</span></code>. <code class="xref py py-mod docutils literal notranslate"><span class="pre">pickle</span></code> protocol version.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toughio.Mesh.write_incon">
+<span class="sig-name descname"><span class="pre">write_incon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'INCON'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/_mesh/_mesh.html#Mesh.write_incon"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.Mesh.write_incon" title="Link to this definition">#</a></dt>
+<dd><p>Write TOUGH <cite>INCON</cite> file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>pathlike</em><em> or </em><em>buffer</em><em>, </em><em>optional</em><em>, </em><em>default 'INCON'</em>) – Output file name or buffer.</p></li>
+<li><p><strong>eos</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Equation of State.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Mostly useful to restart a simulation with other initial conditions but with the same
+mesh.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toughio.Mesh.write_tough">
+<span class="sig-name descname"><span class="pre">write_tough</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MESH'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/_mesh/_mesh.html#Mesh.write_tough"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.Mesh.write_tough" title="Link to this definition">#</a></dt>
+<dd><p>Write TOUGH <cite>MESH</cite> file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>pathlike</em><em> or </em><em>buffer</em><em>, </em><em>optional</em><em>, </em><em>default 'MESH'</em>) – Output file name or buffer.</p></li>
+<li><p><strong>nodal_distance</strong> (<em>str</em><em> (</em><em>'line'</em><em> or </em><em>'orthogonal'</em><em>)</em><em>, </em><em>optional</em><em>, </em><em>default 'line'</em>) – Method to calculate connection nodal distances:
+- ‘line’: distance between node and common face along connecting
+line (distance is not normal),
+- ‘orthogonal’ : distance between node and its orthogonal
+projection onto common face (shortest distance).</p></li>
+<li><p><strong>material_name</strong> (<em>dict</em><em> or </em><em>None</em><em>, </em><em>default None</em>) – Rename cell material.</p></li>
+<li><p><strong>material_end</strong> (<em>str</em><em>, </em><em>array_like</em><em> or </em><em>None</em><em>, </em><em>default None</em>) – Move cells to bottom of block ‘ELEME’ if their materials is in <cite>material_end</cite>.</p></li>
+<li><p><strong>incon</strong> (<em>bool</em><em>, </em><em>optional</em><em>, </em><em>default False</em>) – If <cite>True</cite>, initial conditions will be written in file <cite>INCON</cite>.</p></li>
+<li><p><strong>eos</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Equation of State.</p></li>
+<li><p><strong>gravity</strong> (<em>array_like</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Gravity direction vector.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<section id="i-o">
+<h2>I/O<a class="headerlink" href="#i-o" title="Link to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="toughio.read_mesh">
+<span class="sig-prename descclassname"><span class="pre">toughio.</span></span><span class="sig-name descname"><span class="pre">read_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toughio.read_mesh" title="Link to this definition">#</a></dt>
+<dd><p>Read unstructured mesh from file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>pathlike</em><em> or </em><em>buffer</em>) – Input file name or buffer.</p></li>
+<li><p><strong>file_format</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Input file format.</p></li>
+<li><p><strong>label_length</strong> (<em>int</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Only if <code class="docutils literal notranslate"><span class="pre">file_format</span> <span class="pre">=</span> <span class="pre">&quot;tough&quot;</span></code>. Number of characters in cell labels.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Imported mesh.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#toughio.Mesh" title="toughio.Mesh">toughio.Mesh</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="toughio.write_mesh">
+<span class="sig-prename descclassname"><span class="pre">toughio.</span></span><span class="sig-name descname"><span class="pre">write_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toughio.write_mesh" title="Link to this definition">#</a></dt>
+<dd><p>Write unstructured mesh to file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>pathlike</em><em> or </em><em>buffer</em>) – Output file name or buffer.</p></li>
+<li><p><strong>mesh</strong> (<a class="reference internal" href="#toughio.Mesh" title="toughio.Mesh"><em>toughio.Mesh</em></a>) – Mesh to export.</p></li>
+<li><p><strong>file_format</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Output file format.</p></li>
+<li><p><strong>nodal_distance</strong> (<em>str</em><em> (</em><em>'line'</em><em> or </em><em>'orthogonal'</em><em>)</em><em>, </em><em>optional</em><em>, </em><em>default 'line'</em>) – Only if <code class="docutils literal notranslate"><span class="pre">file_format</span> <span class="pre">=</span> <span class="pre">&quot;tough&quot;</span></code>. Method to calculate connection nodal distances:
+- ‘line’: distance between node and common face along connecting line (distance is not normal),
+- ‘orthogonal’ : distance between node and its orthogonal projection onto common face (shortest distance).</p></li>
+<li><p><strong>material_name</strong> (<em>dict</em><em> or </em><em>None</em><em>, </em><em>default None</em>) – Only if <code class="docutils literal notranslate"><span class="pre">file_format</span> <span class="pre">=</span> <span class="pre">&quot;tough&quot;</span></code>. Rename cell material.</p></li>
+<li><p><strong>material_end</strong> (<em>str</em><em>, </em><em>array_like</em><em> or </em><em>None</em><em>, </em><em>default None</em>) – Only if <code class="docutils literal notranslate"><span class="pre">file_format</span> <span class="pre">=</span> <span class="pre">&quot;tough&quot;</span></code>. Move cells to bottom of block ‘ELEME’ if their materials is in <cite>material_end</cite>.</p></li>
+<li><p><strong>incon</strong> (<em>bool</em><em>, </em><em>optional</em><em>, </em><em>default False</em>) – Only if <code class="docutils literal notranslate"><span class="pre">file_format</span> <span class="pre">=</span> <span class="pre">&quot;tough&quot;</span></code>. If <cite>True</cite>, initial conditions will be written in file <cite>INCON</cite>.</p></li>
+<li><p><strong>eos</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Only if <code class="docutils literal notranslate"><span class="pre">file_format</span> <span class="pre">=</span> <span class="pre">&quot;tough&quot;</span></code>. Equation of State.</p></li>
+<li><p><strong>gravity</strong> (<em>array_like</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Only if <code class="docutils literal notranslate"><span class="pre">file_format</span> <span class="pre">=</span> <span class="pre">&quot;tough&quot;</span></code>. Gravity direction vector.</p></li>
+<li><p><strong>protocol</strong> (integer, optional, default <cite>pickle.HIGHEST_PROTOCOL</cite>) – Only if <code class="docutils literal notranslate"><span class="pre">file_format</span> <span class="pre">=</span> <span class="pre">&quot;pickle&quot;</span></code>. <code class="xref py py-mod docutils literal notranslate"><span class="pre">pickle</span></code> protocol version.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="toughio.register_mesh">
+<span class="sig-prename descclassname"><span class="pre">toughio.</span></span><span class="sig-name descname"><span class="pre">register_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_format</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extensions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">writer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toughio.register_mesh" title="Link to this definition">#</a></dt>
+<dd><p>Register a new mesh format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_format</strong> (<em>str</em>) – File format to register.</p></li>
+<li><p><strong>extensions</strong> (<em>array_like</em>) – List of extensions to associate to the new format.</p></li>
+<li><p><strong>reader</strong> (<em>callable</em>) – Read fumction.</p></li>
+<li><p><strong>writer</strong> (<em>callable</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Write function.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="toughio.read_time_series">
+<span class="sig-prename descclassname"><span class="pre">toughio.</span></span><span class="sig-name descname"><span class="pre">read_time_series</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/_mesh/_helpers.html#read_time_series"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.read_time_series" title="Link to this definition">#</a></dt>
+<dd><p>Read time series from XDMF file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em><em>, </em><em>pathlike</em><em> or </em><em>buffer</em>) – Input file name.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>list of namedtuple (type, data)</em> – Grid cell data.</p></li>
+<li><p><em>list of dict</em> – Data associated to grid points for each time step.</p></li>
+<li><p><em>list of dict</em> – Data associated to grid cells for each time step.</p></li>
+<li><p><em>array_like</em> – Time step values.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="toughio.write_time_series">
+<span class="sig-prename descclassname"><span class="pre">toughio.</span></span><span class="sig-name descname"><span class="pre">write_time_series</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cells</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">point_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/_mesh/_helpers.html#write_time_series"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.write_time_series" title="Link to this definition">#</a></dt>
+<dd><p>Write time series given points and cells data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>pathlike</em><em> or </em><em>buffer</em>) – Output file name.</p></li>
+<li><p><strong>points</strong> (<em>ndarray</em>) – Grid points array.</p></li>
+<li><p><strong>cells</strong> (<em>list</em><em> of </em><em>namedtuple</em><em> (</em><em>type</em><em>, </em><em>data</em><em>)</em>) – Grid cell data.</p></li>
+<li><p><strong>point_data</strong> (<em>list</em><em> of </em><em>dict</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Data associated to grid points for each time step.</p></li>
+<li><p><strong>cell_data</strong> (<em>list</em><em> of </em><em>dict</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Data associated to grid cells for each time step.</p></li>
+<li><p><strong>time_steps</strong> (<em>array_like</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Time step values.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="toughio.from_meshio">
+<span class="sig-prename descclassname"><span class="pre">toughio.</span></span><span class="sig-name descname"><span class="pre">from_meshio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">material</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dfalt'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/_mesh/_mesh.html#from_meshio"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.from_meshio" title="Link to this definition">#</a></dt>
+<dd><p>Convert a <code class="xref py py-class docutils literal notranslate"><span class="pre">meshio.Mesh</span></code> to <a class="reference internal" href="#toughio.Mesh" title="toughio.Mesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">toughio.Mesh</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mesh</strong> (<em>meshio.Mesh</em>) – Input mesh.</p></li>
+<li><p><strong>material</strong> (<em>str</em><em>, </em><em>optional</em><em>, </em><em>default 'dfalt'</em>) – Default material name.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Output mesh.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#toughio.Mesh" title="toughio.Mesh">toughio.Mesh</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="toughio.from_pyvista">
+<span class="sig-prename descclassname"><span class="pre">toughio.</span></span><span class="sig-name descname"><span class="pre">from_pyvista</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">material</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dfalt'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/_mesh/_mesh.html#from_pyvista"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.from_pyvista" title="Link to this definition">#</a></dt>
+<dd><p>Convert a <code class="xref py py-class docutils literal notranslate"><span class="pre">pyvista.UnstructuredGrid</span></code> to <a class="reference internal" href="#toughio.Mesh" title="toughio.Mesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">toughio.Mesh</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mesh</strong> (<em>pyvista.UnstructuredGrid</em>) – Input mesh.</p></li>
+<li><p><strong>material</strong> (<em>str</em><em>, </em><em>optional</em><em>, </em><em>default 'dfalt'</em>) – Default material name.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Output mesh.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#toughio.Mesh" title="toughio.Mesh">toughio.Mesh</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="basic-generators">
+<h2>Basic generators<a class="headerlink" href="#basic-generators" title="Link to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="toughio.meshmaker.cylindric_grid">
+<span class="sig-prename descclassname"><span class="pre">toughio.meshmaker.</span></span><span class="sig-name descname"><span class="pre">cylindric_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin_z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">material</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dfalt'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/meshmaker/_cylindric_grid.html#cylindric_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.meshmaker.cylindric_grid" title="Link to this definition">#</a></dt>
+<dd><p>Generate a cylindric mesh as a radial XZ structured grid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dr</strong> (<em>array_like</em>) – Grid spacing along X axis.</p></li>
+<li><p><strong>dz</strong> (<em>array_like</em>) – Grid spacing along Z axis.</p></li>
+<li><p><strong>origin_z</strong> (<em>scalar</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Depth of origin point.</p></li>
+<li><p><strong>layer</strong> (<em>bool</em><em>, </em><em>optional</em><em>, </em><em>default False</em>) – If <cite>True</cite>, mesh will be generated by layers.</p></li>
+<li><p><strong>material</strong> (<em>str</em><em>, </em><em>optional</em><em>, </em><em>default 'dfalt'</em>) – Default material name.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Output cylindric mesh.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#toughio.Mesh" title="toughio.Mesh">toughio.Mesh</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="toughio.meshmaker.voxelize">
+<span class="sig-prename descclassname"><span class="pre">toughio.meshmaker.</span></span><span class="sig-name descname"><span class="pre">voxelize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">material</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dfalt'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/meshmaker/_voxelize.html#voxelize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.meshmaker.voxelize" title="Link to this definition">#</a></dt>
+<dd><p>Generate a 3D non-uniform structured grid from cloud points.</p>
+<p>Input points must form a non-uniform structured grid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>points</strong> (<em>array_like</em>) – Cooordinates of points.</p></li>
+<li><p><strong>origin</strong> (<em>array_like</em>) – Origin point coordinate.</p></li>
+<li><p><strong>layer</strong> (<em>bool</em><em>, </em><em>optional</em><em>, </em><em>default False</em>) – If <cite>True</cite>, mesh will be generated by layers.</p></li>
+<li><p><strong>material</strong> (<em>str</em><em>, </em><em>optional</em><em>, </em><em>default 'dfalt'</em>) – Default material name.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Output non-uniform structured mesh.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#toughio.Mesh" title="toughio.Mesh">toughio.Mesh</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="toughio.meshmaker.structured_grid">
+<span class="sig-prename descclassname"><span class="pre">toughio.meshmaker.</span></span><span class="sig-name descname"><span class="pre">structured_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">material</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dfalt'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/meshmaker/_structured_grid.html#structured_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.meshmaker.structured_grid" title="Link to this definition">#</a></dt>
+<dd><p>Generate 2D or 3D non-uniform structured grid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dx</strong> (<em>array_like</em>) – Grid spacing along X axis.</p></li>
+<li><p><strong>dy</strong> (<em>array_like</em>) – Grid spacing along Y axis.</p></li>
+<li><p><strong>dz</strong> (<em>array_like</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Grid spacing along Z axis. If <cite>None</cite>, generate 2D grid.</p></li>
+<li><p><strong>origin</strong> (<em>array_like</em><em> or </em><em>None</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – Origin point coordinate.</p></li>
+<li><p><strong>layer</strong> (<em>bool</em><em>, </em><em>optional</em><em>, </em><em>default False</em>) – If <cite>True</cite>, mesh will be generated by layers.</p></li>
+<li><p><strong>material</strong> (<em>str</em><em>, </em><em>optional</em><em>, </em><em>default 'dfalt'</em>) – Default material name.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Output non-uniform structured mesh.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#toughio.Mesh" title="toughio.Mesh">toughio.Mesh</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="toughio.meshmaker.triangulate">
+<span class="sig-prename descclassname"><span class="pre">toughio.meshmaker.</span></span><span class="sig-name descname"><span class="pre">triangulate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">material</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dfalt'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/meshmaker/_triangulate.html#triangulate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.meshmaker.triangulate" title="Link to this definition">#</a></dt>
+<dd><p>Generate a triangulated mesh from cloud points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>points</strong> (<em>array_like</em>) – Cooordinates of points.</p></li>
+<li><p><strong>material</strong> (<em>str</em><em>, </em><em>optional</em><em>, </em><em>default 'dfalt'</em>) – Default material name.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Output triangulated mesh.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#toughio.Mesh" title="toughio.Mesh">toughio.Mesh</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="toughio.meshmaker.from_meshmaker">
+<span class="sig-prename descclassname"><span class="pre">toughio.meshmaker.</span></span><span class="sig-name descname"><span class="pre">from_meshmaker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename_or_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">material</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dfalt'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/toughio/meshmaker/_helpers.html#from_meshmaker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#toughio.meshmaker.from_meshmaker" title="Link to this definition">#</a></dt>
+<dd><p>Generate a mesh from a block MESHM.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename_or_dict</strong> (<em>str</em><em>, </em><em>pathlike</em><em>, </em><em>buffer</em><em> or </em><em>dict</em>) – Input file name, buffer or parameters dict with key “meshmaker”.</p></li>
+<li><p><strong>material</strong> (<em>str</em><em>, </em><em>optional</em><em>, </em><em>default 'dfalt'</em>) – Default material name.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="io.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Input and output files</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="run.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Run</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh"><code class="docutils literal notranslate"><span class="pre">Mesh</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.add_cell_data"><code class="docutils literal notranslate"><span class="pre">Mesh.add_cell_data()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.add_material"><code class="docutils literal notranslate"><span class="pre">Mesh.add_material()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.add_point_data"><code class="docutils literal notranslate"><span class="pre">Mesh.add_point_data()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.cell_data"><code class="docutils literal notranslate"><span class="pre">Mesh.cell_data</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.cell_data_to_point_data"><code class="docutils literal notranslate"><span class="pre">Mesh.cell_data_to_point_data()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.cell_sets"><code class="docutils literal notranslate"><span class="pre">Mesh.cell_sets</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.cells"><code class="docutils literal notranslate"><span class="pre">Mesh.cells</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.centers"><code class="docutils literal notranslate"><span class="pre">Mesh.centers</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.connections"><code class="docutils literal notranslate"><span class="pre">Mesh.connections</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.dim"><code class="docutils literal notranslate"><span class="pre">Mesh.dim</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.extrude_to_3d"><code class="docutils literal notranslate"><span class="pre">Mesh.extrude_to_3d()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.face_areas"><code class="docutils literal notranslate"><span class="pre">Mesh.face_areas</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.face_normals"><code class="docutils literal notranslate"><span class="pre">Mesh.face_normals</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.faces"><code class="docutils literal notranslate"><span class="pre">Mesh.faces</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.field_data"><code class="docutils literal notranslate"><span class="pre">Mesh.field_data</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.filter"><code class="docutils literal notranslate"><span class="pre">Mesh.filter</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.label_length"><code class="docutils literal notranslate"><span class="pre">Mesh.label_length</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.labels"><code class="docutils literal notranslate"><span class="pre">Mesh.labels</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.materials"><code class="docutils literal notranslate"><span class="pre">Mesh.materials</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.n_cells"><code class="docutils literal notranslate"><span class="pre">Mesh.n_cells</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.n_points"><code class="docutils literal notranslate"><span class="pre">Mesh.n_points</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.near"><code class="docutils literal notranslate"><span class="pre">Mesh.near()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.plot"><code class="docutils literal notranslate"><span class="pre">Mesh.plot()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.point_data"><code class="docutils literal notranslate"><span class="pre">Mesh.point_data</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.point_data_to_cell_data"><code class="docutils literal notranslate"><span class="pre">Mesh.point_data_to_cell_data()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.point_sets"><code class="docutils literal notranslate"><span class="pre">Mesh.point_sets</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.points"><code class="docutils literal notranslate"><span class="pre">Mesh.points</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.prune_duplicates"><code class="docutils literal notranslate"><span class="pre">Mesh.prune_duplicates()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.qualities"><code class="docutils literal notranslate"><span class="pre">Mesh.qualities</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.read_output"><code class="docutils literal notranslate"><span class="pre">Mesh.read_output()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.set_cell_labels"><code class="docutils literal notranslate"><span class="pre">Mesh.set_cell_labels()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.set_material"><code class="docutils literal notranslate"><span class="pre">Mesh.set_material()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.split"><code class="docutils literal notranslate"><span class="pre">Mesh.split()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.to_meshio"><code class="docutils literal notranslate"><span class="pre">Mesh.to_meshio()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.to_pyvista"><code class="docutils literal notranslate"><span class="pre">Mesh.to_pyvista()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.volumes"><code class="docutils literal notranslate"><span class="pre">Mesh.volumes</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.write"><code class="docutils literal notranslate"><span class="pre">Mesh.write()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.write_incon"><code class="docutils literal notranslate"><span class="pre">Mesh.write_incon()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.Mesh.write_tough"><code class="docutils literal notranslate"><span class="pre">Mesh.write_tough()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#i-o">I/O</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.read_mesh"><code class="docutils literal notranslate"><span class="pre">read_mesh()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.write_mesh"><code class="docutils literal notranslate"><span class="pre">write_mesh()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.register_mesh"><code class="docutils literal notranslate"><span class="pre">register_mesh()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.read_time_series"><code class="docutils literal notranslate"><span class="pre">read_time_series()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.write_time_series"><code class="docutils literal notranslate"><span class="pre">write_time_series()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.from_meshio"><code class="docutils literal notranslate"><span class="pre">from_meshio()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.from_pyvista"><code class="docutils literal notranslate"><span class="pre">from_pyvista()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-generators">Basic generators</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.meshmaker.cylindric_grid"><code class="docutils literal notranslate"><span class="pre">cylindric_grid()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.meshmaker.voxelize"><code class="docutils literal notranslate"><span class="pre">voxelize()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.meshmaker.structured_grid"><code class="docutils literal notranslate"><span class="pre">structured_grid()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.meshmaker.triangulate"><code class="docutils literal notranslate"><span class="pre">triangulate()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#toughio.meshmaker.from_meshmaker"><code class="docutils literal notranslate"><span class="pre">from_meshmaker()</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/api/mesh.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023, Keurfon Luu.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

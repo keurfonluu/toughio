@@ -1,0 +1,641 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>EOS9 &#8212; toughio 1.15.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=8fbebee6" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../../_static/documentation_options.js?v=70d5d4a5"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tough3/eos/eos9';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="EWASG" href="ewasg.html" />
+    <link rel="prev" title="EOS8" href="eos8.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../_static/logo-light.png" class="logo__image only-light" alt="toughio 1.15.0 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="toughio 1.15.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        TOUGH3
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        TOUGH3
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../install/index.html">Installation</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../install/linux.html">Installation on Linux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../install/windows.html">Installation on Windows</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../guide/index.html">User Guide</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../guide/governing_equations.html">Governing Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guide/numerical_methods.html">Numerical Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guide/initial_and_boundary_conditions.html">Initial and Boundary Conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guide/preparation_of_input_data.html">Preparation of Input Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guide/output_from_tough3.html">Output from TOUGH3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guide/relative_permeability_functions.html">Relative Permeability Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guide/capillary_pressure_functions.html">Capillary Pressure Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">EOS</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="eos1.html">EOS1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos2.html">EOS2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos3.html">EOS3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos4.html">EOS4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos5.html">EOS5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos7.html">EOS7</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos7r.html">EOS7R</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eos8.html">EOS8</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">EOS9</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ewasg.html">EWASG</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eco2n.html">ECO2N</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">TOUGH3</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">EOS</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">EOS9</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="eos9">
+<span id="id1"></span><h1>EOS9<a class="headerlink" href="#eos9" title="Link to this heading">#</a></h1>
+<p>This module considers variably saturated flow of a single aqueous phase, which consists entirely of a single water component, and neglects phase change effects.
+The gas phase is treated as a passive bystander at constant pressure, and conditions are assumed to be isothermal.
+Thus, no mass balance equation for gas and no heat balance is needed, and only a single water mass balance equation is solved for each grid block.
+This is very efficient numerically, making EOS9 the module of choice for problems for which the underlying approximations are applicable.</p>
+<p>Liquid flow in EOS9 is described as follows:</p>
+<div class="math notranslate nohighlight" id="equation-eq-eos9-1">
+<span class="eqno">(68)<a class="headerlink" href="#equation-eq-eos9-1" title="Link to this equation">#</a></span>\[\frac{\partial}{\partial t} \phi \S_l \rho_l = \nabla \cdot \left( k \frac{k_{rl}}{\mu_l} \rho_l \nabla \left( P_l + \rho_l g z \right) \right)\]</div>
+<p>where <span class="math notranslate nohighlight">\(\phi\)</span> is porosity, <span class="math notranslate nohighlight">\(S_l\)</span> is water saturation, <span class="math notranslate nohighlight">\(\rho_l\)</span> is water density, <span class="math notranslate nohighlight">\(k\)</span> is absolute permeability, <span class="math notranslate nohighlight">\(k_{rl}\)</span> is relative permeability to the aqueous phase, <span class="math notranslate nohighlight">\(\mu_l\)</span> is water viscosity, <span class="math notranslate nohighlight">\(P_l\)</span> is water pressure, <span class="math notranslate nohighlight">\(g\)</span> is acceleration of gravity, and <span class="math notranslate nohighlight">\(z\)</span> is defined positive upward.
+Neglecting variations in liquid phase density and viscosity, as is appropriate for (nearly) isothermal conditions, Eq. <a class="reference internal" href="#equation-eq-eos9-1">(68)</a> simplifies to Richards’ equation (<span id="id2"><a class="reference internal" href="../references.html#id93" title="Richards, L. A. (1931). Capillary conduction of liquids through porous mediums. Physics, 1(5), 318–333.">Richards, 1931</a></span>).</p>
+<div class="math notranslate nohighlight" id="equation-eq-eos9-2">
+<span class="eqno">(69)<a class="headerlink" href="#equation-eq-eos9-2" title="Link to this equation">#</a></span>\[\frac{\partial \theta}{\partial t} = \nabla \cdot \left( K \nabla h \right)\]</div>
+<p>where <span class="math notranslate nohighlight">\(\theta = \phi S_l\)</span> is specific volumetric moisture content, <span class="math notranslate nohighlight">\(K = k k_{rl} \frac{\rho_l g}{\mu_l}\)</span> is hydraulic conductivity, and <span class="math notranslate nohighlight">\(h = z + \frac{P_l}{\rho_l g}\)</span> is the hydraulic head.
+EOS9 can describe flow under partially saturated (0 &lt; <code class="xref math math-numref docutils literal notranslate"><span class="pre">S_l</span></code> &lt; 1) as well as fully saturated conditions, and phase changes between the two.</p>
+<section id="specifications">
+<h2>Specifications<a class="headerlink" href="#specifications" title="Link to this heading">#</a></h2>
+<p>With only a single mass balance equation per grid block, there is only a single primary thermodynamic variable.
+This is taken to be pressure for single-phase (saturated) conditions, and is water saturation for unsaturated conditions.
+A distinction between the two is made simply on the basis of the numerical value of the first (and only) primary variable, <span class="math notranslate nohighlight">\(X1\)</span>.
+If <span class="math notranslate nohighlight">\(X1\)</span> &lt; 1, this indicates that If <span class="math notranslate nohighlight">\(X1\)</span> represents water saturation and conditions are unsaturated; if If <span class="math notranslate nohighlight">\(X1\)</span> is larger than a user-specified gas phase reference pressure (default <span class="math notranslate nohighlight">\(P_{gas}\)</span> = 1.013 x 10<sup>5</sup> Pa), it is taken to be water pressure, and saturated conditions prevail.
+When phase changes between saturated and unsaturated conditions occur, the primary variable is switched, as follows.
+The numerical value of <span class="math notranslate nohighlight">\(X1\)</span> and its change during the Newton-Raphson iteration process is monitored.
+If <span class="math notranslate nohighlight">\(X1\)</span> changes from being smaller than 1 to larger than 1, this indicates attainment of fully saturated conditions.
+In that case <span class="math notranslate nohighlight">\(X1\)</span> is switched to pressure, and is initialized at a pressure slightly in excess of gas phase reference pressure as <span class="math notranslate nohighlight">\(X1 = P_{gas}(1 + \varepsilon)\)</span>, with <span class="math notranslate nohighlight">\(\varepsilon\)</span> = 10<sup>-6</sup>.
+If <span class="math notranslate nohighlight">\(X1\)</span> changes from being larger than <span class="math notranslate nohighlight">\(P_{gas}\)</span> to smaller than <span class="math notranslate nohighlight">\(P_{gas}\)</span>, this indicates a transition from fully to partially saturated conditions.
+<span class="math notranslate nohighlight">\(X1\)</span> is then switched to saturation, and is initialized as <span class="math notranslate nohighlight">\(X1 = 1 - \varepsilon\)</span>.
+Actually, a transition from fully to partially saturated conditions is made only when <span class="math notranslate nohighlight">\(X1\)</span> drops below <span class="math notranslate nohighlight">\(P_{gas}(1 - \varepsilon)\)</span>; test calculations have shown that such a (small) finite-size window for phase change improves numerical stability and efficiency.</p>
+<p>In EOS9, the thermophysical properties of water are taken at default reference conditions of <span class="math notranslate nohighlight">\(P\)</span> = 1.013 x 10<sup>5</sup> Pa, <span class="math notranslate nohighlight">\(T\)</span> = 15˚C.
+These defaults can be overwritten in a flexible manner by specifying appropriate data in a fictitious <strong>ROCKS</strong> domain “<code class="docutils literal notranslate"><span class="pre">REFCO</span></code>”, as follows</p>
+<table class="table table-center" id="tab-eos9-1">
+<caption><span class="caption-number">Table 95 </span><span class="caption-text">Domain “<code class="docutils literal notranslate"><span class="pre">REFCO</span></code>”.</span><a class="headerlink" href="#tab-eos9-1" title="Link to this table">#</a></caption>
+<colgroup>
+<col style="width: 12.5%" />
+<col style="width: 12.5%" />
+<col style="width: 75.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Format</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">DROK</span></code></p></td>
+<td><p>E10.4</p></td>
+<td><p>reference pressure</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">POR</span></code></p></td>
+<td><p>E10.4</p></td>
+<td><p>reference temperature</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">PER(1)</span></code></p></td>
+<td><p>E10.4</p></td>
+<td><p>liquid density</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">PER(2)</span></code></p></td>
+<td><p>E10.4</p></td>
+<td><p>liquid viscosity</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">PER(3)</span></code></p></td>
+<td><p>E10.4</p></td>
+<td><p>liquid compressibility</p></td>
+</tr>
+</tbody>
+</table>
+<p>Note that assignment of thermophysical data through a specially-named domain was set up just as a convenient way of providing floating-point parameters to the code.
+No volume elements (grid blocks) should be attached to domain “<code class="docutils literal notranslate"><span class="pre">REFCO</span></code>”, as the data in general will not correspond to reasonable hydrogeologic parameters.
+The above mentioned defaults will be overwritten for any parameters for which a non-zero entry is provided in “<code class="docutils literal notranslate"><span class="pre">REFCO</span></code>”.
+This allows the generation of these parameters internally for user-defined (<span class="math notranslate nohighlight">\(P\)</span>, <span class="math notranslate nohighlight">\(T\)</span>); it also allows for directly assigning user-desired values as, e.g., <span class="math notranslate nohighlight">\(\rho_{liq}\)</span> = 1000 kg/m<sup>3</sup>, <span class="math notranslate nohighlight">\(\mu_{liq}\)</span> = 10<sup>-3</sup> Pa s (<span class="math notranslate nohighlight">\(equiv\)</span> 1 centipoise), etc.
+A summary of EOS9 specifications appears in <a class="reference internal" href="#tab-eos9-2"><span class="std std-numref">Table 96</span></a>.</p>
+<table class="table table-center" id="tab-eos9-2">
+<caption><span class="caption-number">Table 96 </span><span class="caption-text">Summary of EOS9.</span><a class="headerlink" href="#tab-eos9-2" title="Link to this table">#</a></caption>
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 75.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Components</p></td>
+<td><div class="line-block">
+<div class="line">#1: water</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>Parameter choices</p></td>
+<td><div class="line-block">
+<div class="line">(<code class="docutils literal notranslate"><span class="pre">NK</span></code>, <code class="docutils literal notranslate"><span class="pre">NEQ</span></code>, <code class="docutils literal notranslate"><span class="pre">NPH</span></code>, <code class="docutils literal notranslate"><span class="pre">NB</span></code>) =</div>
+<div class="line">(1, 1, 1, 6) water, isothermal (default, no other choices available)</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>Primary variables*†</p></td>
+<td><div class="line-block">
+<div class="line">Saturated conditions:</div>
+<div class="line">(<span class="math notranslate nohighlight">\(P_{liq}\)</span>): (water pressure: <span class="math notranslate nohighlight">\(P_{liq}\)</span> ≥ <span class="math notranslate nohighlight">\(P_{gas}\)</span>)</div>
+<div class="line">Unsaturated conditions:</div>
+<div class="line">(<span class="math notranslate nohighlight">\(S_{liq}\)</span>): (water saturation: 0 &lt; <span class="math notranslate nohighlight">\(S_{liq}\)</span> &lt; 1)</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<div class="line-block">
+<div class="line">* The first primary variable may be initialized as <span class="math notranslate nohighlight">\(X1\)</span> &lt; 0, in which case it will be taken to denote capillary pressure, and will be converted internally to <span class="math notranslate nohighlight">\(S_{liq}\)</span> in the initialization phase.</div>
+<div class="line">† Reference gas phase pressure, flow system temperature, and (optionally) thermophysical parameters of water density, viscosity, and compressibility may be specified through a fictitious ROCKS domain “<code class="docutils literal notranslate"><span class="pre">REFCO</span></code>”.</div>
+</div>
+</div>
+<p>In addition to specifying the primary thermodynamic variable on a default, domain, or grid block basis, EOS9 offers alternative ways of initializing flow problems.
+The primary variable may be entered as a negative number upon initialization, in which case it will be taken to denote capillary pressure, and will be internally converted to <span class="math notranslate nohighlight">\(S_l\)</span> in the initialization phase.
+EOS9 can also initialize a flow problem with gravity-capillary equilibrium, relative to a user-specified reference elevation <span class="math notranslate nohighlight">\(z_{ref}\)</span> of the water table.
+This type of initialization will be engaged if the user enters a non-zero number in slot <code class="docutils literal notranslate"><span class="pre">CWET</span></code> in <strong>ROCKS</strong> domain “<code class="docutils literal notranslate"><span class="pre">REFCO</span></code>”, in which case <code class="docutils literal notranslate"><span class="pre">CWET</span></code> will be taken to denote the water table elevation <span class="math notranslate nohighlight">\(z_{ref}\)</span>, in units of meters.
+Water pressure at <span class="math notranslate nohighlight">\(z_{ref}\)</span> is taken equal to reference gas pressure, <span class="math notranslate nohighlight">\(P_l(z_{ref}) = P_{gas}\)</span>, and is initialized as a function of grid block elevation according to <span class="math notranslate nohighlight">\(P(z) = P_{gas} + \left( z_{ref} - z \right) \rho g\)</span>.
+By convention, the z-axis is assumed to point upward.
+In order to use this facility, the z-coordinates (grid block elevations) must be specified in the <strong>ELEME</strong>-data, which will be done automatically if internal <em>MESH</em> generation is used.</p>
+<p>In the assignment of gravity-capillary equilibrium as just discussed, water saturations at “sufficiently” high elevations above the water table may end up being smaller than the irreducible water saturation <span class="math notranslate nohighlight">\(S_{lr}\)</span> specified in the relative permeability function, which may or may not be consistent with the physical behavior of the flow system.
+Users may optionally enforce that <span class="math notranslate nohighlight">\(S_l\)</span> = <span class="math notranslate nohighlight">\(S_{lr}\)</span> in regions where the capillary pressure function would dictate that <span class="math notranslate nohighlight">\(S_{lr}\)</span> &lt; <span class="math notranslate nohighlight">\(S_{lr}\)</span>.
+This is accomplished by entering an appropriate parameter in slot <code class="docutils literal notranslate"><span class="pre">SPHT</span></code> of <strong>ROCKS</strong> domain “<code class="docutils literal notranslate"><span class="pre">REFCO</span></code>”, and works as follows.
+The irreducible saturation <span class="math notranslate nohighlight">\(S_{lr}\)</span> will be taken to be parameter <code class="docutils literal notranslate"><span class="pre">RP(int(SPHT))</span></code> of the relative permeability function.
+As an example, for the <code class="docutils literal notranslate"><span class="pre">IRP</span></code> = 7 relative permeability function, irreducible water saturation is the parameter <code class="docutils literal notranslate"><span class="pre">RP(2)</span></code>; therefore, for <code class="docutils literal notranslate"><span class="pre">IRP</span></code> = 7 the user should specify <code class="docutils literal notranslate"><span class="pre">SPHT</span></code> = 2.0 in “<code class="docutils literal notranslate"><span class="pre">REFCO</span></code>” to use this facility.</p>
+<p>EOS9 differs from all of the other EOS modules in that, having only a single primary thermodynamic variable, the first (and here only) primary variable does not necessarily denote pressure.
+This necessitates certain other coding adjustments.
+For EOS9, the flow terms is assembled differently in subroutine <em>MULTI</em>, and the slot #6 of the PAR-array, which normally holds just the capillary pressure, represents total water pressure <span class="math notranslate nohighlight">\(P_l = P_{gas} + P_{cap}\)</span>.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="eos8.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">EOS8</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="ewasg.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">EWASG</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#specifications">Specifications</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/tough3/eos/eos9.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023, Keurfon Luu.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,660 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Generate input files &#8212; toughio 1.15.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=8fbebee6" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../../_static/documentation_options.js?v=70d5d4a5"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/heat_pipe_in_cylindrical_geometry/1_preprocessing';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Plot profiles" href="2_postprocessing.html" />
+    <link rel="prev" title="Heat pipe in cylindrical geometry (EOS3)" href="index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../_static/logo-light.png" class="logo__image only-light" alt="toughio 1.15.0 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="toughio 1.15.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../tough3/index.html">
+                        TOUGH3
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../tough3/index.html">
+                        TOUGH3
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../co2_leakage_along_a_fault/index.html">CO<sub>2</sub> leakage along a fault</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../co2_leakage_along_a_fault/1_generate_mesh_in_python_with_gmsh.html">Generate mesh in Python with Gmsh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../co2_leakage_along_a_fault/2_generate_mesh_and_incon_files.html">Generate MESH and INCON files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../co2_leakage_along_a_fault/3_generate_model_parameters_input_file.html">Generate model parameters input file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../co2_leakage_along_a_fault/4_import_and_visualize_simulation_outputs_in_pyvista.html">Import and visualize simulation outputs in PyVista</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Heat pipe in cylindrical geometry (EOS3)</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Generate input files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2_postprocessing.html">Plot profiles</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Examples</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Heat pipe in cylindrical geometry (EOS3)</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Generate input files</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#sphx-glr-download-examples-heat-pipe-in-cylindrical-geometry-1-preprocessing-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code.</p>
+</div>
+<section class="sphx-glr-example-title" id="generate-input-files">
+<span id="sphx-glr-examples-heat-pipe-in-cylindrical-geometry-1-preprocessing-py"></span><h1>Generate input files<a class="headerlink" href="#generate-input-files" title="Link to this heading">#</a></h1>
+<p>The TOUGH input file is shown below and specifies a cylindrical heater of 0.3 m radius and 4.5 m height, that provides a constant output of 3 kW into a porous medium with uniform initial conditions of 18°C temperature, 1 bar pressure, and 20% gas saturation. The mesh consists of a one-dimensional radial grid of 120 active elements extending to a radius of 10,000 m (practically infinite for the time scales of interest here), with an additional inactive element of zero volume representing constant boundary conditions. Properly speaking, the problem represents one unit of an infinite linear string of identical heaters; if a single heater were to be modeled, important end effects would occur at the top and bottom, and a two-dimensional RZ grid would have to be used.</p>
+<p>Most of the formation parameters are identical to data used in previous modeling studies of high-level nuclear waste emplacement at Yucca Mountain (Pruess et al., 1990). As we do not include fracture effects in the present simulation, heat pipe effects would be very weak at the low rock matrix permeabilities (of order 1 microdarcy) encountered at Yucca Mountain. To get a more interesting behavior, we have arbitrarily increased absolute permeability by something like a factor 10,000, to 20 millidarcy, and for consistency have reduced capillary pressures by a factor (10,000)<sup>1/2</sup> = 100 in comparison to typical Yucca Mountain data.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span><span class="n">rhp</span><span class="o">*</span> <span class="mi">1</span><span class="o">-</span><span class="n">D</span> <span class="n">RADIAL</span> <span class="n">HEAT</span> <span class="n">PIPE</span>
+<span class="n">MESHMAKER1</span><span class="o">----*----</span><span class="mi">2</span><span class="o">----*----</span><span class="mi">3</span><span class="o">----*----</span><span class="mi">4</span><span class="o">----*----</span><span class="mi">5</span><span class="o">----*----</span><span class="mi">6</span><span class="o">----*----</span><span class="mi">7</span><span class="o">----*----</span><span class="mi">8</span>
+<span class="n">RZ2D</span>
+<span class="n">RADII</span>
+    <span class="mi">1</span>
+        <span class="mf">0.</span>
+<span class="n">EQUID</span>
+    <span class="mi">1</span>             <span class="mf">.3</span>
+<span class="n">LOGAR</span>
+<span class="mi">99</span>           <span class="mf">1.E2</span>
+<span class="n">LOGAR</span>
+<span class="mi">20</span>           <span class="mf">1.E4</span>
+<span class="n">EQUID</span>
+    <span class="mi">1</span>            <span class="mf">0.0</span>
+<span class="n">LAYER</span><span class="o">----</span><span class="mi">1</span><span class="o">----*----</span><span class="mi">2</span><span class="o">----*----</span><span class="mi">3</span><span class="o">----*----</span><span class="mi">4</span><span class="o">----*----</span><span class="mi">5</span><span class="o">----*----</span><span class="mi">6</span><span class="o">----*----</span><span class="mi">7</span><span class="o">----*----</span><span class="mi">8</span>
+    <span class="mi">1</span>
+    <span class="mf">4.5</span>
+
+<span class="n">ROCKS</span><span class="o">----</span><span class="mi">1</span><span class="o">----*----</span><span class="mi">2</span><span class="o">----*----</span><span class="mi">3</span><span class="o">----*----</span><span class="mi">4</span><span class="o">----*----</span><span class="mi">5</span><span class="o">----*----</span><span class="mi">6</span><span class="o">----*----</span><span class="mi">7</span><span class="o">----*----</span><span class="mi">8</span>
+<span class="n">POMED</span>    <span class="mi">1</span>     <span class="mf">2550.</span>       <span class="mf">.10</span>   <span class="mf">20.E-15</span>   <span class="mf">20.E-15</span>   <span class="mf">20.E-15</span>       <span class="mf">2.0</span>     <span class="mf">800.0</span>
+                                     <span class="mf">.25</span>
+
+<span class="n">MULTI</span><span class="o">----</span><span class="mi">1</span><span class="o">----*----</span><span class="mi">2</span><span class="o">----*----</span><span class="mi">3</span><span class="o">----*----</span><span class="mi">4</span><span class="o">----*----</span><span class="mi">5</span><span class="o">----*----</span><span class="mi">6</span><span class="o">----*----</span><span class="mi">7</span><span class="o">----*----</span><span class="mi">8</span>
+    <span class="mi">2</span>    <span class="mi">3</span>    <span class="mi">2</span>    <span class="mi">6</span>
+<span class="n">START</span><span class="o">----</span><span class="mi">1</span><span class="o">----*----</span><span class="mi">2</span><span class="o">----*----</span><span class="mi">3</span><span class="o">----*----</span><span class="mi">4</span><span class="o">----*----</span><span class="mi">5</span><span class="o">----*----</span><span class="mi">6</span><span class="o">----*----</span><span class="mi">7</span><span class="o">----*----</span><span class="mi">8</span>
+<span class="o">----*----</span><span class="mi">1</span> <span class="n">MOP</span><span class="p">:</span> <span class="mi">123456789</span><span class="o">*</span><span class="mi">123456789</span><span class="o">*</span><span class="mi">1234</span> <span class="o">---*----</span><span class="mi">5</span><span class="o">----*----</span><span class="mi">6</span><span class="o">----*----</span><span class="mi">7</span><span class="o">----*----</span><span class="mi">8</span>
+<span class="n">PARAM</span><span class="o">----</span><span class="mi">1</span><span class="o">----*----</span><span class="mi">2</span><span class="o">----*----</span><span class="mi">3</span><span class="o">----*----</span><span class="mi">4</span><span class="o">----*----</span><span class="mi">5</span><span class="o">----*----</span><span class="mi">6</span><span class="o">----*----</span><span class="mi">7</span><span class="o">----*----</span><span class="mi">8</span>
+<span class="mi">2</span> <span class="mi">250</span>     <span class="mi">25000003000000002</span> <span class="mi">47</span> <span class="mi">1</span> <span class="mi">1</span>                   <span class="mf">1.80</span>
+           <span class="mf">3.15576E8</span>       <span class="o">-</span><span class="mf">1.</span>
+      <span class="mf">1.E3</span>      <span class="mf">9.E3</span>      <span class="mf">9.E4</span>      <span class="mf">4.E5</span>
+     <span class="mf">1.E-5</span>     <span class="mf">1.E00</span>                                   <span class="mf">1.E-7</span>
+                <span class="mf">1.E5</span>                <span class="mf">0.20</span>                 <span class="mf">18.</span>
+<span class="n">RPCAP</span><span class="o">----</span><span class="mi">1</span><span class="o">----*----</span><span class="mi">2</span><span class="o">----*----</span><span class="mi">3</span><span class="o">----*----</span><span class="mi">4</span><span class="o">----*----</span><span class="mi">5</span><span class="o">----*----</span><span class="mi">6</span><span class="o">----*----</span><span class="mi">7</span><span class="o">----*----</span><span class="mi">8</span>
+    <span class="mi">7</span>        <span class="mf">0.45000</span>    <span class="mf">9.6E-4</span>        <span class="mf">1.</span>
+    <span class="mi">7</span>        <span class="mf">0.45000</span>    <span class="mf">1.0E-3</span>   <span class="mf">8.0E-05</span>      <span class="mf">5.E8</span>        <span class="mf">1.</span>
+<span class="n">TIMES</span><span class="o">----</span><span class="mi">1</span><span class="o">----*----</span><span class="mi">2</span><span class="o">----*----</span><span class="mi">3</span><span class="o">----*----</span><span class="mi">4</span><span class="o">----*----</span><span class="mi">5</span><span class="o">----*----</span><span class="mi">6</span><span class="o">----*----</span><span class="mi">7</span><span class="o">----*----</span><span class="mi">8</span>
+    <span class="mi">3</span>
+ <span class="mf">3.15576E7</span>  <span class="mf">1.2559E8</span> <span class="mf">3.15576E8</span>
+<span class="n">GENER</span><span class="o">----</span><span class="mi">1</span><span class="o">----*----</span><span class="mi">2</span><span class="o">----*----</span><span class="mi">3</span><span class="o">----*----</span><span class="mi">4</span><span class="o">----*----</span><span class="mi">5</span><span class="o">----*----</span><span class="mi">6</span><span class="o">----*----</span><span class="mi">7</span><span class="o">----*----</span><span class="mi">8</span>
+<span class="n">A1</span>  <span class="mi">1</span><span class="n">HTR</span> <span class="mi">1</span>                         <span class="n">HEAT</span>       <span class="mf">3.E3</span>
+
+<span class="n">ENDCY</span><span class="o">----</span><span class="mi">1</span><span class="o">----*----</span><span class="mi">2</span><span class="o">----*----</span><span class="mi">3</span><span class="o">----*----</span><span class="mi">4</span><span class="o">----*----</span><span class="mi">5</span><span class="o">----*----</span><span class="mi">6</span><span class="o">----*----</span><span class="mi">7</span><span class="o">----*----</span><span class="mi">8</span>
+</pre></div>
+</div>
+<p>This example shows how to generate this file from scratch block by block using <code class="xref py py-mod docutils literal notranslate"><span class="pre">toughio</span></code>.</p>
+<p>First, we import <code class="xref py py-mod docutils literal notranslate"><span class="pre">numpy</span></code> and <code class="xref py py-mod docutils literal notranslate"><span class="pre">toughio</span></code>.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">toughio</span>
+</pre></div>
+</div>
+<p>In this example, we start with the blocks MESHM and LAYER, and use the function <a class="reference internal" href="../../api/mesh.html#toughio.meshmaker.from_meshmaker" title="toughio.meshmaker.from_meshmaker"><code class="xref py py-func docutils literal notranslate"><span class="pre">toughio.meshmaker.from_meshmaker()</span></code></a> to generate the radial grid. We first define a dictionary with the key “meshmaker” and provide the type of mesh (RZ2D) and the parameters. Once the mesh is generated, we use the method <a class="reference internal" href="../../api/mesh.html#toughio.Mesh.write_tough" title="toughio.Mesh.write_tough"><code class="xref py py-meth docutils literal notranslate"><span class="pre">toughio.Mesh.write_tough()</span></code></a> and <a class="reference internal" href="../../api/mesh.html#toughio.Mesh.write" title="toughio.Mesh.write"><code class="xref py py-meth docutils literal notranslate"><span class="pre">toughio.Mesh.write()</span></code></a> to write the files <cite>MESH</cite> and <cite>mesh.pickle</cite>, respectively. Exporting the mesh is useful for postprocessing as it contains information about the mesh.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;meshmaker&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;rz2d&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;radii&quot;</span><span class="p">,</span> <span class="s2">&quot;radii&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]},</span>
+            <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;equid&quot;</span><span class="p">,</span> <span class="s2">&quot;n_increment&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;logar&quot;</span><span class="p">,</span> <span class="s2">&quot;n_increment&quot;</span><span class="p">:</span> <span class="mi">99</span><span class="p">,</span> <span class="s2">&quot;radius&quot;</span><span class="p">:</span> <span class="mf">100.0</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;logar&quot;</span><span class="p">,</span> <span class="s2">&quot;n_increment&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">&quot;radius&quot;</span><span class="p">:</span> <span class="mf">10000.0</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;equid&quot;</span><span class="p">,</span> <span class="s2">&quot;n_increment&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;thicknesses&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">4.5</span><span class="p">]},</span>
+        <span class="p">]</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">toughio</span><span class="o">.</span><span class="n">meshmaker</span><span class="o">.</span><span class="n">from_meshmaker</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">material</span><span class="o">=</span><span class="s2">&quot;POMED&quot;</span><span class="p">)</span>
+<span class="n">mesh</span><span class="o">.</span><span class="n">write_tough</span><span class="p">(</span><span class="s2">&quot;MESH&quot;</span><span class="p">)</span>
+<span class="n">mesh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;mesh.pickle&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/toughio/toughio/toughio/_mesh/_properties.py:75: RuntimeWarning: invalid value encountered in divide
+  normals /= normals_mag[:, None]
+</pre></div>
+</div>
+<p>To generate the main input file, let us initialize a new dictionary with a title (optional).</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;*rhp* 1-D RADIAL HEAT PIPE&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The block ROCKS contains a single material and can be defined using the key “rocks”, which is a dictionary with keys corresponding to the names of the materials.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;rocks&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;POMED&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;density&quot;</span><span class="p">:</span> <span class="mf">2550.0</span><span class="p">,</span>
+        <span class="s2">&quot;porosity&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="s2">&quot;permeability&quot;</span><span class="p">:</span> <span class="mf">20.0e-15</span><span class="p">,</span>
+        <span class="s2">&quot;conductivity&quot;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span>
+        <span class="s2">&quot;specific_heat&quot;</span><span class="p">:</span> <span class="mf">800.0</span><span class="p">,</span>
+        <span class="s2">&quot;tortuosity&quot;</span><span class="p">:</span> <span class="mf">0.25</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>We can initialize the block MULTI by setting the equation-of-state (EOS3) and the isothermal option. The key “eos” defines the number of mass components and phases while the isothermal option determines the number of equations (i.e., the number of equations is equal to the number of mass components for isothermal simulations). Alternatively, the number of mass components and phases can be fixed using the keys “n_component” and “n_phase”, respectively.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;eos&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;eos3&quot;</span>
+<span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;isothermal&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+</pre></div>
+</div>
+<p>The block START allows INCON data to be defined in arbitrary order and not present for all grid blocks. This option can be enable using the key “start”.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+<p>The block PARAM is mainly defined by the key “options”. However, the MOP values and the default initial conditions for all grid blocks (last record of the block PARAM) are set in the keys “extra_options” and “default”, respectively.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;options&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;verbosity&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s2">&quot;n_cycle&quot;</span><span class="p">:</span> <span class="mi">250</span><span class="p">,</span>
+    <span class="s2">&quot;n_cycle_print&quot;</span><span class="p">:</span> <span class="mi">250</span><span class="p">,</span>
+    <span class="s2">&quot;temperature_dependence_gas&quot;</span><span class="p">:</span> <span class="mf">1.8</span><span class="p">,</span>
+    <span class="s2">&quot;t_max&quot;</span><span class="p">:</span> <span class="mf">10.0</span> <span class="o">*</span> <span class="mf">24.0</span> <span class="o">*</span> <span class="mf">3600.0</span> <span class="o">*</span> <span class="mf">365.25</span><span class="p">,</span>
+    <span class="s2">&quot;t_steps&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0e3</span><span class="p">,</span> <span class="mf">9.0e3</span><span class="p">,</span> <span class="mf">9.0e4</span><span class="p">,</span> <span class="mf">4.0e5</span><span class="p">],</span>
+    <span class="s2">&quot;eps1&quot;</span><span class="p">:</span> <span class="mf">1.0e-5</span><span class="p">,</span>
+    <span class="s2">&quot;eps2&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="s2">&quot;derivative_factor&quot;</span><span class="p">:</span> <span class="mf">1.0e-7</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;extra_options&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="mi">5</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="mi">16</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="mi">17</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
+    <span class="mi">19</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="mi">21</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;initial_condition&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0e5</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">18.0</span><span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The block RPCAP controls the default relative permeability and capillarity models for all materials. Therefore, they are also defined in the dictionary key “default”.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">][</span><span class="s2">&quot;relative_permeability&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
+    <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.45</span><span class="p">,</span> <span class="mf">0.00096</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+<span class="p">}</span>
+<span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">][</span><span class="s2">&quot;capillarity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
+    <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.45</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">,</span> <span class="mf">8.0e-5</span><span class="p">,</span> <span class="mf">5.0e8</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The block TIMES is simply a list of values (in second) defined using the homologous key “times”. Here, we request an output after 1, 4 and 10 years.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;times&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">])</span> <span class="o">*</span> <span class="mf">24.0</span> <span class="o">*</span> <span class="mf">3600.0</span> <span class="o">*</span> <span class="mf">365.25</span>
+</pre></div>
+</div>
+<p>The block GENER is defined by the key “generators” which is a list of dictionaries with keys “label”, “name” (optional), “type”, “times”, “rates” and “specific_enthalpy”. “label” is the name of the element where the component is injected/produced. Here, we use the method <a class="reference internal" href="../../api/mesh.html#toughio.Mesh.near" title="toughio.Mesh.near"><code class="xref py py-meth docutils literal notranslate"><span class="pre">toughio.Mesh.near()</span></code></a> to get the index of the element the nearest to the query point.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;generators&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="n">mesh</span><span class="o">.</span><span class="n">labels</span><span class="p">[</span><span class="n">mesh</span><span class="o">.</span><span class="n">near</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])],</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;HTR 1&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;HEAT&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;rates&quot;</span><span class="p">:</span> <span class="mf">3.0e3</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>Once all the parameters are defined, the input file is ready to written using the function <a class="reference internal" href="../../api/io.html#toughio.write_input" title="toughio.write_input"><code class="xref py py-func docutils literal notranslate"><span class="pre">toughio.write_input()</span></code></a>.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">toughio</span><span class="o">.</span><span class="n">write_input</span><span class="p">(</span><span class="s2">&quot;INFILE&quot;</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.027 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-heat-pipe-in-cylindrical-geometry-1-preprocessing-py">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/d796366e85f21ce0e13d485e05dcfea6/1_preprocessing.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">1_preprocessing.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/8ea9dad3aabe4ffc38e15f8f4ab83ae2/1_preprocessing.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">1_preprocessing.py</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Heat pipe in cylindrical geometry (EOS3)</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="2_postprocessing.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Plot profiles</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/examples/heat_pipe_in_cylindrical_geometry/1_preprocessing.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023, Keurfon Luu.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

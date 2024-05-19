@@ -1,0 +1,933 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Relative Permeability Functions &#8212; toughio 1.15.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=8fbebee6" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../../_static/documentation_options.js?v=70d5d4a5"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tough3/guide/relative_permeability_functions';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Capillary Pressure Functions" href="capillary_pressure_functions.html" />
+    <link rel="prev" title="Output from TOUGH3" href="output_from_tough3.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../_static/logo-light.png" class="logo__image only-light" alt="toughio 1.15.0 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="toughio 1.15.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        TOUGH3
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        TOUGH3
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../install/index.html">Installation</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../install/linux.html">Installation on Linux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../install/windows.html">Installation on Windows</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">User Guide</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="governing_equations.html">Governing Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="numerical_methods.html">Numerical Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="initial_and_boundary_conditions.html">Initial and Boundary Conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="preparation_of_input_data.html">Preparation of Input Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="output_from_tough3.html">Output from TOUGH3</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Relative Permeability Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capillary_pressure_functions.html">Capillary Pressure Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../eos/index.html">EOS</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos1.html">EOS1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos2.html">EOS2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos3.html">EOS3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos4.html">EOS4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos5.html">EOS5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos7.html">EOS7</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos7r.html">EOS7R</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos8.html">EOS8</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos9.html">EOS9</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/ewasg.html">EWASG</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eco2n.html">ECO2N</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">TOUGH3</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">User Guide</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Relative...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="relative-permeability-functions">
+<span id="relative-permeabilty-functions"></span><h1>Relative Permeability Functions<a class="headerlink" href="#relative-permeability-functions" title="Link to this heading">#</a></h1>
+<p>TOUGH3 provides several relative permeability functions for two-phase or three-phase flow problems.
+The original TOUGH2 two-phase functions have been retained (from <code class="docutils literal notranslate"><span class="pre">IRP</span></code> = 1 to <code class="docutils literal notranslate"><span class="pre">IRP</span></code> = 8).
+The modified Brooks-Corey and van Genuchten models and two versions of the hysteresis model (regular and simple) are implemented (<code class="docutils literal notranslate"><span class="pre">IRP</span></code> = 10, 11, 12, and 13).
+The three-phase functions from TMVOC and ECO2M start at <code class="docutils literal notranslate"><span class="pre">IRP</span></code> = 31.
+For TMVOC, if one of the two-phase functions is chosen, the NAPL relative permeability is assumed to be zero.
+For ECO2M, the two-phase functions are only applicable when an aqueous phase and a single CO<sub>2</sub>-rich phase are present.
+If one of the two-phase functions is chosen, the relative permeability of the CO<sub>2</sub>-rich phase will be the same function of saturation, regardless whether the CO<sub>2</sub>-rich phase is liquid or gas.
+The notation used below is:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(k_{rl}\)</span>: aqueous phase relative permeability</p></li>
+<li><p><span class="math notranslate nohighlight">\(k_{rg}\)</span>: gas (for all two-phase EOSs and TMVOC) or gaseous CO<sub>2</sub> (for ECO2M) phase relative permeability</p></li>
+<li><p><span class="math notranslate nohighlight">\(k_{rn}\)</span>: NAPL (for TMVOC) or liquid CO<sub>2</sub> (for ECO2M) phase relative permeability</p></li>
+<li><p><span class="math notranslate nohighlight">\(S_l\)</span>, <span class="math notranslate nohighlight">\(S_g\)</span>, and <span class="math notranslate nohighlight">\(S_n\)</span> are the saturations of aqueous, gas (or gaseous CO<sub>2</sub>) and NAPL (or liquid CO<sub>2</sub>) phases, respectively</p></li>
+</ul>
+<section id="linear-functions-irp-1">
+<h2>Linear Functions (IRP=1)<a class="headerlink" href="#linear-functions-irp-1" title="Link to this heading">#</a></h2>
+<div class="line-block">
+<div class="line"><span class="math notranslate nohighlight">\(k_{rl}\)</span> increases linearly from 0 to 1 in range <span class="math notranslate nohighlight">\(RP(1) \le S_l \le RP(3)\)</span></div>
+<div class="line"><span class="math notranslate nohighlight">\(k_{rg}\)</span> increases linearly from 0 to 1 in range <span class="math notranslate nohighlight">\(RP(2) \le S_l \le RP(4)\)</span></div>
+<div class="line">Restrictions: <span class="math notranslate nohighlight">\(RP(3) \gt RP(1)\)</span>, <span class="math notranslate nohighlight">\(RP(4) \gt RP(2)\)</span></div>
+</div>
+<p>If <span class="math notranslate nohighlight">\(RP(5) \gt 0\)</span>, <span class="math notranslate nohighlight">\(k_{rn}\)</span> increases linearly from 0 to 1 in the range <span class="math notranslate nohighlight">\(RP(1) \le S_n \le RP(3)\)</span></p>
+<div class="line-block">
+<div class="line">If <span class="math notranslate nohighlight">\(RP(5) \gt 0\)</span> and <span class="math notranslate nohighlight">\(RP(6) \gt 0\)</span>, <span class="math notranslate nohighlight">\(k_{rn}\)</span> increases linearly from 0 to 1 in the range <span class="math notranslate nohighlight">\(RP(5) \le S_n \le RP(6)\)</span></div>
+<div class="line">Restrictions: <span class="math notranslate nohighlight">\(RP(6) \lt RP(5)\)</span></div>
+</div>
+</section>
+<section id="irp-2">
+<h2>IRP=2<a class="headerlink" href="#irp-2" title="Link to this heading">#</a></h2>
+<div class="math notranslate nohighlight">
+\[k_{rl} = S_l^{RP(1)}\]</div>
+<div class="math notranslate nohighlight">
+\[k_{rg} = 1\]</div>
+</section>
+<section id="corey-s-curves-irp-3">
+<h2>Corey’s Curves (IRP=3)<a class="headerlink" href="#corey-s-curves-irp-3" title="Link to this heading">#</a></h2>
+<p>After <span id="id1"><a class="reference internal" href="../references.html#id17" title="Corey, A. T. (1954). The interrelation between gas and oil relative permeabilities. Producers monthly, pp. 38–41.">Corey, 1954</a></span>.</p>
+<div class="math notranslate nohighlight">
+\[k_{rl} = \hat{S}^4\]</div>
+<div class="math notranslate nohighlight">
+\[k_{rg} = \left( 1 - \hat{S} \right)^2 \left( 1 - \hat{S}^2 \right)^2\]</div>
+<p>where <span class="math notranslate nohighlight">\(\hat{S} = \frac{S_l - S_{lr}}{1 - S_{lr} - S_{gr}}\)</span>.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(RP(1) = S_{lr}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(2) = S_{gr}\)</span></p></li>
+</ul>
+<p>Restrictions: <span class="math notranslate nohighlight">\(RP(1) + RP(2) \lt 1\)</span></p>
+</section>
+<section id="grant-s-curves-irp-4">
+<h2>Grant’s Curves (IRP=4)<a class="headerlink" href="#grant-s-curves-irp-4" title="Link to this heading">#</a></h2>
+<p>After <span id="id2"><a class="reference internal" href="../references.html#id34" title="Grant, M. (1977). Permeability reduction factors at wairakei, paper present at aiche asme heat transfer conference. Am. Inst. of Chem. Eng., Am. Soc. of Mech. Eng., Salt Lake City, Utah, 1977.">Grant, 1977</a></span>.</p>
+<div class="math notranslate nohighlight">
+\[k_{rl} = \hat{S}^4\]</div>
+<div class="math notranslate nohighlight">
+\[k_{rg} = 1 - k_{rl}\]</div>
+<p>Parameters:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(RP(1) = S_{lr}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(2) = S_{gr}\)</span></p></li>
+</ul>
+<p>Restrictions: <span class="math notranslate nohighlight">\(RP(1) + RP(2) \lt 1\)</span></p>
+</section>
+<section id="all-phases-perfectly-mobile-irp-5">
+<h2>All Phases Perfectly Mobile (IRP=5)<a class="headerlink" href="#all-phases-perfectly-mobile-irp-5" title="Link to this heading">#</a></h2>
+<p><span class="math notranslate nohighlight">\(k_{rg} = k_{rg} = 1\)</span> for all saturations.</p>
+<p>No parameters.</p>
+</section>
+<section id="functions-of-fatt-and-klikoff-irp-6">
+<h2>Functions of Fatt and Klikoff (IRP=6)<a class="headerlink" href="#functions-of-fatt-and-klikoff-irp-6" title="Link to this heading">#</a></h2>
+<p>After <span id="id3"><a class="reference internal" href="../references.html#id28" title="Fatt, I., &amp; Klikoff, W. A. (1959). Effect of fractional wettability on multiphase flow through porous media. Journal of Petroleum Technology, 11(10), 71–76.">Fatt &amp; Klikoff, 1959</a></span>.</p>
+<div class="math notranslate nohighlight">
+\[k_{rl} = \left( S^\ast \right)^3\]</div>
+<div class="math notranslate nohighlight">
+\[k_{rg} = \left( 1 - S^\ast \right)^3\]</div>
+<p>where <span class="math notranslate nohighlight">\(S^\ast = \frac{S_l - S_{lr}}{1 - S_{lr}}\)</span>.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(RP(1) = S_{lr}\)</span></p></li>
+</ul>
+<p>Restriction: <span class="math notranslate nohighlight">\(RP(1) \lt 1\)</span></p>
+</section>
+<section id="van-genuchten-mualem-model-irp-7">
+<h2>van Genuchten-Mualem Model (IRP=7)<a class="headerlink" href="#van-genuchten-mualem-model-irp-7" title="Link to this heading">#</a></h2>
+<p>After <span id="id4"><a class="reference internal" href="../references.html#id59" title="Mualem, Y. (1976). A new model for predicting the hydraulic conductivity of unsaturated porous media. Water resources research, 12(3), 513–522.">Mualem, 1976</a></span> and van <span id="id5"><a class="reference internal" href="../references.html#id107" title="Van Genuchten, M. T. (1980). A closed-form equation for predicting the hydraulic conductivity of unsaturated soils. Soil science society of America journal, 44(5), 892–898.">VanGenuchten, 1980</a></span>.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}k_{rl} =
+    \begin{cases}
+        \sqrt{S^\ast} \left( 1 - \left( 1 - \left( S^\ast \right)^{\frac{1}{\lambda}} \right)^{\lambda} \right)^2 &amp; \text{if $S_l \lt S_{ls}$} \\
+        1 &amp; \text{if $S_l \ge S_{ls}$} \\
+    \end{cases}\end{split}\]</div>
+<p>Gas relative permeability can be chosen as one of the following two forms, the second of which is due to <span id="id6"><a class="reference internal" href="../references.html#id17" title="Corey, A. T. (1954). The interrelation between gas and oil relative permeabilities. Producers monthly, pp. 38–41.">Corey, 1954</a></span>.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}k_{rg} =
+    \begin{cases}
+        1 - k_{rl} &amp; \text{if $S_{gr} = 0$} \\
+        \left( 1 - \hat{S} \right)^2 \left( 1 - \hat{S}^2 \right) &amp; \text{if $S_{gr} \gt 0$} \\
+    \end{cases}\end{split}\]</div>
+<p>subject to the restriction <span class="math notranslate nohighlight">\(0 \le k_{rl}\)</span>, <span class="math notranslate nohighlight">\(k_{rg} \le 1\)</span>.</p>
+<p>Here,</p>
+<div class="math notranslate nohighlight">
+\[S^\ast = \frac{S_l - S_{lr}}{S_{ls} - S_{lr}}\]</div>
+<div class="math notranslate nohighlight">
+\[\hat{S} = \frac{S_l - S_{lr}}{1 - S_{lr} - S_{gr}}\]</div>
+<p>Parameters:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(RP(1) = \lambda\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(2) = S_{lr}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(3) = S_{ls}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(4) = S_{gr}\)</span></p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Parameter <span class="math notranslate nohighlight">\(\lambda\)</span> is <span class="math notranslate nohighlight">\(m\)</span> in van Genuchten’s notation, with <span class="math notranslate nohighlight">\(m = 1 - \frac{1}{n}\)</span>; parameter <span class="math notranslate nohighlight">\(n\)</span> is often written as <span class="math notranslate nohighlight">\(\beta\)</span>.</p>
+</div>
+</section>
+<section id="functions-of-verma-et-al-irp-8">
+<h2>Functions of Verma et al. (IRP=8)<a class="headerlink" href="#functions-of-verma-et-al-irp-8" title="Link to this heading">#</a></h2>
+<p>After <span id="id7"><a class="reference internal" href="../references.html#id110" title="Verma, A. (1985). A study of two-phase concurrent flow of steam and water in an unconsolidated porous medium. Lawrence Berkeley National Lab.(LBNL), Berkeley, CA (United States).">Verma, 1985</a></span>.</p>
+<div class="math notranslate nohighlight">
+\[k_{rl} = \hat{S}^3\]</div>
+<div class="math notranslate nohighlight">
+\[k_{rg} = A + B \hat{S} + C \hat{S}^2\]</div>
+<p>where <span class="math notranslate nohighlight">\(\hat{S} = \frac{S_l - S_{lr}}{S_{ls} - S_{lr}}\)</span></p>
+<p>Parameters as measured by Verma et al. (1985) for steam-water flow in an unconsolidated sand:</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(RP(1) = S_{lr} = 0.2\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(2) = S_{ls} = 0.895\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(3) = A = 1.259\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(4) = B = -1.7615\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(5) = C = 0.5089\)</span></p></li>
+</ul>
+</section>
+<section id="modified-brooks-corey-model-irp-10">
+<h2>Modified Brooks-Corey Model (IRP=10)<a class="headerlink" href="#modified-brooks-corey-model-irp-10" title="Link to this heading">#</a></h2>
+<p>A modified version of the Brooks-Corey model (<span id="id8"><a class="reference internal" href="../references.html#id52" title="Luckner, L., Van Genuchten, M. T., &amp; Nielsen, D. (1989). A consistent set of parametric models for the two-phase flow of immiscible fluids in the subsurface. Water Resources Research, 25(10), 2187–2193.">Luckner et al., 1989</a></span>) has been implemented to prevent the capillary pressure from decreasing towards negative infinity as the effective saturation approaches zero.
+The modified Brooks-Corey model is invoked by setting both <code class="docutils literal notranslate"><span class="pre">IRP</span></code> and <code class="docutils literal notranslate"><span class="pre">ICP</span></code> to 10.</p>
+<div class="math notranslate nohighlight">
+\[k_{rl} = S_{ek}^{\frac{2 + \lambda}{\lambda}}\]</div>
+<div class="math notranslate nohighlight">
+\[\begin{split}k_{rg} =
+    \begin{cases}
+        \left( 1 - S_{ek} \right)^2 \left( 1 - S_{ek}^{\frac{2 + \lambda}{\lambda}} \right) &amp; \text{if $RP(3) = 0$} \\
+        1 - k_{rl} &amp; \text{if $RP(3) \ne 0$} \\
+    \end{cases}\end{split}\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight">
+\[S_{ek} = \frac{S_l - S_{lrk}}{1 - S_{lrk} - S_{gr}}\]</div>
+<p>Parameters:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(RP(1) = S_{lrk}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(2) = S_{gr}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(3) =\)</span> flag to indicate which equation is used for <span class="math notranslate nohighlight">\(k_{rg}\)</span></p></li>
+</ul>
+</section>
+<section id="modified-van-genuchten-model-irp-11">
+<h2>Modified van Genuchten Model (IRP=11)<a class="headerlink" href="#modified-van-genuchten-model-irp-11" title="Link to this heading">#</a></h2>
+<p>A modified version of the van Genuchten model (<span id="id9"><a class="reference internal" href="../references.html#id52" title="Luckner, L., Van Genuchten, M. T., &amp; Nielsen, D. (1989). A consistent set of parametric models for the two-phase flow of immiscible fluids in the subsurface. Water Resources Research, 25(10), 2187–2193.">Luckner et al., 1989</a></span>) has been implemented to prevent the capillary pressure from decreasing towards negative infinity as the effective saturation approaches zero.
+The modified van Genuchten model is invoked by setting both <code class="docutils literal notranslate"><span class="pre">IRP</span></code> and <code class="docutils literal notranslate"><span class="pre">ICP</span></code> to 11.</p>
+<div class="math notranslate nohighlight">
+\[k_{rl} = S_{ekl}^{\gamma} S_{ekl}^{\left( 1 - \gamma \right) \eta} \left( 1 - \left( 1 - S_{ekl}^{\frac{1 - \gamma}{m}} \right)^m \right)^2\]</div>
+<div class="math notranslate nohighlight">
+\[\begin{split}k_{rg} =
+    \begin{cases}
+        \left( 1 - S_{ekg} \right)^{\zeta} \left( 1 - S_{ekg}^{\frac{1}{m}} \right)^{2m} &amp; \text{if $RP(3) = 0$} \\
+        1 - k_{rl} &amp; \text{if $RP(3) \ne 0$} \\
+    \end{cases}\end{split}\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight">
+\[S_{ekl} = \frac{S_l - S_{lrk}}{1 - S_{lrk}}\]</div>
+<div class="math notranslate nohighlight">
+\[S_{ekg} = \frac{S_l}{1 - S_{gr}}\]</div>
+<p>Parameters:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(RP(1) = S_{lrk}\)</span>, if negative, <span class="math notranslate nohighlight">\(S_{lrk} = 0\)</span> for calculating <span class="math notranslate nohighlight">\(k_{rg}\)</span>, and absolute value is used for calculating <span class="math notranslate nohighlight">\(k_{rl}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(2) = S_{gr}\)</span>, if negative, <span class="math notranslate nohighlight">\(S_{gr} = 0\)</span> for calculating <span class="math notranslate nohighlight">\(k_{rl}\)</span>, and absolute value is used for calculating <span class="math notranslate nohighlight">\(k_{rg}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(3) =\)</span> flag to indicate which equation is used for <span class="math notranslate nohighlight">\(k_{rg}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(4) = \eta\)</span> (default = 1/2)</p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(5) = \varepsilon_k\)</span>, use linear function between <span class="math notranslate nohighlight">\(k_{rl}\)</span> (<span class="math notranslate nohighlight">\(S_e = 1 - \varepsilon_k\)</span>) and 1.0</p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(6) = a_{fm}\)</span>, constant fracture-matrix interaction reduction factor, in combination with Active Fracture Model</p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(7) = \zeta\)</span> (default = 1/3)</p></li>
+</ul>
+</section>
+<section id="regular-hysteresis-irp-12">
+<h2>Regular Hysteresis (IRP=12)<a class="headerlink" href="#regular-hysteresis-irp-12" title="Link to this heading">#</a></h2>
+<p>The hysteretic form of the van Genuchten model (<span id="id10"><a class="reference internal" href="../references.html#id47" title="Lenhard, R., &amp; Parker, J. (1987). A model for hysteretic constitutive relations governing multiphase flow: 2. permeability-saturation relations. Water Resources Research, 23(12), 2197–2206.">Lenhard &amp; Parker, 1987</a>, <a class="reference internal" href="../references.html#id69" title="Parker, J., &amp; Lenhard, R. (1987). A model for hysteretic constitutive relations governing multiphase flow: 1. saturation-pressure relations. Water Resources Research, 23(12), 2187–2196.">Parker &amp; Lenhard, 1987</a></span>) has been implemented.
+Details of the implementation are described in <span id="id11"><a class="reference internal" href="../references.html#id22" title="Doughty, C. (2013). User's Guide for Hysteretic Capillary Pressure and Relative Permeability Functions in TOUGH2 Earth Sciences Division Lawrence Berkeley National Laboratory. Lawrence Berkeley National Lab.(LBNL), Berkeley, CA (United States).">Doughty, 2013</a></span>.
+The regular hysteresis model is invoked by setting both <code class="docutils literal notranslate"><span class="pre">IRP</span></code> and <code class="docutils literal notranslate"><span class="pre">ICP</span></code> to 12.</p>
+<div class="math notranslate nohighlight">
+\[k_{rl} = \sqrt{\bar{S}_l} \left( 1 - \left( 1 - \frac{\bar{S}_{gt}}{1 - \bar{S}_l^{\Delta}} \right) \left( 1 - \left( \bar{S}_l + \bar{S}_{gt} \right)^{\frac{1}{m}}\right)^m - \frac{\bar{S}_{gt}}{1 - \bar{S}_l^{\Delta}} \left( 1 - \left( \bar{S}_l^{\Delta} \right)^{\frac{1}{m}} \right)^m \right)^2\]</div>
+<div class="math notranslate nohighlight">
+\[k_{rg} = k_{rgmax} \left( 1 - \left( \bar{S}_l + \bar{S}_{gt} \right) \right)^{\gamma} \left( 1 - \left( \bar{S}_l + \bar{S}_{gt} \right)^{\frac{1}{m}} \right)^{2m}\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight">
+\[\bar{S}_l = \frac{S_l - S_{lr}}{1 - S_{lr}}\]</div>
+<div class="math notranslate nohighlight">
+\[\bar{S}_l^{\Delta} = \frac{S_l^{\Delta} - S_{lr}}{1 - S_{lr}}\]</div>
+<div class="math notranslate nohighlight">
+\[\bar{S}_{gt} = \frac{S_{gr}^{\Delta} \left( S_l - S_l^{\Delta} \right)}{\left( 1 - S_{lr} \right) \left( 1 - S_l^{\Delta} - S_{gr}^{\Delta} \right)}\]</div>
+<div class="math notranslate nohighlight">
+\[S_{gr}^{\Delta} = \frac{1}{\frac{1}{1 - S_l^{\Delta}} + \frac{1}{S_{gr, max}} - \frac{1}{1 - S_{lr}}}\]</div>
+<p><span class="math notranslate nohighlight">\(S_l^{\Delta}\)</span> is the turning-point saturation, and <span class="math notranslate nohighlight">\(S_{gr}^{\Delta}\)</span> is the residual gas saturation.</p>
+<p>Parameters:</p>
+<ul>
+<li><p><span class="math notranslate nohighlight">\(RP(1) = m\)</span>, van Genuchten <span class="math notranslate nohighlight">\(m\)</span> for liquid relative permeability (need not equal <span class="math notranslate nohighlight">\(CP(1)\)</span> or <span class="math notranslate nohighlight">\(CP(6)); :math:`k_{rl}\)</span> uses the same <span class="math notranslate nohighlight">\(m\)</span> for drainage and imbibition.</p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(2) = S_{lr}\)</span>, <span class="math notranslate nohighlight">\(k_{rl} (S_{lr}) = 0\)</span>, <span class="math notranslate nohighlight">\(k_{rg} (S_{lr}) = k_{rgmax}\)</span>. Must have <span class="math notranslate nohighlight">\(S_{lr} \gt S_{lmin}\)</span> in capillary pressure (<span class="math notranslate nohighlight">\(CP(2)). :math:`S_{lr}\)</span> is minimum saturation for transition to imbibition branch. For <span class="math notranslate nohighlight">\(S_l \lt S_{lr}\)</span>, curve stays on primary drainage branch even if <span class="math notranslate nohighlight">\(S_l\)</span> increases.</p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(3) = S_{grmax}\)</span>, maximum possible value of <span class="math notranslate nohighlight">\(S_{gr}^{\Delta}\)</span>. Note that the present version of the code requires that <span class="math notranslate nohighlight">\(S_{lr} + S_{grmax} \lt 1\)</span>, otherwise there will be saturations for which neither fluid phase is mobile, which the code cannot handle. Setting <span class="math notranslate nohighlight">\(S_{grmax} = 0\)</span> effectively turns off hysteresis. As a special option, a constant, non-zero value of Sgr may be employed by setting <span class="math notranslate nohighlight">\(CP(10) \gt 1\)</span> and making <span class="math notranslate nohighlight">\(RP(3)\)</span> negative. The code will set <span class="math notranslate nohighlight">\(S_{gr}^{\Delta}\)</span> = <span class="math notranslate nohighlight">\(-RP(3)\)</span> for all grid blocks at all times.</p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(4) = \gamma\)</span>, typical values 0.33 - 0.50</p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(5) = k_{rgmax}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(6) =\)</span> fitting parameter for <span class="math notranslate nohighlight">\(k_{rg}\)</span> extension for <span class="math notranslate nohighlight">\(S_l \lt S_{lr}\)</span> (only used when <span class="math notranslate nohighlight">\(k_{rgmax} \lt 1\)</span>); determines type of function for extension and slope of <span class="math notranslate nohighlight">\(k_{rg}\)</span> at <span class="math notranslate nohighlight">\(S_l = 0\)</span>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>≤0: use cubic spline for <span class="math notranslate nohighlight">\(0 \lt S_l \lt S_{lr}\)</span>, with slope at <span class="math notranslate nohighlight">\(S_l = 0\)</span> of <span class="math notranslate nohighlight">\(RP(6)\)</span></p></li>
+<li><p>&gt;0: use linear segment for <span class="math notranslate nohighlight">\(0 \lt S_l \lt RP(8) S_{lr}\)</span> and cubic spline for <span class="math notranslate nohighlight">\(RP(8) S_{lr} \lt S_l \lt S_{lr}\)</span>, with slope at <span class="math notranslate nohighlight">\(S_l = 0\)</span> of <span class="math notranslate nohighlight">\(-RP(6)\)</span>.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><span class="math notranslate nohighlight">\(RP(7) =\)</span> numerical factor used for <span class="math notranslate nohighlight">\(k_{rl}\)</span> extension to <span class="math notranslate nohighlight">\(S_l \gt S_l^\ast\)</span>. <span class="math notranslate nohighlight">\(RP(7)\)</span> is the fraction of <span class="math notranslate nohighlight">\(S_l^\ast\)</span> at which <span class="math notranslate nohighlight">\(k_{rl}\)</span> curve departs from the original van Genuchten function. Recommended range of values: 0.95-0.97. For <span class="math notranslate nohighlight">\(RP(7) = 0\)</span>, <span class="math notranslate nohighlight">\(k_{rl} = 1\)</span> for <span class="math notranslate nohighlight">\(S_l \gt S_l^\ast\)</span> (not recommended).</p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(8) =\)</span> numerical factor used for linear <span class="math notranslate nohighlight">\(k_{rg}\)</span> extension to <span class="math notranslate nohighlight">\(S_l \lt S_{lr}\)</span> (only used when <span class="math notranslate nohighlight">\(k_{rgmax} \lt 1\)</span>). <span class="math notranslate nohighlight">\(RP(8)\)</span> is the fraction of <span class="math notranslate nohighlight">\(S_{lr}\)</span> at which the linear and cubic parts of the extensions are joined.</p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(9) =\)</span> flag to turn off hysteresis for <span class="math notranslate nohighlight">\(k_{rl}\)</span> (no effect on <span class="math notranslate nohighlight">\(P_c\)</span> and <span class="math notranslate nohighlight">\(k_{rg}\)</span>; to turn off hysteresis entirely, set <span class="math notranslate nohighlight">\(S_{grmax} = 0\)</span> in <span class="math notranslate nohighlight">\(RP(3)\)</span>).</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>0: hysteresis is on for <span class="math notranslate nohighlight">\(k_{rl}\)</span></p></li>
+<li><p>1: hysteresis is off for <span class="math notranslate nohighlight">\(k_{rl}\)</span> (force <span class="math notranslate nohighlight">\(k_{rl}\)</span> to stay on primary drainage branch (<span class="math notranslate nohighlight">\(k_{rl}^d\)</span>) at all times)</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><span class="math notranslate nohighlight">\(RP(10) = m_{gas}\)</span>, van Genuchten m for gas relative permeability (need not equal <span class="math notranslate nohighlight">\(CP(1)\)</span> or <span class="math notranslate nohighlight">\(CP(6)\)</span>); <span class="math notranslate nohighlight">\(k_{rg}\)</span> uses same <span class="math notranslate nohighlight">\(m_{gas}\)</span> for drainage and imbibition. If zero or blank, use <span class="math notranslate nohighlight">\(RP(1)\)</span> so that <span class="math notranslate nohighlight">\(m_{gas} = m\)</span>.</p></li>
+</ul>
+</section>
+<section id="simple-hysteresis-irp-13">
+<h2>Simple Hysteresis (IRP=13)<a class="headerlink" href="#simple-hysteresis-irp-13" title="Link to this heading">#</a></h2>
+<p>The regular hysteresis option (<code class="docutils literal notranslate"><span class="pre">IRP</span></code> = <code class="docutils literal notranslate"><span class="pre">ICP</span></code> = 12) provides a rigorous representation of hysteretic relative permeability and capillary pressure curves.
+However, it can significantly slow down TOUGH3 simulations, because small time steps are often required at turning points, when a grid block switches between drainage and imbibition, because the slopes of the characteristic curves are discontinuous.
+Moreover, several control parameters are needed, which generally must be determined by trial and error, for the code to run smoothly.
+An alternative means of capturing the essence of hysteresis, while maintaining continuous slopes and requiring no additional control parameters, is the simple hysteresis algorithm of <span id="id12"><a class="reference internal" href="../references.html#id71" title="Patterson, C. G., &amp; Falta, R. W. (2012). A Simple History-Dependent Nonwetting-Phase Trapping Model for the TOUGH Simulators. Illinois State Geological Survey.">Patterson &amp; Falta, 2012</a></span>, which is invoked with <code class="docutils literal notranslate"><span class="pre">IRP</span></code> = <code class="docutils literal notranslate"><span class="pre">ICP</span></code> = 13.
+Presently this option is only available when ECO2N is being used.</p>
+<p>The <span id="id13"><a class="reference internal" href="../references.html#id59" title="Mualem, Y. (1976). A new model for predicting the hydraulic conductivity of unsaturated porous media. Water resources research, 12(3), 513–522.">Mualem, 1976</a></span> relative permeability model is used for the non-wetting phase:</p>
+<div class="math notranslate nohighlight">
+\[k_{rn} = \sqrt{1 - \bar{S}_{wn}} \left( 1 - \bar{S}_{wn}^{\frac{1}{m}} \right)^{2m}\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight">
+\[\bar{S}_{wn} = \frac{S_w - S_{wr}}{1 - S_{wr} - S_{nr}}\]</div>
+<p>and <span class="math notranslate nohighlight">\(S_{wr}\)</span> and <span class="math notranslate nohighlight">\(S_{nr}\)</span> are residual saturations of the wetting and non-wetting phases, respectively.
+Hysteresis is implemented by considering <span class="math notranslate nohighlight">\(S_{nr}\)</span> to be a variable, which is calculated from the maximum historical non-wetting phase saturation in a grid block, <span class="math notranslate nohighlight">\(S_{nmax}\)</span>.
+The user has the option to specify <span class="math notranslate nohighlight">\(S_{nr}\)</span> as a linear function of the historical <span class="math notranslate nohighlight">\(S_{nmax}\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[S_{nr} = f_{snr} S_{nmax}\]</div>
+<p>or <span class="math notranslate nohighlight">\(S_{nr}\)</span> can be calculated using a modified form of the <span id="id14"><a class="reference internal" href="../references.html#id46" title="Land, C. S. (1968). Calculation of imbibition relative permeability for two-and three-phase flow from rock properties. Society of Petroleum Engineers Journal, 8(02), 149–156.">Land, 1968</a></span> relationship</p>
+<div class="math notranslate nohighlight">
+\[S_{nr} = \frac{S_{nmax}}{1 + C S_{nmax}}\]</div>
+<p>with</p>
+<div class="math notranslate nohighlight">
+\[C = \frac{1}{S_{nrmax}} - \frac{1}{1 - S_{wr}}\]</div>
+<p>where <span class="math notranslate nohighlight">\(f_{snr}\)</span> and <span class="math notranslate nohighlight">\(S_{nrmax}\)</span>, the maximum residual non-wetting phase saturation, are user-specified material properties.
+<span class="math notranslate nohighlight">\(S_{nr}\)</span> is calculated during every Newton-Raphson iteration.
+If <span class="math notranslate nohighlight">\(S_n\)</span> drops below <span class="math notranslate nohighlight">\(S_{nr}\)</span> by dissolution or compression, <span class="math notranslate nohighlight">\(S_{nmax}\)</span> is recalculated as</p>
+<div class="math notranslate nohighlight">
+\[S_{nmax} = \frac{S_n}{f_{snr}} \text{ or } S_{nmax} = \frac{S_n}{1 - C S_n}\]</div>
+<p>Wetting-phase relative permeability (non-hysteretic) is from van Genuchten (1980)</p>
+<div class="math notranslate nohighlight">
+\[k_{rw} = \sqrt{\bar{S}_w} \left( 1 - \left( 1 - \bar{S}_w^{\frac{1}{m}}\right)^m \right)^2\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight">
+\[\bar{S}_w = \frac{S_w - S_{wr}}{S_{ws} - S_{wr}}\]</div>
+<p>Parameters:</p>
+<ul>
+<li><p><span class="math notranslate nohighlight">\(RP(1) = m\)</span> to use in <span class="math notranslate nohighlight">\(k_{rw}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(2) = S_{wr}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(3) = S_{ws}\)</span> (recommend 1)</p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(4)\)</span></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>&lt;0: <span class="math notranslate nohighlight">\(= -f_{snr}\)</span> in linear trapping model</p></li>
+<li><p>&gt;0: <span class="math notranslate nohighlight">\(S_{nrmax}\)</span> in Land trapping model</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><span class="math notranslate nohighlight">\(RP(5) = m_{gas}\)</span>, <span class="math notranslate nohighlight">\(m\)</span> to use in <span class="math notranslate nohighlight">\(k_{rn}\)</span>: if zero or blank, use <span class="math notranslate nohighlight">\(RP(1)\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(6) =\)</span> power to use in first term in <span class="math notranslate nohighlight">\(k_{rn}\)</span> (default 1/2)</p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(7)\)</span></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>=0: use <span class="math notranslate nohighlight">\(\left( 1 - \bar{S}_{wn} \right)\)</span> in first term in <span class="math notranslate nohighlight">\(k_{rn}\)</span> (Mualem, 1976)</p></li>
+<li><p>&gt;0: use <span class="math notranslate nohighlight">\(S_g\)</span> in first term in <span class="math notranslate nohighlight">\(k_{rn}\)</span> (<span id="id15"><a class="reference internal" href="../references.html#id14" title="Charbeneau, R. (2007). Distribution and Recovery Model (LDRM) Volume 1: Distribution and Recovery of Petroleum Hydrocarbon Liquids in Porous Media. American Petroleum Institute API.">Charbeneau, 2007</a></span>), so that <span class="math notranslate nohighlight">\(k_{rn}\)</span> does not go to 1 when immobile liquid phase is present</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</section>
+<section id="all-phases-perfectly-mobile-irp-31">
+<h2>All Phases Perfectly Mobile (IRP=31)<a class="headerlink" href="#all-phases-perfectly-mobile-irp-31" title="Link to this heading">#</a></h2>
+<p><span class="math notranslate nohighlight">\(k_{rg} = k_{rl} = k_{rn} = 1\)</span></p>
+<p>No parameters.</p>
+</section>
+<section id="modified-version-of-stone-s-first-three-phase-method-irp-32">
+<span id="irp32"></span><h2>Modified Version of Stone’s First Three-Phase Method (IRP=32)<a class="headerlink" href="#modified-version-of-stone-s-first-three-phase-method-irp-32" title="Link to this heading">#</a></h2>
+<p>After <span id="id16"><a class="reference internal" href="../references.html#id100" title="Stone, H. (1970). Probability model for estimating three-phase relative permeability. Journal of petroleum technology, 22(02), 214–218.">Stone, 1970</a></span>.</p>
+<div class="math notranslate nohighlight">
+\[k_{rg} = \left( \frac{S_g - S_{gr}}{1 - S_{gr}} \right)^n\]</div>
+<div class="math notranslate nohighlight">
+\[k_{rl} = \left( \frac{S_l - S_{lr}}{1 - S_{lr}} \right)^n\]</div>
+<div class="math notranslate nohighlight">
+\[k_{rn} = \left( \frac{1 - S_g - S_l - S_{nr}}{1 - S_g - S_{lr} - S_{nr}} \right) \left( \frac{1 - S_{lr} - S_{nr}}{1 - S_l - S_{nr}} \right) \left( \frac{\left( 1 - S_g - S_{lr} - S_{nr} \right)\left( 1 - S_l \right)}{1 - S_{nr}} \right)^n\]</div>
+<p>When <span class="math notranslate nohighlight">\(S_n = 1 - S_l - S_g - S_s\)</span> is near irreducible liquid saturation, <span class="math notranslate nohighlight">\(S_{nr} \le S_n \le S_{nr} + 0.005\)</span>, liquid relative permeability is taken to be</p>
+<div class="math notranslate nohighlight">
+\[k_{rn}^{'} = k_{rn} \frac{S_n - S_{nr}}{0.005}\]</div>
+<p>Parameters:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(RP(1) = S_{lr}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(2) = S_{nr}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(3) = S_{gr}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(4) = n\)</span></p></li>
+</ul>
+</section>
+<section id="three-phase-functions-of-parker-et-al-irp-33">
+<h2>Three-Phase Functions of Parker et al. (IRP=33)<a class="headerlink" href="#three-phase-functions-of-parker-et-al-irp-33" title="Link to this heading">#</a></h2>
+<p>After <span id="id17"><a class="reference internal" href="../references.html#id70" title="Parker, J., Lenhard, R., &amp; Kuppusamy, T. (1987). A parametric model for constitutive properties governing multiphase flow in porous media. Water Resources Research, 23(4), 618–624.">Parker et al., 1987</a></span>.</p>
+<div class="math notranslate nohighlight">
+\[k_{rg} = \sqrt{\bar{S}_g} \left( 1 - \left( \bar{S}_n \right)^{\frac{1}{m}} \right)^{2m}\]</div>
+<div class="math notranslate nohighlight">
+\[k_{rl} = \sqrt{\bar{S}_l} \left( 1 - \left( 1 - \left( \bar{S}_l \right)^{\frac{1}{m}} \right)^m \right)^2\]</div>
+<div class="math notranslate nohighlight">
+\[k_{rn} = \sqrt{\bar{S}_n - \bar{S}_l} \left( \left( 1 - \left( \bar{S}_l \right)^{\frac{1}{m}} \right)^m - \left( 1 - \left( \bar{S}_n \right)^{\frac{1}{m}} \right)^m \right)^2\]</div>
+<p>with</p>
+<div class="math notranslate nohighlight">
+\[m = 1 - \frac{1}{n}\]</div>
+<div class="math notranslate nohighlight">
+\[\bar{S}_g = \frac{S_g}{1 - S_m}\]</div>
+<div class="math notranslate nohighlight">
+\[\bar{S}_l = \frac{S_l - S_m}{1 - S_m}\]</div>
+<div class="math notranslate nohighlight">
+\[\bar{S}_n = \frac{S_l + S_n - S_m}{1 - S_m}\]</div>
+<p>where <span class="math notranslate nohighlight">\(k_{rg}\)</span>, <span class="math notranslate nohighlight">\(k_{rl}\)</span>, and <span class="math notranslate nohighlight">\(k_{rn}\)</span> are limited to values between 0 and 1.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(RP(1) = S_m\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(2) = n\)</span></p></li>
+</ul>
+</section>
+<section id="irp-34">
+<h2>IRP=34<a class="headerlink" href="#irp-34" title="Link to this heading">#</a></h2>
+<p>Same as <a class="reference internal" href="#irp32"><span class="std std-ref">Modified Version of Stone’s First Three-Phase Method (IRP=32)</span></a>, except that</p>
+<div class="math notranslate nohighlight">
+\[k_{rg} = 1 - \left( \frac{S_n + S_l - S_{lr}}{1 - S_{lr}} \right)^n\]</div>
+</section>
+<section id="power-law-irp-35">
+<h2>Power Law (IRP=35)<a class="headerlink" href="#power-law-irp-35" title="Link to this heading">#</a></h2>
+<p>Phases <span class="math notranslate nohighlight">\(\beta = l, n, g\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[k_{r \beta} = \left( \frac{S_{\beta} - S_{\beta r}}{1 - S_{\beta r}} \right)^n\]</div>
+<p>Parameters:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(RP(1) = S_{lr}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(2) = S_{nr}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(3) = S_{gr}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(RP(4) = n\)</span></p></li>
+</ul>
+</section>
+<section id="functions-used-by-faust-1985-for-two-phase-buckley-leverett-problem">
+<h2>Functions Used by Faust (1985) for Two-Phase Buckley-Leverett Problem<a class="headerlink" href="#functions-used-by-faust-1985-for-two-phase-buckley-leverett-problem" title="Link to this heading">#</a></h2>
+<p>After <span id="id18"><a class="reference internal" href="../references.html#id29" title="Faust, C. R. (1985). Transport of immiscible fluids within and below the unsaturated zone: a numerical model. Water Resources Research, 21(4), 587–596.">Faust, 1985</a></span>.</p>
+<div class="math notranslate nohighlight">
+\[k_{rl} = \frac{\left( S_l - 0.16 \right)^2}{0.64}\]</div>
+<div class="math notranslate nohighlight">
+\[k_{rg} = 0\]</div>
+<div class="math notranslate nohighlight">
+\[k_{rn} = \frac{\left( 0.8 - S_l \right)^2}{0.64}\]</div>
+<p>where <span class="math notranslate nohighlight">\(k_{rl}\)</span> and <span class="math notranslate nohighlight">\(k_{rn}\)</span> are limited to values between 0 and 1.</p>
+<p>No parameters.</p>
+</section>
+<section id="irp-37">
+<h2>IRP=37<a class="headerlink" href="#irp-37" title="Link to this heading">#</a></h2>
+<p>Same are <a class="reference internal" href="#irp32"><span class="std std-ref">Modified Version of Stone’s First Three-Phase Method (IRP=32)</span></a>, except a correction factor is applied to <span class="math notranslate nohighlight">\(k_{rn}\)</span> such as to make <span class="math notranslate nohighlight">\(k_{rn}\)</span> equal to <span class="math notranslate nohighlight">\(k_{rg}\)</span> for two-phase conditions with the same aqueous phase saturation.</p>
+</section>
+<section id="custom">
+<span id="relative-permeabilty-custom"></span><h2>Custom<a class="headerlink" href="#custom" title="Link to this heading">#</a></h2>
+<p>If the user wishes to employ other relative permeability relationships, these need to be programmed into subroutine <em>RELP</em> in module <em>Utility.f90</em>.
+The routine has the following structure:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">SUBROUTINE </span><span class="n">RELP</span><span class="p">(</span><span class="n">SATU</span><span class="p">,</span><span class="n">RELPERM</span><span class="p">,</span><span class="n">NNPH</span><span class="p">,</span><span class="n">NMAT</span><span class="p">,</span><span class="n">USRX</span><span class="p">)</span>
+<span class="w">    </span><span class="p">...</span>
+<span class="w">    </span><span class="n">RELP_FUNCTION</span><span class="p">:</span><span class="w"> </span><span class="k">SELECT CASE</span><span class="w"> </span><span class="p">(</span><span class="n">IRP</span><span class="p">(</span><span class="n">NMAT</span><span class="p">))</span>
+<span class="w">            </span><span class="k">CASE</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">                    </span><span class="k">CALL </span><span class="n">RELP_LINEAR</span><span class="p">(...)</span>
+<span class="w">            </span><span class="k">CASE</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="w">                    </span><span class="p">...</span>
+<span class="w">            </span><span class="p">...</span>
+<span class="w">            </span><span class="p">...</span>
+<span class="w">            </span><span class="k">END SELECT </span><span class="n">RELP_FUNCTION</span>
+
+<span class="k">END</span>
+</pre></div>
+</div>
+<p>To code an additional relative permeability function, the user needs to insert a code segment analogous to that shown above, beginning with a CASE option which would be identical to <code class="docutils literal notranslate"><span class="pre">IRP</span></code> and calls a subroutine for the additional relative permeability function.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="output_from_tough3.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Output from TOUGH3</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="capillary_pressure_functions.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Capillary Pressure Functions</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linear-functions-irp-1">Linear Functions (IRP=1)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#irp-2">IRP=2</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#corey-s-curves-irp-3">Corey’s Curves (IRP=3)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grant-s-curves-irp-4">Grant’s Curves (IRP=4)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#all-phases-perfectly-mobile-irp-5">All Phases Perfectly Mobile (IRP=5)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functions-of-fatt-and-klikoff-irp-6">Functions of Fatt and Klikoff (IRP=6)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#van-genuchten-mualem-model-irp-7">van Genuchten-Mualem Model (IRP=7)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functions-of-verma-et-al-irp-8">Functions of Verma et al. (IRP=8)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modified-brooks-corey-model-irp-10">Modified Brooks-Corey Model (IRP=10)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modified-van-genuchten-model-irp-11">Modified van Genuchten Model (IRP=11)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#regular-hysteresis-irp-12">Regular Hysteresis (IRP=12)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#simple-hysteresis-irp-13">Simple Hysteresis (IRP=13)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#all-phases-perfectly-mobile-irp-31">All Phases Perfectly Mobile (IRP=31)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modified-version-of-stone-s-first-three-phase-method-irp-32">Modified Version of Stone’s First Three-Phase Method (IRP=32)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#three-phase-functions-of-parker-et-al-irp-33">Three-Phase Functions of Parker et al. (IRP=33)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#irp-34">IRP=34</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#power-law-irp-35">Power Law (IRP=35)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functions-used-by-faust-1985-for-two-phase-buckley-leverett-problem">Functions Used by Faust (1985) for Two-Phase Buckley-Leverett Problem</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#irp-37">IRP=37</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#custom">Custom</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/tough3/guide/relative_permeability_functions.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023, Keurfon Luu.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

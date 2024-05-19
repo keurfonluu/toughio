@@ -1,0 +1,779 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Numerical Methods &#8212; toughio 1.15.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=8fbebee6" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../../_static/documentation_options.js?v=70d5d4a5"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tough3/guide/numerical_methods';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Initial and Boundary Conditions" href="initial_and_boundary_conditions.html" />
+    <link rel="prev" title="Governing Equations" href="governing_equations.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../_static/logo-light.png" class="logo__image only-light" alt="toughio 1.15.0 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="toughio 1.15.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        TOUGH3
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        TOUGH3
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../install/index.html">Installation</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../install/linux.html">Installation on Linux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../install/windows.html">Installation on Windows</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">User Guide</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="governing_equations.html">Governing Equations</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Numerical Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="initial_and_boundary_conditions.html">Initial and Boundary Conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="preparation_of_input_data.html">Preparation of Input Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="output_from_tough3.html">Output from TOUGH3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="relative_permeability_functions.html">Relative Permeability Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capillary_pressure_functions.html">Capillary Pressure Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../eos/index.html">EOS</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos1.html">EOS1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos2.html">EOS2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos3.html">EOS3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos4.html">EOS4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos5.html">EOS5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos7.html">EOS7</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos7r.html">EOS7R</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos8.html">EOS8</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eos9.html">EOS9</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/ewasg.html">EWASG</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eos/eco2n.html">ECO2N</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">TOUGH3</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">User Guide</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Numerical Methods</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="numerical-methods">
+<span id="id1"></span><h1>Numerical Methods<a class="headerlink" href="#numerical-methods" title="Link to this heading">#</a></h1>
+<section id="space-and-time-discretization">
+<h2>Space and Time Discretization<a class="headerlink" href="#space-and-time-discretization" title="Link to this heading">#</a></h2>
+<p>TOUGH3 uses an integral finite difference method for space discretization, and first-order fully implicit time differencing.
+The resulting strongly coupled, nonlinear algebraic equations are solved simultaneously using Newton-Raphson iterations for each time step, which involves the calculation of a Jacobian matrix and the solution of a set of linear equations.
+Time steps are automatically adjusted during a simulation run, depending on the convergence rate of the iteration process.
+Newton-Raphson increment weighting can also be adjusted if the iterations oscillate.</p>
+<p>The continuum equations Eq. <a class="reference internal" href="governing_equations.html#equation-eq-1">(1)</a> are discretized in space using the integral finite difference method (IFD; <span id="id2"><a class="reference internal" href="../references.html#id61" title="Narasimhan, T., &amp; Witherspoon, P. (1976). An integrated finite difference method for analyzing fluid flow in porous media. Water Resources Research, 12(1), 57–64.">Narasimhan &amp; Witherspoon, 1976</a></span>).
+Introducing appropriate volume averages, we have</p>
+<div class="math notranslate nohighlight" id="equation-eq-31">
+<span class="eqno">(31)<a class="headerlink" href="#equation-eq-31" title="Link to this equation">#</a></span>\[\int_{V_n} M dV = V_n M_n\]</div>
+<p>where <span class="math notranslate nohighlight">\(M\)</span> is a volume-normalized extensive quantity, and <span class="math notranslate nohighlight">\(M_n\)</span> is the average value of <span class="math notranslate nohighlight">\(M\)</span> over <span class="math notranslate nohighlight">\(V_n\)</span>.</p>
+<p>Surface integrals are approximated as a discrete sum of averages over surface segments <span class="math notranslate nohighlight">\(A_{nm}\)</span>:</p>
+<div class="math notranslate nohighlight" id="equation-eq-32">
+<span class="eqno">(32)<a class="headerlink" href="#equation-eq-32" title="Link to this equation">#</a></span>\[\int_{\Gamma_n} \boldsymbol{\mathrm{F}}^{\kappa} \cdot \boldsymbol{\mathrm{n}} d\Gamma_n = \sum_{m} A_{nm} F_{nm}\]</div>
+<p>Here, <span class="math notranslate nohighlight">\(F_{nm}\)</span> is the average value of the (inward) normal component of <span class="math notranslate nohighlight">\(\boldsymbol{\mathrm{F}}\)</span> over the surface segment
+<span class="math notranslate nohighlight">\(A_{nm}\)</span> between volume elements <span class="math notranslate nohighlight">\(V_n\)</span> and <span class="math notranslate nohighlight">\(V_m\)</span>.
+The discretization approach used in the integral finite difference method and the definition of the geometric parameters are illustrated in Figure <a class="reference internal" href="#fig-1"><span class="std std-numref">2</span></a>.</p>
+<figure class="align-center" id="fig-1">
+<img alt="../../_images/figure_1.png" src="../../_images/figure_1.png" />
+<figcaption>
+<p><span class="caption-number">Figure 2 </span><span class="caption-text">Space discretization and geometry data in the integral finite difference method.</span><a class="headerlink" href="#fig-1" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>The discretized flux is expressed in terms of averages over parameters for elements <span class="math notranslate nohighlight">\(V_n\)</span> and <span class="math notranslate nohighlight">\(V_m\)</span>.
+For the basic Darcy flux term, Eq. <a class="reference internal" href="governing_equations.html#equation-eq-5">(5)</a>, we have</p>
+<div class="math notranslate nohighlight" id="equation-eq-33">
+<span class="eqno">(33)<a class="headerlink" href="#equation-eq-33" title="Link to this equation">#</a></span>\[F_{\beta, nm} = -k_{nm} \left( \frac{k_{r \beta} \rho_{\beta}}{\mu_{\beta}} \right)_{nm} \left( \frac{P_{\beta, n} - P_{\beta, m}}{D_{nm}} \rho_{\beta, nm} g_{nm} \right)\]</div>
+<p>where the subscripts <span class="math notranslate nohighlight">\((nm)\)</span> denote a suitable averaging at the interface between grid blocks <span class="math notranslate nohighlight">\(n\)</span> and <span class="math notranslate nohighlight">\(m\)</span> (such as interpolation, harmonic weighting, and upstream weighting, which will be discussed in Section <a class="reference internal" href="#interface-weighting-schemes"><span class="std std-ref">Interface Weighting Schemes</span></a>).
+<span class="math notranslate nohighlight">\(D_{nm} = D_n + D_m\)</span> is the distance between the nodal points <span class="math notranslate nohighlight">\(n\)</span> and <span class="math notranslate nohighlight">\(m\)</span>, and <span class="math notranslate nohighlight">\(g_{nm}\)</span> is the component of gravitational acceleration in the direction from <span class="math notranslate nohighlight">\(m\)</span> to <span class="math notranslate nohighlight">\(n\)</span>.</p>
+<p>Space discretization of diffusive flux in multiphase conditions raises some subtle issues.
+A finite difference formulation for total diffusive flux, Eq. <a class="reference internal" href="governing_equations.html#equation-eq-11">(11)</a>, may be written as</p>
+<div class="math notranslate nohighlight" id="equation-eq-34">
+<span class="eqno">(34)<a class="headerlink" href="#equation-eq-34" title="Link to this equation">#</a></span>\[\left( f^{\kappa} \right)_{nm} = - \left( \Sigma_l^{\kappa} \right)_{nm} \frac{\left( X_l^{\kappa} \right)_m - \left( X_l^{\kappa} \right)_n}{D_{nm}} - \left( \Sigma_g^{\kappa} \right)_{nm} \frac{\left( X_g^{\kappa} \right)_m - \left( X_g^{\kappa} \right)_n}{D_{nm}}\]</div>
+<p>This expression involves the as yet unknown diffusive strength coefficients <span class="math notranslate nohighlight">\(\left( \Sigma_l^{\kappa} \right)_{nm}\)</span> and <span class="math notranslate nohighlight">\(\left( \Sigma_g^{\kappa} \right)_{nm}\)</span> at the interface, which must be expressed in terms of the strength coefficients in the participating grid blocks.
+Invoking conservation of diffusive flux across the interface between two grid blocks leads in the usual way to the requirement of harmonic weighting of the diffusive strength coefficients.
+However, such weighting may in general not be applied separately to the diffusive fluxes in gas and liquid phases, because these may be strongly coupled by phase partitioning effects.
+This can be seen by considering the extreme case of diffusion of a water-soluble and volatile compound from a grid block in single-phase gas conditions to an adjacent grid block which is in single-phase liquid conditions.
+Harmonic weighting applied separately to liquid and gas diffusive fluxes would
+result in either of them being zero, because for each phase effective diffusivity is zero on one side of the interface.
+Thus total diffusive flux would vanish in this case, which is unphysical.
+In reality, tracer would diffuse through the gas phase to the gas-liquid interface, would establish a certain mass fraction in the aqueous phase by dissolution, and would then proceed to diffuse away from the interface through the aqueous phase.
+Similar arguments can be made in the less extreme situation where liquid saturation changes from a large to a small value rather than from 1 to 0, as may be the case in the capillary fringe, during infiltration events, or at fracture-matrix interfaces in variably saturated media.</p>
+<p>TOUGH3 features a fully coupled approach in which the space-discretized version Eq. <a class="reference internal" href="#equation-eq-34">(34)</a> of the total multiphase diffusive flux Eq. <a class="reference internal" href="governing_equations.html#equation-eq-11">(11)</a> is re-written in terms of an effective multiphase diffusive strength coefficient and a single mass fraction gradient.
+Choosing the liquid mass fraction for this we have</p>
+<div class="math notranslate nohighlight" id="equation-eq-35">
+<span class="eqno">(35)<a class="headerlink" href="#equation-eq-35" title="Link to this equation">#</a></span>\[\left( f^{\kappa} \right)_{nm} = - \left\{ \Sigma_l^{\kappa} + \Sigma_g^{\kappa} \frac{\left( X_g^{\kappa} \right)_m - \left( X_g^{\kappa} \right)_n}{\left( X_l^{\kappa} \right)_m - \left( X_l^{\kappa} \right)_n} \right\}_{nm} \frac{\left( X_l^{\kappa} \right)_m - \left( X_l^{\kappa} \right)_n}{D_{nm}}\]</div>
+<p>where the gas phase mass fraction gradient has been absorbed into the effective diffusive strength term (in braces).
+As is well known, flux conservation at the interface then leads to the requirement of harmonic weighting for the full effective strength coefficient. In order to be able to apply this scheme to the general case where not both phases may be present on both sides of the interface, we always define both liquid and gas phase mass fractions in all grid blocks, regardless of whether
+both phases are present.
+Mass fractions are assigned in such a way as to be consistent with what would be present in an evolving second phase.
+This procedure is applicable to all possible phase combinations, including the extreme case where conditions at the interface change from single-phase gas to single-phase liquid.
+Note that, if the diffusing tracer exists in just one of the two phases, harmonic weighting of the strength coefficient in Eq. <a class="reference internal" href="#equation-eq-35">(35)</a> will reduce to harmonic weighting of either <span class="math notranslate nohighlight">\(\Sigma_l^{\kappa}\)</span> or <span class="math notranslate nohighlight">\(\Sigma_g^{\kappa}\)</span>.
+The simpler scheme of separate harmonic weighting for individual phase diffusive fluxes is retained as an option.</p>
+<p>Substituting Eqs. <a class="reference internal" href="#equation-eq-31">(31)</a> and <a class="reference internal" href="#equation-eq-32">(32)</a> into the governing Eq. <a class="reference internal" href="governing_equations.html#equation-eq-1">(1)</a>, a set of first-order ordinary differential equations in time is obtained:</p>
+<div class="math notranslate nohighlight" id="equation-eq-36">
+<span class="eqno">(36)<a class="headerlink" href="#equation-eq-36" title="Link to this equation">#</a></span>\[\frac{dM_n^{\kappa}}{dt} = \frac{1}{V_n} \sum_m A_{nm} F_{nm}^{\kappa} + q_n^{\kappa}\]</div>
+<p>Time is discretized as a first-order finite difference, and the flux and sink and source terms on the right-hand side of Eq. <a class="reference internal" href="#equation-eq-36">(36)</a> are evaluated at the new time level, <span class="math notranslate nohighlight">\(t^{k + l} = t^k + \Delta t\)</span>, to obtain the numerical stability needed for an efficient calculation of multiphase flow.
+This treatment of flux terms is known as “fully implicit”, because the fluxes are expressed in terms of the unknown thermodynamic parameters at time level <span class="math notranslate nohighlight">\(k + 1\)</span>, so that these unknowns are only implicitly defined in the resulting equations (see, e.g., <span id="id3"><a class="reference internal" href="../references.html#id72" title="Peaceman, D. W. (2000). Fundamentals of numerical reservoir simulation. Elsevier.">Peaceman, 2000</a></span>).
+The time discretization results in the following set of coupled nonlinear, algebraic equations</p>
+<div class="math notranslate nohighlight" id="equation-eq-37">
+<span class="eqno">(37)<a class="headerlink" href="#equation-eq-37" title="Link to this equation">#</a></span>\[R_n^{\kappa, k+1} = M_n^{\kappa, k+1} - R_n^{\kappa, k} \frac{\Delta t}{V_n} \left( \sum_m A_{nm} F_{nm}^{\kappa, k+1} + V_n q_n^{\kappa, k+1} \right) = 0\]</div>
+<p>where we have introduced residuals <span class="math notranslate nohighlight">\(R_n^{\kappa, k+1}\)</span>.
+For each volume element (grid block) <span class="math notranslate nohighlight">\(V_n\)</span>, there are <span class="math notranslate nohighlight">\(NEQ\)</span> mass and heat balance equations (<span class="math notranslate nohighlight">\(\kappa = 1, 2, ..., NEQ\)</span>, where <span class="math notranslate nohighlight">\(NEQ\)</span> represents the number of equations per grid block).
+For a flow system with <span class="math notranslate nohighlight">\(NEL\)</span> grid blocks, Eq. <a class="reference internal" href="#equation-eq-37">(37)</a> represents a total of <span class="math notranslate nohighlight">\(NEL \times NEQ\)</span> coupled nonlinear equations.
+The unknowns are the <span class="math notranslate nohighlight">\(NEL \times NEQ\)</span> independent primary variables <span class="math notranslate nohighlight">\(\left\{ x_i; i = 1, ..., NEL \times NEQ \right\}\)</span> which completely define the state of the flow system at time <span class="math notranslate nohighlight">\(t^{k + l}\)</span>.
+These equations are solved by Newton-Raphson iteration, which is implemented as follows.
+We introduce an iteration index <span class="math notranslate nohighlight">\(p\)</span> and expand the residuals <span class="math notranslate nohighlight">\(R_n^{\kappa, k+1}\)</span> in Eq. <a class="reference internal" href="#equation-eq-37">(37)</a> at iteration step <span class="math notranslate nohighlight">\(p + 1\)</span> in a Taylor series in terms of the residuals at index <span class="math notranslate nohighlight">\(p\)</span>.</p>
+<div class="math notranslate nohighlight" id="equation-eq-38">
+<span class="eqno">(38)<a class="headerlink" href="#equation-eq-38" title="Link to this equation">#</a></span>\[R_n^{\kappa, k+1} \left( x_{i, p+1} \right) = R_n^{\kappa, k+1} \left( x_{i, p} \right) + \sum_i \frac{\partial R_n^{\kappa, k+1}}{\partial x_i} \bigg|_p \left( x_{i, p+1} - x_{i, p} \right) + ... = 0\]</div>
+<p>Retaining only terms up to first order, we obtain a set of <span class="math notranslate nohighlight">\(NEL \times NEQ\)</span> linear equations for the increments <span class="math notranslate nohighlight">\(\left( x_{i, p+1} - x_{i, p} \right)\)</span>:</p>
+<div class="math notranslate nohighlight" id="equation-eq-39">
+<span class="eqno">(39)<a class="headerlink" href="#equation-eq-39" title="Link to this equation">#</a></span>\[- \sum_i \frac{\partial R_n^{\kappa, k+1}}{\partial x_i} \bigg|_p \left( x_{i, p+1} - x_{i, p} \right) = R_n^{\kappa, k+1} \left( x_{i, p} \right)\]</div>
+<p>All terms <span class="math notranslate nohighlight">\(\partial R_n / \partial x_i\)</span> in the Jacobian matrix are evaluated by numerical differentiation.
+Eq. <a class="reference internal" href="#equation-eq-39">(39)</a> is solved by the linear equations solver selected.
+Iteration is continued until the residuals <span class="math notranslate nohighlight">\(R_n^{\kappa, k+1}\)</span> are reduced below a preset convergence tolerance.</p>
+<div class="math notranslate nohighlight" id="equation-eq-40">
+<span class="eqno">(40)<a class="headerlink" href="#equation-eq-40" title="Link to this equation">#</a></span>\[\left\vert \frac{R_{n, p+1}^{\kappa, k+1}}{M_{n, p+1}^{\kappa, k+1}} \right\vert \le \varepsilon_1\]</div>
+<p>The default (relative) convergence criterion is <span class="math notranslate nohighlight">\(\varepsilon_1 = 10^{-5}\)</span>.
+When the accumulation terms are smaller than <span class="math notranslate nohighlight">\(\varepsilon_2\)</span> (default <span class="math notranslate nohighlight">\(\varepsilon_2 = 1\)</span>), an absolute convergence criterion is imposed.</p>
+<div class="math notranslate nohighlight" id="equation-eq-41">
+<span class="eqno">(41)<a class="headerlink" href="#equation-eq-41" title="Link to this equation">#</a></span>\[\left\vert R_n^{\kappa, k+1} \right\vert \le \varepsilon_1 \cdot \varepsilon_2\]</div>
+<p>Convergence is usually attained in 3 to 4 iterations.
+If convergence cannot be achieved within a certain number of iterations (default 8), the time step size <span class="math notranslate nohighlight">\(\Delta t\)</span> is reduced and a new iteration process is started.</p>
+<p>It is appropriate to add some comments about this space discretization technique.
+The entire geometric information of the space discretization in Eq. <a class="reference internal" href="#equation-eq-37">(37)</a> is provided in the form of a list of grid block volumes <span class="math notranslate nohighlight">\(V_n\)</span>, interface areas <span class="math notranslate nohighlight">\(A_{nm}\)</span>, nodal distances <span class="math notranslate nohighlight">\(D_{nm}\)</span> and components <span class="math notranslate nohighlight">\(g_{nm}\)</span> of gravitational acceleration along nodal lines.
+There is no reference whatsoever to a global system of coordinates, or to the dimensionality of a particular flow problem.
+The discretized equations are in fact valid for arbitrary irregular discretizations in one, two or three dimensions, and for porous as well as for fractured media.
+This flexibility should be used with caution, however, because the accuracy of solutions depends upon the accuracy with which the various interface parameters in equations such as Eq. <a class="reference internal" href="#equation-eq-33">(33)</a> can be expressed in terms of average conditions in grid blocks.
+A general requirement is that there exists approximate thermodynamic equilibrium in (almost) all grid blocks at (almost) all times (<span id="id4"><a class="reference internal" href="../references.html#id88" title="Pruess, K., &amp; Narasimhan, T. (1985). A practical method for modeling fluid and heat flow in fractured porous media. Society of Petroleum Engineers Journal, 25(01), 14–26.">Pruess &amp; Narasimhan, 1985</a></span>).
+For systems of regular grid blocks referenced to global coordinates (such as <span class="math notranslate nohighlight">\(r-z\)</span> or <span class="math notranslate nohighlight">\(x-y-z\)</span>), Eq. <a class="reference internal" href="#equation-eq-37">(37)</a> is identical to a conventional finite difference formulation (e.g., <span id="id5"><a class="reference internal" href="../references.html#id56" title="Moridis, G. J. (1992). TOUGH Simulations of the Updegraff's Set of Fluid and Heat Flow Problems. Lawrence Berkeley National Lab.(LBNL), Berkeley, CA (United States).">Moridis, 1992</a>, <a class="reference internal" href="../references.html#id72" title="Peaceman, D. W. (2000). Fundamentals of numerical reservoir simulation. Elsevier.">Peaceman, 2000</a></span>).</p>
+</section>
+<section id="interface-weighting-schemes">
+<span id="id6"></span><h2>Interface Weighting Schemes<a class="headerlink" href="#interface-weighting-schemes" title="Link to this heading">#</a></h2>
+<p>To obtain a reasonably accurate and efficient solution, particularly for multiphase fluid and heat flow problems, a proper interface weighting scheme should be used.
+It is well known that for single-phase flow, the appropriate interface weighting scheme for absolute permeability is harmonic weighting.
+For two-phase flow, the added problem of relative permeability weighting arises.
+It has been established that for transient flow problems in homogeneous media, relative permeability must be upstream weighted, or else phase fronts may be propagated with erroneous speed (<span id="id7"><a class="reference internal" href="../references.html#id6" title="Aziz, K., &amp; Settari, A. (1979). Petroleum reservoir simulation. 1979. Applied Science Publ. Ltd., London, UK.">Aziz &amp; Settari, 1979</a></span>).
+Studies at the Lawrence Berkeley National Laboratory have shown that for transient two-phase problems in composite (layered) media, both absolute and relative permeability must be fully upstream weighted to avoid the possibility of gross errors (<span id="id8"><a class="reference internal" href="../references.html#id103" title="Tsang, Y., &amp; Pruess, K. (1990). Further modeling studies of gas movement and moisture migration at Yucca Mountain, Nevada. Lawrence Berkeley National Lab.(LBNL), Berkeley, CA (United States).">Tsang &amp; Pruess, 1990</a>, <a class="reference internal" href="../references.html#id118" title="Wu, Y.-S., Pruess, K., &amp; Chen, Z. (1993). Buckley-leverett flow in composite porous media. SPE Advanced Technology Series, 1(02), 36–42.">Wu et al., 1993</a></span>).
+The applicable weighting schemes for different flow problems are
+summarized in <a class="reference internal" href="#fig-2"><span class="std std-numref">Figure 3</span></a>.
+There is no single weighting scheme for general two-phase flows in composite media that would at the same time preserve optimal accuracy for single-phase or steady two-phase flows.</p>
+<figure class="align-center" id="fig-2">
+<a class="reference internal image-reference" href="../../_images/figure_2.png"><img alt="../../_images/figure_2.png" src="../../_images/figure_2.png" style="width: 50%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Figure 3 </span><span class="caption-text">Weighting procedures for absolute (<span class="math notranslate nohighlight">\(k\)</span>) and relative permeability (<span class="math notranslate nohighlight">\(k_r\)</span>) at grid block interfaces.</span><a class="headerlink" href="#fig-2" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>For modeling of fracture-matrix interaction, a different weighting scheme can be applied.
+If a zero nodal distance is specified, the absolute (and relative, if <code class="docutils literal notranslate"><span class="pre">MOP2(7)</span></code> &gt; 0) permeability from the other element is used for assignment of interface mobilities.</p>
+<p>Another interesting problem is the weighting scheme for interface densities.
+For proper modeling of gravity effects, it is necessary to define interface density as the arithmetic average between the densities of the two adjacent grid blocks, regardless of nodal distances from the interface.
+An unstable situation may arise when phases (dis-)appear, because interface density may then have to be “switched” to the upstream value when the phase in question is not present in the downstream block.
+For certain flow problems, spatial interpolation of densities may provide more accurate answers.</p>
+<p>Issues of interface weighting and associated discretization errors are especially important when non-uniform or irregular grids are used.
+Additional complications related to interface weighting arise in flow problems that involve hydrodynamic instabilities.
+Examples include immiscible displacements with unfavorable mobility ratio where a less viscous fluid displaces a fluid of higher viscosity (viscous instability), and flow problems where a denser fluid invades a zone with less dense fluid from above (gravity instability).
+These instabilities can produce very large grid orientation errors, i.e., simulated results can depend strongly on the orientation of the computational grid (<span id="id9"><a class="reference internal" href="../references.html#id81" title="Pruess, K. (1991). TOUGH2: A general-purpose numerical simulator for multiphase nonisothermal flows. Lawrence Berkeley National Lab.(LBNL), Berkeley, CA (United States).">Pruess, 1991</a>, <a class="reference internal" href="../references.html#id87" title="Pruess, K., &amp; Bodvarsson, F. (1983). A seven-point finite difference method for improved grid orientation performance in pattern steamfloods. SPE Reservoir Simulation Symposium.">Pruess &amp; Bodvarsson, 1983</a>, <a class="reference internal" href="../references.html#id119" title="Yanosik, J., &amp; McCracken, T. (1979). A nine-point, finite-difference reservoir simulator for realistic prediction of adverse mobility ratio displacements. Society of Petroleum Engineers Journal, 19(04), 253–262.">Yanosik &amp; McCracken, 1979</a></span>).</p>
+<p>In some cases, it may be advisable to use higher-order differencing schemes.
+Grid orientation effects can be reduced by using 7-point or 9-point differencing instead of the common 5-point “stencil”, to achieve a higher degree of rotational invariance in the finite difference approximations of the fundamental differential operators.
+In the integral finite difference method, these higher-order schemes can be implemented through preprocessing of geometry data, without any coding changes, by assigning additional flow connections with appropriate weighting factors between elements of the computational grid (<span id="id10"><a class="reference internal" href="../references.html#id81" title="Pruess, K. (1991). TOUGH2: A general-purpose numerical simulator for multiphase nonisothermal flows. Lawrence Berkeley National Lab.(LBNL), Berkeley, CA (United States).">Pruess, 1991</a>, <a class="reference internal" href="../references.html#id87" title="Pruess, K., &amp; Bodvarsson, F. (1983). A seven-point finite difference method for improved grid orientation performance in pattern steamfloods. SPE Reservoir Simulation Symposium.">Pruess &amp; Bodvarsson, 1983</a></span>).
+However, reduction or elimination of grid orientation effects as such does not necessarily achieve a better numerical approximation.
+It may just amount to reducing the anisotropy of space discretization errors but not their magnitude, creating an illusion of a better approximation by making space discretization effects less obvious (<span id="id11"><a class="reference internal" href="../references.html#id81" title="Pruess, K. (1991). TOUGH2: A general-purpose numerical simulator for multiphase nonisothermal flows. Lawrence Berkeley National Lab.(LBNL), Berkeley, CA (United States).">Pruess, 1991</a></span>).</p>
+</section>
+<section id="linear-equation-solvers">
+<span id="id12"></span><h2>Linear Equation Solvers<a class="headerlink" href="#linear-equation-solvers" title="Link to this heading">#</a></h2>
+<p>TOUGH3 offers a choice of linear solvers: the internal serial linear solvers of TOUGH2, the parallel Aztec solvers (<span id="id13"><a class="reference internal" href="../references.html#id104" title="Tuminaro, R. S., Heroux, M., Hutchinson, S. A., &amp; Shadid, J. N. (1999). Official aztec user's guide: version 2.1. Sandia National Laboratories, Albuquerque, NM, 87185.">Tuminaro et al., 1999</a></span>; used in TOUGH2-MP), and all the serial and parallel solvers available in Portable, Extensible Toolkit for Scientific Computation (PETSc) (<span id="id14"><a class="reference internal" href="../references.html#id7" title="Balay, S., Abhyankar, S., Adams, M. F., Brown, J., Brune, P., Buschelman, K., … others. (2016). Petsc users manual (tech. rep. anl-95/11-revision 3.7). Argonne National Laboratory.">Balay et al., 2016</a></span>).
+TOUGH3 provides a common interface to all three sources of linear solvers, allowing users to experiment with different solvers and their preconditioners, and to determine the most efficient method for the problem of interest.
+In addition, there is no restriction on using the Aztec and PETSc solvers in serial mode. Moreover, the internal serial solvers included in TOUGH3 are updated with a new sorting algorithm (private communication, Navarro, 2015), which results in a performance gain up to 30% when compared with the serial solvers in TOUGH2 (actual performance gains are problem-specific).
+The different linear equation solvers included in the TOUGH3 package can be selected by means of parameter <code class="docutils literal notranslate"><span class="pre">MOP(21)</span></code> in data block <strong>PARAM.1</strong> (see Section 8.2).</p>
+<section id="internal-serial-solvers">
+<h3>Internal serial solvers<a class="headerlink" href="#internal-serial-solvers" title="Link to this heading">#</a></h3>
+<p>The most reliable linear equation solvers are based on direct methods, while the performance of iterative techniques tends to be problem-specific and lacks the predictability of direct solvers.
+The robustness of direct solvers comes at the expense of large storage requirements and execution times that typically increase proportional to <span class="math notranslate nohighlight">\(N^3\)</span>, where <span class="math notranslate nohighlight">\(N\)</span> is the number of equations to be solved.
+In contrast, iterative solvers have much lower memory requirements, and their computational work increases much less rapidly with problem size, approximately proportional to <span class="math notranslate nohighlight">\(N^{\omega}\)</span>, with <span class="math notranslate nohighlight">\(\omega \approx 1.4 - 1.6\)</span> (<span id="id15"><a class="reference internal" href="../references.html#id57" title="Moridis, G. J., &amp; Pruess, K. (1995). Flow and transport simulations using T2CG1, a package of conjugate gradient solvers for the TOUGH2 family of codes. Lawrence Berkeley National Lab.(LBNL), Berkeley, CA (United States).">Moridis &amp; Pruess, 1995</a></span>).
+For large problems (especially 3D problems with more than several thousand volume elements), iterative conjugate gradient (CG) type solvers are therefore the method of choice.
+Technical details of the serial methods and their performance can be found in <span id="id16"><a class="reference internal" href="../references.html#id58" title="Moridis, G. J., &amp; Pruess, K. (1998). T2solv: an enhanced package of solvers for the tough2 family of reservoir simulation codes. Geothermics, 27(4), 415–444.">Moridis &amp; Pruess, 1998</a></span>.</p>
+<p>TOUGH3 includes several internal serial solvers: one direct solver, LUBAND, and four iterative solvers, DSLUBC (bi-conjugate gradient solver), DSLUCS (Lanczos-type bi-conjugate gradient solver), DSLUGM (generalized minimum residual solver), and DLUSTB (stabilized bi-conjugate gradient solver).
+By default, TOUGH3 uses DSLUCS with incomplete LU-factorization as preconditioner for serial runs.
+Users need to beware that iterative methods may fail for matrices with special features, such as many zeros on the main diagonal, large numerical range of matrix elements, and nearly linearly dependent rows or columns.
+Depending on features of the problem at hand, appropriate matrix preconditioning may be essential to achieve convergence.
+Poor accuracy of the linear equation solution will lead to deteriorated convergence rates for the Newton-Raphson iteration, and an increase in the number of iterations for a given time step.
+In severe cases, time steps may fail with residuals either stagnating or wildly fluctuating.
+Users experiencing difficulties with the default settings are encouraged to experiment with the various solvers and preconditioners included in the TOUGH3 package.</p>
+<p>All iterative solvers use incomplete LU-factorization as a preconditioner.
+Alternative preconditioners and iteration parameters can be selected by means of an optional data block <strong>SOLVR</strong> in the TOUGH3 input file.
+If <strong>SOLVR</strong> is present, its specifications will override the choices made by <code class="docutils literal notranslate"><span class="pre">MOP(21)</span></code>.
+The default preconditioning with SOLVR is also incomplete LU-factorization.</p>
+<p>The solver DLUSTB implements the BiCGSTAB(m) algorithm (<span id="id17"><a class="reference internal" href="../references.html#id94" title="Sleijpen, G. L., &amp; Fokkema, D. R. (1993). Bicgstab (ell) for linear equations involving unsymmetric matrices with complex spectrum. Electronic Transactions on Numerical Analysis., 1, 11–32.">Sleijpen &amp; Fokkema, 1993</a></span>), an extension of the BiCGSTAB algorithm of <span id="id18"><a class="reference internal" href="../references.html#id106" title="van der Vorst, H. (1992). Bi-cgstab: a fast and smoothly converging variant of bicg in the presence of rounding errors. SIAM J. Sci. Statist. Comput, 13, 631–644.">Vorst, 1992</a></span>.
+DLUSTB provides improved convergence behavior when iterations are started close to the solution, i.e., near steady state.
+The preconditoning algorithms (the Z-preprocessors) can cope with difficult problems in which many of the Jacobian matrix elements on the main diagonal are zero.
+An example is the “two-waters” problem with EOS1 in which typically 2/3 of the elements in the main diagonal are zero.
+<span id="id19"><a class="reference internal" href="../references.html#id58" title="Moridis, G. J., &amp; Pruess, K. (1998). T2solv: an enhanced package of solvers for the tough2 family of reservoir simulation codes. Geothermics, 27(4), 415–444.">Moridis &amp; Pruess, 1998</a></span> show that this type of problem can be solved by choosing appropriate pre-processing options.</p>
+</section>
+<section id="petsc-solvers">
+<h3>PETSc solvers<a class="headerlink" href="#petsc-solvers" title="Link to this heading">#</a></h3>
+<p>TOUGH3 provides access to PETSc-based sparse and dense linear solvers.
+In many cases, the PETSc solvers are more efficient than the original serial solvers and the Aztec solvers.
+Since PETSc is being continually updated, users should consult PETSc’s documentation (<a class="reference external" href="http://www.mcs.anl.gov/petsc/documentation/index.html">http://www.mcs.anl.gov/petsc/documentation/index.html</a>) and the summary of the linear solvers available from PETSc (<a class="reference external" href="http://www.mcs.anl.gov/petsc/documentation/linearsolvertable.html">http://www.mcs.anl.gov/petsc/documentation/linearsolvertable.html</a>) for a list of updated Krylov subspace algorithms and preconditioners <a class="footnote-reference brackets" href="#id21" id="id20" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a>.</p>
+<p>The current default PETSc solver is the bi-conjugate gradient method with incomplete LU factorization as the preconditioner.
+Different Krylov subspace algorithms and preconditioners can be selected through the specification of a PETSc option file (<cite>.petscrc</cite>), an example of which is shown below:</p>
+<div class="literal-block-wrapper docutils container" id="id22">
+<div class="code-block-caption"><span class="caption-number">Listing 1 </span><span class="caption-text">An example of the PETSc option file (<code class="docutils literal notranslate"><span class="pre">.petscrc</span></code>).</span><a class="headerlink" href="#id22" title="Link to this code">#</a></div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># monitor solves</span>
+<span class="o">-</span><span class="n">ksp_monitor</span>
+<span class="c1"># biconjugate gradient</span>
+<span class="o">-</span><span class="n">ksp_type</span> <span class="n">bicg</span>
+<span class="c1"># additive Schwarz preconditioner</span>
+<span class="o">-</span><span class="n">pc_type</span> <span class="n">asm</span>
+<span class="c1"># relative tolerance</span>
+<span class="o">-</span><span class="n">ksp_rtol</span> <span class="mf">1e-7</span>
+</pre></div>
+</div>
+</div>
+<p>Commonly used options are shown in Table <a class="reference internal" href="#tab-2"><span class="std std-numref">Table 1</span></a>.</p>
+<table class="table table-center" id="tab-2">
+<caption><span class="caption-number">Table 1 </span><span class="caption-text">Commonly used options for PETSc linear solvers.</span><a class="headerlink" href="#tab-2" title="Link to this table">#</a></caption>
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 20.0%" />
+<col style="width: 60.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Keywords</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Options</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ksp_type</span></code></p></td>
+<td><p>Solvers</p></td>
+<td><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">bigcg</span></code> (bi-conjugate gradient method)</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">bcgsl</span></code>  (stabilized version of bi-conjugate gradient method)</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">cg</span></code> (conjugate gradient method)</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">minres</span></code> (minimum residual gradient)</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">gmres</span></code> (generalized minimal residual method)</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">fgmres</span></code> (flexible generalized minimal residual method)</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pc_type</span></code></p></td>
+<td><p>preconditioner</p></td>
+<td><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">jacobi</span></code> (point Jacobi preconditioner)</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">pcjacobi</span></code> (point block Jacobi preconditioner)</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">bjacobi</span></code> (block Jacobi preconditioner)</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">asm</span></code> (restricted additive Schwarz method)</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">ilu</span></code> (incomplete factorization preconditioner)</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">icc</span></code> (incomplete Cholesky factorization preconditioner)</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">jacobi</span></code> (diagonal scaling preconditioning)</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ksp_monitor</span></code></p></td>
+<td><p>monitor convergence</p></td>
+<td><p>N/A. Refer to <a class="reference external" href="http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/KSP/KSPMonitorSet.html">http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/KSP/KSPMonitorSet.html</a> for alternatives.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ksp_rtol</span></code></p></td>
+<td><p>relative convergence tolerance</p></td>
+<td><p>Any real number.</p></td>
+</tr>
+</tbody>
+</table>
+<p>We do not provide the ability to set these options through the <code class="docutils literal notranslate"><span class="pre">SOLVR</span></code> block since it is difficult to encode the various options into the structure of the <code class="docutils literal notranslate"><span class="pre">SOLVR</span></code> block.
+In addition, the use of a separate option file ensures easy access to PETSc’s latest linear solvers and its diagnostic tools.</p>
+<p>A special case is when using dense linear solver.
+Then, the user will set <code class="docutils literal notranslate"><span class="pre">ksp_type</span></code> to <code class="docutils literal notranslate"><span class="pre">none</span></code> and <code class="docutils literal notranslate"><span class="pre">pc_type</span></code> to <code class="docutils literal notranslate"><span class="pre">lu</span></code>.
+Note that LU decomposition only works in serial mode.
+To use dense linear solvers in parallel, changes can be made to the PETSc configuration scripts to include the parallel dense linear solver MUMPS and SuperLU.</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id21" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id20">5</a><span class="fn-bracket">]</span></span>
+<p>In TOUGH3, the PETSc libraries are configured without any external linear solver packages such as MUMPS and SuperLU. However, these packages can be easily included through minor changes to the configuration script.</p>
+</aside>
+</aside>
+</section>
+<section id="aztec-solvers">
+<h3>Aztec solvers<a class="headerlink" href="#aztec-solvers" title="Link to this heading">#</a></h3>
+<p>TOUGH3 provides an interface to Aztec solvers, but users should note that the version of the Aztec solver in TOUGH3 is no longer actively maintained.
+The PETSc solvers are in general more efficient than the Aztec solvers, but the Aztec solvers can be more efficient when the number of variables per core is small.</p>
+<p>Consistent with the implementation of the PETSc solvers, the options available in Aztec can be set through the specification of an Aztec option file (<code class="docutils literal notranslate"><span class="pre">.aztecrc</span></code>).
+An example is shown below:</p>
+<div class="literal-block-wrapper docutils container" id="id23">
+<div class="code-block-caption"><span class="caption-number">Listing 2 </span><span class="caption-text">An example of the Aztec option file (<code class="docutils literal notranslate"><span class="pre">.aztecrc</span></code>).</span><a class="headerlink" href="#id23" title="Link to this code">#</a></div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">AZ_solver</span> <span class="n">AZ_bicgstab</span>
+<span class="n">AZ_precond</span> <span class="n">AZ_dom_decomp</span>
+<span class="n">AZ_tol</span> <span class="mf">1e-6</span>
+</pre></div>
+</div>
+</div>
+<p>The format of the Aztec option file is inherited from TOUGH2-MP. TOUGH3 allows the user to modify nearly all Aztec options and parameters described in Section 2 of the Aztec manual (<a class="reference external" href="http://www.cs.sandia.gov/CRF/pspapers/Aztec_ug_2.1.ps">http://www.cs.sandia.gov/CRF/pspapers/Aztec_ug_2.1.ps</a>) through <code class="docutils literal notranslate"><span class="pre">.aztecrc</span></code>. User can also refer to the TOUGH2-MP manual for more details.</p>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="governing_equations.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Governing Equations</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="initial_and_boundary_conditions.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Initial and Boundary Conditions</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#space-and-time-discretization">Space and Time Discretization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#interface-weighting-schemes">Interface Weighting Schemes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linear-equation-solvers">Linear Equation Solvers</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#internal-serial-solvers">Internal serial solvers</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#petsc-solvers">PETSc solvers</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#aztec-solvers">Aztec solvers</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/tough3/guide/numerical_methods.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023, Keurfon Luu.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

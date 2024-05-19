@@ -1,0 +1,46 @@
+
+:orphan:
+
+.. _sphx_glr_examples_co2_leakage_along_a_fault_sg_execution_times:
+
+
+Computation times
+=================
+**00:08.958** total execution time for 4 files **from examples/co2_leakage_along_a_fault**:
+
+.. container::
+
+  .. raw:: html
+
+    <style scoped>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+    </style>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script type="text/javascript" class="init">
+    $(document).ready( function () {
+        $('table.sg-datatable').DataTable({order: [[1, 'desc']]});
+    } );
+    </script>
+
+  .. list-table::
+   :header-rows: 1
+   :class: table table-striped sg-datatable
+
+   * - Example
+     - Time
+     - Mem (MB)
+   * - :ref:`sphx_glr_examples_co2_leakage_along_a_fault_2_generate_mesh_and_incon_files.py` (``2_generate_mesh_and_incon_files.py``)
+     - 00:05.731
+     - 0.0
+   * - :ref:`sphx_glr_examples_co2_leakage_along_a_fault_1_generate_mesh_in_python_with_gmsh.py` (``1_generate_mesh_in_python_with_gmsh.py``)
+     - 00:02.159
+     - 0.0
+   * - :ref:`sphx_glr_examples_co2_leakage_along_a_fault_4_import_and_visualize_simulation_outputs_in_pyvista.py` (``4_import_and_visualize_simulation_outputs_in_pyvista.py``)
+     - 00:01.045
+     - 0.0
+   * - :ref:`sphx_glr_examples_co2_leakage_along_a_fault_3_generate_model_parameters_input_file.py` (``3_generate_model_parameters_input_file.py``)
+     - 00:00.021
+     - 0.0
