@@ -21,12 +21,12 @@ class Output(ABC):
         self._labels = list(labels) if labels is not None else labels
 
     @abstractmethod
-    def __getitem__(self):
+    def __getitem__(self, slice):
         """Slice output."""
-        pass
+        raise NotImplementedError()
 
     @abstractmethod
-    def index(self):
+    def index(self, *args):
         """Get index of element or connection."""
         if self.labels is None:
             raise AttributeError()
