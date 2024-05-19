@@ -26,7 +26,7 @@ class Output(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def index(self, label, *args):
+    def index(self, label, *args, **kwargs):
         """Get index of element or connection."""
         if self.labels is None:
             raise AttributeError()
@@ -127,7 +127,7 @@ class ElementOutput(Output):
             [self._labels[i] for i in islice],
         )
 
-    def index(self, label):
+    def index(self, label, *args, **kwargs):
         """
         Get index of element.
 
@@ -142,7 +142,7 @@ class ElementOutput(Output):
             Index of element.
 
         """
-        super().index()
+        super().index(label, *args, **kwargs)
 
         return self.labels.index(label)
 
@@ -208,7 +208,7 @@ class ConnectionOutput(Output):
             [self._labels[i] for i in islice],
         )
 
-    def index(self, label, label2=None):
+    def index(self, label, label2=None, *args, **kwargs):
         """
         Get index of connection.
 
@@ -225,7 +225,7 @@ class ConnectionOutput(Output):
             Index of connection.
 
         """
-        super().index()
+        super().index(label, *args, **kwargs)
         labels = ["".join(label) for label in self.labels]
 
         if label2 is not None:
