@@ -271,12 +271,17 @@ def to_output(file_type, labels_order, headers, times, labels, data):
                 "Found duplicate connections. Fixing outputs by summing duplicate connections."
             )
 
-            for output in outputs:
-                output.labels = list(connections)
-                output.data = {
-                    k: np.array([v[idx].sum() for idx in connections.values()])
-                    for k, v in output.data.items()
-                }
+            outputs = [
+                ConnectionOutput(
+                    time=output.time,
+                    data={
+                        k: np.array([v[idx].sum() for idx in connections.values()])
+                        for k, v in output.data.items()
+                    },
+                    labels=list(connections),
+                )
+                for output in outputs
+            ]
 
     if file_type == "element" and labels_order is not None:
         outputs = [output[labels_order] for output in outputs]
