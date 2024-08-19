@@ -841,7 +841,12 @@ def _read_oft(f, oft, label_length):
     while True:
         if line.strip():
             data = read_record(line, fmt[label_length])
-            history[key].append(label_format.format(data[0]))
+            tmp = {"label": label_format.format(data[0])}
+
+            if data[2] is not None:
+                tmp["flag"] = data[2]
+
+            history[key].append(tmp)
 
         else:
             break

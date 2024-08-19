@@ -1056,43 +1056,56 @@ def _write_hyste(parameters, space_between_values):
     return out
 
 
+def _write_oft(oft, parameters, space_between_values):
+    """Write FOFT, COFT, and GOFT blocks data."""
+    from ._common import histories
+
+    keys = {
+        "FOFT": "element",
+        "COFT": "connection",
+        "GOFT": "generator",
+    }
+
+    # Formats
+    fmt = block_to_format[oft]
+    fmt = str2format(fmt[5])
+
+    out = []
+    for oft in parameters[f"{keys[oft]}_history"]:
+        data = deepcopy(histories)
+
+        if isinstance(oft, dict):
+            data.update(oft)
+        
+        else:
+            data["label"] = oft
+
+        values = [
+            data["label"],
+            None,
+            data["flag"],
+        ]
+        out += write_record(values, fmt, space_between_values)
+
+    return out
+
+
 @block("FOFT", multi=True)
 def _write_foft(parameters, space_between_values):
     """Write FOFT block data."""
-    # Formats
-    fmt = block_to_format["FOFT"]
-    fmt = str2format(fmt[5])
-
-    values = [x for x in parameters["element_history"]]
-    out = write_record(values, fmt, space_between_values, multi=True)
-
-    return out
+    return _write_oft("FOFT", parameters, space_between_values)
 
 
 @block("COFT", multi=True)
 def _write_coft(parameters, space_between_values):
     """Write COFT block data."""
-    # Format
-    fmt = block_to_format["COFT"]
-    fmt = str2format(fmt[5])
-
-    values = [x for x in parameters["connection_history"]]
-    out = write_record(values, fmt, space_between_values, multi=True)
-
-    return out
+    return _write_oft("COFT", parameters, space_between_values)
 
 
 @block("GOFT", multi=True)
 def _write_goft(parameters, space_between_values):
     """Write GOFT block data."""
-    # Format
-    fmt = block_to_format["GOFT"]
-    fmt = str2format(fmt[5])
-
-    values = [x for x in parameters["generator_history"]]
-    out = write_record(values, fmt, space_between_values, multi=True)
-
-    return out
+    return _write_oft("GOFT", parameters, space_between_values)
 
 
 @block("ROFT", multi=True)

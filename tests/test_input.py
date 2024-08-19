@@ -446,9 +446,19 @@ def test_hyste(write_read):
 )
 def test_oft(write_read, oft, n):
     parameters_ref = {
-        oft: [helpers.random_string(n) for _ in range(np.random.randint(10) + 1)]
+        oft: [
+            helpers.random_string(n),
+            helpers.random_string(n),
+            {"label": helpers.random_string(n)},
+            {"label": helpers.random_string(n), "flag": np.random.randint(10)},
+        ]
     }
     parameters = write_read(parameters_ref)
+
+    if write_read == write_read_tough:
+        for i, v in enumerate(parameters_ref[oft]):
+            if not isinstance(v, dict):
+                parameters_ref[oft][i] = {"label": v}
 
     assert helpers.allclose(parameters_ref, parameters)
 
