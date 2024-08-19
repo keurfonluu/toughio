@@ -1076,7 +1076,7 @@ def _write_oft(oft, parameters, space_between_values):
 
         if isinstance(oft, dict):
             data.update(oft)
-        
+
         else:
             data["label"] = oft
 
