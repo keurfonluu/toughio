@@ -22,11 +22,10 @@ jobs:
             python-version: '3.9'
       - name: Install OSMesa VTK
         run: |
-          sudo apt update
-          sudo apt install libosmesa6-dev libgl1-mesa-dev retry --option="APT::Acquire::Retries=3"
-          pip install https://github.com/pyvista/pyvista-wheels/raw/main/vtk-osmesa-9.1.0-cp39-cp39-linux_x86_64.whl
+          pip install vtk-osmesa==9.3.0 --index-url https://gitlab.kitware.com/api/v4/projects/13/packages/pypi/simple
       - name: Install libGLU for pygmsh
         run: |
+          sudo apt update
           sudo apt install libglu1
       - name: Install toughio
         run: |
