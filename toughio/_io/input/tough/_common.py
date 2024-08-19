@@ -166,6 +166,11 @@ solver = {
     "eps": 1.0e-6,
 }
 
+histories = {
+    "label": None,
+    "flag": None,
+}
+
 generators = {
     "label": None,
     "name": None,

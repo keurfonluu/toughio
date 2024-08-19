@@ -14,6 +14,12 @@ Input parameters
 Simulation outputs
 ------------------
 
+.. autoclass:: toughio.ElementOutput
+   :members:
+
+.. autoclass:: toughio.ConnectionOutput
+   :members:
+
 .. autofunction:: toughio.read_output
 
 .. autofunction:: toughio.read_table
