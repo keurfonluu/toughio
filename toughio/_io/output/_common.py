@@ -256,27 +256,48 @@ class ConnectionOutput(Output):
 
         centers = {k: np.asarray(v["center"]) for k, v in mesh["elements"].items()}
         face_areas = {k: v["interface_area"] for k, v in mesh["connections"].items()}
-
         labels = list(centers)
-        Q = np.zeros((len(centers), 3, len(self.data)))
 
-        for i, label in enumerate(labels):
-            output = self[label]
-            gamma = np.row_stack(list(output.data.values()))
+        # Gather all data to build linear systems to solve
+        data = np.row_stack(list(self.data.values()))
+        connections = {
+            label: {
+                "index": [],
+                "areas": [],
+                "normals": [],
+            }
+            for label in labels
+        }
 
-            G = np.array(
-                [
-                    face_areas[f"{l1}{l2}"] * (centers[l1] - centers[l2])
-                    / np.linalg.norm(centers[l1] - centers[l2])
-                    for l1, l2 in output.labels
-                ]
-            )
-            Q[i] = np.linalg.pinv(G.T @ G) @ G.T @ gamma.T
+        for i, (l1, l2) in enumerate(self.labels):
+            area = face_areas[f"{l1}{l2}"]
+            normal = centers[l1] - centers[l2]
+            normal /= np.linalg.norm(normal)
+
+            connections[l1]["index"].append(i)
+            connections[l1]["areas"].append(area)
+            connections[l1]["normals"].append(normal)
+
+            connections[l2]["index"].append(i)
+            connections[l2]["areas"].append(area)
+            connections[l2]["normals"].append(normal)
+
+        connections = [
+            {k: np.array(v) for k, v in connection.items()}
+            for connection in connections.values()
+        ]
+
+        # Approximate connection data
+        Q = np.zeros((len(centers), 3, len(data)))
+
+        for i, connection in enumerate(connections):
+            G = connection["areas"][:, np.newaxis] * connection["normals"]
+            Q[i] = np.linalg.pinv(G.T @ G) @ G.T @ data[:, connection["index"]].T
 
         return ElementOutput(
             time=self.time,
             data={
-                k: v for k, v in zip(output.data, Q.transpose((2, 0, 1)))
+                k: v for k, v in zip(self.data, Q.transpose((2, 0, 1)))
                 if k not in {"X", "Y", "Z"}
             },
             labels=labels,
