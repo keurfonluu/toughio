@@ -17,9 +17,9 @@ class Output(ABC):
         Do not use.
 
         """
-        self._time = time
-        self._data = data
-        self._labels = list(labels) if labels is not None else labels
+        self.time = time
+        self.data = data
+        self.labels = labels
 
     @abstractmethod
     def __getitem__(self, islice):
@@ -66,7 +66,7 @@ class Output(ABC):
             if len(value) != self.n_data:
                 raise ValueError()
 
-            self._labels = list(value)
+            self._labels = np.asarray(value)
 
         else:
             self._labels = None
@@ -145,7 +145,7 @@ class ElementOutput(Output):
         """
         super().index(label, *args, **kwargs)
 
-        return self.labels.index(label)
+        return np.flatnonzero(self.labels == label)[0]
 
 
 class ConnectionOutput(Output):
@@ -185,11 +185,7 @@ class ConnectionOutput(Output):
 
         if np.ndim(islice) == 0:
             if isinstance(islice, str):
-                islice = [
-                    i
-                    for i, (label1, label2) in enumerate(self.labels)
-                    if label1 == islice or label2 == islice
-                ]
+                islice = np.flatnonzero((self.labels == islice).any(axis=1))
 
             elif isinstance(islice, slice):
                 islice = np.arange(self.n_data)[islice]
