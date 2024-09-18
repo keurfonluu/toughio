@@ -1071,20 +1071,18 @@ def _write_oft(oft, parameters, space_between_values):
     fmt = str2format(fmt[5])
 
     out = []
-    for oft in parameters[f"{keys[oft]}_history"]:
+    for v in parameters[f"{keys[oft]}_history"]:
         data = deepcopy(histories)
 
-        if isinstance(oft, dict):
-            data.update(oft)
+        if isinstance(v, dict):
+            data.update(v)
 
         else:
-            data["label"] = oft
+            data["label"] = v
 
-        values = [
-            data["label"],
-            None,
-            data["flag"],
-        ]
+        values = [data["label"]]
+        values += [None] if oft != "GOFT" else [None, None]
+        values += [data["flag"]]
         out += write_record(values, fmt, space_between_values)
 
     return out

@@ -837,14 +837,15 @@ def _read_oft(f, oft, label_length):
     if not label_length:
         label_length = get_label_length(line[:9])
     label_format = f"{{:>{label_length if oft != 'COFT' else 2 * label_length}}}"
+    iflag = 2 if oft != "GOFT" else 3
 
     while True:
         if line.strip():
             data = read_record(line, fmt[label_length])
             tmp = {"label": label_format.format(data[0])}
 
-            if data[2] is not None:
-                tmp["flag"] = data[2]
+            if data[iflag] is not None:
+                tmp["flag"] = data[iflag]
 
             history[key].append(tmp)
 
