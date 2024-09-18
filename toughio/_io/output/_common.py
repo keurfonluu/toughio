@@ -1,6 +1,7 @@
 import logging
 from abc import ABC, abstractmethod
 
+import os
 import numpy as np
 
 __all__ = [
@@ -232,6 +233,58 @@ class ConnectionOutput(Output):
             label = f"{label}{label2}"
 
         return labels.index(label)
+
+    def to_element(self, mesh):
+        """
+        Project connection data to element centers.
+
+        Parameters
+        ----------
+        mesh : dict or pathlike
+            Mesh parameters or file name.
+
+        Returns
+        -------
+        :class:`toughio.ElementOutput`
+            Element output with projected data.
+
+        References
+        ----------
+        .. [1] Painter, S. L., Gable, C. W., and Kelkar, S. (2012). "Pathline tracing on fully unstructured control-volume grids". Computational Geosciences, 16(4), 1125-1134
+        
+        """
+        from .. import read_input
+
+        if isinstance(mesh, (str, os.PathLike)):
+            mesh = read_input(mesh, file_format="tough", blocks=["ELEME", "CONNE"])
+
+        centers = {k: np.asarray(v["center"]) for k, v in mesh["elements"].items()}
+        face_areas = {k: v["interface_area"] for k, v in mesh["connections"].items()}
+
+        labels = list(centers)
+        Q = np.zeros((len(centers), 3, len(self.data)))
+
+        for i, label in enumerate(labels):
+            output = self[label]
+            gamma = np.row_stack(list(output.data.values()))
+
+            G = np.array(
+                [
+                    face_areas[f"{l1}{l2}"] * (centers[l1] - centers[l2])
+                    / np.linalg.norm(centers[l1] - centers[l2])
+                    for l1, l2 in output.labels
+                ]
+            )
+            Q[i] = np.linalg.pinv(G.T @ G) @ G.T @ gamma.T
+
+        return ElementOutput(
+            time=self.time,
+            data={
+                k: v for k, v in zip(output.data, Q.transpose((2, 0, 1)))
+                if k not in {"X", "Y", "Z"}
+            },
+            labels=labels,
+        )
 
 
 def to_output(file_type, labels_order, headers, times, labels, data):
