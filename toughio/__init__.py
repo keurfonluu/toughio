@@ -21,12 +21,14 @@ from ._mesh import register as register_mesh
 from ._mesh import write as write_mesh
 from ._mesh import write_time_series
 from ._run import run
+from .core import ParticleTracker
 
 __all__ = [
     "Mesh",
     "CellBlock",
     "ElementOutput",
     "ConnectionOutput",
+    "ParticleTracker",
     "meshmaker",
     "register_input",
     "register_output",
