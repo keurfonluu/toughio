@@ -230,7 +230,7 @@ class ConnectionOutput(Output):
 
         return labels.index(label)
 
-    def to_element(self, mesh):
+    def to_element(self, mesh, ignore_elements=None):
         """
         Project connection data to element centers.
 
@@ -238,6 +238,8 @@ class ConnectionOutput(Output):
         ----------
         mesh : dict or pathlike
             Mesh parameters or file name.
+        ignore_elements : sequence of str, optional
+            Labels of elements to ignore.
 
         Returns
         -------
@@ -254,7 +256,11 @@ class ConnectionOutput(Output):
         if isinstance(mesh, (str, os.PathLike)):
             mesh = read_input(mesh, file_format="tough", blocks=["ELEME", "CONNE"])
 
-        centers = {k: np.asarray(v["center"]) for k, v in mesh["elements"].items()}
+        ignore_elements = set(ignore_elements) if ignore_elements is not None else set()
+        centers = {
+            k: np.asarray(v["center"]) for k, v in mesh["elements"].items()
+            if k not in ignore_elements
+        }
         face_areas = {k: v["interface_area"] for k, v in mesh["connections"].items()}
         labels = list(centers)
 
@@ -270,6 +276,9 @@ class ConnectionOutput(Output):
         }
 
         for i, (l1, l2) in enumerate(self.labels):
+            if l1 in ignore_elements or l2 in ignore_elements:
+                continue
+
             area = face_areas[f"{l1}{l2}"]
             normal = centers[l1] - centers[l2]
             normal /= np.linalg.norm(normal)
