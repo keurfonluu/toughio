@@ -159,8 +159,14 @@ class ParticleTracker:
 
             v = self.get_velocity(path[count - 1]) * direction
             vn = np.linalg.norm(v)
-            dx = step_size
-            dt = dx / vn
+
+            # Stop if zero velocity
+            if vn > 0.0:
+                dx = step_size
+                dt = dx / vn
+
+            else:
+                break
 
             if time[-1] + dt >= max_time:
                 exceed_max_time = True
