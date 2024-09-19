@@ -1,7 +1,6 @@
 import meshio
 import numpy as np
 import pyvista as pv
-from joblib import Parallel, delayed
 
 from .._mesh import Mesh
 
@@ -38,7 +37,11 @@ class ParticleTracker:
             Velocity vector at query point.
 
         """
-        return pv.PolyData(point).sample(self.mesh)["velocity"][0]
+        return pv.PolyData(point).sample(
+            self.mesh,
+            locator="cell",
+            mark_blank=False,
+        )["velocity"][0]
 
     def track(
         self,
@@ -52,6 +55,7 @@ class ParticleTracker:
         end_points=None,
         radius=None,
         window_length=None,
+        check_bounds=False,
     ):
         """
         Track particle(s) given starting point coordinates.
@@ -75,9 +79,11 @@ class ParticleTracker:
         end_points : ArrayLike, optional
             Ending point coordinates.
         radius : scalar, optional, default 1.0
-            Ending point radius (in m). The tracking algorithm stops if the pathline is within `radius` meters of an ending point.
+            Ending point radius (in m). The tracking algorithm stops if the pathline is within *radius* meters of an ending point.
         window_length : int, optional, default 32
             Window length for oscillation detection.
+        check_bounds : bool, default False
+            If True, a particle is out of bound if it is not contained by any cell of the mesh, otherwise a simple box condition is applied (faster but less accurate).
 
         Returns
         -------
@@ -113,19 +119,14 @@ class ParticleTracker:
             end_points,
             radius,
             window_length,
+            check_bounds,
         )
 
         if np.ndim(particles) == 1:
             return self._track(particles, *args)
 
         elif np.ndim(particles) == 2:
-            with Parallel(n_jobs=-1, prefer="threads") as parallel:
-                out = parallel(
-                    delayed(self._track)(particle, *args)
-                    for particle in particles
-                )
-
-            return out
+            return [self._track(particle, *args) for particle in particles]
 
         else:
             raise ValueError()
@@ -142,9 +143,12 @@ class ParticleTracker:
         end_points,
         radius,
         window_length,
+        check_bounds,
     ):
         """Track a particle."""
         x, y, z = particle
+        xmin, xmax, ymin, ymax, zmin, zmax = self.mesh.bounds
+
         path = np.empty((max_step + 1, 3))
         time = np.empty(max_step + 1)
         path[0] = x, y, z
@@ -201,8 +205,13 @@ class ParticleTracker:
                 break
 
             # Stop if particle is out of bound
-            if self.mesh.find_containing_cell(path[count]) == -1:
-                break
+            if check_bounds:
+                if self.mesh.find_containing_cell(path[count]) == -1:
+                    break
+
+            else:
+                if not (xmin <= x <= xmax and ymin <= y <= ymax and zmin <= z <= zmax):
+                    break
 
             # Stop if oscillation is detected
             # Oscillation is here characterized by fast changes in particle's direction (the particle is going back and forth)
