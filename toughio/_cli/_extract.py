@@ -41,6 +41,7 @@ def extract(argv=None):
 
     # Read TOUGH output file
     output = read_output(args.infile, connection=args.connection)
+    output = output if isinstance(output, list) else [output]
 
     try:
         if not args.connection:
