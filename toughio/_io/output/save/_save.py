@@ -1,7 +1,7 @@
 import numpy as np
 
+from ....core import ElementOutput
 from ...input import tough
-from .._common import ElementOutput
 
 __all__ = [
     "read",

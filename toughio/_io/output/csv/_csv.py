@@ -1,5 +1,6 @@
 from ...._common import open_file
-from .._common import ElementOutput, to_output
+from ....core import ElementOutput
+from .._common import to_output
 
 __all__ = [
     "read",

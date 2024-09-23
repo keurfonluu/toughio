@@ -2,7 +2,7 @@ import meshio
 import numpy as np
 import pyvista as pv
 
-from .._mesh import Mesh
+from .mesh import Mesh
 
 
 class ParticleTracker:

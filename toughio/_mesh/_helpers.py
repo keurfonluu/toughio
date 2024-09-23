@@ -5,7 +5,7 @@ import meshio
 import numpy as np
 
 from .._common import filetype_from_filename, register_format
-from ._mesh import from_meshio
+from ..core import Mesh
 
 __all__ = [
     "register",
@@ -13,6 +13,8 @@ __all__ = [
     "write",
     "read_time_series",
     "write_time_series",
+    "from_meshio",
+    "from_pyvista",
 ]
 
 
@@ -296,3 +298,163 @@ def write_time_series(
     if str(filename.parent) != ".":
         h5_filename = f"{filename.stem}.h5"
         shutil.move(h5_filename, str(filename.parent))
+
+
+def from_meshio(mesh, material="dfalt"):
+    """
+    Convert a :class:`meshio.Mesh` to :class:`toughio.Mesh`.
+
+    Parameters
+    ----------
+    mesh : meshio.Mesh
+        Input mesh.
+    material : str, optional, default 'dfalt'
+        Default material name.
+
+    Returns
+    -------
+    toughio.Mesh
+        Output mesh.
+
+    """
+    from ._helpers import get_material_key
+
+    if not isinstance(mesh, meshio.Mesh):
+        raise TypeError()
+    if not isinstance(material, str):
+        raise TypeError()
+
+    if mesh.cell_data:
+        cells = mesh.cells
+        cell_data = mesh.cell_data
+
+        key = get_material_key(cell_data)
+        if key:
+            cell_data["material"] = cell_data.pop(key)
+        cell_data = {k: np.concatenate(v) for k, v in cell_data.items()}
+
+    else:
+        cells = mesh.cells
+        cell_data = {}
+
+    out = Mesh(
+        points=mesh.points,
+        cells=cells,
+        point_data=mesh.point_data,
+        cell_data=cell_data,
+        field_data=mesh.field_data,
+        point_sets=(
+            mesh.point_sets
+            if hasattr(mesh, "point_sets")
+            else mesh.node_sets if hasattr(mesh, "node_sets") else None
+        ),
+        cell_sets=mesh.cell_sets if hasattr(mesh, "cell_sets") else None,
+    )
+
+    if "material" not in out.cell_data:
+        imat = (
+            np.max([v[0] for v in mesh.field_data.values() if v[1] == 3]) + 1
+            if mesh.field_data
+            else 1
+        )
+        out.cell_data["material"] = np.full(out.n_cells, imat, dtype=np.int64)
+        out.field_data[material] = np.array([imat, 3])
+
+    return out
+
+
+def from_pyvista(mesh, material="dfalt"):
+    """
+    Convert a :class:`pyvista.UnstructuredGrid` to :class:`toughio.Mesh`.
+
+    Parameters
+    ----------
+    mesh : pyvista.UnstructuredGrid
+        Input mesh.
+    material : str, optional, default 'dfalt'
+        Default material name.
+
+    Returns
+    -------
+    toughio.Mesh
+        Output mesh.
+
+    """
+    try:
+        import pyvista
+        import vtk
+
+        from ..core.mesh._common import vtk_to_meshio_type
+
+        VTK9 = vtk.vtkVersion().GetVTKMajorVersion() >= 9
+    except ImportError:
+        raise ImportError(
+            "Converting pyvista.UnstructuredGrid requires pyvista to be installed."
+        )
+
+    if not isinstance(mesh, pyvista.UnstructuredGrid):
+        raise TypeError()
+    if not isinstance(material, str):
+        raise TypeError()
+
+    # Copy useful arrays to avoid repeated calls to properties
+    vtk_offset = mesh.offset
+    vtk_cells = mesh.cells
+    vtk_cell_type = mesh.celltypes
+
+    # Check that meshio supports all cell types in input mesh
+    pixel_voxel = {8, 11}  # Handle pixels and voxels
+    for cell_type in np.unique(vtk_cell_type):
+        if not (cell_type in vtk_to_meshio_type or cell_type in pixel_voxel):
+            raise ValueError(f"toughio does not support VTK type {cell_type}.")
+
+    # Get cells
+    cells = []
+    c = 0
+    for offset, cell_type in zip(vtk_offset, vtk_cell_type):
+        numnodes = vtk_cells[offset]
+        if VTK9:
+            cell = vtk_cells[offset + 1 + c : offset + 1 + c + numnodes]
+            c += 1
+        else:
+            cell = vtk_cells[offset + 1 : offset + 1 + numnodes]
+        cell = (
+            cell
+            if cell_type not in pixel_voxel
+            else (
+                cell[[0, 1, 3, 2]] if cell_type == 8 else cell[[0, 1, 3, 2, 4, 5, 7, 6]]
+            )
+        )
+        cell_type = cell_type if cell_type not in pixel_voxel else cell_type + 1
+        cell_type = (
+            vtk_to_meshio_type[cell_type] if cell_type != 7 else f"polygon{numnodes}"
+        )
+
+        if len(cells) > 0 and cells[-1][0] == cell_type:
+            cells[-1][1].append(cell)
+        else:
+            cells.append((cell_type, [cell]))
+
+    for k, c in enumerate(cells):
+        cells[k] = (c[0], np.array(c[1]))
+
+    # Get point data
+    point_data = {k.replace(" ", "_"): v for k, v in mesh.point_data.items()}
+
+    # Get cell data
+    cell_data = {k.replace(" ", "_"): v for k, v in mesh.cell_data.items()}
+
+    # Create toughio.Mesh
+    out = Mesh(
+        points=np.array(mesh.points),
+        cells=cells,
+        point_data=point_data,
+        cell_data=cell_data,
+    )
+
+    if "material" not in out.cell_data:
+        imat = 1
+        out.cell_data["material"] = np.full(out.n_cells, imat, dtype=np.int64)
+        out.field_data[material] = np.array([imat, 3])
+
+    return out

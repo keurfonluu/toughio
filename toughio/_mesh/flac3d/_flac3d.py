@@ -5,8 +5,8 @@ import numpy as np
 
 from ...__about__ import __version__ as version
 from ..._common import open_file
+from ...core import Mesh
 from .._helpers import get_material_key
-from .._mesh import Mesh
 
 __all__ = [
     "read",

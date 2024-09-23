@@ -1,7 +1,7 @@
 import numpy as np
 
 from ..._common import filetype_from_filename, open_file, register_format
-from ._common import Output
+from ...core import Output
 
 __all__ = [
     "register",

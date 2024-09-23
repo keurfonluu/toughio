@@ -7,8 +7,8 @@ import numpy as np
 
 from ...__about__ import __version__ as version
 from ..._common import open_file
+from ...core import Mesh
 from .._helpers import get_material_key
-from .._mesh import CellBlock, Mesh
 
 __all__ = [
     "read",
@@ -75,8 +75,8 @@ def read_buffer(f):
     # Read cell data
     if num_cell_data:
         cdata = _read_data(f, num_cells, cell_ids)
-        # sections = np.cumsum([len(c[1]) for c in cells[:-1]])
-        sections = np.cumsum([len(c.data) for c in cells[:-1]])
+        sections = np.cumsum([len(c[1]) for c in cells[:-1]])
+        # sections = np.cumsum([len(c.data) for c in cells[:-1]])
         for k, v in cdata.items():
             cell_data[k] = np.split(v, sections)
 
@@ -116,9 +116,7 @@ def _read_cells(f, num_cells, point_ids):
 
     # Convert to numpy arrays
     for k, (cell_type, cdata) in enumerate(cells):
-        cells[k] = CellBlock(
-            cell_type, np.array(cdata)[:, avsucd_to_meshio_order[cell_type]]
-        )
+        cells[k] = (cell_type, np.array(cdata)[:, avsucd_to_meshio_order[cell_type]])
         cell_data["avsucd:material"][k] = np.array(cell_data["avsucd:material"][k])
     return cell_ids, cells, cell_data
 
