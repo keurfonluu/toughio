@@ -1,25 +1,27 @@
+from __future__ import annotations
+from typing import TextIO
+
+import os
+
 import numpy as np
 
+from .._common import to_output
 from ...._common import open_file
 
-__all__ = [
-    "read",
-]
 
-
-def read(filename):
+def read(filename: str | os.PathLike | TextIO) -> HistoryOutput:
     """
     Read CSV table file.
 
     Parameters
     ----------
-    filename : str, pathlike or buffer
-        Input file name or buffer.
+    filename : str | PathLike | TextIO
+        History file name or buffer.
 
     Returns
     -------
-    dict
-        Table data.
+    :class:`toughio.HistoryOutput`
+        History output data.
 
     Note
     ----
@@ -67,4 +69,4 @@ def read(filename):
             else:
                 out[header] = np.array([float(x) for x in X])
 
-        return out
+    return to_output(out, filename)

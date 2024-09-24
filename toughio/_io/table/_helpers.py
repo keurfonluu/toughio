@@ -1,9 +1,9 @@
-from ..._common import filetype_from_filename, register_format
+from __future__ import annotations
+from typing import Callable, Literal, Optional, TextIO
 
-__all__ = [
-    "register",
-    "read",
-]
+import os
+
+from ..._common import filetype_from_filename, register_format
 
 
 _extension_to_filetype = {}
@@ -11,7 +11,12 @@ _reader_map = {}
 _writer_map = {}
 
 
-def register(file_format, extensions, reader, writer=None):
+def register(
+    file_format: str,
+    extensions: list[str],
+    reader: Callable,
+    writer: Optional[Callable] = None,
+) -> None:
     """
     Register a new table format.
 
@@ -19,11 +24,11 @@ def register(file_format, extensions, reader, writer=None):
     ----------
     file_format : str
         File format to register.
-    extensions : array_like
+    extensions : ArrayLike
         List of extensions to associate to the new format.
     reader : callable
         Read function.
-    writer : callable or None, optional, default None
+    writer : callable, optional
         Write function.
 
     """
@@ -38,21 +43,25 @@ def register(file_format, extensions, reader, writer=None):
     )
 
 
-def read(filename, file_format=None, **kwargs):
+def read(
+    filename: str | os.PathLike | TextIO,
+    file_format: Optional[Literal["column", "csv", "tecplot"]] = None,
+    **kwargs,
+):
     """
-    Read table file.
+    Read history file.
 
     Parameters
     ----------
-    filename : str, pathlike or buffer
-        Input file name or buffer.
-    file_format : str ('column', 'csv', 'tecplot') or None, optional, default None
-        Input file format.
+    filename : str | PathLike | TextIO
+        History file name or buffer.
+    file_format : {'column', 'csv', 'tecplot'}, optional
+        History file format.
 
     Returns
     -------
-    dict
-        Table data.
+    :class:`toughio.HistoryOutput`
+        History output data.
 
     """
     fmt = (

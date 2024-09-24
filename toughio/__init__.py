@@ -20,6 +20,7 @@ from ._mesh import write as write_mesh
 from ._mesh import write_time_series
 from ._run import run
 from .core import (
+    HistoryOutput,
     Mesh,
     CellBlock,
     ConnectionOutput,
@@ -31,6 +32,7 @@ from .core import (
 __all__ = [
     "Mesh",
     "CellBlock",
+    "HistoryOutput",
     "ElementOutput",
     "ConnectionOutput",
     "Output",

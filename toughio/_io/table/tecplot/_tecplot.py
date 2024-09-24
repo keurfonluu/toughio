@@ -1,20 +1,28 @@
+from __future__ import annotations
+from typing import TextIO
+
+import os
+
+import numpy as np
+
+from .._common import to_output
 from ...._common import open_file
 from ...output.tecplot._tecplot import read_buffer
 
 
-def read(filename):
+def read(filename: str | os.PathLike | TextIO) -> HistoryOutput:
     """
     Read TECPLOT table file.
 
     Parameters
     ----------
-    filename : str, pathlike or buffer
-        Input file name or buffer.
+    filename : str | PathLike | TextIO
+        History file name or buffer.
 
     Returns
     -------
-    dict
-        Table data.
+    :class:`toughio.HistoryOutput`
+        History output data.
 
     """
     with open_file(filename, "r") as f:
@@ -24,4 +32,4 @@ def read(filename):
     for zone in zones:
         out[zone["title"]] = zone["data"][:, 1]
 
-    return out
+    return to_output(out, filename)
