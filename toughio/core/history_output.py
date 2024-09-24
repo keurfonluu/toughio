@@ -179,8 +179,11 @@ class HistoryOutput(UserDict):
             }
         )
 
-        if obj1.label and obj1.label == obj2.label:
-            output.label = obj1.label
+        for name in {"label", "type"}:
+            value = getattr(obj1, name)
+
+            if value and value == getattr(obj2, name):
+                setattr(output, name, value)
 
         return output
 
@@ -399,6 +402,20 @@ class HistoryOutput(UserDict):
         """Set label."""
         if value:
             self.metadata["label"] = value
+
+    @property
+    def type(self) -> str | None:
+        """Return type."""
+        try:
+            return self.metadata["type"]
+
+        except KeyError:
+            return None
+
+    @type.setter
+    def type(self, value: str) -> None:
+        if value:
+            self.metadata["type"] = value
 
     @property
     def ndim(self) -> int:
