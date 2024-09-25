@@ -8,7 +8,6 @@ from ._io import (
     register_input,
     register_output,
     register_table,
-    write_h5,
     write_input,
     write_output,
 )
@@ -20,9 +19,10 @@ from ._mesh import write as write_mesh
 from ._mesh import write_time_series
 from ._run import run
 from .core import (
-    HistoryOutput,
     Mesh,
     CellBlock,
+    H5File,
+    HistoryOutput,
     ConnectionOutput,
     ElementOutput,
     Output,
@@ -32,9 +32,10 @@ from .core import (
 __all__ = [
     "Mesh",
     "CellBlock",
+    "H5File",
     "HistoryOutput",
-    "ElementOutput",
     "ConnectionOutput",
+    "ElementOutput",
     "Output",
     "ParticleTracker",
     "meshmaker",
@@ -45,7 +46,6 @@ __all__ = [
     "read_input",
     "read_output",
     "read_table",
-    "write_h5",
     "write_input",
     "write_output",
     "from_meshio",
