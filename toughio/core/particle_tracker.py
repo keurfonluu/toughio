@@ -1,3 +1,7 @@
+from __future__ import annotations
+from numpy.typing import ArrayLike
+from typing import Literal, Optional
+
 import meshio
 import numpy as np
 import pyvista as pv
@@ -17,12 +21,19 @@ class ParticleTracker:
         Velocity field data.
 
     """
-    def __init__(self, mesh, velocity):
+    __name__: str = "ParticleTracker"
+    __qualname__: str = "toughio.ParticleTracker"
+
+    def __init__(
+        self,
+        mesh: Mesh | meshio.Mesh | pv.UnstructuredGrid,
+        velocity: str | ArrayLike,
+    ):
         """Initialize a particle tracker."""
         self.mesh = mesh
         self.velocity = velocity
 
-    def get_velocity(self, point):
+    def get_velocity(self, point: ArrayLike) -> ArrayLike:
         """
         Get velocity vector at any point in mesh.
 
@@ -45,18 +56,18 @@ class ParticleTracker:
 
     def track(
         self,
-        particles,
-        direction="forward",
-        step_size=None,
-        time_ini=None,
-        max_step=None,
-        max_time=None,
-        max_length=None,
-        end_points=None,
-        radius=None,
-        window_length=None,
-        check_bounds=False,
-    ):
+        particles: ArrayLike,
+        direction: Optional[Literal["forward", "backward"]] = "forward",
+        step_size: Optional[float] = None,
+        time_ini: Optional[float] = None,
+        max_step: Optional[int] = None,
+        max_time: Optional[float] = None,
+        max_length: Optional[float] = None,
+        end_points: Optional[ArrayLike] = None,
+        radius: Optional[float] = None,
+        window_length: Optional[int] = None,
+        check_bounds: bool = False,
+    ) -> ArrayLike | list[ArrayLike]:
         """
         Track particle(s) given starting point coordinates.
 
@@ -133,18 +144,18 @@ class ParticleTracker:
 
     def _track(
         self,
-        particle,
-        direction,
-        step_size,
-        time_ini,
-        max_step,
-        max_time,
-        max_length,
-        end_points,
-        radius,
-        window_length,
-        check_bounds,
-    ):
+        particle: ArrayLike,
+        direction: float,
+        step_size: float,
+        time_ini: float,
+        max_step: int,
+        max_time: float,
+        max_length: float,
+        end_points: ArrayLike,
+        radius: float,
+        window_length: int,
+        check_bounds: bool,
+    ) -> ArrayLike:
         """Track a particle."""
         x, y, z = particle
         xmin, xmax, ymin, ymax, zmin, zmax = self.mesh.bounds
@@ -241,12 +252,12 @@ class ParticleTracker:
         return path[: count + 1]
 
     @property
-    def mesh(self):
+    def mesh(self) -> pv.UnstructuredGrid:
         """Return mesh."""
         return self._mesh
 
     @mesh.setter
-    def mesh(self, value):
+    def mesh(self, value: Mesh | meshio.Mesh | pv.UnstructuredGrid) -> None:
         """Set mesh."""
         if isinstance(value, Mesh):
             self._mesh = value.to_pyvista()
@@ -261,12 +272,12 @@ class ParticleTracker:
             raise ValueError("invalid input mesh")
 
     @property
-    def velocity(self):
+    def velocity(self) -> ArrayLike:
         """Return velocity field data."""
         return self._velocity
 
     @velocity.setter
-    def velocity(self, value):
+    def velocity(self, value: str | ArrayLike) -> None:
         """Set velocity field data."""
         if isinstance(value, str):
             if value not in self.mesh.cell_data:
