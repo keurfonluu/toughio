@@ -1,4 +1,4 @@
-from . import _cli, capillarity, meshmaker, relative_permeability
+from . import _cli, capillarity, meshmaker, relative_permeability, utils
 from .__about__ import __version__
 from ._helpers import convert_labels
 from ._io import (
@@ -56,6 +56,7 @@ __all__ = [
     "write_time_series",
     "relative_permeability",
     "capillarity",
+    "utils",
     "convert_labels",
     "run",
     "_cli",
