@@ -31,9 +31,12 @@ def read(filename, file_type, labels_order=None, time_steps=None):
         Output data for each time step.
 
     """
+    return_list = True
+
     if time_steps is not None:
         if isinstance(time_steps, int):
             time_steps = [time_steps]
+            return_list = False
 
         if any(i < 0 for i in time_steps):
             n_steps = _count_time_steps(filename)
@@ -94,6 +97,7 @@ def read(filename, file_type, labels_order=None, time_steps=None):
         times,
         [labels[i1:i2] for i1, i2 in zip(offset[:-1], offset[1:])],
         [data[i1:i2] for i1, i2 in zip(offset[:-1], offset[1:])],
+        return_list,
     )
 
 

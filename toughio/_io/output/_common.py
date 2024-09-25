@@ -5,7 +5,7 @@ import numpy as np
 from ...core import ConnectionOutput, ElementOutput
 
 
-def to_output(file_type, labels_order, headers, times, labels, data):
+def to_output(file_type, labels_order, headers, times, labels, data, return_list):
     """Helper function to create output data objects."""
     outputs = []
     for time, labels_, data_ in zip(times, labels, data):
@@ -57,4 +57,4 @@ def to_output(file_type, labels_order, headers, times, labels, data):
     if file_type == "element" and labels_order is not None:
         outputs = [output[labels_order] for output in outputs]
 
-    return outputs[0] if len(outputs) == 1 else outputs
+    return outputs if return_list else outputs[0]

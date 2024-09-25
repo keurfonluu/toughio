@@ -52,9 +52,12 @@ def read(filename, file_type, labels_order=None, time_steps=None):
         Output data for each time step.
 
     """
+    return_list = True
+
     if time_steps is not None:
         if isinstance(time_steps, int):
             time_steps = [time_steps]
+            return_list = False
 
         if any(i < 0 for i in time_steps):
             n_steps = _count_time_steps(filename)
@@ -65,7 +68,14 @@ def read(filename, file_type, labels_order=None, time_steps=None):
     with open_file(filename, "r") as f:
         headers, times, labels, data = _read_csv(f, file_type, time_steps)
 
-        return to_output(file_type, labels_order, headers, times, labels, data)
+    return to_output(
+        file_type,
+        labels_order,
+        headers, times,
+        labels,
+        data,
+        return_list,
+    )
 
 
 def _read_csv(f, file_type, time_steps=None):
