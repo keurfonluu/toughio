@@ -1,68 +1,85 @@
+from __future__ import annotations
+from numpy.typing import ArrayLike
+from typing import Optional
+
 from abc import ABC, abstractmethod
 
 import os
 import numpy as np
 
-__all__ = [
-    "ConnectionOutput",
-    "ElementOutput",
-    "Output",
-]
-
 
 class Output(ABC):
-    def __init__(self, time, data, labels=None):
-        """
-        Base class for output data.
+    """
+    Base class for output data.
 
-        Do not use.
+    Parameters
+    ----------
+    data : dict
+        Data arrays.
+    time : scalar, optional
+        Time step (in seconds).
+    labels : sequence of str, optional
+        Labels of elements.
 
-        """
+    """
+    __name__: str = "Output"
+    __qualname__: str = "toughio.Output"
+
+    def __init__(
+        self,
+        data: dict,
+        time: Optional[float] = None,
+        labels: Optional[ArrayLike] = None,
+    ) -> None:
+        """Initialize an output."""
         self.time = time
         self.data = data
         self.labels = labels
 
     @abstractmethod
-    def __getitem__(self, islice):
-        """Slice output."""
+    def __getitem__(self, islice: tuple) -> None:
+        """Slice an output."""
         raise NotImplementedError()
 
     @abstractmethod
-    def index(self, label, *args, **kwargs):
+    def index(self, label: str, *args, **kwargs) -> None:
         """Get index of element or connection."""
         if self.labels is None:
             raise AttributeError()
 
     @property
-    def n_data(self):
+    def n_data(self) -> int:
         """Return number of data points."""
         return len(self.data[list(self.data)[0]])
 
     @property
-    def time(self):
+    def time(self) -> float:
         """Return time step (in seconds)."""
         return self._time
 
     @time.setter
-    def time(self, value):
+    def time(self, value: float) -> None:
+        """Set time step."""
         self._time = value
 
     @property
-    def data(self):
+    def data(self) -> dict:
         """Return data arrays."""
         return self._data
 
     @data.setter
-    def data(self, value):
+    def data(self, value: dict) -> None:
+        """Set data arrays."""
         self._data = value
 
     @property
-    def labels(self):
+    def labels(self) -> ArrayLike | None:
         """Return labels."""
         return self._labels
 
     @labels.setter
-    def labels(self, value):
+    def labels(self, value: ArrayLike) -> None:
+        """Set labels."""
         if value is not None:
             if len(value) != self.n_data:
                 raise ValueError()
@@ -74,34 +91,46 @@ class Output(ABC):
 
 
 class ElementOutput(Output):
-    def __init__(self, time, data, labels=None):
+    """
+    Element output data.
+
+    Parameters
+    ----------
+    data : dict
+        Data arrays.
+    time : scalar, optional
+        Time step (in seconds).
+    labels : sequence of str, optional
+        Labels of elements.
+
+    """
+    __name__: str = "ElementOutput"
+    __qualname__: str = "toughio.ElementOutput"
+
+    def __init__(
+        self,
+        data: dict,
+        time: Optional[float] = None,
+        labels: Optional[ArrayLike] = None,
+    ) -> None:
+        """Initialize an element output."""
+        super().__init__(data=data, time=time, labels=labels)
+
+    def __getitem__(
+        self,
+        islice: int | str | slice | list[int] | list[str],
+    ) -> dict | ElementOutput:
         """
-        Element output data.
+        Slice an element output.
 
         Parameters
         ----------
-        time : scalar
-            Time step (in seconds).
-        data : dict
-            Data arrays.
-        labels : sequence of str or None, default, None
-            Labels of elements.
-
-        """
-        super().__init__(time, data, labels)
-
-    def __getitem__(self, islice):
-        """
-        Slice element output.
-
-        Parameters
-        ----------
-        islice : int, str, slice, sequence of int or sequence of str
+        islice : int | str | slice | sequence of int | sequence of str
             Indices or labels of elements to slice.
 
         Returns
         -------
-        dict or :class:`toughio.ElementOutput`
+        dict | :class:`toughio.ElementOutput`
             Sliced element outputs.
 
         """
@@ -124,12 +153,12 @@ class ElementOutput(Output):
             raise ValueError()
 
         return ElementOutput(
-            self.time,
-            {k: v[islice] for k, v in self.data.items()},
-            [self._labels[i] for i in islice],
+            data={k: v[islice] for k, v in self.data.items()},
+            time=self.time,
+            labels=[self._labels[i] for i in islice],
         )
 
-    def index(self, label, *args, **kwargs):
+    def index(self, label: str) -> int:
         """
         Get index of element.
 
@@ -144,40 +173,52 @@ class ElementOutput(Output):
             Index of element.
 
         """
-        super().index(label, *args, **kwargs)
+        super().index(label)
 
         return np.flatnonzero(self.labels == label)[0]
 
 
 class ConnectionOutput(Output):
-    def __init__(self, time, data, labels=None):
+    """
+    Connection output data.
+
+    Parameters
+    ----------
+    data : dict
+        Data arrays.
+    time : scalar, optional
+        Time step (in seconds).
+    labels : sequence of str, optional
+        Labels of connections.
+
+    """
+    __name__: str = "ConnectionOutput"
+    __qualname__: str = "toughio.ConnectionOutput"
+
+    def __init__(
+        self,
+        data: dict,
+        time: Optional[float] = None,
+        labels: Optional[ArrayLike] = None,
+    ) -> None:
+        """Initialize a connection output."""
+        super().__init__(data=data, time=time, labels=labels)
+
+    def __getitem__(
+        self,
+        islice: int | str | slice | list[int] | list[str],
+    ) -> dict | ConnectionOutput:
         """
-        Connection output data.
+        Slice a connection output.
 
         Parameters
         ----------
-        time : scalar
-            Time step (in seconds).
-        data : dict
-            Data arrays.
-        labels : sequence of str or None, default, None
-            Labels of connections.
-
-        """
-        super().__init__(time, data, labels)
-
-    def __getitem__(self, islice):
-        """
-        Slice connection output.
-
-        Parameters
-        ----------
-        islice : int, str, slice, sequence of int or sequence of str
+        islice : int | str | slice | sequence of int | sequence of str
             Indices or labels of connections to slice.
 
         Returns
         -------
-        dict or :class:`toughio.ConnectionOutput`
+        dict | :class:`toughio.ConnectionOutput`
             Sliced connection outputs.
 
         """
@@ -201,12 +242,12 @@ class ConnectionOutput(Output):
             raise ValueError()
 
         return ConnectionOutput(
-            self.time,
-            {k: v[islice] for k, v in self.data.items()},
-            [self._labels[i] for i in islice],
+            data={k: v[islice] for k, v in self.data.items()},
+            time=self.time,
+            labels=[self._labels[i] for i in islice],
         )
 
-    def index(self, label, label2=None, *args, **kwargs):
+    def index(self, label: str, label2: Optional[str] = None) -> int:
         """
         Get index of connection.
 
@@ -214,8 +255,8 @@ class ConnectionOutput(Output):
         ----------
         label : str
             Label of connection or label of first element of connection.
-        label2 : str or None, optional, default None
-            Label of second element of connection (if `label` is the label of the first element).
+        label2 : str, optional
+            Label of second element of connection (if *label* is the label of the first element).
 
         Returns
         -------
@@ -223,7 +264,7 @@ class ConnectionOutput(Output):
             Index of connection.
 
         """
-        super().index(label, *args, **kwargs)
+        super().index(label)
         labels = ["".join(label) for label in self.labels]
 
         if label2 is not None:
@@ -231,13 +272,17 @@ class ConnectionOutput(Output):
 
         return labels.index(label)
 
-    def to_element(self, mesh, ignore_elements=None):
+    def to_element(
+        self,
+        mesh,
+        ignore_elements: Optional[list[str]] = None,
+    ) -> ElementOutput:
         """
         Project connection data to element centers.
 
         Parameters
         ----------
-        mesh : dict or pathlike
+        mesh : dict | PathLike
             Mesh parameters or file name.
         ignore_elements : sequence of str, optional
             Labels of elements to ignore.
@@ -305,10 +350,10 @@ class ConnectionOutput(Output):
             Q[i] = np.linalg.pinv(G.T @ G) @ G.T @ data[:, connection["index"]].T
 
         return ElementOutput(
-            time=self.time,
             data={
                 k: v for k, v in zip(self.data, Q.transpose((2, 0, 1)))
                 if k not in {"X", "Y", "Z"}
             },
+            time=self.time,
             labels=labels,
         )

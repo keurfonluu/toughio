@@ -73,30 +73,30 @@ hybrid_mesh = toughio.Mesh(
 
 output_eleme = [
     toughio.ElementOutput(
-        float(time),
-        {
+        data={
             "X": np.random.rand(10),
             "Y": np.random.rand(10),
             "Z": np.random.rand(10),
             "PRES": np.random.rand(10),
             "TEMP": np.random.rand(10),
         },
-        np.array([f"AAA0{i}" for i in range(10)]),
+        time=float(time),
+        labels=np.array([f"AAA0{i}" for i in range(10)]),
     )
     for time in range(3)
 ]
 
 output_conne = [
     toughio.ConnectionOutput(
-        float(time),
-        {
+        data={
             "X": np.random.rand(10),
             "Y": np.random.rand(10),
             "Z": np.random.rand(10),
             "HEAT": np.random.rand(10),
             "FLOW": np.random.rand(10),
         },
-        np.array([[f"AAA0{i}", f"AAA0{i}"] for i in range(10)]),
+        time=float(time),
+        labels=np.array([[f"AAA0{i}", f"AAA0{i}"] for i in range(10)]),
     )
     for time in range(3)
 ]

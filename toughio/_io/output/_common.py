@@ -10,9 +10,9 @@ def to_output(file_type, labels_order, headers, times, labels, data):
     outputs = []
     for time, labels_, data_ in zip(times, labels, data):
         kwargs = {
+            "data": {k: v for k, v in zip(headers, np.transpose(data_))},
             "time": time,
             "labels": labels_ if labels_ is not None and len(labels_) else None,
-            "data": {k: v for k, v in zip(headers, np.transpose(data_))},
         }
 
         output = (
@@ -44,11 +44,11 @@ def to_output(file_type, labels_order, headers, times, labels, data):
 
             outputs = [
                 ConnectionOutput(
-                    time=output.time,
                     data={
                         k: np.array([v[idx].sum() for idx in connections.values()])
                         for k, v in output.data.items()
                     },
+                    time=output.time,
                     labels=list(connections),
                 )
                 for output in outputs
