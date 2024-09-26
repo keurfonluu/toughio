@@ -118,7 +118,7 @@ def dump_outputs(
     if not filenames_to_dump:
         raise ValueError(f"could not find any output file in '{str(path)}'")
         
-    with H5File(filename, mode="w", exist_ok=exist_ok) as f:
+    with H5File(filename, mode="w", compression_opts=compression_opts, exist_ok=exist_ok) as f:
         for filename_ in connection_output_filenames:
             outputs = read_output(filename_, connection=True)
 
