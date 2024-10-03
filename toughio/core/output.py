@@ -275,6 +275,7 @@ class ConnectionOutput(Output):
     def to_element(
         self,
         mesh,
+        linear_data: Optional[list[str]] = None,
         ignore_elements: Optional[list[str]] = None,
     ) -> ElementOutput:
         """
@@ -284,6 +285,8 @@ class ConnectionOutput(Output):
         ----------
         mesh : dict | PathLike
             Mesh parameters or file name.
+        linear_data : sequence of str, optional
+            Data keys corresponding to linear quantities. Linear quantities (e.g., Darcy's velocity) are not scaled by the interface area.
         ignore_elements : sequence of str, optional
             Labels of elements to ignore.
 
@@ -302,6 +305,7 @@ class ConnectionOutput(Output):
         if isinstance(mesh, (str, os.PathLike)):
             mesh = read_input(mesh, file_format="tough", blocks=["ELEME", "CONNE"])
 
+        linear_data = list(linear_data) if linear_data is not None else {"VEL_L", "VEL_G", "V(LIQ.)", "V(GAS)"}
         ignore_elements = set(ignore_elements) if ignore_elements is not None else set()
         centers = {
             k: np.asarray(v["center"]) for k, v in mesh["elements"].items()
@@ -311,7 +315,6 @@ class ConnectionOutput(Output):
         labels = list(centers)
 
         # Gather all data to build linear systems to solve
-        data = np.row_stack(list(self.data.values()))
         connections = {
             label: {
                 "index": [],
@@ -342,12 +345,34 @@ class ConnectionOutput(Output):
             for connection in connections.values()
         ]
 
+        # Identify linear and volumetric data
+        data = np.row_stack(list(self.data.values()))
+        linear, volume = [], []
+
+        for i, k in enumerate(self.data):
+            if k in linear_data:
+                linear.append(i)
+
+            else:
+                volume.append(i)
+
+        if linear:
+            data_linear = data[linear]
+
+        if volume:
+            data_volume = data[volume]
+
         # Approximate connection data
         Q = np.zeros((len(centers), 3, len(data)))
 
         for i, connection in enumerate(connections):
-            G = connection["areas"][:, np.newaxis] * connection["normals"]
-            Q[i] = np.linalg.pinv(G.T @ G) @ G.T @ data[:, connection["index"]].T
+            if linear:
+                G = connection["normals"]
+                Q[i][:, linear] = np.linalg.pinv(G.T @ G) @ G.T @ data_linear[:, connection["index"]].T
+
+            if volume:
+                G = connection["areas"][:, np.newaxis] * connection["normals"]
+                Q[i][:, volume] = np.linalg.pinv(G.T @ G) @ G.T @ data_volume[:, connection["index"]].T
 
         return ElementOutput(
             data={
