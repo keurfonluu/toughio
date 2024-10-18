@@ -67,7 +67,7 @@ class H5File:
         """On context closing."""
         self._h5file.close()
 
-        if exc_type or exc_val or exc_tb:
+        if self.mode == "w" and (exc_type or exc_val or exc_tb):
             os.remove(self.filename)
 
     def __contains__(self, node: str) -> bool:
