@@ -386,7 +386,6 @@ def from_pyvista(mesh, material="dfalt"):
 
         from ..core.mesh._common import vtk_to_meshio_type
 
-        VTK9 = vtk.vtkVersion().GetVTKMajorVersion() >= 9
     except ImportError:
         raise ImportError(
             "Converting pyvista.UnstructuredGrid requires pyvista to be installed."
@@ -399,7 +398,7 @@ def from_pyvista(mesh, material="dfalt"):
 
     # Copy useful arrays to avoid repeated calls to properties
     vtk_offset = mesh.offset
-    vtk_cells = mesh.cells
+    vtk_cells = mesh.cell_connectivity
     vtk_cell_type = mesh.celltypes
 
     # Check that meshio supports all cell types in input mesh
@@ -410,14 +409,9 @@ def from_pyvista(mesh, material="dfalt"):
 
     # Get cells
     cells = []
-    c = 0
-    for offset, cell_type in zip(vtk_offset, vtk_cell_type):
-        numnodes = vtk_cells[offset]
-        if VTK9:
-            cell = vtk_cells[offset + 1 + c : offset + 1 + c + numnodes]
-            c += 1
-        else:
-            cell = vtk_cells[offset + 1 : offset + 1 + numnodes]
+    
+    for i1, i2, cell_type in zip(vtk_offset[:-1], vtk_offset[1:], vtk_cell_type):
+        cell = vtk_cells[i1 : i2]
         cell = (
             cell
             if cell_type not in pixel_voxel
@@ -427,7 +421,7 @@ def from_pyvista(mesh, material="dfalt"):
         )
         cell_type = cell_type if cell_type not in pixel_voxel else cell_type + 1
         cell_type = (
-            vtk_to_meshio_type[cell_type] if cell_type != 7 else f"polygon{numnodes}"
+            vtk_to_meshio_type[cell_type] if cell_type != 7 else f"polygon{len(cell)}"
         )
 
         if len(cells) > 0 and cells[-1][0] == cell_type:
