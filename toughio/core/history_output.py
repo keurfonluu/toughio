@@ -204,6 +204,8 @@ class HistoryOutput(UserDict):
         ax: Optional[Axes] = None,
         logx: bool = False,
         logy: bool = False,
+        xscale: Optional[float] = None,
+        yscale: Optional[float] = None,
         time_unit: Optional[Literal["second", "hour", "day", "year"]] = None,
         *args,
         **kwargs,
@@ -223,11 +225,17 @@ class HistoryOutput(UserDict):
             If True, use log scaling on X axis.
         logy : bool, default False
             If True, use log scaling on Y axis.
+        xscale : scalar, optional
+            Scaling factor applied to X axis.
+        yscale : scalar, optional
+            Scaling factor applied to Y axis.
         time_unit : {'second', 'hour', 'day', 'year'}, optional
             Unit of time axis (if *x* is time data).
 
         """
         ax = ax if ax is not None else plt.gca()
+        xscale = xscale if xscale else 1.0
+        yscale = yscale if yscale else 1.0
         time_unit = time_unit if time_unit else "second"
 
         if x:
@@ -245,13 +253,13 @@ class HistoryOutput(UserDict):
                 pass
 
             elif time_unit == "hour":
-                x = np.array(x) / 3600.0
+                xscale = 1.0 / 3600.0
 
             elif time_unit == "day":
-                x = np.array(x) / 86400.0
+                xscale = 1.0 / 86400.0
 
             elif time_unit == "year":
-                x = np.array(x) / 31557600.0
+                xscale = 1.0 / 31557600.0
 
             else:
                 raise ValueError(f"invalid time unit '{time_unit}'")
@@ -274,7 +282,7 @@ class HistoryOutput(UserDict):
         else:
             p = ax.plot
 
-        p(x, y, *args, **kwargs)
+        p(x * xscale, y * yscale, *args, **kwargs)
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
 
