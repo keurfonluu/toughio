@@ -11,7 +11,7 @@ from .mesh import Mesh
 
 class ParticleTracker:
     """
-    Particle tracer class.
+    Particle tracker class.
     
     Parameters
     ----------
