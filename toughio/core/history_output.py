@@ -135,14 +135,14 @@ class HistoryOutput(UserDict):
             for key, value in super().items():
                 yield key, value
 
-    def concatenate(self, obj: HistoryOutput, shift: bool = False) -> HistoryOutput:
+    def concatenate(self, obj: HistoryOutput | list[HistoryOutput], shift: bool = False) -> HistoryOutput:
         """
-        Concatenate two history outputs.
+        Concatenate history outputs.
 
         Parameters
         ----------
-        obj : :class:`toughio.HistoryOutput`
-            History output to concatenate this output with.
+        obj : :class:`toughio.HistoryOutput` | sequence of :class:`toughio.HistoryOutput`
+            History output(s) to concatenate this output with.
         shift : bool, default False
             If True, shift times of *obj* by the last time value of this output.
         
@@ -152,38 +152,48 @@ class HistoryOutput(UserDict):
             Concatenated history output.
 
         """
-        obj1, obj2 = self, obj
-        time1, time2 = obj1.time, obj2.time
+        if isinstance(obj, HistoryOutput):
+            obj1, obj2 = self, obj
+            time1, time2 = obj1.time, obj2.time
 
-        if time1 is None or time2 is None:
-            raise ValueError("could not concatenate history output without time data")
+            if time1 is None or time2 is None:
+                raise ValueError("could not concatenate history output without time data")
 
-        if sorted(obj1) != sorted(obj2):
-            raise ValueError("could not concatenate history output with different data")
-        
-        if shift:
-            obj2 = obj2.shift(time1[-1])
-            mask2 = np.ones_like(time2, dtype=bool)
+            if sorted(obj1) != sorted(obj2):
+                raise ValueError("could not concatenate history output with different data")
+            
+            if shift:
+                obj2 = obj2.shift(time1[-1])
+                mask2 = np.ones_like(time2, dtype=bool)
+
+            else:
+                if time1[0] > time2[0]:
+                    obj1, obj2 = obj2, obj1
+                    time1, time2 = time2, time1
+
+                mask2 = time2 > time1[-1]
+
+            output = HistoryOutput(
+                {
+                    key: np.concatenate((value, obj2[key][mask2]))
+                    for key, value in obj1.to_dict(unit=True).items()
+                }
+            )
+
+            for name in {"label", "type"}:
+                value = getattr(obj1, name)
+
+                if value and value == getattr(obj2, name):
+                    setattr(output, name, value)
+
+        elif isinstance(obj, (list, tuple)) and all(isinstance(x, HistoryOutput) for x in obj):
+            output = self
+
+            for x in obj:
+                output = output.concatenate(x, shift)
 
         else:
-            if time1[0] > time2[0]:
-                obj1, obj2 = obj2, obj1
-                time1, time2 = time2, time1
-
-            mask2 = time2 > time1[-1]
-
-        output = HistoryOutput(
-            {
-                key: np.concatenate((value, obj2[key][mask2]))
-                for key, value in obj1.to_dict(unit=True).items()
-            }
-        )
-
-        for name in {"label", "type"}:
-            value = getattr(obj1, name)
-
-            if value and value == getattr(obj2, name):
-                setattr(output, name, value)
+            raise ValueError("could not concatenate with input obj")
 
         return output
 
