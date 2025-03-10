@@ -153,4 +153,4 @@ def cylindric_grid(
         material=material,
     )
 
-    return CylindricMesh(mesh)
+    return CylindricMesh(mesh, metadata=mesh.metadata)
