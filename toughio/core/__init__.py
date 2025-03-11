@@ -7,3 +7,4 @@ from .labeler import Labeler
 from .mesh import Mesh, CylindricMesh
 from .output import ConnectionOutput, ElementOutput, Output
 from .particle_tracker import ParticleTracker
+from .well import Pipe, WellCasing

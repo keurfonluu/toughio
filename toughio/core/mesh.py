@@ -1,5 +1,5 @@
 from __future__ import annotations
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from numpy.typing import ArrayLike
 from typing import Literal, Optional
 from typing_extensions import Self
@@ -16,6 +16,7 @@ import pvgridder as pvg
 from scipy.spatial import KDTree
 
 from ._typing import GridLike
+from .well import WellCasing
 
 
 class BaseMesh(ABC):
@@ -407,6 +408,35 @@ class BaseMesh(ABC):
             self.metadata[material_key][material] = imat
 
         self.materials_digitized[ind] = imat
+
+    def set_material_by_layer(
+        self,
+        material: str,
+        vmin: Optional[float] = None,
+        vmax: Optional[float] = None,
+        axis: int = 2,
+    ) -> None:
+        """
+        Set material to cells within defined bounds.
+
+        Parameters
+        ----------
+        material : str
+            Material name.
+        vmin : float, optional
+            Lower bound value. If None, default to -Infinity.
+        vmax : float, optional
+            Upper bound value. If None, default to +Infinity.
+        axis : int, default 2
+            Axis along which filter is applied.
+    
+        """
+        vmin = vmin if vmin is not None else -np.inf
+        vmax = vmax if vmax is not None else np.inf
+
+        v = self.centers[:, axis]
+        mask = np.logical_and(v > vmin, v < vmax)
+        self.set_material(material, mask)
 
     def to_meshio(self) -> meshio.Mesh:
         """
@@ -1118,6 +1148,136 @@ class CylindricMesh(BaseMesh):
         areas = 2.0 * np.pi * centers[:, 0] * lengths
 
         return connections, centers, normals, areas
+
+    def add_well(self, well: WellCasing) -> None:
+        """
+        Apply a wellbore design to a mesh.
+
+        Parameters
+        ----------
+        well : toughio.WellCasing
+            Wellbore design to apply.
+
+        """
+        centers = self.centers
+        x = np.unique(self.points[:, 0])
+
+        def get_radii(pipe: Pipe) -> tuple[float, float]:
+            rout = pipe.radius + pipe.thickness
+            rind = np.flatnonzero(x == rout)[0]
+            rin = x[rind - 1] if rind else 0.0
+
+            return rin, rout
+
+        if not np.isin(well.radii, x).all():
+            raise ValueError("could not generate wellbore with radius not matching radial discretization of porous medium")
+
+        well_domain = np.zeros(self.n_cells, dtype=bool)
+
+        for pipe in well.pipes:
+            rin, rout = get_radii(pipe)
+            mask = (
+                (centers[:, 0] > rin)
+                & (centers[:, 0] < rout)
+                & (centers[:, 2] > pipe.zmin)
+                & (centers[:, 2] < pipe.zmax)
+            )
+            well_domain[mask] = not pipe.is_porous
+            self.set_material(pipe.material, mask)
+            self.set_active(True, mask)
+
+        self.add_data("WellDomain", well_domain)
+
+        if well.branches:
+            z = np.unique(self.points[:, 2])
+            labels = self.labels
+            branches = []
+
+            for id1, id2, depth in well.branches:
+                i = np.searchsorted(z, depth, side="left") - 1
+                rin1, rout1 = get_radii(well.pipes[id1])
+                rin2, rout2 = get_radii(well.pipes[id2])
+
+                mask1 = (
+                    (centers[:, 0] > rin1)
+                    & (centers[:, 0] < rout1)
+                    & (centers[:, 2] > z[i])
+                    & (centers[:, 2] < z[i + 1])
+                )
+                mask2 = (
+                    (centers[:, 0] > rin2)
+                    & (centers[:, 0] < rout2)
+                    & (centers[:, 2] > z[i])
+                    & (centers[:, 2] < z[i + 1])
+                )
+                assert mask1.sum() == 1
+                assert mask2.sum() == 1
+                branches.append((labels[mask1][0], labels[mask2][0]))
+
+            self.metadata["WellBranch"] = branches
+
+    def to_tough(self, *args, **kwargs) -> dict:
+        """
+        Convert mesh to TOUGH mesh.
+
+        Parameters
+        ----------
+        filename : str | os.PathLike, optional
+            Output file name.
+        nodal_distance : {'line', 'orthogonal'}, default 'line'
+            Method to calculate connection nodal distances:
+
+             - 'line': distance between node and common face along connecting line
+             (distance is not normal),
+             - 'orthogonal': distance between node and its orthogonal projection onto
+             common face (shortest distance).
+
+        material_name : dict, optional
+            Map of material names.
+        gravity : ArrayLike, optional
+            Gravity direction vector.
+        incon : bool, default False
+            If True, also export initial conditions.
+        **kwargs : dict, optional
+            Additional keyword arguments. See ``toughio.write_input`` for more details.
+
+        Returns
+        -------
+        dict
+            TOUGH mesh as a dict. Only provided if *filename* is None.
+
+        """
+        parameters = super().to_tough(*args, **kwargs)
+        mask = self.data.get("WellDomain", np.zeros(self.n_cells, dtype=bool))
+
+        if mask.any():
+            label_length = self.label_length
+            well_elements = set(self.labels[mask])
+
+            # Identify branches
+            branch_connections = set()
+            branches = self.metadata.get("WellBranch", [])
+
+            for label1, label2 in branches:
+                branch_connections.add(f"{label1}{label2}")
+                branch_connections.add(f"{label2}{label1}")
+
+            # Remove horizontal connections for well elements
+            connections = {}
+
+            for k, v in parameters["connections"].items():
+                if (
+                    (k[:label_length] in well_elements or k[label_length:] in well_elements)
+                    and v["permeability_direction"] != 3
+                    and k not in branch_connections
+                ):
+                    continue
+
+                connections[k] = v
+
+            parameters["connections"] = connections
+
+        return parameters
 
     @property
     def volumes(self) -> ArrayLike:
