@@ -95,6 +95,10 @@ class HistoryOutput(UserDict):
         """Concatenate two history outputs."""
         return self.concatenate(obj, shift=False)
 
+    def __iadd__(self, obj: HistoryOutput) -> HistoryOutput:
+        """Concatenate two history outputs."""
+        return self.__add__(obj)
+
     def __call__(self, x: ArrayLike) -> HistoryOutput:
         """Interpolate an history output."""
         xp = self.time
@@ -108,6 +112,25 @@ class HistoryOutput(UserDict):
         }
 
         return HistoryOutput(out)
+
+    def copy(self, deep: bool = True) -> Self:
+        """
+        Return a copy of the history output.
+
+        Parameters
+        ----------
+        deep : bool, default True
+            If True, return a deep copy.
+
+        Returns
+        -------
+        toughio.HistoryOutput
+            Copy of the history output.
+
+        """
+        copy_ = copy.deepcopy if deep else copy.copy
+
+        return self.__class__(copy_(self), copy_(self.metadata))
 
     def items(self, unit: bool = False) -> tuple[str, ArrayLike] | tuple[str, ArrayLike, str | None]:
         """
@@ -153,7 +176,13 @@ class HistoryOutput(UserDict):
             Concatenated history output.
 
         """
-        if isinstance(obj, HistoryOutput):
+        if not self:
+            return obj.copy()
+
+        elif not obj:
+            return self.copy()
+        
+        elif isinstance(obj, HistoryOutput):
             obj1, obj2 = self, obj
             time1, time2 = obj1.time, obj2.time
 
@@ -304,7 +333,7 @@ class HistoryOutput(UserDict):
             Shifted history output. Only provided if *inplace* is False.
 
         """
-        obj = self if inplace else copy.deepcopy(self)
+        obj = self if inplace else self.copy(deep=True)
 
         time = obj.time
 
