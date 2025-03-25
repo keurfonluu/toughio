@@ -4,6 +4,7 @@ from typing import Optional
 import glob
 import os
 import pathlib
+import tarfile
 
 import numpy as np
 
@@ -21,6 +22,7 @@ def dump_outputs(
     rock_history_pattern: Optional[str] = None,
     compression_opts: Optional[int] = None,
     exist_ok: bool = False,
+    tar: bool = False,
     return_dumped_filenames: bool = False,
 ) -> list[str] | None:
     """
@@ -48,6 +50,8 @@ def dump_outputs(
         Compression level for gzip compression. May be an integer from 0 to 9.
     exist_ok : bool, default False
         If True, overwrite *filename* if it already exists.
+    tar : bool, default False
+        If True, move dumped files to a tarball.
     return_dumped_filenames : bool, default False
         If True, return a list of of the output file names that have been dumped.
     
@@ -146,6 +150,14 @@ def dump_outputs(
         for filename_ in rock_history_filenames:
             output = read_table(filename_)
             f.dump(output)
+
+    if tar:
+        tar_filename = pathlib.Path(filename).with_suffix(".tar.gz")
+
+        with tarfile.open(tar_filename, "w:gz") as tf:
+            for filename_ in filenames_to_dump:
+                tf.add(filename_, arcname=pathlib.Path(filename_).name)
+                os.remove(filename_)
 
     if return_dumped_filenames:
         return filenames_to_dump
