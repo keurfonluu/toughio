@@ -2,6 +2,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from numpy.typing import ArrayLike
 from typing import Literal, Optional
+from typing_extensions import Self
 
 import copy
 import re
@@ -95,9 +96,13 @@ class HistoryOutput(UserDict):
         """Concatenate two history outputs."""
         return self.concatenate(obj, shift=False)
 
-    def __iadd__(self, obj: HistoryOutput) -> HistoryOutput:
-        """Concatenate two history outputs."""
-        return self.__add__(obj)
+    def __iadd__(self, obj: HistoryOutput) -> Self:
+        """Concatenate two history outputs in-place."""
+        out = self.__add__(obj)
+        self.clear()
+        self.update(out)
+
+        return self
 
     def __call__(self, x: ArrayLike) -> HistoryOutput:
         """Interpolate an history output."""
