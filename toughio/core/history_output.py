@@ -300,10 +300,15 @@ class HistoryOutput(UserDict):
                 raise ValueError(f"invalid time unit '{time_unit}'")
 
             xlabel = f"Time ({time_unit})"
+        
+        try:
+            unit = self.units[y]
 
-        key, unit = self._get_key_unit(y)
-        y = self[key]
-        ylabel = f"{key} ({unit})" if unit else key
+        except KeyError:
+            unit = None
+
+        ylabel = f"{y} ({unit})" if unit else y
+        y = self.data[y]
 
         if logx and logy:
             p = ax.loglog
@@ -420,7 +425,7 @@ class HistoryOutput(UserDict):
     @staticmethod
     def _get_key_unit(key: str) -> tuple[str, str]:
         """Split a key to (key, unit) pair."""
-        match = re.match(r"^(.*?)\s*(?:\((.*?)\))?$", key)
+        match = re.match(r"^(.*?)(?:\(([^()]+)\))?$", key)
 
         if match:
             key, unit = match.groups()
@@ -428,6 +433,9 @@ class HistoryOutput(UserDict):
 
         else:
             raise ValueError(f"invalid key '{key}'")
+
+        key = key.strip() if key else None
+        unit = unit.strip() if unit else None
 
         return key, unit
 
