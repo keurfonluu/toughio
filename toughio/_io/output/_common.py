@@ -23,7 +23,7 @@ def to_output(file_type, labels_order, headers, times, labels, data, return_list
         outputs.append(output)
 
     # Some older versions of TOUGH3 have duplicate connection outputs when running in parallel
-    # Fix the outputs here by summing the duplicate connections
+    # Fix the outputs here by keeping the first occurence (the other occurrences should hold the same values)
     if file_type == "connection" and len(labels[0]):
         # Check whether there are duplicate connections
         connections = {}
@@ -38,14 +38,10 @@ def to_output(file_type, labels_order, headers, times, labels, data, return_list
                 connections[(c1, c2)] = [i]
 
         if found_duplicate:
-            logging.warning(
-                "Found duplicate connections. Fixing outputs by summing duplicate connections."
-            )
-
             outputs = [
                 ConnectionOutput(
                     data={
-                        k: np.array([v[idx].sum() for idx in connections.values()])
+                        k: np.array([v[idx[0]] for idx in connections.values()])
                         for k, v in output.data.items()
                     },
                     time=output.time,
