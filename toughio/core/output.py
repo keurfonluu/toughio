@@ -38,9 +38,10 @@ class Output(ABC):
         self.labels = labels
 
     @abstractmethod
-    def __getitem__(self, islice: tuple) -> None:
+    def __getitem__(self, *args) -> None:
         """Slice an output."""
-        pass
+        if self.labels is None:
+            raise AttributeError("could not slice output with no labels")
 
     @abstractmethod
     def index(self, label: str, *args, **kwargs) -> None:
@@ -135,8 +136,7 @@ class ElementOutput(Output):
             Sliced element outputs.
 
         """
-        if self.labels is None:
-            raise AttributeError()
+        super().__getitem__()
 
         if np.ndim(islice) == 0:
             if isinstance(islice, slice):
@@ -223,8 +223,7 @@ class ConnectionOutput(Output):
             Sliced connection outputs.
 
         """
-        if self.labels is None:
-            raise AttributeError()
+        super().__getitem__()
 
         if np.ndim(islice) == 0:
             if isinstance(islice, str):
@@ -236,7 +235,12 @@ class ConnectionOutput(Output):
             else:
                 return {k: v[islice] for k, v in self.data.items()}
 
-        elif np.ndim(islice) <= 2:
+        elif np.shape(islice) == (2,):
+            islice = self.index(*islice)
+
+            return {k: v[islice] for k, v in self.data.items()}
+
+        elif np.ndim(islice) == 2:
             islice = [self.index(*i) if np.ndim(i) == 1 else i for i in islice]
 
         else:
@@ -245,7 +249,7 @@ class ConnectionOutput(Output):
         return ConnectionOutput(
             data={k: v[islice] for k, v in self.data.items()},
             time=self.time,
-            labels=[self._labels[i] for i in islice],
+            labels=self._labels[islice],
         )
 
     def index(self, label: str, label2: Optional[str] = None) -> int:
