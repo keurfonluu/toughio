@@ -60,6 +60,15 @@ class H5File:
 
         self._h5file = h5py.File(self.filename, self.mode)
 
+        if self.mode == "w":
+            import datetime
+        
+            # Add version info
+            node = self._get_node("VersionInfo")
+            self._dump_data("version", "1.0", node=node)
+            self._dump_data("user", os.getlogin(), node=node)
+            self._dump_data("date", str(datetime.datetime.now().astimezone().isoformat()), node=node)
+
         return self
 
     def __exit__(
