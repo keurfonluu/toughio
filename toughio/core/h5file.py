@@ -9,8 +9,11 @@ import pathlib
 
 import h5py
 import numpy as np
+import pyvista as pv
+import pvgridder as pvg
 
 from .history_output import HistoryOutput
+from .mesh import Mesh
 from .output import ConnectionOutput, ElementOutput
 
 
@@ -77,15 +80,15 @@ class H5File:
 
     def dump(
         self,
-        obj: ConnectionOutput | ElementOutput | HistoryOutput,
+        obj: Mesh | ConnectionOutput | ElementOutput | HistoryOutput,
     ) -> None:
         """
-        Dump an output to container.
+        Dump a mesh or an output to container.
 
         Parameters
         ----------
-        obj : toughio.ConnectionOutput | toughio.ElementOutput | toughio.HistoryOutput
-            Output to dump to container.
+        obj : toughio.Mesh | toughio.ConnectionOutput | toughio.ElementOutput | toughio.HistoryOutput
+            Mesh or output to dump to container.
 
         """
         def check_name(name: str, node: h5py.Group) -> str:
@@ -107,8 +110,36 @@ class H5File:
 
         except AttributeError:
             name = type(obj)
+
+        if isinstance(obj, Mesh):
+            # /Mesh
+            node = self._get_node("Mesh")
+
+            type_ = "StructuredGrid" if isinstance(obj.pyvista, pv.StructuredGrid) else "UnstructuredGrid"
+            self._dump_data("type", type_, node=node)
+
+            # /Mesh/pyvista
+            node = self._get_node("pyvista", node=node)
+            
+            if isinstance(obj.pyvista, pv.UnstructuredGrid):
+                cells = pvg.get_cell_connectivity(obj.pyvista, flatten=True)
+
+                self._dump_data("cells", cells, node=node)
+                self._dump_data("celltypes", obj.pyvista.celltypes, node=node)
+                self._dump_data("points", obj.pyvista.points, node=node)
+
+            else:
+                self._dump_data("x", obj.pyvista.x, node=node)
+                self._dump_data("y", obj.pyvista.y, node=node)
+                self._dump_data("z", obj.pyvista.z, node=node)
+
+            # /Mesh
+            node = self._get_node("Mesh")
+
+            self._dump_dict("data", obj.data, node=node)
+            self._dump_dict("metadata", obj.metadata, node=node)
         
-        if isinstance(obj, (ConnectionOutput, ElementOutput)):
+        elif isinstance(obj, (ConnectionOutput, ElementOutput)):
             # /Output
             node = self._get_node("Output")
 
@@ -178,11 +209,45 @@ class H5File:
             # /History/{type_}/{name}
             node = self._get_node(name, node=node)
 
-            self._dump_dict("data", obj.to_dict(unit=True), node=node)
+            self._dump_dict("data", obj.to_dict(unit=False), node=node)
             self._dump_dict("metadata", {k: v for k, v in obj.metadata.items() if k not in {"label", "type"}}, node=node)
 
         else:
             raise ValueError(f"could not dump {name} to file")
+
+    def load_mesh(self) -> Mesh:
+        """
+        Load mesh.
+
+        Returns
+        -------
+        toughio.Mesh
+            Mesh instance.
+
+        """
+        if "Mesh" not in self:
+            raise ValueError("could not load mesh")
+
+        type_ = self._load_data("Mesh/type")
+        data = self._load_dict("Mesh/data")
+        metadata = self._load_dict("Mesh/metadata")
+
+        if type_ == "StructuredGrid":
+            x = self._load_data("Mesh/pyvista/x")
+            y = self._load_data("Mesh/pyvista/y")
+            z = self._load_data("Mesh/pyvista/z")
+            mesh = pv.StructuredGrid(x, y, z)
+
+        else:
+            points = self._load_data("Mesh/pyvista/points")
+            cells = self._load_data("Mesh/pyvista/cells")
+            celltypes = self._load_data("Mesh/pyvista/celltypes")
+            mesh = pv.UnstructuredGrid(cells, celltypes, points)
+
+        mesh = Mesh(mesh, metadata=metadata)
+        mesh.add_data(data)
+
+        return mesh
 
     def load_connection_output(
         self,
