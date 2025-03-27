@@ -35,8 +35,8 @@ class HistoryOutput(UserDict):
         metadata: Optional[dict] = None,
     ) -> None:
         """Initialize an history output."""
-        super().__init__(obj if obj else {})
         self.metadata = metadata
+        super().__init__(obj if obj else {})
 
     def _repr_html_(self) -> str:
         """Represent an history output as an HTML dataframe."""
@@ -83,14 +83,12 @@ class HistoryOutput(UserDict):
         value = np.asarray(value) if ndim == 1 else value
         super().__setitem__(key, value)
 
-        # Check unit
-        if unit and not isinstance(unit, str):
-            raise ValueError(f"invalid unit {unit}")
+        # Add unit
+        if unit:
+            if not isinstance(unit, str):
+                raise ValueError(f"invalid unit {unit}")
 
-        if not hasattr(self, "_units"):
-            self._units = {}
-
-        self.units[key] = unit
+            self.units[key] = unit
 
     def __add__(self, obj: HistoryOutput) -> HistoryOutput:
         """Concatenate two history outputs."""
@@ -158,7 +156,13 @@ class HistoryOutput(UserDict):
         """
         if unit:
             for key, value in super().items():
-                yield key, value, self.units[key]
+                try:
+                    unit = self.units[key]
+
+                except KeyError:
+                    unit = None
+
+                yield key, value, unit
 
         else:
             for key, value in super().items():
@@ -513,4 +517,8 @@ class HistoryOutput(UserDict):
     @property
     def units(self) -> dict:
         """Return data units."""
-        return self._units
+        if "units" not in self.metadata:
+            self.metadata["units"] = {}
+
+        return self.metadata["units"]
+        
