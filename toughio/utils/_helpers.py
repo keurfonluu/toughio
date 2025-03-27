@@ -8,12 +8,13 @@ import tarfile
 
 import numpy as np
 
-from ..core import H5File
+from ..core import H5File, Mesh
 
 
 def dump_outputs(
     filename: str | os.PathLike,
     path: Optional[str | os.PathLike] = None,
+    with_mesh: Optional[str | os.PathLike | Mesh] = None,
     connection_output_pattern: Optional[str] = None,
     element_output_pattern: Optional[str] = None,
     connection_history_pattern: Optional[str] = None,
@@ -34,6 +35,8 @@ def dump_outputs(
         H5 container file name.
     path : str | PathLike
         Path of directory where outputs to be dumped are located.
+    with_mesh : str | PathLike | toughio.Mesh
+        Mesh to export.
     connection_output_pattern : str, optional
         Pattern used to find connection output file names.
     element_output_pattern : str, optional
@@ -123,6 +126,9 @@ def dump_outputs(
         raise ValueError(f"could not find any output file in '{str(path)}'")
         
     with H5File(filename, mode="w", compression_opts=compression_opts, exist_ok=exist_ok) as f:
+        if with_mesh:
+            f.dump(Mesh(with_mesh))
+
         for filename_ in connection_output_filenames:
             outputs = read_output(filename_, connection=True)
 
@@ -157,7 +163,10 @@ def dump_outputs(
         with tarfile.open(tar_filename, "w:gz") as tf:
             for filename_ in filenames_to_dump:
                 tf.add(filename_, arcname=pathlib.Path(filename_).name)
-                os.remove(filename_)
+
+        # Remove files only when the tarball is written
+        for filename_ in filenames_to_dump:
+            os.remove(filename_)
 
     if return_dumped_filenames:
         return filenames_to_dump
