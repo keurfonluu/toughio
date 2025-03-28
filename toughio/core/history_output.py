@@ -99,6 +99,13 @@ class HistoryOutput(UserDict):
         out = self.__add__(obj)
         self.clear()
         self.update(out)
+        
+        for k, v in obj.metadata.items():
+            if k in self.metadata and isinstance(v, dict):
+                self.metadata[k].update(v)
+
+            else:
+                self.metadata[k] = copy.deepcopy(v)
 
         return self
 
