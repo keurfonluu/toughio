@@ -210,6 +210,27 @@ class BaseMesh(ABC):
 
         return self[mask]
 
+    def extract_slice(self, normal: str | ArrayLike, origin: Optional[ArrayLike] = None) -> toughio.Mesh:
+        """
+        Extract cells along a plane defined by its origin and normal vector.
+
+        Parameters
+        ----------
+        normal : {'x', '-x', 'y', '-y', 'z', '-z'} | ArrayLike
+            Orientation of normal vector.
+        origin : ArrayLike, optional
+            Origin of normal vector.
+
+        Returns
+        -------
+        toughio.Mesh
+            Mesh with extracted slice.
+
+        """
+        mesh = self.pyvista.slice(normal, origin=origin).cast_to_unstructured_grid()
+
+        return Mesh(mesh, metadata=self.metadata)
+
     def find_cells_by_material(self, material: int | str | Sequence[int | str], invert: bool = False) -> ArrayLike:
         """
         Find cells with given material names or IDS.
@@ -871,7 +892,7 @@ class BaseMesh(ABC):
     @labels.setter
     def labels(self, value: ArrayLike) -> None:
         """Set cell labels."""
-        self.metadata["Label"] = list(value)
+        self.metadata["Label"] = list(map(str, value))
         self.metadata["Label Length"] = len(max(value, key=len))
 
     @property
