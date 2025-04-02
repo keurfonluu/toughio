@@ -73,7 +73,6 @@ def tar(c):
     with tarfile.open("toughio.tar.gz", "w:gz") as tf:
         tf.add("toughio", arcname="toughio/toughio", filter=filter)
         tf.add("pyproject.toml", arcname="toughio/pyproject.toml")
-        tf.add("setup.cfg", arcname="toughio/setup.cfg")
 
 
 @task
