@@ -791,7 +791,15 @@ class BaseMesh(ABC):
             self.pyvista.user_dict.update(self.metadata)
             self.pyvista.save(filename)
 
-    def plot(self, **kwargs) -> None:
+    def plot(
+        self,
+        scalars: Optional[str | ArrayLike] = None,
+        show_edges: bool = True,
+        parallel_projection: bool = False,
+        enable_picking: bool = False,
+        tolerance: float = 0.0,
+        **kwargs,
+    ) -> None:
         """
         Plot a mesh.
 
@@ -801,10 +809,57 @@ class BaseMesh(ABC):
             Additional keyword arguments. See ``pyvista.DataSet.plot`` for more details.
 
         """
-        if "scalars" not in kwargs:
-            kwargs["scalars"] = self.materials
-            
-        self.pyvista.cast_to_unstructured_grid().plot(**kwargs)
+        scalars = scalars if scalars else self.materials
+        mesh = self.pyvista
+
+        # Ghost cells are not hidden for 2D structured grids
+        # See <https://github.com/pyvista/pyvista/issues/7112>
+        if (~self.active).any():
+            mesh = mesh.cast_to_unstructured_grid()
+
+        p = pv.Plotter(**kwargs)
+        p.add_mesh(
+            mesh,
+            scalars=scalars,
+            show_edges=show_edges,
+            scalar_bar_args={
+                "vertical": True,
+                "position_y": 0.15,
+                "height": 0.7,
+            }
+        )
+
+        if enable_picking:
+            infos = p.add_text(
+                "",
+                position="upper_left",
+                font_size=12,
+                shadow=False,
+            )
+
+            def callback(mesh: pv.DataSet) -> None:
+                i = mesh.cell_data["vtkOriginalCellIds"][0]
+                label = self.labels[i]
+                coords = np.round(mesh.get_cell(0).center, 3)
+                material = self.materials[i]
+                out = f"{label}\nCoords: ({', '.join(map(str, coords))})\nMaterial: {material}"
+
+                infos.SetText(2, out)
+                p.update()
+
+            p.enable_element_picking(
+                mode="cell",
+                callback=callback,
+                show_message=False,
+                tolerance=tolerance,
+                picker="cell",
+            )
+
+        if parallel_projection:
+            p.enable_parallel_projection()
+
+        p.add_axes()
+        p.show()
 
     def _compute_connection_properties(self) -> tuple[ArrayLike, ArrayLike, ArrayLike, ArrayLike]:
         """Compute connection properties."""
