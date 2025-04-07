@@ -40,10 +40,10 @@ class BaseMesh(ABC):
                 self._pyvista = mesh.copy()
 
             elif isinstance(mesh, pv.RectilinearGrid):
-                self._pyvista = mesh.cast_to_structured_grid()
+                self._pyvista = self._cast_to_unstructured_grid(mesh)
 
             elif isinstance(mesh, pv.ExplicitStructuredGrid):
-                self._pyvista = mesh.cast_to_unstructured_grid()
+                self._pyvista = self._cast_to_unstructured_grid(mesh)
 
             elif isinstance(mesh, meshio.Mesh):
                 if mesh.cell_sets:
@@ -78,7 +78,7 @@ class BaseMesh(ABC):
             raise ValueError()
 
         if isinstance(self.pyvista, pv.UnstructuredGrid):
-            self._pyvista = pvg.extract_cells_by_dimension(self.pyvista)
+            self._pyvista = pvg.extract_cells_by_dimension(self.pyvista, keep_empty_cells=True)
 
         # Cache user_dict in metadata for performance
         # Update user_dict with metadata when saving mesh
@@ -230,6 +230,41 @@ class BaseMesh(ABC):
         mesh = self.pyvista.slice(normal, origin=origin).cast_to_unstructured_grid()
 
         return Mesh(mesh, metadata=self.metadata)
+
+    def fuse_cells(self, ind: ArrayLike | Sequence[ArrayLike], inplace: bool = False) -> None | Self:
+        """
+        Fuse cells.
+
+        Parameters
+        ----------
+        ind : ArrayLike | Sequence[ArrayLike]
+            Indices or sequence of indices of cells to fuse.
+        inplace : bool, default False
+            If True, modify the current mesh. Otherwise, return a new mesh.
+
+        Returns
+        -------
+        toughio.Mesh
+            Mesh with fused cells. Only provided if *inplace* is False.
+
+        """
+        mask = np.ones(self.n_cells, dtype=bool)
+            
+        for ids in ind:
+            mask[ids[1:]] = False
+
+        pyvista = pvg.fuse_cells(self.pyvista, ind)
+        labels = self.labels[mask]
+
+        if inplace:
+            self._pyvista = pyvista
+            self.labels = labels
+
+        else:
+            mesh = self.__class__(pyvista, metadata=self.metadata, force=True)
+            mesh.labels = self.labels[mask]
+
+            return mesh
 
     def find_cells_by_material(self, material: int | str | Sequence[int | str], invert: bool = False) -> ArrayLike:
         """
@@ -585,38 +620,49 @@ class BaseMesh(ABC):
             distances_2 = distance_point_plane(centers_2, face_centers, face_normals, bounds_2)
 
         # Write MESH file
-        parameters = {
-            "elements": {
-                label: {
-                    "material": (
-                        material_name[material]
-                        if material in material_name
-                        else material
-                    ),
-                    "volume": volume,
-                    "center": center,
-                }
-                for label, material, volume, center in zip(labels, materials, volumes, centers)
-                if label not in inactive_labels
-            },
-            "connections": {
-                f"{l1}{l2}": {
+        # Elements
+        elements = {
+            label: {
+                "material": (
+                    material_name[material]
+                    if material in material_name
+                    else material
+                ),
+                "volume": volume,
+                "center": center,
+            }
+            for label, material, volume, center in zip(labels, materials, volumes, centers)
+            if label not in inactive_labels
+        }
+
+        # Connections
+        connections = {}
+
+        for l1, l2, isot, d1, d2, face_area, angle in zip(
+            labels_1,
+            labels_2,
+            permability_directions,
+            distances_1,
+            distances_2,
+            face_areas,
+            angles,
+        ):
+            label = f"{l1}{l2}"
+
+            if label in connections:
+                connections[label]["nodal_distances"][0] = min(connections[label]["nodal_distances"][0], d1)
+                connections[label]["nodal_distances"][1] = min(connections[label]["nodal_distances"][1], d2)
+                connections[label]["interface_area"] += face_area
+
+            else:
+                connections[label] = {
                     "permeability_direction": isot,
                     "nodal_distances": [d1, d2],
                     "interface_area": face_area,
                     "gravity_cosine_angle": angle,
                 }
-                for l1, l2, isot, d1, d2, face_area, angle in zip(
-                    labels_1,
-                    labels_2,
-                    permability_directions,
-                    distances_1,
-                    distances_2,
-                    face_areas,
-                    angles,
-                )
-            }
-        }
+
+        parameters = {"elements": elements, "connections": connections}
 
         # Initial conditions
         if incon:
@@ -861,6 +907,31 @@ class BaseMesh(ABC):
         p.add_axes()
         p.show()
 
+    @staticmethod
+    def _cast_to_unstructured_grid(mesh: pv.DataSet) -> pv.UnstructuredGrid:
+        """
+        Properly cast mesh to unstructured grid.
+        
+        Note
+        ----
+        This method prevents the conversion of ghost cells to empty cells.
+
+        """
+        mesh = mesh.copy(deep=False)
+
+        if "vtkGhostType" in mesh.cell_data:
+            tmp = mesh.cell_data.pop("vtkGhostType")
+
+        else:
+            tmp = None
+
+        mesh = mesh.cast_to_unstructured_grid()
+
+        if tmp is not None:
+            mesh.cell_data["vtkGhostType"] = tmp
+
+        return mesh
+
     def _compute_connection_properties(self) -> tuple[ArrayLike, ArrayLike, ArrayLike, ArrayLike]:
         """Compute connection properties."""
         poly = (
@@ -903,14 +974,14 @@ class BaseMesh(ABC):
     @property
     def centers(self) -> ArrayLike:
         """Return cell center array."""
-        if self.active.all():
-            mesh = self.pyvista
+        # Ghost cells are converted to empty cells after casting which yield no center
+        mesh = self._cast_to_unstructured_grid(self.pyvista)
+        
+        # Handle empty cells (that exists in the mesh but are not ghost cells)
+        cell_centers = np.full((mesh.n_cells, 3), np.nan)
+        cell_centers[mesh.celltypes != pv.CellType.EMPTY_CELL] = mesh.cell_centers(vertex=False).points
 
-        else:
-            mesh = self.pyvista.copy(deep=False)
-            mesh.clear_data()
-
-        return mesh.cell_centers(vertex=False).points
+        return cell_centers
 
     @property
     def data(self) -> dict:
@@ -1116,7 +1187,7 @@ class Mesh(BaseMesh):
             return self.pyvista.get_cell(key)
 
         else:
-            mesh = Mesh(self.pyvista.cast_to_unstructured_grid().extract_cells(key), metadata=self.metadata)
+            mesh = Mesh(self._cast_to_unstructured_grid(self.pyvista).extract_cells(key), metadata=self.metadata)
             mesh.labels = self.labels[key]
 
             return mesh
@@ -1163,6 +1234,7 @@ class CylindricMesh(BaseMesh):
         self,
         *args,
         metadata: Optional[dict] = None,
+        force: bool = False,
     ) -> None:
         """
         Cylindric mesh class.
@@ -1181,6 +1253,9 @@ class CylindricMesh(BaseMesh):
             Cell data key to use to initialize material data.
         metadata : dict, optional
             Mesh metadata.
+        force : bool, default False
+            If True, do not check if mesh is a 2D vertical rectilinear grid (may yield
+            unexpected results).
 
         """
         super().__init__(*args, metadata=metadata)
@@ -1188,17 +1263,18 @@ class CylindricMesh(BaseMesh):
         if self.ndim != 2:
             raise ValueError("could not initialize a cylindric mesh from a 3D mesh")
 
-        if not isinstance(self.pyvista, pv.StructuredGrid):
-            raise ValueError("could not initialize a cylindric mesh from an unstructured mesh")
-
-        if self.pyvista.dimensions[1] != 1:
-            raise ValueError("could not initialize a cylindric mesh from a non vertical mesh")
-
         x = np.unique(self.points[:, 0])
         z = np.unique(self.points[:, 2])
 
-        if x.size * z.size != np.prod(self.pyvista.dimensions):
-            raise ValueError("could not initialize a cylindric mesh from a non rectilinear mesh")
+        if not force:
+            if not isinstance(self.pyvista, pv.StructuredGrid):
+                raise ValueError("could not initialize a cylindric mesh from an unstructured mesh")
+
+            if self.pyvista.dimensions[1] != 1:
+                raise ValueError("could not initialize a cylindric mesh from a non vertical mesh")
+
+            if x.size * z.size != np.prod(self.pyvista.dimensions):
+                raise ValueError("could not initialize a cylindric mesh from a non rectilinear mesh")
 
         self.points[:, 0] -= x[0]
         self.points[:, 1] = 0.0
@@ -1249,18 +1325,24 @@ class CylindricMesh(BaseMesh):
             raise ValueError("could not generate wellbore with radius not matching radial discretization of porous medium")
 
         well_domain = np.zeros(self.n_cells, dtype=bool)
+        cells_to_fuse = []
 
-        for pipe in well.pipes:
-            rin, rout = get_radii(pipe)
+        for pipe in well.pipes[::-1]:
             mask = (
-                (centers[:, 0] > rin)
-                & (centers[:, 0] < rout)
+                (centers[:, 0] < pipe.radius + pipe.thickness)
                 & (centers[:, 2] > pipe.zmin)
                 & (centers[:, 2] < pipe.zmax)
             )
             well_domain[mask] = not pipe.is_porous
             self.set_material(pipe.material, mask)
             self.set_active(True, mask)
+            
+            # Find horizontally connected cells to be fused to ensure 1D vertical flow in wellbore
+            pipe_centers = centers[mask]
+
+            if not pipe.is_porous and np.ptp(pipe_centers[:, 0]) > 0.0:
+                for z in np.unique(pipe_centers[:, 2]):
+                    cells_to_fuse.append(np.flatnonzero(np.logical_and(mask, centers[:, 2] == z)))
 
         self.add_data("WellDomain", well_domain)
 
@@ -1291,6 +1373,36 @@ class CylindricMesh(BaseMesh):
                 branches.append((labels[mask1][0], labels[mask2][0]))
 
             self.metadata["WellBranch"] = branches
+
+        # Fuse cells (this will change the mesh to an unstructured grid)
+        # Only fuse cells with the same material ID
+        cells_to_fuse = [
+            ids for ids in cells_to_fuse
+            if np.ptp(self.materials_digitized[ids]) == 0
+        ]
+
+        if cells_to_fuse:
+            self.fuse_cells(cells_to_fuse, inplace=True)
+
+    def copy(self, deep: bool = True) -> Self:
+        """
+        Return a copy of the mesh.
+
+        Parameters
+        ----------
+        deep : bool, default True
+            If True, return a deep copy.
+
+        Returns
+        -------
+        toughio.Mesh
+            Copy of the mesh.
+
+        """
+        mesh = self.__class__(self.pyvista.copy(deep=deep), force=True)
+        mesh.metadata.update(self.metadata)
+
+        return mesh
 
     def to_tough(self, *args, **kwargs) -> dict:
         """
@@ -1324,7 +1436,7 @@ class CylindricMesh(BaseMesh):
 
         """
         parameters = super().to_tough(*args, **kwargs)
-        mask = self.data.get("WellDomain", np.zeros(self.n_cells, dtype=bool))
+        mask = self.data.get("WellDomain", np.zeros(self.n_cells)).astype(bool)
 
         if mask.any():
             label_length = self.label_length
@@ -1342,9 +1454,11 @@ class CylindricMesh(BaseMesh):
             connections = {}
 
             for k, v in parameters["connections"].items():
+                l1, l2 = k[:label_length], k[label_length:]
+
                 if (
-                    (k[:label_length] in well_elements or k[label_length:] in well_elements)
-                    and v["permeability_direction"] != 3
+                    (l1 in well_elements or l2 in well_elements)
+                    and v["gravity_cosine_angle"] == 0.0  # horizontal connection
                     and k not in branch_connections
                 ):
                     continue
@@ -1358,10 +1472,9 @@ class CylindricMesh(BaseMesh):
     @property
     def volumes(self) -> ArrayLike:
         """Return cell volume array."""
-        centers = self.centers
-        x = np.unique(self.points[:, 0])
-        z = np.unique(self.points[:, 2])
-        ix = np.searchsorted(x, centers[:, 0]) - 1
-        iz = np.searchsorted(z, centers[:, 2]) - 1
-
-        return 2.0 * np.pi * centers[:, 0] * np.diff(x)[ix] * np.diff(z)[iz]
+        get_min_max = lambda arr: (arr.min(), arr.max())
+        cells = pvg.get_cell_connectivity(self._cast_to_unstructured_grid(self.pyvista))
+        xmin, xmax = np.transpose([get_min_max(self.points[:, 0][cell]) for cell in cells])
+        zmin, zmax = np.transpose([get_min_max(self.points[:, 2][cell]) for cell in cells])
+        
+        return np.pi * (xmax ** 2 - xmin ** 2) * (zmax - zmin)
