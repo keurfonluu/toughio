@@ -103,10 +103,16 @@ class BaseMesh(ABC):
         if self.label_length is None:
             self.set_label_length()
 
-    @abstractmethod
-    def __getitem__(self, key: tuple[int | slice | ArrayLike]) -> None:
+    def __getitem__(self, key: tuple[int | slice | ArrayLike]) -> Self:
         """Slice a mesh."""
-        pass
+        if isinstance(key, int):
+            return self.pyvista.get_cell(key)
+
+        else:
+            mesh = self.__class__(self._cast_to_unstructured_grid(self.pyvista).extract_cells(key), metadata=self.metadata)
+            mesh.labels = self.labels[key]
+
+            return mesh
 
     def copy(self, deep: bool = True) -> Self:
         """
@@ -363,8 +369,11 @@ class BaseMesh(ABC):
             if material is not None
             else self
         )
+        centers = mesh.centers
 
-        ids = KDTree(mesh.centers).query(points)[1]
+        mask = ~np.isnan(mesh.centers).any(axis=1)
+        ids = KDTree(centers[mask]).query(points)[1]
+        ids = np.arange(mesh.n_cells)[mask][ids]
         ids = mesh.data["vtkOriginalCellIds"][ids] if material is not None else ids
             
         return ids
@@ -1181,17 +1190,6 @@ class Mesh(BaseMesh):
         """Initialize a mesh."""
         super().__init__(*args, metadata=metadata)
 
-    def __getitem__(self, key: tuple[int | slice | ArrayLike]) -> Mesh:
-        """Slice a mesh."""
-        if isinstance(key, int):
-            return self.pyvista.get_cell(key)
-
-        else:
-            mesh = Mesh(self._cast_to_unstructured_grid(self.pyvista).extract_cells(key), metadata=self.metadata)
-            mesh.labels = self.labels[key]
-
-            return mesh
-
     def extrude_to_3d(self, height: ArrayLike = 1.0, axis: int = 2) -> Mesh:
         """
         Convert a 2D mesh to 3D by extruding cells along given axis.
@@ -1279,9 +1277,20 @@ class CylindricMesh(BaseMesh):
         self.points[:, 0] -= x[0]
         self.points[:, 1] = 0.0
 
-    def __getitem__(self, key: tuple[int | slice | ArrayLike]) -> None:
-        """Raise an error if trying to slice a cylindric mesh."""
-        raise ValueError("could not slice cylindric mesh")
+    def __getitem__(self, key: tuple[int | slice | ArrayLike]) -> Self:
+        """Slice a mesh."""
+        if isinstance(key, int):
+            return self.pyvista.get_cell(key)
+
+        else:
+            mesh = self.__class__(
+                self._cast_to_unstructured_grid(self.pyvista).extract_cells(key),
+                metadata=self.metadata,
+                force=True,
+            )
+            mesh.labels = self.labels[key]
+
+            return mesh
 
     def _compute_connection_properties(self) -> tuple[ArrayLike, ArrayLike, ArrayLike, ArrayLike]:
         """Compute connection properties."""
@@ -1324,7 +1333,7 @@ class CylindricMesh(BaseMesh):
         if not np.isin(well.radii, x).all():
             raise ValueError("could not generate wellbore with radius not matching radial discretization of porous medium")
 
-        well_domain = np.zeros(self.n_cells, dtype=bool)
+        well_domain = np.full(self.n_cells, -1)
         cells_to_fuse = []
 
         for pipe in well.pipes[::-1]:
@@ -1333,9 +1342,11 @@ class CylindricMesh(BaseMesh):
                 & (centers[:, 2] > pipe.zmin)
                 & (centers[:, 2] < pipe.zmax)
             )
-            well_domain[mask] = not pipe.is_porous
             self.set_material(pipe.material, mask)
             self.set_active(True, mask)
+
+            if not pipe.is_porous:
+                well_domain[mask] = pipe.id
             
             # Find horizontally connected cells to be fused to ensure 1D vertical flow in wellbore
             pipe_centers = centers[mask]
@@ -1346,34 +1357,6 @@ class CylindricMesh(BaseMesh):
 
         self.add_data("WellDomain", well_domain)
 
-        if well.branches:
-            z = np.unique(self.points[:, 2])
-            labels = self.labels
-            branches = []
-
-            for id1, id2, depth in well.branches:
-                i = np.searchsorted(z, depth, side="left") - 1
-                rin1, rout1 = get_radii(well.pipes[id1])
-                rin2, rout2 = get_radii(well.pipes[id2])
-
-                mask1 = (
-                    (centers[:, 0] > rin1)
-                    & (centers[:, 0] < rout1)
-                    & (centers[:, 2] > z[i])
-                    & (centers[:, 2] < z[i + 1])
-                )
-                mask2 = (
-                    (centers[:, 0] > rin2)
-                    & (centers[:, 0] < rout2)
-                    & (centers[:, 2] > z[i])
-                    & (centers[:, 2] < z[i + 1])
-                )
-                assert mask1.sum() == 1
-                assert mask2.sum() == 1
-                branches.append((labels[mask1][0], labels[mask2][0]))
-
-            self.metadata["WellBranch"] = branches
-
         # Fuse cells (this will change the mesh to an unstructured grid)
         # Only fuse cells with the same material ID
         cells_to_fuse = [
@@ -1383,6 +1366,34 @@ class CylindricMesh(BaseMesh):
 
         if cells_to_fuse:
             self.fuse_cells(cells_to_fuse, inplace=True)
+
+        # Connections
+        connections = {}
+
+        for connection in well.connections:
+            pipe1, pipe2 = connection["pipe1"], connection["pipe2"]
+
+            # Well-well connection
+            if pipe2 is not None:
+                key = (min(pipe1.id, pipe2.id), max(pipe1.id, pipe2.id))
+
+            # Well-formation connection
+            else:
+                key = pipe1.id
+
+            connections[key] = {
+                "type": connection["type"],
+                "zmin": connection["zmin"],
+                "zmax": connection["zmax"],
+            }
+
+        if connections:
+            self.metadata["WellConnection"] = connections
+
+        # Wellheads
+        for wellhead in well.wellheads:
+            whid = self.find_nearest_cell((wellhead.radius, 0.0, wellhead.zmax), material=wellhead.material)
+            self.set_label(f"*{self.labels[whid][1:]}", whid)
 
     def copy(self, deep: bool = True) -> Self:
         """
@@ -1436,32 +1447,65 @@ class CylindricMesh(BaseMesh):
 
         """
         parameters = super().to_tough(*args, **kwargs)
-        mask = self.data.get("WellDomain", np.zeros(self.n_cells)).astype(bool)
+        well_domain = self.data.get("WellDomain", np.full(self.n_cells, -1))
 
-        if mask.any():
+        if (well_domain >= 0).any():
             label_length = self.label_length
-            well_elements = set(self.labels[mask])
+            label_map = {label: i for i, label in enumerate(self.labels)}
+            well_connections = self.metadata.get("WellConnection", {})
+            well_isots = {
+                "well": {"branch": 0, "heat": -1, "forward": 4, "backward": 5},
+                "formation": {"heat": -1, "perforation": 1, "gas": 4, "liquid": 5, "backward": 6},
+            }
 
-            # Identify branches
-            branch_connections = set()
-            branches = self.metadata.get("WellBranch", [])
-
-            for label1, label2 in branches:
-                branch_connections.add(f"{label1}{label2}")
-                branch_connections.add(f"{label2}{label1}")
-
-            # Remove horizontal connections for well elements
+            # Update connections
             connections = {}
 
             for k, v in parameters["connections"].items():
                 l1, l2 = k[:label_length], k[label_length:]
+                i1, i2 = label_map[l1], label_map[l2]
+                wid1, wid2 = well_domain[i1], well_domain[i2]
 
-                if (
-                    (l1 in well_elements or l2 in well_elements)
-                    and v["gravity_cosine_angle"] == 0.0  # horizontal connection
-                    and k not in branch_connections
-                ):
-                    continue
+                # Set nodal distance to zero for well elements
+                if wid1 >= 0:
+                    v["nodal_distances"][0] = 1.0e-9
+
+                if wid2 >= 0:
+                    v["nodal_distances"][1] = 1.0e-9
+
+                # Horizontal well connections
+                if (wid1 >= 0 or wid2 >= 0) and v["gravity_cosine_angle"] == 0.0:
+                    # Default to heat only
+                    isot = -1
+
+                    # Well-well connection
+                    if (min(wid1, wid2), max(wid1, wid2)) in well_connections:
+                        key = "well"
+                        connection = well_connections[(min(wid1, wid2), max(wid1, wid2))]
+
+                    # Well-formation connection
+                    elif wid1 in well_connections or wid2 in well_connections:
+                        key = "formation"
+
+                        try:
+                            connection = well_connections[wid1]
+
+                        except KeyError:
+                            connection = well_connections[wid2]
+
+                    else:
+                        connection = None
+
+                    if connection:
+                        zmin, zmax = connection["zmin"], connection["zmax"]
+                        z1 = parameters["elements"][l1]["center"][2]
+                        z2 = parameters["elements"][l2]["center"][2]
+
+                        if zmin <= z1 <= zmax and zmin <= z2 <= zmax:
+                            type_ = connection["type"]
+                            isot = well_isots[key][type_]
+
+                    v["permeability_direction"] = isot
 
                 connections[k] = v
 
