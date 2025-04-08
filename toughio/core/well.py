@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Optional
+from typing import Literal, Optional
 from numpy.typing import ArrayLike
 
 import numpy as np
@@ -99,9 +99,12 @@ class Pipe:
 
 
 class WellCasing:
-    def __init__(self) -> None:
+    def __init__(
+        self,
+
+    ) -> None:
         self._pipes = []
-        self._branches = []
+        self._metadata = {"Wellheads": [], "Connections": []}
         
     def add_pipe(
         self,
@@ -121,24 +124,96 @@ class WellCasing:
 
         return pipe
 
-    def add_branch(self, pipe1: Pipe, pipe2: Pipe, z: Optional[float] = None) -> None:
-        self.branches.append((pipe1.id, pipe2.id, z))
+    def set_connection(
+        self,
+        type_: Literal["backward", "branch", "forward", "gas", "heat", "liquid", "perforation"],
+        pipe1: Pipe,
+        pipe2: Optional[Pipe] = None,
+        zmin: Optional[float] = None,
+        zmax: Optional[float] = None,
+    ) -> None:
+        if (
+            pipe1 not in self.pipes
+            or (pipe2 is not None and pipe2 not in self.pipes)
+        ):
+            raise ValueError("could not define connection with pipes not in the casing")
+
+        elif type_ == "perforation" and pipe2 is not None:
+            raise ValueError("could not define a perforation connection with an end pipe")
+
+        if pipe2 is not None:
+            if type_ not in {"branch", "heat", "forward", "backward"}:
+                raise ValueError(f"invalid well-well connection type '{type_}'")
+
+            if pipe1.zmin > pipe2.zmax or pipe2.zmin > pipe1.zmax:
+                raise ValueError("start and end pipes are not connected")
+
+            zmin = zmin if zmin is not None else max(pipe1.zmin, pipe2.zmin)
+            zmax = zmax if zmax is not None else min(pipe1.zmax, pipe2.zmax)
+
+        else:
+            if type_ not in {"heat", "perforation", "gas", "liquid", "backward"}:
+                raise ValueError(f"invalid well-formation connection type '{type_}'")
+
+            zmin = zmin if zmin else pipe1.zmin
+            zmax = zmax if zmax else pipe1.zmax
+
+        connection = {
+            "type": type_,
+            "pipe1": pipe1,
+            "pipe2": pipe2,
+            "zmin": zmin,
+            "zmax": zmax,
+        }
+        self.connections.append(connection)
+
+    def set_wellhead(self, pipe: Pipe) -> None:
+        if pipe not in self.pipes:
+            raise ValueError("could not set wellhead to a pipe not in the casing")
+
+        if pipe.is_porous:
+            raise ValueError("could not set wellhead to a porous section")
+
+        self.wellheads.append(pipe)
 
     def to_pyvista(self, resolution: int = 64, well_only: bool = False) -> pv.PolyData | pv.UnstructuredGrid:
         pipes = [pipe.to_pyvista(resolution) for pipe in self.pipes if not (well_only and pipe.is_porous)]
 
         return pv.merge(pipes)
 
-    def plot(self, zscale: Optional[float] = None, **kwargs) -> None:
-        mesh = self.to_pyvista()
-        if zscale:
-            mesh.points[:, 2] *= zscale
+    def plot(
+        self,
+        well_only: bool = False,
+        xscale: Optional[float] = None,
+        zscale: Optional[float] = None,
+        **kwargs
+    ) -> None:
+        mesh = self.to_pyvista(well_only=well_only)
 
-        mesh.plot(scalars="Material", opacity=0.5, **kwargs)
+        p = pv.Plotter(**kwargs)
+        
+        if xscale or zscale:
+            p.set_scale(xscale=xscale, zscale=zscale)
+
+        p.add_mesh(
+            mesh,
+            scalars="Material",
+            opacity=0.5,
+        )
+        p.add_axes()
+        p.show()
 
     @property
-    def branches(self) -> list:
-        return self._branches
+    def connections(self) -> list[dict]:
+        return self.metadata["Connections"]
+
+    @property
+    def materials(self) -> ArrayLike:
+        return np.array([pipe.material for pipe in self.pipes])
+
+    @property
+    def metadata(self) -> dict:
+        return self._metadata
 
     @property
     def pipes(self) -> list[Pipe]:
@@ -149,5 +224,5 @@ class WellCasing:
         return np.array([pipe.radius for pipe in self.pipes])
 
     @property
-    def materials(self) -> ArrayLike:
-        return np.array([pipe.material for pipe in self.pipes])
+    def wellheads(self) -> int:
+        return self.metadata["Wellheads"]
