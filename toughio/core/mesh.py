@@ -848,40 +848,80 @@ class BaseMesh(ABC):
 
     def plot(
         self,
+        plotter: Optional[pv.Plotter] = None,
+        *,
         scalars: Optional[str | ArrayLike] = None,
         show_edges: bool = True,
+        xscale: Optional[float] = None,
+        yscale: Optional[float] = None,
+        zscale: Optional[float] = None,
         parallel_projection: bool = False,
         enable_picking: bool = False,
         tolerance: float = 0.0,
-        **kwargs,
+        **kwargs
     ) -> None:
         """
         Plot a mesh.
 
         Parameters
         ----------
+        plotter : pyvista.Plotter, optional
+            Active plotter.
+        scalars : str | ArrayLike, optional
+            Scalars used to color the mesh.
+        show_edges : bool, default True
+            Show the edges of a mesh.
+        xscale : float, optional
+            Scaling in the X direction.
+        yscale : float, optional
+            Scaling in the Y direction.
+        zscale : float, optional
+            Scaling in the Z direction.
+        parallel_projection : bool, default False
+            If True, enable parallel projection.
+        enable_picking : bool, default False
+            If True, enable cell picking with right-click.
+        tolerance : float, default 0.0
+            Specify tolerance for performing pick operation.
         **kwargs : dict, optional
-            Additional keyword arguments. See ``pyvista.DataSet.plot`` for more details.
+            Additional keyword arguments. See ``pyvista.DataSet.plot`` and
+            ``pyvista.Plotter.add_mesh`` for more details.
 
         """
-        scalars = scalars if scalars else self.materials
-        mesh = self.pyvista
+        default_kwargs = {
+            "scalars": self.materials,
+            "show_edges": True,
+        }
+        default_kwargs.update(kwargs)
 
         # Ghost cells are not hidden for 2D structured grids
         # See <https://github.com/pyvista/pyvista/issues/7112>
-        if (~self.active).any():
-            mesh = mesh.cast_to_unstructured_grid()
+        mesh = self._cast_to_unstructured_grid(self.pyvista)
 
-        p = pv.Plotter(**kwargs)
+        # Plot
+        if plotter is None:
+            plotter_kwargs = {}
+
+            for keyword in {"notebook", "title"}:
+                if keyword in default_kwargs:
+                    plotter_kwargs[keyword] = default_kwargs.pop(keyword)
+
+            p = pv.Plotter(**plotter_kwargs)
+
+        else:
+            p = plotter
+
+        if xscale or yscale or zscale:
+            p.set_scale(xscale, yscale, zscale)
+
         p.add_mesh(
             mesh,
-            scalars=scalars,
-            show_edges=show_edges,
             scalar_bar_args={
                 "vertical": True,
-                "position_y": 0.15,
-                "height": 0.7,
-            }
+                "position_y": 0.1,
+                "height": 0.8,
+            },
+            **default_kwargs
         )
 
         if enable_picking:
@@ -910,11 +950,13 @@ class BaseMesh(ABC):
                 picker="cell",
             )
 
+        p.add_axes()
+
         if parallel_projection:
             p.enable_parallel_projection()
 
-        p.add_axes()
-        p.show()
+        if plotter is None:
+            p.show()
 
     @staticmethod
     def _cast_to_unstructured_grid(mesh: pv.DataSet) -> pv.UnstructuredGrid:
