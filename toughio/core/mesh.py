@@ -615,18 +615,17 @@ class BaseMesh(ABC):
         mask = lines != 0.0
         permability_directions = np.where(mask.sum(axis=1) == 1, mask.argmax(axis=1) + 1, 1)
 
-        # Gravity angles
-        angles = lines @ gravity
-
-        # Nodal distances
+        # Nodal distances and gravity angles
         if nodal_distance == "line":
             fp = intersection_line_plane(centers_1, lines, face_centers, face_normals)
             distances_1 = np.where(bounds_1, 1.0e-9, np.linalg.norm(centers_1 - fp, axis=1))
             distances_2 = np.where(bounds_2, 1.0e-9, np.linalg.norm(centers_2 - fp, axis=1))
+            angles = lines @ gravity
 
         elif nodal_distance == "orthogonal":
             distances_1 = distance_point_plane(centers_1, face_centers, face_normals, bounds_1)
             distances_2 = distance_point_plane(centers_2, face_centers, face_normals, bounds_2)
+            angles = np.sign((face_normals * lines).sum(axis=1)) * (face_normals @ gravity)
 
         # Write MESH file
         # Elements
@@ -1451,7 +1450,15 @@ class CylindricMesh(BaseMesh):
 
         return mesh
 
-    def to_tough(self, *args, **kwargs) -> dict:
+    def to_tough(
+        self,
+        filename: Optional[str | os.PathLike] = None,
+        nodal_distance: Literal["line", "orthogonal"] = "orthogonal",
+        material_name: Optional[dict] = None,
+        gravity: Optional[ArrayLike] = None,
+        incon: bool = False,
+        **kwargs
+    ) -> dict | None:
         """
         Convert mesh to TOUGH mesh.
 
@@ -1459,7 +1466,7 @@ class CylindricMesh(BaseMesh):
         ----------
         filename : str | os.PathLike, optional
             Output file name.
-        nodal_distance : {'line', 'orthogonal'}, default 'line'
+        nodal_distance : {'line', 'orthogonal'}, default 'orthogonal'
             Method to calculate connection nodal distances:
 
              - 'line': distance between node and common face along connecting line
@@ -1482,7 +1489,14 @@ class CylindricMesh(BaseMesh):
             TOUGH mesh as a dict. Only provided if *filename* is None.
 
         """
-        parameters = super().to_tough(*args, **kwargs)
+        parameters = super().to_tough(
+            filename=filename,
+            nodal_distance=nodal_distance,
+            material_name=material_name,
+            gravity=gravity,
+            incon=incon,
+            **kwargs
+        )
         well_domain = self.data.get("WellDomain", np.full(self.n_cells, -1))
 
         if (well_domain >= 0).any():
