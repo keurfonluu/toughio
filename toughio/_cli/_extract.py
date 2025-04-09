@@ -1,7 +1,10 @@
 import numpy as np
 
-from .._io.output import read as read_output
-from .._io.output import write as write_output
+from .._io.output import (
+    read as read_output,
+    write as write_output,
+)
+
 
 __all__ = [
     "extract",

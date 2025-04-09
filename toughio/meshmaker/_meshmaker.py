@@ -1,9 +1,10 @@
 from __future__ import annotations
+
 from typing import Optional
-from numpy.typing import ArrayLike
 
 import numpy as np
 import pyvista as pv
+from numpy.typing import ArrayLike
 
 
 def structured_grid(

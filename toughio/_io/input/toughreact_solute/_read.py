@@ -1,7 +1,8 @@
+from .._common import read_end_comments
+from ..._common import read_record, to_float
 from ...._common import open_file, prune_values
 from ....core import FileIterator, ReadError
-from ..._common import read_record, to_float
-from .._common import read_end_comments
+
 
 __all__ = [
     "read",

@@ -1,13 +1,13 @@
 from __future__ import annotations
-from typing import Callable, Optional
-from numpy.typing import ArrayLike
 
 import os
+from typing import Callable, Optional
 
 import meshio
 import numpy as np
 import pvgridder as pvg
 import pyvista as pv
+from numpy.typing import ArrayLike
 
 from ..core import Mesh
 
@@ -17,7 +17,7 @@ def extrude_to_3d(
     height: Optional[ArrayLike] = None,
     axis: int = 2,
 ) -> pv.StructuredGrid | pv.UnstructuredGrid:
-    from pvgridder import get_dimension, MeshExtrude
+    from pvgridder import MeshExtrude, get_dimension
 
     if get_dimension(mesh) != 2:
         raise ValueError("could not extrude 3D mesh")

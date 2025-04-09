@@ -1,13 +1,13 @@
 from __future__ import annotations
-from typing import TextIO
 
 import os
+from typing import TextIO
 
 import numpy as np
 
 from .._common import to_output
-from ...._common import open_file
 from ...output.tecplot._tecplot import read_buffer
+from ...._common import open_file
 
 
 def read(filename: str | os.PathLike | TextIO) -> HistoryOutput:

@@ -1,10 +1,10 @@
 from __future__ import annotations
-from typing import Optional
 
 import glob
 import os
 import pathlib
 import tarfile
+from typing import Optional
 
 import numpy as np
 

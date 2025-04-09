@@ -1,10 +1,10 @@
 from __future__ import annotations
-from typing import Any, Optional
 
 import os
 from collections.abc import Callable, Sequence
 from contextlib import contextmanager
 from io import TextIOWrapper
+from typing import Any, Optional
 
 import numpy as np
 

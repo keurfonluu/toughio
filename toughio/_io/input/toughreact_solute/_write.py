@@ -1,5 +1,6 @@
-from ...._common import open_file
 from .._common import getval, write_ffrecord
+from ...._common import open_file
+
 
 __all__ = [
     "write",

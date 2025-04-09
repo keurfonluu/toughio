@@ -1,8 +1,9 @@
+from ._helpers import read_model_record, read_primary_variables
+from .._common import read_end_comments
+from ..._common import read_record
 from ...._common import block_to_format, get_label_length, open_file, prune_values
 from ....core import FileIterator, ReadError
-from ..._common import read_record
-from .._common import read_end_comments
-from ._helpers import read_model_record, read_primary_variables
+
 
 __all__ = [
     "read",

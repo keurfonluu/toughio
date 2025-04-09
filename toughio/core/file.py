@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Optional, TextIO
+
 from typing_extensions import Self
 
 
@@ -16,6 +17,7 @@ class FileIterator:
         Line count.
 
     """
+
     __name__: str = "FileIterator"
     __qualname__: str = "toughio.FileIterator"
 

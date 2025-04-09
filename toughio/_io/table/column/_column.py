@@ -1,7 +1,7 @@
 from __future__ import annotations
-from typing import TextIO
 
 import os
+from typing import TextIO
 
 import numpy as np
 

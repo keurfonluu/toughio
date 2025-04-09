@@ -1,16 +1,18 @@
 from __future__ import annotations
-from numpy.typing import ArrayLike
+
 from typing import Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.axes import Axes
+from numpy.typing import ArrayLike
 
 from ._curve import BaseCurve
 
 
 class RelativePermeabilityModel(BaseCurve):
     """Base class for relative permeability model."""
+
     _short = "RP"
 
     def _eval(self, sl: ArrayLike, *args) -> None: ...
@@ -65,6 +67,7 @@ class Linear(RelativePermeabilityModel):
         Upper gas saturation threshold (RP(4)).
 
     """
+
     def __init__(self, slmin: float, sgmin: float, slmax: float, sgmax: float) -> None:
         """Initialize linear relative permeability model."""
         if slmin >= slmax:
@@ -105,6 +108,7 @@ class Pickens(RelativePermeabilityModel):
         RP(1).
 
     """
+
     def __init__(self, x: float) -> None:
         """Initialize Pickens' relative permeability model."""
         super().__init__(x)
@@ -135,6 +139,7 @@ class Corey(RelativePermeabilityModel):
         Irreducible gas saturation (RP(2)).
 
     """
+
     def __init__(self, slr: float, sgr: float) -> None:
         """Initialize Corey's relative permeability model."""
         if slr + sgr >= 1.0:
@@ -177,6 +182,7 @@ class Grant(RelativePermeabilityModel):
         Irreducible gas saturation (RP(2)).
 
     """
+
     def __init__(self, slr: float, sgr: float) -> None:
         """Initialize Grant's relative permeability model."""
         if slr + sgr >= 1.0:
@@ -217,6 +223,7 @@ class FattKlikoff(RelativePermeabilityModel):
         Irreducible liquid saturation (RP(1)).
 
     """
+
     def __init__(self, slr: float) -> None:
         """Initialize Fatt and Klikoff's relative permeability model."""
         if slr >= 1.0:
@@ -258,6 +265,7 @@ class vanGenuchtenMualem(RelativePermeabilityModel):
         Irreducible gas saturation (RP(4)).
 
     """
+
     def __init__(self, m: float, slr: float, sls: float, sgr: float) -> None:
         """Initialize van Genuchten-Mualem's relative permeability model."""
         super().__init__(m, slr, sls, sgr)
@@ -265,7 +273,7 @@ class vanGenuchtenMualem(RelativePermeabilityModel):
         self._name = "van Genuchten-Mualem"
 
     def _eval(self, sl: ArrayLike, *args) -> tuple[ArrayLike, ArrayLike]:
-        """van Genuchten-Mualem's function."""
+        """Van Genuchten-Mualem's function."""
         m, slr, sls, sgr = args
 
         Seff = (sl - slr) / (sls - slr)
@@ -301,6 +309,7 @@ class Verma(RelativePermeabilityModel):
         C (RP(5)).
 
     """
+
     def __init__(self, slr: float = 0.2, sls: float = 0.895, a: float = 1.259, b: float = -1.7615, c: float = 0.5089) -> None:
         super().__init__(slr, sls, a, b, c)
         self._id = 8

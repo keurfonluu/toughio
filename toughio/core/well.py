@@ -1,14 +1,16 @@
 from __future__ import annotations
+
 from typing import Literal, Optional
-from numpy.typing import ArrayLike
 
 import numpy as np
-import pyvista as pv
 import pvgridder as pvg
+import pyvista as pv
+from numpy.typing import ArrayLike
 
 
 class Pipe:
     """Pipe class."""
+
     __name__: str = "Pipe"
     __qualname__: str = "toughio.Pipe"
 
@@ -124,6 +126,7 @@ class WellCasing:
     Well casing class.
 
     """
+
     __name__: str = "WellCasing"
     __qualname__: str = "toughio.WellCasing"
 

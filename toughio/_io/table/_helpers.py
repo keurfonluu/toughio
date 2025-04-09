@@ -1,7 +1,7 @@
 from __future__ import annotations
-from typing import Callable, Literal, Optional, TextIO
 
 import os
+from typing import Callable, Literal, Optional, TextIO
 
 from ..._common import filetype_from_filename, register_format
 

@@ -3,11 +3,12 @@ from copy import deepcopy
 
 import numpy as np
 
-from ...._common import block_to_format, open_file, prune_values, str2format
-from ..._common import write_record
-from .._common import write_ffrecord
 from ._common import default
 from ._helpers import block, write_model_record
+from .._common import write_ffrecord
+from ..._common import write_record
+from ...._common import block_to_format, open_file, prune_values, str2format
+
 
 __all__ = [
     "write",
@@ -79,9 +80,12 @@ def write_buffer(
     simulator="tough",
 ):
     """Write TOUGH input file as a list of 80-character long record strings."""
-    from ._common import Parameters
-    from ._common import blocks as blocks_
-    from ._common import default, eos
+    from ._common import (
+        Parameters,
+        blocks as blocks_,
+        default,
+        eos,
+    )
 
     # Block filters
     if block is not None:

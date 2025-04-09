@@ -1,16 +1,18 @@
 from __future__ import annotations
-from numpy.typing import ArrayLike
+
 from typing import Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.axes import Axes
+from numpy.typing import ArrayLike
 
 from ._curve import BaseCurve
 
 
 class CapillarityModel(BaseCurve):
     """Base class for capillarity model."""
+
     _short = "CP"
 
     def _eval(self, sl: ArrayLike, *args) -> None: ...
@@ -61,6 +63,7 @@ class Linear(CapillarityModel):
         Upper liquid saturation threshold (CP(3)).
 
     """
+
     def __init__(self, pmax: float, smin: float, smax: float) -> None:
         """Initialize linear capillarity model."""
         if smax <= smin:
@@ -98,6 +101,7 @@ class Pickens(CapillarityModel):
         CP(4).
 
     """
+
     def __init__(self, p0: float, slr: float, sl0: float, x: float) -> None:
         """Initialize Pickens' capillarity model."""
         if not (0.0 < slr < 1.0):
@@ -144,6 +148,7 @@ class TRUST(CapillarityModel):
         Maximum pressure (CP(5)).
 
     """
+
     def __init__(self, p0: float, slr: float, eta: float, pe: float, pmax: float) -> None:
         """Initialize TRUST capillarity model."""
         if slr < 0.0:
@@ -182,6 +187,7 @@ class Milly(CapillarityModel):
         Irreducible liquid saturation (CP(1)).
 
     """
+
     def __init__(self, slr: float) -> None:
         """Initialize Milly's capillarity model."""
         if slr < 0.0:
@@ -223,6 +229,7 @@ class vanGenuchten(CapillarityModel):
         Maximum liquid saturation (CP(5)).
 
     """
+
     def __init__(self, m: float, slr: float, alpha: float, pmax: float, sls: float) -> None:
         """Initialize van Genuchten's capillarity model."""
         if pmax < 0.0:
@@ -233,7 +240,7 @@ class vanGenuchten(CapillarityModel):
         self._name = "van Genuchten"
 
     def _eval(self, sl: ArrayLike, *args) -> ArrayLike:
-        """van Genuchten's function."""
+        """Van Genuchten's function."""
         m, slr, alpha, pmax, sls = args
 
         Seff = (sl - slr) / (sls - slr)

@@ -1,19 +1,19 @@
 from __future__ import annotations
-from collections.abc import Callable, Sequence
-from numpy.typing import ArrayLike
-from typing import Literal, Optional
-from typing_extensions import Self
 
 import copy
 import os
 import pathlib
 from abc import ABC, abstractmethod
+from collections.abc import Callable, Sequence
+from typing import Literal, Optional
 
 import meshio
 import numpy as np
-import pyvista as pv
 import pvgridder as pvg
+import pyvista as pv
+from numpy.typing import ArrayLike
 from scipy.spatial import KDTree
+from typing_extensions import Self
 
 from ._typing import GridLike
 from .well import WellCasing
@@ -21,6 +21,7 @@ from .well import WellCasing
 
 class BaseMesh(ABC):
     """Base class for mesh."""
+
     __name__: str = "BaseMesh"
     __qualname__: str = "toughio.BaseMesh"
 
@@ -1214,6 +1215,7 @@ class Mesh(BaseMesh):
         Mesh metadata.
 
     """
+
     __name__: str = "Mesh"
     __qualname__: str = "toughio.Mesh"
 

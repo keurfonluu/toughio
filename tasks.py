@@ -53,8 +53,8 @@ def clean(c, bytecode=False):
 
 @task
 def ruff(c):
-    c.run("ruff check --fix pvgridder")
-    c.run("ruff format --target-version py38 --line-length 88 pvgridder")
+    c.run("ruff check --fix toughio")
+    c.run("ruff format --target-version py38 --line-length 88 toughio")
 
 
 @task

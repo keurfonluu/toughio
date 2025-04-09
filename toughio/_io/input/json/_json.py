@@ -4,6 +4,7 @@ import numpy as np
 
 from ...._common import open_file
 
+
 __all__ = [
     "read",
     "write",

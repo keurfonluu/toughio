@@ -1,9 +1,9 @@
 from __future__ import annotations
-from numpy.typing import ArrayLike
 
 from string import ascii_uppercase
 
 import numpy as np
+from numpy.typing import ArrayLike
 
 
 class Labeler:
@@ -16,6 +16,7 @@ class Labeler:
         Number of characters.
 
     """
+
     __name__: str = "Labeler"
     __qualname__: str = "toughio.Labeler"
 

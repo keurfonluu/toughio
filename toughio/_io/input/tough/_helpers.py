@@ -2,8 +2,9 @@ from functools import wraps
 
 import numpy as np
 
-from ...._common import prune_values
 from ..._common import read_record, write_record
+from ...._common import prune_values
+
 
 str_to_dtype = {
     "int": (int, np.int32, np.int64),

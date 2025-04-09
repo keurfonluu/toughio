@@ -1,8 +1,9 @@
 import numpy as np
 
+from .._common import to_output
 from ...._common import open_file
 from ....core import ElementOutput
-from .._common import to_output
+
 
 __all__ = [
     "read",

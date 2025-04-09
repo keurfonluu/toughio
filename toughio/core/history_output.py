@@ -1,17 +1,17 @@
 from __future__ import annotations
-from collections.abc import Sequence
-from numpy.typing import ArrayLike
-from typing import Literal, Optional
-from typing_extensions import Self
 
 import copy
 import re
 from collections import UserDict
+from collections.abc import Sequence
+from typing import Literal, Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from matplotlib.axes import Axes
+from numpy.typing import ArrayLike
+from typing_extensions import Self
 
 
 class HistoryOutput(UserDict):
@@ -26,6 +26,7 @@ class HistoryOutput(UserDict):
         Output metadata.
 
     """
+
     __name__: str = "HistoryOutput"
     __qualname__: str = "toughio.HistoryOutput"
 

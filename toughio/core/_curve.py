@@ -1,13 +1,14 @@
 from __future__ import annotations
-from numpy.typing import ArrayLike
 
 from abc import ABC, abstractmethod
 
 import numpy as np
+from numpy.typing import ArrayLike
 
 
 class BaseCurve(ABC):
     """Base class for curve models."""
+
     _short: str = None
 
     def __init__(self, *args) -> None:

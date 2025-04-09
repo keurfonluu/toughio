@@ -1,12 +1,12 @@
 from __future__ import annotations
-from collections.abc import Sequence
-from numpy.typing import ArrayLike
-from typing import Optional
-
-from abc import ABC, abstractmethod
 
 import os
+from abc import ABC, abstractmethod
+from collections.abc import Sequence
+from typing import Optional
+
 import numpy as np
+from numpy.typing import ArrayLike
 
 
 class Output(ABC):
@@ -23,6 +23,7 @@ class Output(ABC):
         Labels of elements.
 
     """
+
     __name__: str = "Output"
     __qualname__: str = "toughio.Output"
 
@@ -106,6 +107,7 @@ class ElementOutput(Output):
         Labels of elements.
 
     """
+
     __name__: str = "ElementOutput"
     __qualname__: str = "toughio.ElementOutput"
 
@@ -193,6 +195,7 @@ class ConnectionOutput(Output):
         Labels of connections.
 
     """
+
     __name__: str = "ConnectionOutput"
     __qualname__: str = "toughio.ConnectionOutput"
 

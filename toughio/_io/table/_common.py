@@ -1,9 +1,9 @@
 from __future__ import annotations
-from typing import TextIO
 
 import io
 import os
 import pathlib
+from typing import TextIO
 
 from ...core import HistoryOutput
 

@@ -2,9 +2,10 @@ from functools import partial
 
 import numpy as np
 
-from ...._common import open_file
-from ..._common import read_record, to_float
 from .._common import to_output
+from ..._common import read_record, to_float
+from ...._common import open_file
+
 
 __all__ = [
     "read",

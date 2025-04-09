@@ -1,11 +1,12 @@
 from __future__ import annotations
+
 from collections.abc import Sequence
-from numpy.typing import ArrayLike
 from typing import Literal, Optional
 
 import meshio
 import numpy as np
 import pyvista as pv
+from numpy.typing import ArrayLike
 
 from .mesh import Mesh
 
@@ -22,6 +23,7 @@ class ParticleTracker:
         Velocity field data.
 
     """
+
     __name__: str = "ParticleTracker"
     __qualname__: str = "toughio.ParticleTracker"
 

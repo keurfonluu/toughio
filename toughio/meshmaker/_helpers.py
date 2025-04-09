@@ -1,7 +1,7 @@
 import numpy as np
 
-from .._io.input._helpers import read
 from ._meshmaker import cylindric_grid, structured_grid
+from .._io.input._helpers import read
 
 
 def from_meshmaker(filename_or_dict, material="dfalt"):
