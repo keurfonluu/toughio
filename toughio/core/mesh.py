@@ -1371,7 +1371,7 @@ class CylindricMesh(BaseMesh):
         well_domain = np.full(self.n_cells, -1)
         cells_to_fuse = []
 
-        for pipe in well.pipes[::-1]:
+        for id_, pipe in zip(np.arange(len(well.pipes))[::-1], well.pipes[::-1]):
             mask = (
                 (centers[:, 0] < pipe.radius + pipe.thickness)
                 & (centers[:, 2] > pipe.zmin)
@@ -1381,7 +1381,7 @@ class CylindricMesh(BaseMesh):
             self.set_active(True, mask)
 
             if not pipe.is_porous:
-                well_domain[mask] = pipe.id
+                well_domain[mask] = id_
             
             # Find horizontally connected cells to be fused to ensure 1D vertical flow in wellbore
             pipe_centers = centers[mask]
@@ -1409,12 +1409,15 @@ class CylindricMesh(BaseMesh):
             pipe1, pipe2 = connection["pipe1"], connection["pipe2"]
 
             # Well-well connection
+            id1 = well.pipes.index(pipe1)
+
             if pipe2 is not None:
-                key = (min(pipe1.id, pipe2.id), max(pipe1.id, pipe2.id))
+                id2 = well.pipes.index(pipe2)
+                key = (min(id1, id2), max(id1, id2))
 
             # Well-formation connection
             else:
-                key = pipe1.id
+                key = id1
 
             connections[key] = {
                 "type": connection["type"],

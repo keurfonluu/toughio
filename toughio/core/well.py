@@ -19,7 +19,6 @@ class Pipe:
         zmax: float,
         material: str,
         thickness: float = 0.0,
-        id_: Optional[int] = None,
     ) -> None:
         """Initialize a pipe."""
         self.radius = radius
@@ -27,7 +26,6 @@ class Pipe:
         self.zmax = zmax
         self.material = material
         self.thickness = thickness
-        self.id = id_
 
         if self.is_porous and material.upper().startswith(("W", "X")):
             raise ValueError("could not create porous well section with material name starting with 'W' or 'X")
@@ -59,16 +57,6 @@ class Pipe:
         pipe.cell_data["Material"] = np.array([self.material] * resolution, dtype="<U5")
 
         return pipe
-
-    @property
-    def id(self) -> int:
-        """Return pipe ID."""
-        return self._id
-
-    @id.setter
-    def id(self, value: int) -> None:
-        """Set pipe ID."""
-        self._id = value
 
     @property
     def is_porous(self) -> bool:
@@ -174,7 +162,7 @@ class WellCasing:
             Pipe section.
 
         """
-        pipe = Pipe(radius, zmin, zmax, material, thickness, id_=len(self.pipes))
+        pipe = Pipe(radius, zmin, zmax, material, thickness)
 
         if self.pipes:
             if self.pipes[-1].radius > radius:
