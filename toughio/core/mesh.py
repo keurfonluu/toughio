@@ -850,8 +850,6 @@ class BaseMesh(ABC):
         self,
         plotter: Optional[pv.Plotter] = None,
         *,
-        scalars: Optional[str | ArrayLike] = None,
-        show_edges: bool = True,
         xscale: Optional[float] = None,
         yscale: Optional[float] = None,
         zscale: Optional[float] = None,
@@ -867,10 +865,6 @@ class BaseMesh(ABC):
         ----------
         plotter : pyvista.Plotter, optional
             Active plotter.
-        scalars : str | ArrayLike, optional
-            Scalars used to color the mesh.
-        show_edges : bool, default True
-            Show the edges of a mesh.
         xscale : float, optional
             Scaling in the X direction.
         yscale : float, optional
@@ -884,7 +878,7 @@ class BaseMesh(ABC):
         tolerance : float, default 0.0
             Specify tolerance for performing pick operation.
         **kwargs : dict, optional
-            Additional keyword arguments. See ``pyvista.DataSet.plot`` and
+            Additional keyword arguments. See ``pyvista.Plotter`` and
             ``pyvista.Plotter.add_mesh`` for more details.
 
         """
@@ -1496,7 +1490,7 @@ class CylindricMesh(BaseMesh):
             label_map = {label: i for i, label in enumerate(self.labels)}
             well_connections = self.metadata.get("WellConnection", {})
             well_isots = {
-                "well": {"branch": 0, "heat": -1, "forward": 4, "backward": 5},
+                "well": {"branch": 3, "heat": -1, "forward": 4, "backward": 5},
                 "formation": {"heat": -1, "perforation": 1, "gas": 4, "liquid": 5, "backward": 6},
             }
 
@@ -1508,18 +1502,8 @@ class CylindricMesh(BaseMesh):
                 i1, i2 = label_map[l1], label_map[l2]
                 wid1, wid2 = well_domain[i1], well_domain[i2]
 
-                # Set nodal distance to zero for well elements
-                if wid1 >= 0:
-                    v["nodal_distances"][0] = 1.0e-9
-
-                if wid2 >= 0:
-                    v["nodal_distances"][1] = 1.0e-9
-
-                # Horizontal well connections
-                if (wid1 >= 0 or wid2 >= 0) and v["gravity_cosine_angle"] == 0.0:
-                    # Default to heat only
-                    isot = -1
-
+                # Well connections
+                if (wid1 >= 0 or wid2 >= 0):
                     # Well-well connection
                     if (min(wid1, wid2), max(wid1, wid2)) in well_connections:
                         key = "well"
@@ -1538,16 +1522,41 @@ class CylindricMesh(BaseMesh):
                     else:
                         connection = None
 
-                    if connection:
-                        zmin, zmax = connection["zmin"], connection["zmax"]
-                        z1 = parameters["elements"][l1]["center"][2]
-                        z2 = parameters["elements"][l2]["center"][2]
+                    # Horizontal connections
+                    if v["gravity_cosine_angle"] == 0.0:
+                        # Update ISOT
+                        isot = -1
 
-                        if zmin <= z1 <= zmax and zmin <= z2 <= zmax:
+                        if connection:
+                            zmin, zmax = connection["zmin"], connection["zmax"]
+                            z1 = parameters["elements"][l1]["center"][2]
+                            z2 = parameters["elements"][l2]["center"][2]
                             type_ = connection["type"]
-                            isot = well_isots[key][type_]
 
-                    v["permeability_direction"] = isot
+                            if zmin <= z1 <= zmax and zmin <= z2 <= zmax:
+                                if type_ == "none":
+                                    continue
+
+                                else:
+                                    isot = well_isots[key][type_]
+
+                            # Remove well-well connection
+                            elif key == "well":
+                                continue
+
+                        v["permeability_direction"] = isot
+
+                        # Set nodal distance to zero for well elements
+                        if wid1 >= 0:
+                            v["nodal_distances"][0] = 1.0e-9
+
+                        if wid2 >= 0:
+                            v["nodal_distances"][1] = 1.0e-9
+
+                    # Vertical connections
+                    else:
+                        if connection and connection["type"] == "none":
+                            continue
 
                 connections[k] = v
 
