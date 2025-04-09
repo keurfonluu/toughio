@@ -41,6 +41,7 @@ dependencies = [
     "numpy >= 1.13.0",
     "pandas",
     "pyvista >= 0.36",
+    "pyvista-gridder",
     "psutil >= 5.0",
     "scipy >= 0.9",
 ]
