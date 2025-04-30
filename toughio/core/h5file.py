@@ -451,6 +451,96 @@ class H5File:
         """
         return self._list("History/Rock")
 
+    def iter_connection_output(self) -> Sequence[ConnectionOutput]:
+        """
+        Iterate over connection outputs.
+
+        Yields
+        ------
+        str
+            Name of connection output.
+        toughio.ConnectionOutput
+            Connection output.
+
+        """
+        for name in self.list_connection_output():
+            yield name, self.load_connection_output(name)
+
+    def iter_element_output(self) -> Sequence[ElementOutput]:
+        """
+        Iterate over element outputs.
+
+        Yields
+        ------
+        str
+            Name of element output.
+        toughio.ElementOutput
+            Element output.
+
+        """
+        for name in self.list_element_output():
+            yield name, self.load_element_output(name)
+
+    def iter_connection_history(self) -> Sequence[HistoryOutput]:
+        """
+        Iterate over connection history outputs.
+
+        Yields
+        ------
+        str
+            Name of connection history output.
+        toughio.HistoryOutput
+            Connection history output.
+
+        """
+        for name in self.list_connection_history():
+            yield name, self.load_connection_history(name)
+
+    def iter_element_history(self) -> Sequence[HistoryOutput]:
+        """
+        Iterate over element history outputs.
+
+        Yields
+        ------
+        str
+            Name of element history output.
+        toughio.HistoryOutput
+            Element history output.
+
+        """
+        for name in self.list_element_history():
+            yield name, self.load_element_history(name)
+
+    def iter_generator_history(self) -> Sequence[HistoryOutput]:
+        """
+        Iterate over generator history outputs.
+
+        Yields
+        ------
+        str
+            Name of generator history output.
+        toughio.HistoryOutput
+            Generator history output.
+
+        """
+        for name in self.list_generator_history():
+            yield name, self.load_generator_history(name)
+
+    def iter_rock_history(self) -> Sequence[HistoryOutput]:
+        """
+        Iterate over rock history outputs.
+
+        Yields
+        ------
+        str
+            Name of rock history output.
+        toughio.HistoryOutput
+            Rock history output.
+
+        """
+        for name in self.list_rock_history():
+            yield name, self.load_rock_history(name)
+
     def _load_output(
         self,
         type_: Literal["connection", "element"],
