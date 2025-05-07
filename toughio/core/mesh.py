@@ -692,6 +692,9 @@ class BaseMesh(ABC):
             parameters["initial_conditions"] = {}
 
             for label, phi, k, index, values in zip(labels, porosities, permeabilities, phase_compositions, initial_conditions):
+                if label in inactive_labels:
+                    continue
+                
                 tmp = {}
 
                 if phi != 0.0:
