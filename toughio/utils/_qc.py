@@ -17,6 +17,9 @@ def plot_eleme_conne(
     parallel_projection: bool = False,
     show_elements: bool = True,
     show_connections: bool = True,
+    cmap: Optional[str] = None,
+    point_size: int = 8,
+    line_width: int = 4,
     **kwargs
 ) -> None:
     """
@@ -38,6 +41,12 @@ def plot_eleme_conne(
         If True, show elements as Gaussian points.
     show_connections : bool, default True
         If True, show connections as lines.
+    cmap : str, optional
+        Colormap for the elements.
+    point_size : int, default 8
+        Size of the points representing elements.
+    line_width : int, default 4
+        Width of the lines representing connections.
     **kwargs : dict, optional
         Additional keyword arguments. See ``pyvista.Plotter`` for more details.
 
@@ -78,8 +87,9 @@ def plot_eleme_conne(
         p.add_mesh(
             elements,
             scalars=materials,
+            cmap=cmap,
             render_points_as_spheres=True,
-            point_size=8,
+            point_size=point_size,
         )
     
     if show_connections:
@@ -109,7 +119,7 @@ def plot_eleme_conne(
 
             p.add_mesh(
                 v,
-                line_width=4,
+                line_width=line_width,
                 color=color,
             )
 
