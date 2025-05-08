@@ -147,6 +147,24 @@ class BaseMesh(ABC):
             Data array.
 
         """
+        active = self.active
+        n_active = active.sum()
+        n_cells = self.n_cells
+
+        def add_active_data(name: str, arr: ArrayLike) -> None:
+            """Add active data array."""
+            arr = np.asanyarray(arr)
+
+            if len(arr) >= n_cells:
+                self.data[name] = arr[:n_cells]
+
+            elif len(arr) == n_active:
+                self.data[name] = np.full((n_cells, arr.shape[1] if arr.ndim > 1 else 1), np.nan, dtype=arr.dtype)
+                self.data[name][active] = arr
+
+            else:
+                raise ValueError(f"could not add data array '{name}'")
+
         from .. import ElementOutput
 
         if len(args) == 1:
@@ -157,14 +175,14 @@ class BaseMesh(ABC):
 
             if isinstance(data, dict):
                 for k, v in data.items():
-                    self.data[k] = v[:self.n_cells]
+                    add_active_data(k, v)
 
             else:
                 raise ValueError(f"could not add data from '{type(data)}'")
 
         elif len(args) == 2:
             name, data = args
-            self.data[name] = data[:self.n_cells]
+            add_active_data(name, data)
 
         else:
             raise ValueError("invalid input data")
@@ -1010,7 +1028,7 @@ class BaseMesh(ABC):
         """Get property data."""
         if name not in self.data:
             data = np.zeros(self.n_cells, dtype=float) if default is None else default
-            self.add_data(name, data)
+            self.data[name] = data
 
         return self.data[name]
 
@@ -1376,7 +1394,7 @@ class CylindricMesh(BaseMesh):
         well_domain = np.full(self.n_cells, -1)
         cells_to_fuse = []
 
-        for id_, pipe in zip(np.arange(len(well.pipes))[::-1], well.pipes[::-1]):
+        for id_, pipe in reversed(list(enumerate(well.pipes))):
             mask = (
                 (centers[:, 0] < pipe.radius + pipe.thickness)
                 & (centers[:, 2] > pipe.zmin)
@@ -1384,9 +1402,7 @@ class CylindricMesh(BaseMesh):
             )
             self.set_material(pipe.material, mask)
             self.set_active(True, mask)
-
-            if not pipe.is_porous:
-                well_domain[mask] = id_
+            well_domain[mask] = -id_ if pipe.is_porous else id_
             
             # Find horizontally connected cells to be fused to ensure 1D vertical flow in wellbore
             pipe_centers = centers[mask]
@@ -1395,7 +1411,7 @@ class CylindricMesh(BaseMesh):
                 for z in np.unique(pipe_centers[:, 2]):
                     cells_to_fuse.append(np.flatnonzero(np.logical_and(mask, centers[:, 2] == z)))
 
-        self.add_data("WellDomain", well_domain)
+        self.data["WellDomain"] = well_domain
 
         # Fuse cells (this will change the mesh to an unstructured grid)
         # Only fuse cells with the same material ID
@@ -1418,17 +1434,19 @@ class CylindricMesh(BaseMesh):
 
             if pipe2 is not None:
                 id2 = well.pipes.index(pipe2)
-                key = (min(id1, id2), max(id1, id2))
+                key = f"{min(id1, id2)}-{max(id1, id2)}"
 
             # Well-formation connection
             else:
                 key = id1
 
-            connections[key] = {
-                "type": connection["type"],
-                "zmin": connection["zmin"],
-                "zmax": connection["zmax"],
-            }
+            connections.setdefault(key, []).append(
+                {
+                    "type": connection["type"],
+                    "zmin": connection["zmin"],
+                    "zmax": connection["zmax"],
+                }
+            )
 
         if connections:
             self.metadata["WellConnection"] = connections
@@ -1522,40 +1540,53 @@ class CylindricMesh(BaseMesh):
             for k, v in parameters["connections"].items():
                 l1, l2 = k[:label_length], k[label_length:]
                 i1, i2 = label_map[l1], label_map[l2]
-                wid1, wid2 = well_domain[i1], well_domain[i2]
+                wid1, wid2 = int(well_domain[i1]), int(well_domain[i2])
 
                 # Well connections
                 if (wid1 >= 0 or wid2 >= 0):
                     # Well-well connection
-                    if (min(wid1, wid2), max(wid1, wid2)) in well_connections:
+                    if f"{min(wid1, wid2)}-{max(wid1, wid2)}" in well_connections:
                         key = "well"
-                        connection = well_connections[(min(wid1, wid2), max(wid1, wid2))]
+                        connection_key = f"{min(wid1, wid2)}-{max(wid1, wid2)}"
+
+                    # Vertical well-formation connection
+                    elif f"{min(abs(wid1), abs(wid2))}-{max(abs(wid1), abs(wid2))}" in well_connections:
+                        key = "formation"
+                        connection_key = f"{min(abs(wid1), abs(wid2))}-{max(abs(wid1), abs(wid2))}"
 
                     # Well-formation connection
                     elif wid1 in well_connections or wid2 in well_connections:
                         key = "formation"
 
-                        try:
-                            connection = well_connections[wid1]
+                        if wid1 in well_connections:
+                            connection_key = wid1
 
-                        except KeyError:
-                            connection = well_connections[wid2]
+                        else:
+                            connection_key = wid2
 
                     else:
-                        connection = None
+                        connection_key = None
 
                     # Horizontal connections
                     if v["gravity_cosine_angle"] == 0.0:
                         # Update ISOT
                         isot = -1
 
-                        if connection:
-                            zmin, zmax = connection["zmin"], connection["zmax"]
-                            z1 = parameters["elements"][l1]["center"][2]
-                            z2 = parameters["elements"][l2]["center"][2]
-                            type_ = connection["type"]
+                        if connection_key is not None:
+                            matched_connection = None
 
-                            if zmin <= z1 <= zmax and zmin <= z2 <= zmax:
+                            for connection in well_connections[connection_key]:
+                                zmin, zmax = connection["zmin"], connection["zmax"]
+                                z1 = parameters["elements"][l1]["center"][2]
+                                z2 = parameters["elements"][l2]["center"][2]
+
+                                if zmin <= z1 <= zmax and zmin <= z2 <= zmax:
+                                    matched_connection = connection
+                                    break
+
+                            if matched_connection is not None:
+                                type_ = matched_connection["type"]
+
                                 if type_ == "none":
                                     continue
 
@@ -1577,8 +1608,16 @@ class CylindricMesh(BaseMesh):
 
                     # Vertical connections
                     else:
-                        if connection and connection["type"] == "none":
-                            continue
+                        if connection_key is not None:
+                            none_connection = False
+
+                            for connection in well_connections[connection_key]:
+                                if connection["type"] == "none":
+                                    none_connection = True
+                                    continue
+
+                            if none_connection:
+                                continue
 
                 connections[k] = v
 
