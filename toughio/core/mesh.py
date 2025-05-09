@@ -549,9 +549,9 @@ class BaseMesh(ABC):
     def to_tough(
         self,
         filename: Optional[str | os.PathLike] = None,
-        nodal_distance: Literal["line", "orthogonal"] = "line",
         material_name: Optional[dict] = None,
         gravity: Optional[ArrayLike] = None,
+        assume_orthogonal: bool = False,
         incon: bool = False,
         **kwargs
     ) -> dict | None:
@@ -562,18 +562,13 @@ class BaseMesh(ABC):
         ----------
         filename : str | os.PathLike, optional
             Output file name.
-        nodal_distance : {'line', 'orthogonal'}, default 'line'
-            Method to calculate connection nodal distances:
-
-             - 'line': distance between node and common face along connecting line
-             (distance is not normal),
-             - 'orthogonal': distance between node and its orthogonal projection onto
-             common face (shortest distance).
-
         material_name : dict, optional
             Map of material names.
         gravity : ArrayLike, optional
             Gravity direction vector.
+        assume_orthogonal : bool, default False
+            If True, connection properties will be calculated assuming orthogonal
+            connection lines.
         incon : bool, default False
             If True, also export initial conditions.
         **kwargs : dict, optional
@@ -630,20 +625,18 @@ class BaseMesh(ABC):
         lines = centers_2 - centers_1
         lines /= np.linalg.norm(lines, axis=1)[:, None]
 
-        # Permeability directions
-        mask = lines != 0.0
-        permability_directions = np.where(mask.sum(axis=1) == 1, mask.argmax(axis=1) + 1, 1)
-
-        # Nodal distances and gravity angles
-        if nodal_distance == "line":
+        # Nodal distances, permeability directions and gravity angles
+        if not assume_orthogonal:
             fp = intersection_line_plane(centers_1, lines, face_centers, face_normals)
             distances_1 = np.where(bounds_1, 1.0e-9, np.linalg.norm(centers_1 - fp, axis=1))
             distances_2 = np.where(bounds_2, 1.0e-9, np.linalg.norm(centers_2 - fp, axis=1))
+            permeability_directions = np.abs(lines).argmax(axis=1) + 1
             angles = lines @ gravity
 
-        elif nodal_distance == "orthogonal":
+        else:
             distances_1 = distance_point_plane(centers_1, face_centers, face_normals, bounds_1)
             distances_2 = distance_point_plane(centers_2, face_centers, face_normals, bounds_2)
+            permeability_directions = np.abs(face_normals).argmax(axis=1) + 1
             angles = np.sign((face_normals * lines).sum(axis=1)) * (face_normals @ gravity)
 
         # Write MESH file
@@ -668,7 +661,7 @@ class BaseMesh(ABC):
         for l1, l2, isot, d1, d2, face_area, angle in zip(
             labels_1,
             labels_2,
-            permability_directions,
+            permeability_directions,
             distances_1,
             distances_2,
             face_areas,
@@ -809,9 +802,9 @@ class BaseMesh(ABC):
     def write_tough(
         self,
         filename: str | os.PathLike = "MESH",
-        nodal_distance: Literal["line", "orthogonal"] = "line",
         material_name: Optional[dict] = None,
         gravity: Optional[ArrayLike] = None,
+        assume_orthogonal: bool = False,
         incon: bool = False,
         **kwargs
     ) -> None:
@@ -822,18 +815,13 @@ class BaseMesh(ABC):
         ----------
         filename : str | os.PathLike, default 'MESH'
             Output file name.
-        nodal_distance : {'line', 'orthogonal'}, default 'line'
-            Method to calculate connection nodal distances:
-
-             - 'line': distance between node and common face along connecting line
-             (distance is not normal),
-             - 'orthogonal': distance between node and its orthogonal projection onto
-             common face (shortest distance).
-
         material_name : dict, optional
             Map of material names.
         gravity : ArrayLike, optional
             Gravity direction vector.
+        assume_orthogonal : bool, default False
+            If True, connection properties will be calculated assuming orthogonal
+            connection lines.
         incon : bool, default False
             If True, also export initial conditions to INCON file.
         **kwargs : dict, optional
@@ -842,9 +830,9 @@ class BaseMesh(ABC):
         """
         self.to_tough(
             filename,
-            nodal_distance,
             material_name,
             gravity,
+            assume_orthogonal,
             incon,
         )
 
@@ -1487,9 +1475,9 @@ class CylindricMesh(BaseMesh):
     def to_tough(
         self,
         filename: Optional[str | os.PathLike] = None,
-        nodal_distance: Literal["line", "orthogonal"] = "orthogonal",
         material_name: Optional[dict] = None,
         gravity: Optional[ArrayLike] = None,
+        assume_orthogonal: bool = True,
         incon: bool = False,
         **kwargs
     ) -> dict | None:
@@ -1500,18 +1488,13 @@ class CylindricMesh(BaseMesh):
         ----------
         filename : str | os.PathLike, optional
             Output file name.
-        nodal_distance : {'line', 'orthogonal'}, default 'orthogonal'
-            Method to calculate connection nodal distances:
-
-             - 'line': distance between node and common face along connecting line
-             (distance is not normal),
-             - 'orthogonal': distance between node and its orthogonal projection onto
-             common face (shortest distance).
-
         material_name : dict, optional
             Map of material names.
         gravity : ArrayLike, optional
             Gravity direction vector.
+        assume_orthogonal : bool, default True
+            If True, connection properties will be calculated assuming orthogonal
+            connection lines.
         incon : bool, default False
             If True, also export initial conditions.
         **kwargs : dict, optional
@@ -1525,9 +1508,9 @@ class CylindricMesh(BaseMesh):
         """
         parameters = super().to_tough(
             filename=filename,
-            nodal_distance=nodal_distance,
             material_name=material_name,
             gravity=gravity,
+            assume_orthogonal=assume_orthogonal,
             incon=incon,
             **kwargs
         )
