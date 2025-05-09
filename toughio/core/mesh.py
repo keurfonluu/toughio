@@ -946,19 +946,20 @@ class BaseMesh(ABC):
                 font_size=12,
                 shadow=False,
             )
+            labels = self.labels
+            materials = self.materials
+            values = (
+                mesh.cell_data[default_kwargs["scalars"]]
+                if isinstance(default_kwargs["scalars"], str)
+                else default_kwargs["scalars"]
+            )
 
             def callback(mesh: pv.DataSet) -> None:
                 i = mesh.cell_data["vtkOriginalCellIds"][0]
-                label = self.labels[i]
+                label = labels[i]
                 coords = np.round(mesh.get_cell(0).center, 3)
-                material = self.materials[i]
-
-                if isinstance(default_kwargs["scalars"], str):
-                    value = mesh.cell_data[default_kwargs["scalars"]][i]
-
-                else:
-                    value = default_kwargs["scalars"][i]
-
+                material = materials[i]
+                value = values[i]
                 out = f"{label}\nCoords: ({', '.join(map(str, coords))})\nMaterial: {material}\nValue: {value}"
 
                 infos.SetText(2, out)
