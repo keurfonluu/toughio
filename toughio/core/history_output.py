@@ -568,8 +568,8 @@ class WellOutput(HistoryOutput):
         if t is None and z is None:
             raise ValueError("could not interpolate well output without time or depth data")
 
-        t = t if t is not None else np.unique(self.data["Time"])
-        z = z if z is not None else np.unique(self.data["Depth"])
+        t = t if t is not None else self.time
+        z = z if z is not None else self.depth
         T, Z = np.meshgrid(t, z)
 
         tp = self.data["Time"]
@@ -582,12 +582,12 @@ class WellOutput(HistoryOutput):
                 (T, Z),
                 method="linear",
             ).ravel()
-            for key, value in self.to_dict(unit=True).items()
+            for key, value in self.to_dict().items()
         }
 
         return WellOutput(out)
 
-    def _get_time_key(self) -> str | None:
+    def _get_time_key(self, *args, **kwargs) -> str:
         """Get key of time data."""
         return "Time"
 
@@ -650,6 +650,30 @@ class WellOutput(HistoryOutput):
 
         if logy:
             ax.set_yscale("log")
+
+    def to_dataframe(self) -> pd.DataFrame | pd.Series:
+        """
+        Convert to a Pandas dataframe or series.
+
+        Returns
+        -------
+        pandas.DataFrame | pandas.Series
+            Converted dataframe or series.
+
+        """
+        return super().to_dataframe(unit=False)
+
+    def to_dict(self) -> dict:
+        """
+        Convert to a dict.
+
+        Returns
+        -------
+        dict
+            Converted dict.
+
+        """
+        return super().to_dict(unit=False)
 
     @property
     def depth(self) -> ArrayLike:
