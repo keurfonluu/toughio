@@ -894,6 +894,11 @@ class BaseMesh(ABC):
         default_kwargs = {
             "scalars": self.materials,
             "show_edges": True,
+            "scalar_bar_args": {
+                "vertical": True,
+                "position_y": 0.1,
+                "height": 0.8,
+            },
         }
         default_kwargs.update(kwargs)
 
@@ -917,15 +922,7 @@ class BaseMesh(ABC):
         if xscale or yscale or zscale:
             p.set_scale(xscale, yscale, zscale)
 
-        p.add_mesh(
-            mesh,
-            scalar_bar_args={
-                "vertical": True,
-                "position_y": 0.1,
-                "height": 0.8,
-            },
-            **default_kwargs
-        )
+        p.add_mesh(mesh, **default_kwargs)
 
         if enable_picking:
             infos = p.add_text(
