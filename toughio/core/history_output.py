@@ -320,23 +320,15 @@ class HistoryOutput(UserDict):
             unit = None
 
         ylabel = f"{y} ({unit})" if unit else y
-        y = self.data[y]
-
-        if logx and logy:
-            p = ax.loglog
-
-        elif logx:
-            p = ax.semilogx
-
-        elif logy:
-            p = ax.semilogy
-
-        else:
-            p = ax.plot
-
-        p(x * xscale, y * yscale, *args, **kwargs)
+        ax.plot(x * xscale, self.data[y] * yscale, *args, **kwargs)
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
+
+        if logx:
+            ax.set_xscale("log")
+
+        if logy:
+            ax.set_yscale("log")
 
     def shift(self, t: float, inplace: bool = False) -> HistoryOutput | None:
         """
