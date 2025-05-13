@@ -12,3 +12,4 @@ from .table import (
     read as read_table,
     register as register_table,
 )
+from .well import read as read_well_output

@@ -103,8 +103,16 @@ def read_buffer(f, time_steps=None):
         elif line.upper().startswith("ZONE"):
             zone = _read_zone(line)
 
+            # Read data all at once
             if "I" not in zone:
-                raise ValueError()
+                data = []
+
+                for line in f:
+                    line = line.strip().split(",")
+                    data.append(list(map(lambda x: None if not x.strip() else int(x) if x.isnumeric() else float(x), line)))
+
+                zones.append({"data": data})
+                break
 
             else:
                 t_step += 1

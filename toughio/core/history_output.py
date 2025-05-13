@@ -429,7 +429,13 @@ class HistoryOutput(UserDict):
 
         if time_key:
             if unit:
-                time_unit = self.units[time_key]
+                try:
+                    time_unit = self.units[time_key]
+
+                except KeyError:
+                    time_unit = "S"
+                    self.units[time_key] = time_unit
+
                 time_key = f"{time_key} ({time_unit if time_unit else '-'})"
 
         return time_key
@@ -530,3 +536,129 @@ class HistoryOutput(UserDict):
 
         return self.metadata["units"]
         
+
+class WellOutput(HistoryOutput):
+    """
+    Well output class.
+
+    Parameters
+    ----------
+    obj : dict, optional
+        Data dict.
+    metadata : dict, optional
+        Output metadata.
+
+    """
+
+    __name__: str = "WellOutput"
+    __qualname__: str = "toughio.WellOutput"
+
+    def __init__(
+        self,
+        obj: Optional[dict] = None,
+        metadata: Optional[dict] = None,
+    ) -> None:
+        """Initialize a well output."""
+        super().__init__(obj, metadata)
+
+    def __call__(self, t: Optional[ArrayLike] = None, z: Optional[ArrayLike] = None) -> WellOutput:
+        """Interpolate a well output."""
+        from scipy.interpolate import griddata
+
+        if t is None and z is None:
+            raise ValueError("could not interpolate well output without time or depth data")
+
+        t = t if t is not None else np.unique(self.data["Time"])
+        z = z if z is not None else np.unique(self.data["Depth"])
+        T, Z = np.meshgrid(t, z)
+
+        tp = self.data["Time"]
+        zp = self.data["Depth"]
+
+        out = {
+            key: griddata(
+                (tp, zp),
+                value,
+                (T, Z),
+                method="linear",
+            ).ravel()
+            for key, value in self.to_dict(unit=True).items()
+        }
+
+        return WellOutput(out)
+
+    def _get_time_key(self) -> str | None:
+        """Get key of time data."""
+        return "Time"
+
+    def plot(
+        self,
+        key: str,
+        ax: Optional[Axes] = None,
+        logx: bool = False,
+        logy: bool = False,
+        *args,
+        **kwargs,
+    ) -> None:
+        """
+        Plot a well output.
+
+        Parameters
+        ----------
+        key : str
+            Data key to plot.
+        ax : matplotlib.axes.Axes, optional
+            Plot axes.
+        logx : bool, default False
+            If True, use log scaling on X axis.
+        logy : bool, default False
+            If True, use log scaling on Y axis.
+        *args
+            Additional arguments to pass to the plot function.
+        **kwargs
+            Additional keyword arguments to pass to the plot function.
+        
+        """
+        ax = ax if ax is not None else plt.gca()
+        t = self.time
+        z = self.depth
+
+        if t.size == 1:
+            ax.plot(self.data[key], z, *args, **kwargs)
+            ax.set_xlabel(key)
+            ax.set_ylabel("Depth")
+            ax.yaxis.set_inverted(True)
+
+        elif z.size == 1:
+            ax.plot(t, self.data[key], *args, **kwargs)
+            ax.set_xlabel("Time")
+            ax.set_ylabel(key)
+
+        else:
+            data = (
+                self(0.5 * (t[:-1] + t[1:]), 0.5 * (z[:-1] + z[1:]))
+                .data[key]
+                .reshape((z.size - 1, t.size - 1))
+            )
+            ax.pcolormesh(t, z, data)
+            ax.yaxis.set_inverted(True)
+            ax.set_xlabel("Time")
+            ax.set_ylabel("Depth")
+            
+        if logx:
+            ax.set_xscale("log")
+
+        if logy:
+            ax.set_yscale("log")
+
+    @property
+    def depth(self) -> ArrayLike:
+        """Return depth data."""
+        return np.unique(self.data["Depth"])
+
+    @property
+    def time(self) -> ArrayLike | None:
+        """Return time data."""
+        time_key = self._get_time_key()
+
+        return np.unique(self[time_key]) if time_key else None
