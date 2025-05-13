@@ -49,21 +49,26 @@ class HistoryOutput(UserDict):
 
     def __contains__(self, key: str) -> bool:
         """Return True if history output contains a key."""
-        key, unit = self._get_key_unit(key)
+        if super().__contains__(key):
+            return True
 
-        if unit and self.units[key] != unit:
-            return False
+        else:
+            key, unit = self._get_key_unit(key)
 
-        return key in set(self.keys())
+            if unit and self.units[key] != unit:
+                return False
+
+            return key in set(self.keys())
 
     def __getitem__(self, key: str) -> ArrayLike:
         """Slice an history output."""
-        if key not in self:
-            raise KeyError(f"'{key}'")
+        try:
+            return super().__getitem__(key)
 
-        key, unit = self._get_key_unit(key)
+        except KeyError:
+            key, unit = self._get_key_unit(key)
 
-        return super().__getitem__(key)
+            return super().__getitem__(key)
 
     def __setitem__(self, key: str, value: ArrayLike) -> None:
         """Add data to an history output."""
@@ -123,6 +128,23 @@ class HistoryOutput(UserDict):
         }
 
         return HistoryOutput(out)
+
+    def add_data(self, name: str, data: ArrayLike, unit: Optional[str] = None) -> None:
+        """
+        Add data to the history output.
+
+        Parameters
+        ----------
+        name : str
+            Data name.
+        data : ArrayLike
+            Data values.
+        unit : str, optional
+            Data unit.
+
+        """
+        self.data[name] = data
+        self.units[name] = unit
 
     def copy(self, deep: bool = True) -> Self:
         """
@@ -643,7 +665,7 @@ class WellOutput(HistoryOutput):
         if logy:
             ax.set_yscale("log")
 
-    def to_dataframe(self) -> pd.DataFrame | pd.Series:
+    def to_dataframe(self, *args, **kwargs) -> pd.DataFrame | pd.Series:
         """
         Convert to a Pandas dataframe or series.
 
@@ -655,7 +677,7 @@ class WellOutput(HistoryOutput):
         """
         return super().to_dataframe(unit=False)
 
-    def to_dict(self) -> dict:
+    def to_dict(self, *args, **kwargs) -> dict:
         """
         Convert to a dict.
 
