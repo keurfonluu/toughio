@@ -253,7 +253,7 @@ def test_ncgas(write_read):
 def test_multi(write_read, isothermal):
     import random
 
-    from toughio._io.input.tough._common import eos
+    from toughio._io.input.tough.blocks.multi import eos_values as eos
 
     parameters_ref = {
         "eos": random.choice(
