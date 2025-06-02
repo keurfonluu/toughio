@@ -56,7 +56,7 @@ def read(
     blocks = (
         blocks
         if blocks is not None
-        else [block.name for block, _ in registered_blocks]
+        else [block.name for block in registered_blocks]
     )
     blocks = tuple(blocks)
 
@@ -78,7 +78,7 @@ def read_buffer(
     """Read TOUGH input file."""
     block_readers = {
         block.name: block(free_format=free_format)
-        for block, _ in registered_blocks
+        for block in registered_blocks
     }
 
     if simulator != "tough4":

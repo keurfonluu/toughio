@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from .title import TITLE
 from .dimen import DIMEN
 from .rocks import ROCKS
@@ -35,59 +33,42 @@ from .nover import NOVER
 from .endcy import ENDCY
 from .end_comments import END_COMMENTS
 
-from .....core import DataBlock
-
 
 registered_blocks = [
-    (TITLE, 100),
-    (DIMEN, 98),
-    (ROCKS, 96),
-    (RPCAP, 94),
-    (REACT, 92),
-    (FLAC, 90),
-    (CHEMP, 88),
-    (NCGAS, 86),
-    (MULTI, 84),
-    (SOLVR, 82),
-    (INDEX, 80),
-    (START, 78),
-    (PARAM, 76),
-    (SELEC, 74),
-    (INDOM, 72),
-    (MOMOP, 70),
-    (TIMES, 68),
-    (HYSTE, 66),
-    (FOFT, 64),
-    (COFT, 62),
-    (GOFT, 60),
-    (ROFT, 58),
-    (GENER, 56),
-    (TIMBC, 54),
-    (DIFFU, 52),
-    (OUTPT, 50),
-    (OUTPU, 48),
-    (ELEME, 46),
-    (COORD, 44),
-    (CONNE, 42),
-    (INCON, 40),
-    (MESHM, 38),
-    (POISE, 36),
-    (NOVER, 34),
-    (ENDCY, 32),
-    (END_COMMENTS, 30),
+    TITLE,
+    DIMEN,
+    ROCKS,
+    RPCAP,
+    REACT,
+    FLAC,
+    CHEMP,
+    NCGAS,
+    MULTI,
+    SOLVR,
+    INDEX,
+    START,
+    PARAM,
+    SELEC,
+    INDOM,
+    MOMOP,
+    TIMES,
+    HYSTE,
+    FOFT,
+    COFT,
+    GOFT,
+    ROFT,
+    GENER,
+    TIMBC,
+    DIFFU,
+    OUTPT,
+    OUTPU,
+    ELEME,
+    COORD,
+    CONNE,
+    INCON,
+    MESHM,
+    POISE,
+    NOVER,
+    ENDCY,
+    END_COMMENTS,
 ]
-
-
-def register_block(block: DataBlock, priority: int | float) -> None:
-    """
-    Register a new block with a specified priority.
-
-    Parameters
-    ----------
-    block : DataBlock
-        The block class to register
-    priority : scalar
-        The priority of the block, higher values are processed first.
-        
-    """
-    registered_blocks.append((block, priority))

@@ -66,7 +66,7 @@ def write(
         raise ValueError(f"invalid simulator '{simulator}'")
 
     if blocks is None:
-        blocks = [block.name for block, _ in registered_blocks]
+        blocks = [block.name for block in registered_blocks]
 
         if block is not None:
             if block.lower() == "all":
@@ -121,7 +121,7 @@ def write_buffer(
             space_between_blocks=space_between_blocks,
             free_format=free_format,
         )
-        for block, _ in sorted(registered_blocks, key=lambda x: x[1], reverse=True)
+        for block in registered_blocks
         if block.name in blocks
     }
 

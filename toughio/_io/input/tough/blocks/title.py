@@ -24,7 +24,7 @@ class TITLE(DataBlock):
         from . import registered_blocks
 
         title = []
-        blocks = set([block[0].name for block in registered_blocks])
+        blocks = set([block.name for block in registered_blocks])
 
         while True:
             if len(title) >= 100:
