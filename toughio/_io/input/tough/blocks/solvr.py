@@ -7,7 +7,7 @@ from .....core import DataBlock, FileIterator
 
 class SOLVR(DataBlock):
     name = "SOLVR"
-    formats = {1: "1d,2s,2s,3s,2s,10f,10f"}
+    formats = {1: "1s,4s,5s,10f,10f"}
 
     def _read(
         self,
@@ -19,12 +19,13 @@ class SOLVR(DataBlock):
         # Read records
         data = self.readers[1](f)
         solvr["solver"] = {
-            "method": data[0],
-            "z_precond": data[2],
-            "o_precond": data[4],
-            "rel_iter_max": data[5],
-            "eps": data[6],
+            "method": int(data[0]) if data[0].isdigit() else data[0],
+            "z_precond": data[1],
+            "o_precond": data[2],
+            "rel_iter_max": data[3],
+            "eps": data[4],
         }
+        solvr["solver"] = self.prune_values(solvr["solver"])
 
         return solvr
 
@@ -33,9 +34,7 @@ class SOLVR(DataBlock):
         values = [
             parameters["solver"].get(key) for key in [
                 "method",
-                "__EMPTY__",
                 "z_precond",
-                "__EMPTY__",
                 "o_precond",
                 "rel_iter_max",
                 "eps",
