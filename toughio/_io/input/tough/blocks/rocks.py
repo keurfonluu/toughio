@@ -23,6 +23,8 @@ class ROCKS(DataBlock):
         self,
         f: FileIterator | TextIO | str,
         simulator: str,
+        *args,
+        **kwargs
     ) -> dict:
         """Read ROCKS block data."""
         rocks = {"rocks": {}}

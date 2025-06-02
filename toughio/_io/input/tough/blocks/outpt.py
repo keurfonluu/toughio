@@ -12,6 +12,8 @@ class OUTPT(DataBlock):
     def _read(
         self,
         f: FileIterator | TextIO | str,
+        *args,
+        **kwargs
     ) -> dict:
         """Read OUTPT block data."""
         outpt = {"react": {"output": {}}}
@@ -43,3 +45,11 @@ class OUTPT(DataBlock):
             parameters.get("react", {}).get("output", {}).get("format") is not None
             and simulator == "toughreact"
         )
+
+    def update(
+        self,
+        parameters: dict,
+        data: dict,
+    ) -> None:
+        """Update input file parameters given a OUTPT block."""
+        parameters.setdefault("react", {}).update(data["react"])

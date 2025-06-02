@@ -12,9 +12,11 @@ class INDEX(DataBlock):
     def _read(
         self,
         f: FileIterator | TextIO | str,
+        *args,
+        **kwargs
     ) -> dict:
         """Read INDEX block data."""
-        pass
+        return {"index": True}
 
     def _write(self, parameters: dict, *args, **kwargs) -> list[str]:
         """Write INDEX block data."""

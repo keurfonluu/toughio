@@ -14,6 +14,8 @@ class SELEC(DataBlock):
     def _read(
         self,
         f: FileIterator | TextIO | str,
+        *args,
+        **kwargs
     ) -> dict:
         """Read SELEC block data."""
         selec = {"selections": {}}

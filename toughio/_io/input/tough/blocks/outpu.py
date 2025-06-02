@@ -15,6 +15,8 @@ class OUTPU(DataBlock):
     def _read(
         self,
         f: FileIterator | TextIO | str,
+        *args,
+        **kwargs
     ) -> dict:
         """Read OUTPU block data."""
         outpu = {"output": {}}

@@ -13,6 +13,8 @@ class ROFT(DataBlock):
     def _read(
         self,
         f: FileIterator | TextIO | str,
+        *args,
+        **kwargs
     ) -> dict:
         """Read ROFT block data."""
         history = {"rock_history": []}

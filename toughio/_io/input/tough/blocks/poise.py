@@ -12,6 +12,8 @@ class POISE(DataBlock):
     def _read(
         self,
         f: FileIterator | TextIO | str,
+        *args,
+        **kwargs
     ) -> dict:
         """Read POISE block data."""
         poise = {"react": {"poiseuille": {}}}
@@ -52,3 +54,11 @@ class POISE(DataBlock):
             parameters.get("react", {}).get("poiseuille")
             and simulator == "toughreact"
         )
+
+    def update(
+        self,
+        parameters: dict,
+        data: dict,
+    ) -> None:
+        """Update input file parameters given a POISE block."""
+        parameters.setdefault("react", {}).update(data["react"])

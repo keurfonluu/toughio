@@ -41,6 +41,8 @@ class INCON(DataBlock):
         n_variables: int,
         eos: str = None,
         simulator: str = "tough",
+        *args,
+        **kwargs
     ) -> dict:
         """Read INCON block data."""
         incon = {"initial_conditions": {}}
@@ -161,3 +163,11 @@ class INCON(DataBlock):
     def _write_conditions(self, parameters: dict, *args, **kwargs) -> bool:
         """Check if INCON block should be written."""
         return bool(parameters.get("initial_conditions", {}))
+
+    def update(
+        self,
+        parameters: dict,
+        data: dict,
+    ) -> None:
+        """Update input file parameters given a INCON block."""
+        parameters.update(data["data"])

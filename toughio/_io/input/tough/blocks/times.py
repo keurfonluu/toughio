@@ -15,6 +15,8 @@ class TIMES(DataBlock):
     def _read(
         self,
         f: FileIterator | TextIO | str,
+        *args,
+        **kwargs
     ) -> dict:
         """Read TIMES block data."""
         times = {"times": []}

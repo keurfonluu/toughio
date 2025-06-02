@@ -12,6 +12,8 @@ class MULTI(DataBlock):
     def _read(
         self,
         f: FileIterator | TextIO | str,
+        *args,
+        **kwargs
     ) -> dict:
         """Read MULTI block data."""
         multi = {}
@@ -24,6 +26,8 @@ class MULTI(DataBlock):
 
         if len(data) > 4:
             multi["n_component_incon"] = data[4]
+
+        multi["n_variables"] = multi["n_component"] + int(not multi["isothermal"])
 
         return multi
 

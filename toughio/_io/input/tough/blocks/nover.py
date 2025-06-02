@@ -12,9 +12,11 @@ class NOVER(DataBlock):
     def _read(
         self,
         f: FileIterator | TextIO | str,
+        *args,
+        **kwargs
     ) -> dict:
         """Read NOVER block data."""
-        pass
+        return {"nover": True}
 
     def _write(self, parameters: dict, *args, **kwargs) -> list[str]:
         """Write NOVER block data."""

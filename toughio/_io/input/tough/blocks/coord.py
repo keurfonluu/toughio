@@ -13,6 +13,8 @@ class COORD(DataBlock):
     def _read(
         self,
         f: FileIterator | TextIO | str,
+        *args,
+        **kwargs
     ) -> dict:
         """Read COORD block data."""
         coord = []
@@ -44,3 +46,11 @@ class COORD(DataBlock):
     def _write_conditions(self, parameters: dict, *args, **kwargs) -> bool:
         """Check if COORD block should be written."""
         return parameters.get("coordinates", False)
+
+    def update(
+        self,
+        parameters: dict,
+        data: dict,
+    ) -> None:
+        """Update input file parameters given a COORD block."""
+        parameters["coordinates"] = True

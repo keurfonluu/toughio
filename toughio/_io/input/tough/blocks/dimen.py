@@ -13,6 +13,8 @@ class DIMEN(DataBlock):
     def _read(
         self,
         f: FileIterator | TextIO | str,
+        *args,
+        **kwargs
     ) -> dict:
         """Read DIMEN block data."""
         dimen = {"array_dimensions": {}}

@@ -12,6 +12,8 @@ class HYSTE(DataBlock):
     def _read(
         self,
         f: FileIterator | TextIO | str,
+        *args,
+        **kwargs
     ) -> dict:
         """Read HYSTE block data."""
         data = self.readers[1](f)

@@ -68,6 +68,14 @@ class DataBlock:
 
         return self._read(f, *args, **kwargs)
 
+    def update(
+        self,
+        parameters: dict,
+        data: dict,
+    ) -> dict:
+        """Update input file parameters given a data block."""
+        parameters.update(data)
+
     def write(
         self,
         parameters: Optional[dict] = None,

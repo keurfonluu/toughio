@@ -17,6 +17,8 @@ class END_COMMENTS(DataBlock):
     def _read(
         self,
         f: FileIterator | TextIO | str,
+        *args,
+        **kwargs
     ) -> dict:
         """Read END COMMENTS block data."""
         # Save end comments
@@ -32,16 +34,9 @@ class END_COMMENTS(DataBlock):
         # Remove trailing empty records
         end_comments = [comment if comment else None for comment in end_comments]
         end_comments = self.prune_values(end_comments)
+        end_comments = [comment if comment else "" for comment in end_comments]
         
-        if end_comments:
-            return (
-                end_comments[0]
-                if len(end_comments) == 1
-                else [comment if comment else "" for comment in end_comments]
-            )
-
-        else:
-            return None
+        return {"end_comments": end_comments}
 
     def _write(self, parameters: dict, *args, **kwargs) -> list[str]:
         """Write END COMMENTS block data."""
@@ -57,3 +52,16 @@ class END_COMMENTS(DataBlock):
     def _write_conditions(self, parameters: dict, *args, **kwargs) -> bool:
         """Check if END COMMENTS block should be written."""
         return bool(parameters.get("end_comments", []))
+
+    def update(
+        self,
+        parameters: dict,
+        data: dict,
+    ) -> None:
+        """Update input file parameters given a END COMMENTS block."""
+        end_comments = data["end_comments"]
+
+        if len(end_comments) == 1:
+            end_comments = end_comments[0]
+
+        parameters["end_comments"] = end_comments

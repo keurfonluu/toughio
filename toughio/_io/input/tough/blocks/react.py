@@ -12,6 +12,8 @@ class REACT(DataBlock):
     def _read(
         self,
         f: FileIterator | TextIO | str,
+        *args,
+        **kwargs
     ) -> dict:
         """Read REACT block data."""
         data = self.readers[1](f)
@@ -32,3 +34,11 @@ class REACT(DataBlock):
             bool(parameters.get("react", {}).get("options", {}))
             and simulator == "toughreact"
         )
+
+    def update(
+        self,
+        parameters: dict,
+        data: dict,
+    ) -> None:
+        """Update input file parameters given a REACT block."""
+        parameters.setdefault("react", {}).update(data["react"])

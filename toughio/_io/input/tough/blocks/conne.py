@@ -20,6 +20,8 @@ class CONNE(DataBlock):
         self,
         f: FileIterator | TextIO | str,
         label_length: int,
+        *args,
+        **kwargs
     ) -> dict:
         """Read CONNE block data."""
         conne = {"connections": {}}
@@ -97,3 +99,11 @@ class CONNE(DataBlock):
     def _write_conditions(self, parameters: dict, *args, **kwargs) -> bool:
         """Check if CONNE block should be written."""
         return parameters.get("connections", {}) or parameters.get("elements", {})
+
+    def update(
+        self,
+        parameters: dict,
+        data: dict,
+    ) -> None:
+        """Update input file parameters given a CONNE block."""
+        parameters.update(data["data"])

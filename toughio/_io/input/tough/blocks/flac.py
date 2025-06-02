@@ -17,10 +17,12 @@ class FLAC(DataBlock):
     def _read(
         self,
         f: FileIterator | TextIO | str,
-        rocks: dict,
+        parameters: dict,
+        *args,
+        **kwargs
     ) -> dict:
         """Read FLAC block data."""
-        flac = {"flac": {}, "rocks": rocks}
+        flac = {"flac": {}}
 
         # Record 1
         data = self.readers[1](f)
@@ -29,9 +31,9 @@ class FLAC(DataBlock):
         flac["flac"]["version"] = data[2]
 
         # Additional records
-        for rock in rocks:
-            rocks[rock]["permeability_model"] = self.read_model_record(f, self.readers[2], 1)
-            rocks[rock]["equivalent_pore_pressure"] = self.read_model_record(f, self.readers[3], 2)
+        for rock in parameters["rocks"]:
+            parameters["rocks"][rock]["permeability_model"] = self.read_model_record(f, self.readers[2], 1)
+            parameters["rocks"][rock]["equivalent_pore_pressure"] = self.read_model_record(f, self.readers[3], 2)
 
         flac["flac"] = self.prune_values(flac["flac"])
 
@@ -67,3 +69,11 @@ class FLAC(DataBlock):
     def _write_conditions(self, parameters: dict, *args, **kwargs) -> bool:
         """Check if FLAC block should be written."""
         return bool(parameters.get("flac", {}))
+
+    def update(
+        self,
+        parameters: dict,
+        data: dict,
+    ) -> None:
+        """Update input file parameters given a FLAC block."""
+        parameters["flac"] = data["flac"]

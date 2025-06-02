@@ -25,6 +25,8 @@ class PARAM(DataBlock):
         f: FileIterator | TextIO | str,
         n_variables: int,
         eos: Optional[str] = None,
+        *args,
+        **kwargs
     ) -> dict:
         """Read PARAM block data."""
         param = {}
@@ -227,3 +229,13 @@ class PARAM(DataBlock):
             or any(parameters.get("default", {}).get("initial_condition", []))
             or (eos in {"eco2m", "tmvoc"} and parameters.get("default", {}).get("phase_composition") is not None)
         )
+
+    def update(
+        self,
+        parameters: dict,
+        data: dict,
+    ) -> None:
+        """Update input file parameters given a PARAM block."""
+        parameters["options"] = data["data"]["options"]
+        parameters["extra_options"] = data["data"]["extra_options"]
+        parameters.setdefault("default", {}).update(data["data"]["default"])

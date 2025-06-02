@@ -83,6 +83,8 @@ class FOFT(DataBlock):
         self,
         f: FileIterator | TextIO | str,
         label_length: int,
+        *args,
+        **kwargs
     ) -> dict:
         """Read FOFT block data."""
         return _read_oft(f, "FOFT", label_length, self.readers)
@@ -94,6 +96,14 @@ class FOFT(DataBlock):
     def _write_conditions(self, parameters: dict, *args, **kwargs) -> bool:
         """Check if FOFT block should be written."""
         return len(parameters.get("element_history", {})) > 0
+
+    def update(
+        self,
+        parameters: dict,
+        data: dict,
+    ) -> None:
+        """Update input file parameters given a FOFT block."""
+        parameters.update(data["data"])
 
 
 class COFT(DataBlock):
@@ -111,6 +121,8 @@ class COFT(DataBlock):
         self,
         f: FileIterator | TextIO | str,
         label_length: int,
+        *args,
+        **kwargs
     ) -> dict:
         """Read COFT block data."""
         return _read_oft(f, "COFT", label_length, self.readers)
@@ -122,6 +134,14 @@ class COFT(DataBlock):
     def _write_conditions(self, parameters: dict, *args, **kwargs) -> bool:
         """Check if COFT block should be written."""
         return len(parameters.get("connection_history", {})) > 0
+
+    def update(
+        self,
+        parameters: dict,
+        data: dict,
+    ) -> None:
+        """Update input file parameters given a COFT block."""
+        parameters.update(data["data"])
 
 
 class GOFT(DataBlock):
@@ -139,6 +159,8 @@ class GOFT(DataBlock):
         self,
         f: FileIterator | TextIO | str,
         label_length: int,
+        *args,
+        **kwargs
     ) -> dict:
         """Read GOFT block data."""
         return _read_oft(f, "GOFT", label_length, self.readers)
@@ -150,6 +172,14 @@ class GOFT(DataBlock):
     def _write_conditions(self, parameters: dict, *args, **kwargs) -> bool:
         """Check if GOFT block should be written."""
         return len(parameters.get("generator_history", {})) > 0
+
+    def update(
+        self,
+        parameters: dict,
+        data: dict,
+    ) -> None:
+        """Update input file parameters given a GOFT block."""
+        parameters.update(data["data"])
 
 
 oft_to_key = {

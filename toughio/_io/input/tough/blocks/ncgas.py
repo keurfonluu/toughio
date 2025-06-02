@@ -13,6 +13,8 @@ class NCGAS(DataBlock):
     def _read(
         self,
         f: FileIterator | TextIO | str,
+        *args,
+        **kwargs
     ) -> dict:
         """Read NCGAS block data."""
         ncgas = {"non_condensible_gas": []}

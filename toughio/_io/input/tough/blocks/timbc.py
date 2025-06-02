@@ -21,6 +21,8 @@ class TIMBC(DataBlock):
         self,
         f: FileIterator | TextIO | str,
         simulator: str,
+        *args,
+        **kwargs
     ) -> dict:
         """Read TIMBC block data."""
         timbc = {"boundary_conditions": []}

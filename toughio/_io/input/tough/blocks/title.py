@@ -17,6 +17,8 @@ class TITLE(DataBlock):
     def _read(
         self,
         f: FileIterator | TextIO | str,
+        *args,
+        **kwargs
     ) -> dict:
         """Read TITLE block data."""
         from . import registered_blocks
@@ -41,7 +43,7 @@ class TITLE(DataBlock):
 
         f.seek(0)
 
-        return title
+        return {"title": title}
 
     def _write(self, parameters: dict, *args, **kwargs) -> list[str]:
         """Write TITLE block data."""

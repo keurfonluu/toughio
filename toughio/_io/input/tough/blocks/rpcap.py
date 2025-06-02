@@ -12,6 +12,8 @@ class RPCAP(DataBlock):
     def _read(
         self,
         f: FileIterator | TextIO | str,
+        *args,
+        **kwargs
     ) -> dict:
         """Read RPCAP block data."""
         rpcap = {}
@@ -40,3 +42,11 @@ class RPCAP(DataBlock):
             parameters.get("default", {}).get("relative_permeability", {}).get("id") is not None
             or parameters.get("default", {}).get("capillarity", {}).get("id") is not None
         )
+
+    def update(
+        self,
+        parameters: dict,
+        data: dict,
+    ) -> None:
+        """Update input file parameters given a RPCAP block."""
+        parameters.setdefault("default", {}).update(data)

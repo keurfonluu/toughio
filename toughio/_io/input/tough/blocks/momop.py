@@ -12,6 +12,8 @@ class MOMOP(DataBlock):
     def _read(
         self,
         f: FileIterator | TextIO | str,
+        *args,
+        **kwargs
     ) -> dict:
         """Read MOMOP block data."""
         data = self.readers[1](f)

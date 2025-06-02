@@ -26,6 +26,8 @@ class GENER(DataBlock):
         f: FileIterator | TextIO | str,
         label_length: int,
         simulator: str = "tough",
+        *args,
+        **kwargs
     ) -> dict:
         """Read GENER block data."""
         def read_table(f: FileIterator, n: int, reader: RecordFormatter) -> list:
@@ -227,3 +229,11 @@ class GENER(DataBlock):
     def _write_conditions(self, parameters: dict, *args, **kwargs) -> bool:
         """Check if GENER block should be written."""
         return bool(parameters.get("generators", {}))
+
+    def update(
+        self,
+        parameters: dict,
+        data: dict,
+    ) -> None:
+        """Update input file parameters given a GENER block."""
+        parameters.update(data["data"])

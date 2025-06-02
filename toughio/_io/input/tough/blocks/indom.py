@@ -19,6 +19,8 @@ class INDOM(DataBlock):
         f: FileIterator | TextIO | str,
         n_variables: int,
         eos: Optional[str] = None,
+        *args,
+        **kwargs
     ) -> dict:
         """Read INDOM block data."""
         indom = {"rocks": {}}
@@ -98,3 +100,12 @@ class INDOM(DataBlock):
                     break
 
         return indom
+
+    def update(
+        self,
+        parameters: dict,
+        data: dict,
+    ) -> None:
+        """Update input file parameters given a INDOM block."""
+        for k, v in data["data"]["rocks"].items():
+            parameters["rocks"][k].update(v)

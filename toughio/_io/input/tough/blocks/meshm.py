@@ -32,6 +32,8 @@ class MESHM(DataBlock):
     def _read(
         self,
         f: FileIterator | TextIO | str,
+        *args,
+        **kwargs
     ) -> dict:
         """Read MESHM block data."""
         # Mesh type

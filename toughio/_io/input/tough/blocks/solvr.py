@@ -12,6 +12,8 @@ class SOLVR(DataBlock):
     def _read(
         self,
         f: FileIterator | TextIO | str,
+        *args,
+        **kwargs
     ) -> dict:
         """Read SOLVR block data."""
         solvr = {}

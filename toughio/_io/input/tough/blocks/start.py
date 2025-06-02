@@ -12,9 +12,11 @@ class START(DataBlock):
     def _read(
         self,
         f: FileIterator | TextIO | str,
+        *args,
+        **kwargs
     ) -> dict:
         """Read START block data."""
-        pass
+        return {"start": True}
 
     def _write(self, parameters: dict, *args, **kwargs) -> list[str]:
         """Write START block data."""

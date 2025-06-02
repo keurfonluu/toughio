@@ -17,9 +17,11 @@ class ENDCY(DataBlock):
     def _read(
         self,
         f: FileIterator | TextIO | str,
+        *args,
+        **kwargs
     ) -> dict:
         """Read ENDCY block data."""
-        pass
+        return {}
 
     def _write(self, parameters: dict, *args, **kwargs) -> list[str]:
         """Write ENDCY block data."""
