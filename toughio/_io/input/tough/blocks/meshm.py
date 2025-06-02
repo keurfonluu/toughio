@@ -63,7 +63,7 @@ class MESHM(DataBlock):
                         "n_increment": data[1],
                     }
 
-                    if data[2]:
+                    if len(data) > 2 and data[2]:
                         tmp["sizes"] = data[2]
 
                     else:
