@@ -1,7 +1,6 @@
 import pytest
 import numpy as np
 import toughio
-import helpers
 
 
 @pytest.fixture(params=["tough", "json"], ids=["tough", "json"])
@@ -9,7 +8,7 @@ def file_format(request):
     return request.param
 
 @pytest.fixture
-def write_read(file_format):
+def write_read(file_format, helpers):
     def _write_read(x, writer_kws=None, reader_kws=None, **kwargs):
         writer_kws_ = {"file_format": file_format}
         reader_kws_ = {"file_format": file_format}
@@ -41,7 +40,7 @@ def test_flag(write_read, flag, enable):
         assert not enable
 
 @pytest.mark.parametrize("single", [True, False])
-def test_title(write_read, single):
+def test_title(write_read, single, helpers):
     parameters_ref = {
         "title": (
             helpers.random_string(80)
@@ -53,7 +52,7 @@ def test_title(write_read, single):
     assert helpers.allclose(parameters_ref, parameters)
 
 @pytest.mark.parametrize("single", [True, False])
-def test_end_comments(write_read, single):
+def test_end_comments(write_read, single, helpers):
     parameters_ref = {
         "end_comments": (
             helpers.random_string(80)
@@ -69,7 +68,7 @@ def test_end_comments(write_read, single):
     (lambda: np.random.rand(np.random.randint(100) + 1), 4),
     (lambda: np.random.rand(np.random.randint(100) + 1), 10),
 ])
-def test_param(write_read, t_steps, num_pvars):
+def test_param(write_read, t_steps, num_pvars, helpers):
     t_steps = t_steps() if callable(t_steps) else t_steps
     parameters_ref = {
         "options": {
@@ -100,7 +99,7 @@ def test_param(write_read, t_steps, num_pvars):
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
 @pytest.mark.parametrize("isothermal", [True, False])
-def test_multi(write_read, isothermal, file_format):
+def test_multi(write_read, isothermal, file_format, helpers):
     import random
     from toughio._io.input.tough.blocks.multi import eos_values as eos
     if file_format == "json":
@@ -123,7 +122,7 @@ def test_multi(write_read, isothermal, file_format):
     assert helpers.allclose(multi_ref, multi)
 
 @pytest.mark.parametrize("n_phase", [lambda: np.random.randint(8) + 1])
-def test_diffu(write_read, n_phase):
+def test_diffu(write_read, n_phase, helpers):
     n_phase = n_phase() if callable(n_phase) else n_phase
     parameters_ref = {
         "n_phase": n_phase,
@@ -133,7 +132,7 @@ def test_diffu(write_read, n_phase):
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
 @pytest.mark.parametrize("times_len", [lambda: np.random.randint(100) + 1])
-def test_times(write_read, times_len):
+def test_times(write_read, times_len, helpers):
     times_len = times_len() if callable(times_len) else times_len
     parameters_ref = {"times": np.random.rand(times_len)}
     parameters = write_read(parameters_ref)
@@ -144,7 +143,7 @@ def test_times(write_read, times_len):
     ("connection_history", 10),
     ("generator_history", 5),
 ])
-def test_oft(write_read, oft, n, file_format):
+def test_oft(write_read, oft, n, file_format, helpers):
     parameters_ref = {
         oft: [
             helpers.random_string(n),
@@ -161,7 +160,7 @@ def test_oft(write_read, oft, n, file_format):
     assert helpers.allclose(parameters_ref, parameters)
 
 @pytest.mark.parametrize("n_roft", [lambda: np.random.randint(10) + 1])
-def test_roft(write_read, n_roft):
+def test_roft(write_read, n_roft, helpers):
     n_roft = n_roft() if callable(n_roft) else n_roft
     parameters_ref = {
         "rock_history": [
@@ -173,7 +172,7 @@ def test_roft(write_read, n_roft):
     assert helpers.allclose(parameters_ref, parameters)
 
 @pytest.mark.parametrize("num_floats", [None, 8])
-def test_selec(write_read, num_floats):
+def test_selec(write_read, num_floats, helpers):
     floats = (
         np.random.rand(num_floats)
         if num_floats is not None and num_floats <= 8
@@ -198,7 +197,7 @@ def test_selec(write_read, num_floats):
         "n_rocks", "n_times", "n_generators", "n_rates", "n_increment_x", "n_increment_y", "n_increment_z", "n_increment_rad", "n_properties", "n_properties_times", "n_regions", "n_regions_parameters", "n_ltab", "n_rpcap", "n_elements_timbc", "n_timbc"
     ]
 ])
-def test_dimen(write_read, array_dim_keys):
+def test_dimen(write_read, array_dim_keys, helpers):
     parameters_ref = {
         "array_dimensions": {k: np.random.randint(100) for k in array_dim_keys}
     }
@@ -208,7 +207,7 @@ def test_dimen(write_read, array_dim_keys):
 @pytest.mark.parametrize("keys", [[
     "density", "porosity", "permeability", "conductivity", "specific_heat", "compressibility", "expansivity", "conductivity_dry", "tortuosity", "klinkenberg_parameter", "distribution_coefficient_3", "distribution_coefficient_4"
 ]])
-def test_rocks(write_read, keys):
+def test_rocks(write_read, keys, helpers):
     parameters_ref = {
         "rocks": {
             helpers.random_string(5): {key: np.random.rand() for key in keys[:5]},
@@ -227,7 +226,7 @@ def test_rocks(write_read, keys):
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
 @pytest.mark.parametrize("rpcap", ["rp", "cap", "both"])
-def test_rpcap(write_read, rpcap):
+def test_rpcap(write_read, rpcap, helpers):
     parameters_ref = {"default": {}}
     if rpcap in {"rp", "both"}:
         parameters_ref["default"]["relative_permeability"] = {"id": np.random.randint(10), "parameters": np.random.rand(np.random.randint(7) + 1)}
@@ -237,7 +236,7 @@ def test_rpcap(write_read, rpcap):
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
 @pytest.mark.parametrize("flac_keys", [["creep", "porosity_model", "version"]])
-def test_flac(write_read, flac_keys):
+def test_flac(write_read, flac_keys, helpers):
     parameters_ref = {
         "flac": {k: bool(np.random.randint(2)) if k == "creep" else np.random.randint(10) for k in flac_keys},
         "rocks": {
@@ -251,7 +250,7 @@ def test_flac(write_read, flac_keys):
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
 @pytest.mark.parametrize("n_chemp", [10])
-def test_chemp(write_read, n_chemp):
+def test_chemp(write_read, n_chemp, helpers):
     parameters_ref = {
         "chemical_properties": {
             helpers.random_string(20): {k: np.random.rand() for k in [
@@ -262,7 +261,7 @@ def test_chemp(write_read, n_chemp):
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
 @pytest.mark.parametrize("n_ncgas", [10])
-def test_ncgas(write_read, n_ncgas):
+def test_ncgas(write_read, n_ncgas, helpers):
     parameters_ref = {
         "non_condensible_gas": [helpers.random_string(10) for _ in range(int(np.random.rand() * n_ncgas) + 1)]
     }
@@ -272,7 +271,7 @@ def test_ncgas(write_read, n_ncgas):
 @pytest.mark.parametrize("num_pvars,num_items", [
     (4, None), (10, None), (4, 1), (10, 1)
 ])
-def test_indom(write_read, num_pvars, num_items):
+def test_indom(write_read, num_pvars, num_items, helpers):
     num_items = num_items if num_items else np.random.randint(10) + 1
     parameters_ref = {
         "rocks": {
@@ -286,7 +285,7 @@ def test_indom(write_read, num_pvars, num_items):
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
 @pytest.mark.parametrize("n_items", [lambda: np.random.randint(10) + 2])
-def test_gener_delv(write_read, n_items):
+def test_gener_delv(write_read, n_items, helpers):
     n_items = n_items() if callable(n_items) else n_items
     parameters_ref = {
         "generators": [
@@ -309,7 +308,7 @@ def test_gener_delv(write_read, n_items):
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
 @pytest.mark.parametrize("n_items", [lambda: np.random.randint(10) + 2])
-def test_timbc(write_read, n_items):
+def test_timbc(write_read, n_items, helpers):
     n_items = n_items() if callable(n_items) else n_items
     parameters_ref = {
         "boundary_conditions": [
@@ -331,7 +330,7 @@ def test_timbc(write_read, n_items):
 @pytest.mark.parametrize("label_length,coord", [
     (5, False), (6, False), (5, True), (6, True)
 ])
-def test_eleme(write_read, keys, label_length, coord):
+def test_eleme(write_read, keys, label_length, coord, helpers):
     labels = [helpers.random_label(label_length) for _ in range(np.random.randint(10) + 1)]
     parameters_ref = {
         "elements": {
@@ -353,7 +352,7 @@ def test_eleme(write_read, keys, label_length, coord):
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-3)
 
 @pytest.mark.parametrize("label_length", [5, 6])
-def test_conne(write_read, label_length):
+def test_conne(write_read, label_length, helpers):
     labels = ["".join(helpers.random_label(label_length) for _ in range(2)) for _ in range(np.random.randint(10) + 1)]
     keys = [
         "nseq", "nadd", "permeability_direction", "nodal_distances", "interface_area", "gravity_cosine_angle", "radiant_emittance_factor"
@@ -384,7 +383,7 @@ def test_conne(write_read, label_length):
 @pytest.mark.parametrize("label_length,num_pvars,num_items", [
     (5, 4, None), (5, 10, None), (6, 4, None), (5, 4, 1), (5, 10, 1), (6, 4, None)
 ])
-def test_incon(write_read, label_length, num_pvars, num_items):
+def test_incon(write_read, label_length, num_pvars, num_items, helpers):
     num_items = num_items if num_items else np.random.randint(10) + 1
     labels = [helpers.random_label(label_length) for _ in range(num_items)]
     keys = ["porosity", "userx", "values"]
@@ -405,7 +404,7 @@ def test_incon(write_read, label_length, num_pvars, num_items):
     parameters = write_read(parameters_ref)
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-3)
 
-def test_meshm_xyz(write_read):
+def test_meshm_xyz(write_read, helpers):
     parameters_ref = {
         "meshmaker": {
             "type": "xyz",
@@ -422,7 +421,7 @@ def test_meshm_xyz(write_read):
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
 @pytest.mark.parametrize("layer, minc", [(True, False), (False, False), (True, True), (False, True)])
-def test_meshm_rz2d(write_read, layer, minc):
+def test_meshm_rz2d(write_read, layer, minc, helpers):
     parameters_ref = {
         "meshmaker": {
             "type": "rz2dl" if layer else "rz2d",
@@ -446,7 +445,7 @@ def test_meshm_rz2d(write_read, layer, minc):
     parameters = write_read(parameters_ref)
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
-def test_minc(write_read):
+def test_minc(write_read, helpers):
     n_volume = np.random.randint(100) + 1
     parameters_ref = {
         "minc": {
@@ -462,7 +461,7 @@ def test_minc(write_read):
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
 @pytest.mark.parametrize("eos", ["eco2m", "tmvoc"])
-def test_phase_composition(write_read, file_format, eos):
+def test_phase_composition(write_read, file_format, eos, helpers):
     parameters_ref = {
         "eos": eos,
         "n_component": 1,
