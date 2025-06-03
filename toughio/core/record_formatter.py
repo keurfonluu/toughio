@@ -34,7 +34,7 @@ class RecordFormatter:
 
     def __init__(
         self,
-        fmt,
+        fmt: str,
         mode: Literal["r", "w"] = "r",
         free_format: bool = False,
         space_between_values: bool = False,
@@ -82,12 +82,28 @@ class RecordFormatter:
                 data = arg.next()
 
             if self.free_format or "," in data:
-                out = [
-                    tokens[token[-1]]["converter"](x.strip())
-                    if x.strip()
-                    else None
-                    for token, x in zip(self.format, data.split(self.delimiter))
-                ]
+                # Handle comments
+                data = data.replace("!", "//").split("//")[0].strip()
+
+                # Split and strip
+                data = [x.strip() for x in data.split(self.delimiter)]
+
+                # Pad to format length
+                data.extend((len(self.format) - len(data)) * [None])
+
+                # Loop over items
+                out = []
+
+                for token, x in zip(self.format, data):
+                    if not x:
+                        out.append(None)
+
+                    elif "*" in x:
+                        value, n = x.split("*")
+                        out += [tokens[token[-1]]["converter"](value)] * int(n)
+
+                    else:
+                        out.append(tokens[token[-1]]["converter"](x))
 
             else:
                 i, out = 0, []
@@ -168,7 +184,7 @@ class RecordFormatter:
             return fmt.replace("g", "").replace("f", "").format(x)
 
     @property
-    def format(self) -> str:
+    def format(self) -> Sequence[str]:
         """Return format string."""
         return self._format
 
