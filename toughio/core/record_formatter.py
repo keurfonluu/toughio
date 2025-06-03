@@ -115,8 +115,6 @@ class RecordFormatter:
                     out.append(tokens[token[-1]]["converter"](tmp) if tmp else None)
                     i += n
 
-            return out
-
         # Writer
         else:
             if arg is None:
@@ -143,7 +141,16 @@ class RecordFormatter:
                     for value in values
                 ]
 
-            return [f"{self.delimiter.join(record)}\n" for record in records]
+            if self.free_format:
+                out = [
+                   f"{self.delimiter.join(record).rstrip(self.delimiter)}\n"
+                   for record in records 
+                ]
+
+            else:
+                out = [f"{self.delimiter.join(record)}\n" for record in records]
+
+        return out
 
     def to_str(self, x: Any, fmt: str) -> str:
         """Convert variable to string."""
