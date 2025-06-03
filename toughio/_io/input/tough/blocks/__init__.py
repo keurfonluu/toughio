@@ -3,6 +3,7 @@ from .dimen import DIMEN
 from .rocks import ROCKS
 from .rpcap import RPCAP
 from .modde import MODDE
+from .wellb import WELLB
 from .react import REACT
 from .flac import FLAC
 from .chemp import CHEMP
@@ -41,6 +42,7 @@ registered_blocks = [
     ROCKS,
     RPCAP,
     MODDE,
+    WELLB,
     REACT,
     FLAC,
     CHEMP,
