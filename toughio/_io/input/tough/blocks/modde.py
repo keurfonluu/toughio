@@ -103,6 +103,7 @@ class MODDE(DataBlock):
             parameters.get("do_wellbore"),
             parameters.get("two_phase_co2"),
         ]
+        values[0] = not values[0] if values[0] is not None else None
         values = [str(value).lower() if value is not None else "" for value in values]
         out += self.writers[3](values)
 
