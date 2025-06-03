@@ -3,15 +3,37 @@ import numpy as np
 import toughio
 
 
-@pytest.fixture(params=["tough", "json"], ids=["tough", "json"])
-def file_format(request):
-    return request.param
+pytestmark = pytest.mark.parametrize(
+    "params",
+    [
+        ("tough", False),
+        ("tough", True),
+        ("json", None),
+    ],
+    ids=[
+        "tough-fixed",
+        "tough-free",
+        "json",
+    ],
+    indirect=True,
+)
+
 
 @pytest.fixture
-def write_read(file_format, helpers):
+def params(request):
+    return request.param
+
+
+@pytest.fixture
+def write_read(params, helpers):
+    file_format, free_format = params
+
     def _write_read(x, writer_kws=None, reader_kws=None, **kwargs):
         writer_kws_ = {"file_format": file_format}
         reader_kws_ = {"file_format": file_format}
+        if file_format == "tough":
+            writer_kws_["free_format"] = free_format
+            reader_kws_["free_format"] = free_format
         writer_kws_.update(writer_kws if writer_kws is not None else {})
         reader_kws_.update(reader_kws if reader_kws is not None else {})
 
@@ -24,20 +46,25 @@ def write_read(file_format, helpers):
             reader_kws=reader_kws_,
             **kwargs,
         )
+
+    _write_read.file_format = file_format
+    _write_read.free_format = free_format
     return _write_read
+
 
 @pytest.mark.parametrize("flag, enable", [
     ("index", True), ("index", False),
     ("start", True), ("start", False),
     ("nover", True), ("nover", False),
 ])
-def test_flag(write_read, flag, enable):
+def test_flag(write_read, flag, enable, helpers):
     parameters_ref = {flag: enable}
     parameters = write_read(parameters_ref)
     if flag in parameters:
         assert parameters_ref[flag] == parameters[flag]
     else:
         assert not enable
+
 
 @pytest.mark.parametrize("single", [True, False])
 def test_title(write_read, single, helpers):
@@ -51,6 +78,7 @@ def test_title(write_read, single, helpers):
     parameters = write_read(parameters_ref)
     assert helpers.allclose(parameters_ref, parameters)
 
+
 @pytest.mark.parametrize("single", [True, False])
 def test_end_comments(write_read, single, helpers):
     parameters_ref = {
@@ -62,6 +90,7 @@ def test_end_comments(write_read, single, helpers):
     }
     parameters = write_read(parameters_ref)
     assert helpers.allclose(parameters_ref, parameters)
+
 
 @pytest.mark.parametrize("t_steps,num_pvars", [
     (lambda: np.random.rand(), 4),
@@ -98,11 +127,12 @@ def test_param(write_read, t_steps, num_pvars, helpers):
     parameters = write_read(parameters_ref)
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
+
 @pytest.mark.parametrize("isothermal", [True, False])
-def test_multi(write_read, isothermal, file_format, helpers):
+def test_multi(write_read, isothermal, helpers):
     import random
     from toughio._io.input.tough.blocks.multi import eos_values as eos
-    if file_format == "json":
+    if write_read.file_format == "json":
         pytest.skip("MULTI block not supported for JSON format")
     parameters_ref = {
         "eos": random.choice(
@@ -121,6 +151,7 @@ def test_multi(write_read, isothermal, file_format, helpers):
     assert helpers.allclose(parameters_ref, parameters, ignore_keys=["eos"])
     assert helpers.allclose(multi_ref, multi)
 
+
 @pytest.mark.parametrize("n_phase", [lambda: np.random.randint(8) + 1])
 def test_diffu(write_read, n_phase, helpers):
     n_phase = n_phase() if callable(n_phase) else n_phase
@@ -131,6 +162,7 @@ def test_diffu(write_read, n_phase, helpers):
     parameters = write_read(parameters_ref)
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
+
 @pytest.mark.parametrize("times_len", [lambda: np.random.randint(100) + 1])
 def test_times(write_read, times_len, helpers):
     times_len = times_len() if callable(times_len) else times_len
@@ -138,12 +170,13 @@ def test_times(write_read, times_len, helpers):
     parameters = write_read(parameters_ref)
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
+
 @pytest.mark.parametrize("oft, n", [
     ("element_history", 5),
     ("connection_history", 10),
     ("generator_history", 5),
 ])
-def test_oft(write_read, oft, n, file_format, helpers):
+def test_oft(write_read, oft, n, helpers):
     parameters_ref = {
         oft: [
             helpers.random_string(n),
@@ -153,11 +186,12 @@ def test_oft(write_read, oft, n, file_format, helpers):
         ]
     }
     parameters = write_read(parameters_ref)
-    if file_format != "json":
+    if write_read.file_format != "json":
         for i, v in enumerate(parameters_ref[oft]):
             if not isinstance(v, dict):
                 parameters_ref[oft][i] = {"label": v}
     assert helpers.allclose(parameters_ref, parameters)
+
 
 @pytest.mark.parametrize("n_roft", [lambda: np.random.randint(10) + 1])
 def test_roft(write_read, n_roft, helpers):
@@ -170,6 +204,7 @@ def test_roft(write_read, n_roft, helpers):
     }
     parameters = write_read(parameters_ref)
     assert helpers.allclose(parameters_ref, parameters)
+
 
 @pytest.mark.parametrize("num_floats", [None, 8])
 def test_selec(write_read, num_floats, helpers):
@@ -192,6 +227,7 @@ def test_selec(write_read, num_floats, helpers):
     parameters = write_read(parameters_ref)
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
+
 @pytest.mark.parametrize("array_dim_keys", [
     [
         "n_rocks", "n_times", "n_generators", "n_rates", "n_increment_x", "n_increment_y", "n_increment_z", "n_increment_rad", "n_properties", "n_properties_times", "n_regions", "n_regions_parameters", "n_ltab", "n_rpcap", "n_elements_timbc", "n_timbc"
@@ -203,6 +239,7 @@ def test_dimen(write_read, array_dim_keys, helpers):
     }
     parameters = write_read(parameters_ref)
     assert helpers.allclose(parameters_ref, parameters)
+
 
 @pytest.mark.parametrize("keys", [[
     "density", "porosity", "permeability", "conductivity", "specific_heat", "compressibility", "expansivity", "conductivity_dry", "tortuosity", "klinkenberg_parameter", "distribution_coefficient_3", "distribution_coefficient_4"
@@ -225,6 +262,7 @@ def test_rocks(write_read, keys, helpers):
     parameters = write_read(parameters_ref)
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
+
 @pytest.mark.parametrize("rpcap", ["rp", "cap", "both"])
 def test_rpcap(write_read, rpcap, helpers):
     parameters_ref = {"default": {}}
@@ -234,6 +272,7 @@ def test_rpcap(write_read, rpcap, helpers):
         parameters_ref["default"]["capillarity"] = {"id": np.random.randint(10), "parameters": np.random.rand(np.random.randint(7) + 1)}
     parameters = write_read(parameters_ref)
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
+
 
 @pytest.mark.parametrize("flac_keys", [["creep", "porosity_model", "version"]])
 def test_flac(write_read, flac_keys, helpers):
@@ -249,6 +288,7 @@ def test_flac(write_read, flac_keys, helpers):
     parameters = write_read(parameters_ref)
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
+
 @pytest.mark.parametrize("n_chemp", [10])
 def test_chemp(write_read, n_chemp, helpers):
     parameters_ref = {
@@ -260,6 +300,7 @@ def test_chemp(write_read, n_chemp, helpers):
     parameters = write_read(parameters_ref)
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
+
 @pytest.mark.parametrize("n_ncgas", [10])
 def test_ncgas(write_read, n_ncgas, helpers):
     parameters_ref = {
@@ -267,6 +308,7 @@ def test_ncgas(write_read, n_ncgas, helpers):
     }
     parameters = write_read(parameters_ref)
     assert helpers.allclose(parameters_ref, parameters)
+
 
 @pytest.mark.parametrize("num_pvars,num_items", [
     (4, None), (10, None), (4, 1), (10, 1)
@@ -283,6 +325,7 @@ def test_indom(write_read, num_pvars, num_items, helpers):
     }
     parameters = write_read(parameters_ref)
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
+
 
 @pytest.mark.parametrize("n_items", [lambda: np.random.randint(10) + 2])
 def test_gener_delv(write_read, n_items, helpers):
@@ -307,6 +350,7 @@ def test_gener_delv(write_read, n_items, helpers):
     parameters = write_read(parameters_ref)
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
+
 @pytest.mark.parametrize("n_items", [lambda: np.random.randint(10) + 2])
 def test_timbc(write_read, n_items, helpers):
     n_items = n_items() if callable(n_items) else n_items
@@ -323,6 +367,7 @@ def test_timbc(write_read, n_items, helpers):
     }
     parameters = write_read(parameters_ref)
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-8)
+
 
 @pytest.mark.parametrize("keys", [[
     "nseq", "nadd", "material", "volume", "heat_exchange_area", "permeability_modifier", "center"
@@ -350,6 +395,7 @@ def test_eleme(write_read, keys, label_length, coord, helpers):
     }
     parameters = write_read(parameters_ref)
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-3)
+
 
 @pytest.mark.parametrize("label_length", [5, 6])
 def test_conne(write_read, label_length, helpers):
@@ -380,6 +426,7 @@ def test_conne(write_read, label_length, helpers):
     parameters = write_read(parameters_ref)
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
+
 @pytest.mark.parametrize("label_length,num_pvars,num_items", [
     (5, 4, None), (5, 10, None), (6, 4, None), (5, 4, 1), (5, 10, 1), (6, 4, None)
 ])
@@ -404,6 +451,7 @@ def test_incon(write_read, label_length, num_pvars, num_items, helpers):
     parameters = write_read(parameters_ref)
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-3)
 
+
 def test_meshm_xyz(write_read, helpers):
     parameters_ref = {
         "meshmaker": {
@@ -419,6 +467,7 @@ def test_meshm_xyz(write_read, helpers):
     }
     parameters = write_read(parameters_ref)
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
+
 
 @pytest.mark.parametrize("layer, minc", [(True, False), (False, False), (True, True), (False, True)])
 def test_meshm_rz2d(write_read, layer, minc, helpers):
@@ -445,6 +494,7 @@ def test_meshm_rz2d(write_read, layer, minc, helpers):
     parameters = write_read(parameters_ref)
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
+
 def test_minc(write_read, helpers):
     n_volume = np.random.randint(100) + 1
     parameters_ref = {
@@ -460,8 +510,9 @@ def test_minc(write_read, helpers):
     parameters = write_read(parameters_ref)
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
+
 @pytest.mark.parametrize("eos", ["eco2m", "tmvoc"])
-def test_phase_composition(write_read, file_format, eos, helpers):
+def test_phase_composition(write_read, eos, helpers):
     parameters_ref = {
         "eos": eos,
         "n_component": 1,
@@ -483,6 +534,6 @@ def test_phase_composition(write_read, file_format, eos, helpers):
         },
     }
 
-    reader_kws = {"eos": eos} if file_format != "json" else {}
+    reader_kws = {"eos": eos} if write_read.file_format != "json" else {}
     parameters = write_read(parameters_ref, reader_kws=reader_kws)
     assert helpers.allclose(parameters_ref, parameters, ignore_keys=["eos"])
