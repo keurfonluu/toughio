@@ -97,12 +97,13 @@ class MODDE(DataBlock):
 
         # Record 3
         values = [
-            "false" if parameters.get("isothermal", True) else "true",
-            "true" if parameters.get("do_diffusion", False) else "false",
-            "true" if parameters.get(f"include_{self._components.get(parameters.get('eos', '').lower(), '')}", False) else "false",
-            "true" if parameters.get("do_wellbore", False) else "false",
-            "true" if parameters.get("two_phase_co2", False) else "false",
+            parameters.get("isothermal"),
+            parameters.get("do_diffusion"),
+            parameters.get(f"include_{self._components.get(parameters.get('eos', '').lower(), '')}"),
+            parameters.get("do_wellbore"),
+            parameters.get("two_phase_co2"),
         ]
+        values = [str(value).lower() if value is not None else "" for value in values]
         out += self.writers[3](values)
 
         return out
