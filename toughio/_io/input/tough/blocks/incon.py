@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import Optional, TextIO
 
 import numpy as np
@@ -38,7 +39,7 @@ class INCON(DataBlock):
         self,
         f: FileIterator | TextIO | str,
         label_length: int,
-        n_variables: int,
+        n_variables: int | Sequence[int],
         eos: str = None,
         simulator: str = "tough",
         *args,

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import Optional, TextIO
 
 from .....core import DataBlock, FileIterator
@@ -17,7 +18,7 @@ class INDOM(DataBlock):
     def _read(
         self,
         f: FileIterator | TextIO | str,
-        n_variables: int,
+        n_variables: int | Sequence[int],
         eos: Optional[str] = None,
         *args,
         **kwargs

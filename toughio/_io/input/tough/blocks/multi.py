@@ -58,14 +58,14 @@ class MULTI(DataBlock):
 
         return out
 
-    def _write_conditions(self, parameters: dict, eos: str, *args, **kwargs) -> bool:
+    def _write_conditions(self, parameters: dict, eos: str, simulator: str, *args, **kwargs) -> bool:
         """Check if MULTI block should be written."""
         return (
             parameters.get("eos", eos)
             or parameters.get("n_component")
             or parameters.get("n_phase")
             or parameters.get("n_component_incon")
-        )
+        ) and not (bool(parameters.get("eos")) and simulator == "tough4")
 
 
 eos_values = {

@@ -28,7 +28,8 @@ def read(
     blocks : Sequence[str], optional
         Blocks to read. If None, read all blocks.
     label_length : int, optional
-        Number of characters in cell labels.
+        Number of characters in cell labels. Supercedes the label length defined in
+        MODDE.
     n_variables : int, optional
         Number of primary variables.
     free_format : bool, default False
@@ -117,6 +118,7 @@ def read_buffer(
 
                 if not label_length and "label_length" in data:
                     label_length = data["label_length"]
+                    parameters["label_length"] = label_length
 
                 if not n_variables and "n_variables" in data:
                     n_variables = data["n_variables"]

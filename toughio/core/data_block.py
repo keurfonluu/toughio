@@ -150,13 +150,20 @@ class DataBlock:
     def read_primary_variables(
         f: FileIterator | TextIO | str,
         reader: RecordFormatter,
-        n_variables: int,
+        n_variables: int | Sequence[int],
     ) -> list[Any]:
         """Read primary variables."""
         data = []
 
         if n_variables:
-            n = int(np.ceil(n_variables / 4))
+            if not isinstance(n_variables, int):
+                n_variables = len(n_variables)
+
+            n = (
+                -n_variables
+                if n_variables < 0
+                else int(np.ceil(n_variables / len(reader.format)))
+            )
 
             for _ in range(n):
                 data += reader(f)
