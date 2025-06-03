@@ -106,7 +106,7 @@ class WELLB(DataBlock):
                     "perimeter": data[6],
                     "heat_exchange": data[7],
                 }
-                wellb[data[0]] = self.prune_values(tmp)
+                parameters["rocks"][data[0]].update(self.prune_values(tmp))
 
             else:
                 raise ValueError(f"invalid action word '{data[0]}'")
@@ -180,19 +180,29 @@ class WELLB(DataBlock):
             out += self.writers["2/FREEE"](values)
 
         # Rocks
-        for rock in parameters.get("rocks", {}):
-            if rock not in data:
+        wellbore_keys = {
+            "roughness",
+            "screen_fraction",
+            "area",
+            "factor",
+            "diameter",
+            "perimeter",
+            "heat_exchange",
+        }
+
+        for k, v in parameters.get("rocks", {}).items():
+            if not wellbore_keys.intersection(v):
                 continue
 
             values = [
-                rock,
-                data.get(rock).get("roughness"),
-                data.get(rock).get("screen_fraction"),
-                data.get(rock).get("area"),
-                data.get(rock).get("factor"),
-                data.get(rock).get("diameter"),
-                data.get(rock).get("perimeter"),
-                data.get(rock).get("heat_exchange"),
+                k,
+                v.get("roughness"),
+                v.get("screen_fraction"),
+                v.get("area"),
+                v.get("factor"),
+                v.get("diameter"),
+                v.get("perimeter"),
+                v.get("heat_exchange"),
             ]
             out += self.writers["2/ROCKS"](values)
 
