@@ -36,7 +36,7 @@ class END_COMMENTS(DataBlock):
         end_comments = self.prune_values(end_comments)
         end_comments = [comment if comment else "" for comment in end_comments]
         
-        return {"end_comments": end_comments}
+        return {"end_comments": end_comments} if end_comments else {}
 
     def _write(self, parameters: dict, *args, **kwargs) -> list[str]:
         """Write END COMMENTS block data."""
@@ -59,9 +59,10 @@ class END_COMMENTS(DataBlock):
         data: dict,
     ) -> None:
         """Update input file parameters given a END COMMENTS block."""
-        end_comments = data["end_comments"]
+        end_comments = data.get("end_comments", [])
 
         if len(end_comments) == 1:
             end_comments = end_comments[0]
 
-        parameters["end_comments"] = end_comments
+        if end_comments:
+            parameters["end_comments"] = end_comments

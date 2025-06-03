@@ -43,7 +43,7 @@ class TITLE(DataBlock):
 
         f.seek(0)
 
-        return {"title": title}
+        return {"title": title} if title else {}
 
     def _write(self, parameters: dict, *args, **kwargs) -> list[str]:
         """Write TITLE block data."""
