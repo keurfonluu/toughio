@@ -46,6 +46,11 @@ def read(filename):
             parameters["selections"]["integers"]
         )
 
+    if "selections" in parameters and "floats" in parameters["selections"]:
+        parameters["selections"]["floats"] = to_int(
+            parameters["selections"]["floats"]
+        )
+
     return parameters
 
 
