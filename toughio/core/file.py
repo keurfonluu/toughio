@@ -42,10 +42,12 @@ class FileIterator:
         """Return next line."""
         if skip_empty:
             while True:
-                line = self.__next__().strip()
+                line = self.__next__()
 
                 if comments:
-                    if line and not line.startswith(comments):
+                    line_ = line.strip()
+
+                    if line_ and not line_.startswith(comments):
                         self.line = line
 
                         return line
@@ -57,9 +59,9 @@ class FileIterator:
 
         elif comments:
             while True:
-                line = self.__next__().strip()
+                line = self.__next__()
 
-                if not line.startswith(comments):
+                if not line.strip().startswith(comments):
                     self.line = line
 
                     return line
