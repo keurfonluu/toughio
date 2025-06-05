@@ -191,7 +191,7 @@ class GENER(DataBlock):
                 data.get("nseq"),
                 data.get("nadd"),
                 data.get("nads"),
-                ltab if ltab > 1 else 1,
+                ltab if ltab > 1 else None,
                 None,
                 data.get("type"),
                 itab,

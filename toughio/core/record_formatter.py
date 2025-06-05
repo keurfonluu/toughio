@@ -59,7 +59,9 @@ class RecordFormatter:
                     "{{:{}}}".format(f"{tokens[token[-1]]['format']}")
                     if free_format
                     else "{{:{}}}".format(f"{token[:-1]}.{token[:-1]}")
-                    if token[-1].lower() == "s"
+                    if token[-1] == "s"
+                    else "{{:{}}}".format(f">{token[:-1]}.{token[:-1]}")
+                    if token[-1] == "S"
                     else "{{:{}}}".format(f">{token[:-1]}{tokens[token[-1]]['format']}")
                 )
                 for token in fmt
@@ -110,8 +112,7 @@ class RecordFormatter:
                 
                 for token in self.format:
                     n = int(token[:-1].split(".")[0])
-                    tmp = data[i : i + n]
-                    tmp = tmp if token[-1] == "S" else tmp.strip()
+                    tmp = data[i : i + n].strip()
                     out.append(tokens[token[-1]]["converter"](tmp) if tmp else None)
                     i += n
 
@@ -234,8 +235,8 @@ def to_float(s: str) -> float:
 
 
 tokens = {
-    "s": {"converter": str, "format": ""},
-    "S": {"converter": str, "format": ""},
+    "s": {"converter": str, "format": ""},  # left-justified string (default)
+    "S": {"converter": str, "format": ""},  # right-justified string
     "d": {"converter": int, "format": "g"},
     "f": {"converter": to_float, "format": "f"},
     "e": {"converter": to_float, "format": "f"},

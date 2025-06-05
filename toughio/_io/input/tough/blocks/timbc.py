@@ -38,7 +38,9 @@ class TIMBC(DataBlock):
 
             else:
                 tmp2 = self.readers[2](f)
-                tmp1 = self.readers[f"1/{simulator}"](f)
+                # The reader will mistakenly split labels with whitespace
+                # Use a simple parser to handle this
+                tmp1 = [f.next().strip()]
                 data = tmp1 + tmp2
             
             if len(data) < 2:

@@ -3,8 +3,11 @@ from __future__ import annotations
 from typing import Literal, Optional
 
 import numpy as np
+import pandas as pd
 import pvgridder as pvg
 import pyvista as pv
+import matplotlib.pyplot as plt
+from matplotlib.axes import Axes
 from numpy.typing import ArrayLike
 
 from .history_output import HistoryOutput
@@ -449,7 +452,7 @@ class WellOutput(HistoryOutput):
                 .data[key]
                 .reshape((z.size - 1, t.size - 1))
             )
-            ax.pcolormesh(t, z, data)
+            ax.pcolormesh(t, z, data, *args, **kwargs)
             ax.yaxis.set_inverted(True)
             ax.set_xlabel("Time")
             ax.set_ylabel("Depth")

@@ -7,7 +7,7 @@ from .....core import DataBlock, FileIterator
 
 class SOLVR(DataBlock):
     name = "SOLVR"
-    formats = {1: "1s,4s,5s,10f,10f"}
+    formats = {1: "1s,4S,5S,10f,10f"}
 
     def _read(
         self,
@@ -34,13 +34,11 @@ class SOLVR(DataBlock):
     def _write(self, parameters: dict, *args, **kwargs) -> list[str]:
         """Write SOLVR block data."""
         values = [
-            parameters["solver"].get(key) for key in [
-                "method",
-                "z_precond",
-                "o_precond",
-                "rel_iter_max",
-                "eps",
-            ]
+            str(parameters["solver"].get("method", "")),
+            parameters["solver"].get("z_precond"),
+            parameters["solver"].get("o_precond"),
+            parameters["solver"].get("rel_iter_max"),
+            parameters["solver"].get("eps"),
         ]
         out = self.writers[1](values)
 
