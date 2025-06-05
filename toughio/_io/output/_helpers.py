@@ -4,13 +4,6 @@ from ..._common import filetype_from_filename, open_file, register_format
 from ...core import Output
 
 
-__all__ = [
-    "register",
-    "read",
-    "write",
-]
-
-
 _extension_to_filetype = {}
 _reader_map = {}
 _writer_map = {}

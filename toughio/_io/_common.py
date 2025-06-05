@@ -1,6 +1,3 @@
-import numpy as np
-
-
 def read_record(data, fmt):
     """Parse string to data given format."""
     token_to_type = {
@@ -19,28 +16,6 @@ def read_record(data, fmt):
         tmp = tmp if token[-1] == "S" else tmp.strip()
         out.append(token_to_type[token[-1]](tmp) if tmp else None)
         i += n
-
-    return out
-
-
-def write_record(data, fmt, space_between_values=False, multi=False):
-    """Return a list of record strings given format."""
-    if not multi:
-        data = [to_str(d, f, space_between_values) for d, f in zip(data, fmt)]
-        out = [f"{''.join(data):80}\n"]
-
-    else:
-        n = len(data)
-        ncol = len(fmt)
-        data = [
-            data[ncol * i : min(ncol * i + ncol, n)]
-            for i in range(int(np.ceil(n / ncol)))
-        ]
-
-        out = []
-        for d in data:
-            d = [to_str(dd, f, space_between_values) for dd, f in zip(d, fmt)]
-            out += [f"{''.join(d):80}\n"]
 
     return out
 
