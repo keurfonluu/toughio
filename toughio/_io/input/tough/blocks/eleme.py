@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from typing import TextIO
+from collections.abc import Sequence
+from functools import partial
+from typing import Any, TextIO
 
 from .....core import DataBlock, FileIterator
 
@@ -13,13 +15,16 @@ class ELEME(DataBlock):
         7: "7s,4d,4d,5s,10f,10f,10f,10f,10f,10f",
         8: "8s,4d,3d,5s,10f,10f,10f,10f,10f,10f",
         9: "9s,3d,3d,5s,10f,10f,10f,10f,10f,10f",
+        "5/tough4-free": "5s,5s,10f,10f,10f,10f,10f,10f",
     }
     _space_between_blocks = True
+    _with_nseq = True
 
     def _read(
         self,
         f: FileIterator | TextIO | str,
         label_length: int,
+        simulator: str,
         *args,
         **kwargs
     ) -> dict:
@@ -35,65 +40,123 @@ class ELEME(DataBlock):
         label_format = f"{{:>{label_length}}}"
 
         # Read records
+        if simulator == "tough4":
+            if self.free_format and not self._with_nseq:
+                read_record = self._read_record_tough4_free
+
+            else:
+                read_record = partial(self._read_record_default, label_length=5)
+
+        else:
+            read_record = partial(self._read_record_default, label_length=label_length)
+
         while True:
             if line.strip():
-                data = self.readers[label_length](line)
-                label = label_format.format(data[0])
+                label, tmp = read_record(line)
+                label = label_format.format(label)
                 label = label.lstrip() if label.lstrip().isalpha() else label
-                rock = data[3]
 
-                if rock:
-                    rock = rock.strip()
-                    rock = int(rock) if rock.isdigit() else rock
+                if tmp["material"]:
+                    tmp["material"] = tmp["material"].strip()
+                    tmp["material"] = int(tmp["material"]) if tmp["material"].isdigit() else tmp["material"]
 
-                eleme["elements"][label] = {
-                    "nseq": data[1],
-                    "nadd": data[2],
-                    "material": rock,
-                    "volume": data[4],
-                    "heat_exchange_area": data[5],
-                    "permeability_modifier": data[6],
-                    "center": data[7:10],
-                }
+                eleme["elements"][label] = self.prune_values(tmp)
 
             else:
                 break
 
-            line = f.next()
+            try:
+                line = f.next()
 
-        eleme["elements"] = {k: self.prune_values(v) for k, v in eleme["elements"].items()}
+            except StopIteration:
+                break
 
         return {
             "data": eleme,
             "label_length": label_length,
         }
 
-    def _write(self, parameters: dict, *args, **kwargs) -> list[str]:
+    def _read_record_tough4_free(self, line: str) -> tuple[str, dict]:
+        """Read a record in free format for TOUGH4."""
+        data = self.readers["5/tough4-free"](line)
+
+        return data[0], {
+            "material": data[1],
+            "volume": data[2],
+            "heat_exchange_area": data[3],
+            "permeability_modifier": data[4],
+            "center": data[5:8],
+        }
+
+    def _read_record_default(self, line: str, label_length) -> tuple[str, dict]:
+        """Read a record in default format."""
+        data = self.readers[label_length](line)
+
+        return data[0], {
+            "nseq": data[1],
+            "nadd": data[2],
+            "material": data[3],
+            "volume": data[4],
+            "heat_exchange_area": data[5],
+            "permeability_modifier": data[6],
+            "center": data[7:10],
+        }
+
+    def _write(self, parameters: dict, simulator: str, *args, **kwargs) -> list[str]:
         """Write ELEME block data."""
         # Label length
         label_length = len(max(parameters["elements"], key=len))
         
         # Write records
-        out = []
+        if simulator == "tough4":
+            if self.free_format and not self._with_nseq:
+                key = "5/tough4-free"
+                get_values = self._get_values_tough4_free
 
-        for k, v in parameters["elements"].items():
-            material = v.get("material", "")
-            material = f"{material:>5}" if isinstance(material, int) else material
-            center = v.get("center", [None, None, None])
+            else:
+                key = 5
+                get_values = self._get_values_default
 
-            values = [
-                k,
-                v.get("nseq"),
-                v.get("nadd"),
-                material,
-                v.get("volume"),
-                v.get("heat_exchange_area"),
-                v.get("permeability_modifier"),
-                *center
-            ]
-            out += self.writers[label_length](values)
+        else:
+            key = label_length
+            get_values = self._get_values_default
 
+        out = [
+            self.writers[key]([k, *get_values(v)])[0]
+            for k, v in parameters["elements"].items()
+        ]
+        
         return out
+
+    @staticmethod
+    def _get_values_tough4_free(data: dict) -> Sequence[Any]:
+        """Get values for TOUGH4 free format."""
+        material = data.get("material", "")
+        material = f"{material:>5}" if isinstance(material, int) else material
+
+        return [
+            material,
+            data.get("volume", 0.0),
+            data.get("heat_exchange_area", 0.0),
+            data.get("permeability_modifier", 0.0),
+            *data.get("center", [None, None, None])
+        ]
+
+    @staticmethod
+    def _get_values_default(data: dict) -> Sequence[Any]:
+        """Get values for default format."""
+        material = data.get("material", "")
+        material = f"{material:>5}" if isinstance(material, int) else material
+
+        return [
+            data.get("nseq"),
+            data.get("nadd"),
+            material,
+            data.get("volume"),
+            data.get("heat_exchange_area"),
+            data.get("permeability_modifier"),
+            *data.get("center", [None, None, None])
+        ]
 
     def _write_conditions(self, parameters: dict, *args, **kwargs) -> bool:
         """Check if ELEME block should be written."""

@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import Optional, TextIO
+from functools import partial
+from typing import Any, Optional, TextIO
 
 import numpy as np
 
@@ -32,16 +33,19 @@ class INCON(DataBlock):
         "7/toughreact": "7s,4d,4d,15f,15f,15f,15f",
         "8/toughreact": "8s,4d,3d,15f,15f,15f,15f",
         "9/toughreact": "9s,3d,3d,15f,15f,15f,15f",
+        "5/tough4-fixed": "5s,5d,5d,15f,5s,10f,10f,10f",
+        "5/tough4-free": "5s,15f,5s,10f,10f,10f",
     }
     _space_between_blocks = True
+    _with_nseq = True
 
     def _read(
         self,
         f: FileIterator | TextIO | str,
         label_length: int,
         n_variables: int | Sequence[int],
-        eos: str = None,
-        simulator: str = "tough",
+        eos: str,
+        simulator: str,
         *args,
         **kwargs
     ) -> dict:
@@ -57,32 +61,30 @@ class INCON(DataBlock):
         label_format = f"{{:>{label_length}}}"
 
         # Read records
-        key = (
-            f"{label_length}/{simulator}" if simulator == "toughreact"
-            else f"{label_length}/{eos}" if eos in {"eco2m", "tmvoc"}
-            else label_length
-        )
         flag = False
+
+        if simulator == "toughreact":
+            read_record = partial(self._read_record_toughreact, label_length=label_length)
+
+        elif simulator == "tough4":
+            if self.free_format and not self._with_nseq:
+                read_record = self._read_record_tough4_free
+
+            else:
+                read_record = self._read_record_tough4_fixed
+
+        elif eos in {"eco2m", "tmvoc"}:
+            read_record = partial(self._read_record_eco2m_tmvoc, label_length=label_length)
+
+        else:
+            read_record = partial(self._read_record_default, label_length=label_length)
 
         while True:
             if line.strip() and not line.startswith("+++"):
                 # Record 1
-                data = self.readers[key](line)
-                label = label_format.format(data[0])
-                incon["initial_conditions"][label] = {"porosity": data[3]}
-
-                if simulator == "toughreact":
-                    permeability = data[4] if len(set(data[4:7])) == 1 else data[4:7]
-                    incon["initial_conditions"][label]["permeability"] = (
-                        permeability if permeability else None
-                    )
-
-                elif eos in {"eco2m", "tmvoc"}:
-                    incon["initial_conditions"][label]["phase_composition"] = data[4]
-
-                else:
-                    userx = self.prune_values(data[4:])
-                    incon["initial_conditions"][label]["userx"] = userx if userx else None
+                label, tmp = read_record(line)
+                label = label_format.format(label)
+                incon["initial_conditions"][label] = self.prune_values(tmp)
 
                 # Record 2
                 data = self.read_primary_variables(f, self.readers[0], n_variables)
@@ -96,17 +98,71 @@ class INCON(DataBlock):
                 flag = line.startswith("+++")
                 break
 
-            line = f.next()
+            try:
+                line = f.next()
 
-        incon["initial_conditions"] = {
-            k: self.prune_values(v) for k, v in incon["initial_conditions"].items()
-        }
+            except StopIteration:
+                break
 
         return {
             "data": incon,
             "flag": flag,
             "label_length": label_length,
             "n_variables": n_variables,
+        }
+
+    def _read_record_toughreact(self, line: str, label_length: int) -> tuple[str, dict]:
+        """Read record 1 for TOUGHREACT."""
+        data = self.readers[f"{label_length}/toughreact"](line)
+        permeability = data[4:7]
+        permeability = permeability[0] if len(set(permeability)) == 1 else permeability
+
+        return data[0], {
+            "porosity": data[3],
+            "permeability": permeability if permeability else None,
+        }
+
+    def _read_record_tough4_free(self, line: str) -> tuple[str, dict]:
+        """Read record 1 for TOUGH4 in free format."""
+        data = self.readers[f"5/tough4-free"](line)
+        permeability = data[3:6]
+        permeability = permeability[0] if len(set(permeability)) == 1 else permeability
+
+        return data[0], {
+            "porosity": data[1],
+            "phase_state": data[2],
+            "permeability": permeability if permeability else None,
+        }
+
+    def _read_record_tough4_fixed(self, line: str) -> tuple[str, dict]:
+        """Read record 1 for TOUGH4 in fixed format."""
+        data = self.readers[f"5/tough4-fixed"](line)
+        permeability = data[5:8]
+        permeability = permeability[0] if len(set(permeability)) == 1 else permeability
+
+        return data[0], {
+            "porosity": data[3],
+            "phase_state": data[4],
+            "permeability": permeability if permeability else None,
+        }
+
+    def _read_record_eco2m_tmvoc(self, line: str, label_length: int) -> tuple[str, dict]:
+        """Read record 1 for ECO2M and TMVOC."""
+        data = self.readers[f"{label_length}/eco2m"](line)
+
+        return data[0], {
+            "porosity": data[3],
+            "phase_composition": data[4],
+        }
+
+    def _read_record_default(self, line: str, label_length: int) -> tuple[str, dict]:
+        """Read record 1 for default format."""
+        data = self.readers[label_length](line)
+        userx = self.prune_values(data[4:])
+
+        return data[0], {
+            "porosity": data[3],
+            "userx": userx if userx else None,
         }
 
     def _write(
@@ -121,45 +177,100 @@ class INCON(DataBlock):
         # Label length
         label_length = len(max(parameters["initial_conditions"], key=len))
         label_length = max(label_length, 5)
-        key = (
-            f"{label_length}/{simulator}" if simulator == "toughreact"
-            else f"{label_length}/{eos}" if eos in {"eco2m", "tmvoc"}
-            else label_length
-        )
 
         # Write records
         out = []
 
-        for k, v in parameters["initial_conditions"].items():
-            # Record 1
-            values = [
-                k,
-                None,
-                None,
-                v.get("porosity"),
-            ]
+        if simulator == "toughreact":
+            key = f"{label_length}/toughreact"
+            get_values = self._get_values_toughreact
 
-            if simulator == "toughreact":
-                per = v.get("permeability")
-                per = [per] * 3 if not np.ndim(per) else per
-
-                if not (isinstance(per, (list, tuple, np.ndarray)) and len(per) == 3):
-                    raise TypeError()
-
-                values += [k for k in per]
-
-            elif eos in {"eco2m", "tmvoc"}:
-                values += [v.get("phase_composition")]
+        elif simulator == "tough4":
+            if self.free_format and not self._with_nseq:
+                key = f"5/tough4-free"
+                get_values = self._get_values_tough4_free
 
             else:
-                values += list(v.get("userx", [None] * 6))
+                key = f"5/tough4-fixed"
+                get_values = self._get_values_tough4_fixed
 
-            out += self.writers[key](values)
+        elif eos in {"eco2m", "tmvoc"}:
+            key = f"{label_length}/{eos}"
+            get_values = self._get_values_eco2m_tmvoc
+
+        else:
+            get_values = self._get_values_default
+            key = label_length
+
+        for k, v in parameters["initial_conditions"].items():
+            # Record 1
+            out += self.writers[key]([k, *get_values(v)])
 
             # Record 2
             out += self.writers[0](v.get("values", [None] * 4))
 
         return out
+
+    @staticmethod
+    def _get_values_toughreact(data: dict) -> Sequence[Any]:
+        """Get values of record 1 for TOUGHREACT."""
+        per = data.get("permeability")
+        per = [per] * 3 if np.ndim(per) == 0 else per
+
+        return [
+            None,
+            None,
+            data.get("porosity"),
+            *per,
+        ]
+
+    @staticmethod
+    def _get_values_tough4_free(data: dict) -> Sequence[Any]:
+        """Get values of record 1 for TOUGH4 in free format."""
+        per = data.get("permeability")
+        per = [per] * 3 if np.ndim(per) == 0 else per
+
+        return [
+            data.get("porosity"),
+            data.get("phase_state"),
+            *per,
+        ]
+    
+    @staticmethod
+    def _get_values_tough4_fixed(data: dict) -> Sequence[Any]:
+        """Get values of record 1 for TOUGH4 in fixed format."""
+        per = data.get("permeability")
+        per = [per] * 3 if np.ndim(per) == 0 else per
+
+        return [
+            None,
+            None,
+            data.get("porosity"),
+            data.get("phase_state"),
+            *per,
+        ]
+
+    @staticmethod
+    def _get_values_eco2m_tmvoc(data: dict) -> Sequence[Any]:
+        """Get values of record 1 for ECO2M and TMVOC."""
+        return [
+            None,
+            None,
+            data.get("porosity"),
+            data.get("phase_composition"),
+        ]
+
+    @staticmethod
+    def _get_values_default(data: dict) -> Sequence[Any]:
+        """Get values of record 1 for default format."""
+        userx = data.get("userx", [None] * 6)
+
+        return [
+            None,
+            None,
+            data.get("porosity"),
+            *userx,
+        ]
 
     def _write_conditions(self, parameters: dict, *args, **kwargs) -> bool:
         """Check if INCON block should be written."""

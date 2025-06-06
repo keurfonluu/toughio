@@ -86,6 +86,17 @@ def read_buffer(
         block_readers["TIMBC"].free_format = True
         block_readers["TIMBC"].delimiter = None
 
+    if simulator == "tough4":
+        if free_format:
+            line = f.readline()
+            f.seek(0)
+
+            # In TOUGH4, NSEQ and NADD are only allowed in INFILE
+            if line.startswith(("ELEME", "GENER", "INCON")):
+                for block in ["ELEME", "CONNE", "GENER", "INCON"]:
+                    if block in blocks:
+                        block_readers[block]._with_nseq = False
+
     # Read blocks
     parameters = {}
     flag = False
