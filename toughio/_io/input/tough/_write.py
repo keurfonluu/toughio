@@ -11,13 +11,13 @@ from ...._common import open_file
 def write(
     filename: str | os.PathLike | TextIO,
     parameters: dict,
-    blocks: Optional[Sequence[str]] = None,
-    space_between_blocks: bool = False,
+    blocks: Optional[Sequence[str] | Literal["MESH", "GENER", "INCON"]] = None,
+    space_between_blocks: bool = True,
     space_between_values: bool = False,
-    free_format: bool = False,
+    free_format: Optional[bool] = None,
     eos: Optional[str] = None,
     simulator: Literal["tough", "tough3", "tough4", "toughreact"] = "tough",
-    block: Optional[Literal["all", "gener", "mesh", "incon"] | Sequence[str]] = None,
+    block: Optional[Literal["all", "MESH", "GENER", "INCON"] | Sequence[str]] = None,
     ignore_blocks: Optional[Sequence[str]] = None,
 ) -> None:
     """
@@ -29,14 +29,18 @@ def write(
         Output file name or buffer.
     parameters : dict
         Parameters to export.
-    blocks : Sequence[str], optional
+    blocks : Sequence[str] | {'MESH', 'GENER', 'INCON'}, optional
         Blocks to write.
-    space_between_blocks : bool, default False
+    space_between_blocks : bool, default True
         If True, add an empty record between blocks.
     space_between_values : bool, default False
         If True, add a white space between floating point values.
-    free_format : bool, default False
-        If True, write comma-separated free-format records.
+    free_format : bool, optional
+        If True, write comma-separated free-format records. If None, default to:
+
+         - True, if *simulator* is 'tough4'
+         - False, otherwise.
+
     simulator : str {'tough', 'tough3', 'tough4', 'toughreact'}, default 'tough'
         Simulator type.
     eos : str, optional
@@ -45,9 +49,9 @@ def write(
         Blocks to write:
 
          - 'all': write all blocks
-         - 'gener': only write block GENER
-         - 'mesh': only write blocks ELEME, COORD and CONNE
-         - 'incon': only write block INCON
+         - 'MESH': only write blocks ELEME and CONNE
+         - 'GENER': only write block GENER
+         - 'INCON': only write block INCON
          - None: write all blocks except blocks defined in *ignore_blocks*.
         
         Ignored if *blocks* is not None.
@@ -69,16 +73,16 @@ def write(
         blocks = [block.name for block in registered_blocks]
 
         if block is not None:
-            if block.lower() == "all":
+            if block.upper() == "ALL":
                 blocks = set(blocks)
 
-            elif block.lower() == "gener":
+            elif block.upper() == "MESH":
+                blocks = {"ELEME", "CONNE", "END COMMENTS"}
+
+            elif block.upper() == "GENER":
                 blocks = {"GENER", "END COMMENTS"}
 
-            elif block.lower() == "mesh":
-                blocks = {"ELEME", "COORD", "CONNE", "END COMMENTS"}
-
-            elif block.lower() == "incon":
+            elif block.upper() == "INCON":
                 blocks = {"INCON", "END COMMENTS"}
 
             else:
@@ -86,9 +90,25 @@ def write(
 
         elif ignore_blocks is not None:
             blocks = set([block for block in blocks if block not in ignore_blocks])
+
+    elif isinstance(blocks, str):
+        if blocks.upper() == "MESH":
+            blocks = {"ELEME", "CONNE", "END COMMENTS"}
+
+        elif blocks.upper() == "GENER":
+            blocks = {"GENER", "END COMMENTS"}
+
+        elif blocks.upper() == "INCON":
+            blocks = {"INCON", "END COMMENTS"}
+
+        else:
+            raise ValueError(f"invalid block option '{blocks}'")
             
     else:
         blocks = set(blocks)
+
+    if free_format is None:
+        free_format = simulator == "tough4"
 
     buffer = write_buffer(
         parameters,
