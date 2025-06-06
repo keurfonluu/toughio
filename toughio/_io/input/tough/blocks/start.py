@@ -9,6 +9,11 @@ class START(DataBlock):
     name = "START"
     formats = {}
 
+    def __init__(self, *args, **kwargs):
+        """Initialize START block."""
+        super().__init__(*args, **kwargs)
+        self._space_between_blocks = False
+
     def _read(
         self,
         f: FileIterator | TextIO | str,

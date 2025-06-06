@@ -9,6 +9,11 @@ class NOVER(DataBlock):
     name = "NOVER"
     formats = {}
 
+    def __init__(self, *args, **kwargs):
+        """Initialize NOVER block."""
+        super().__init__(*args, **kwargs)
+        self._space_between_blocks = False
+
     def _read(
         self,
         f: FileIterator | TextIO | str,
