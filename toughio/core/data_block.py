@@ -195,7 +195,11 @@ class DataBlock:
     ) -> list[str]:
         """Write model record defined by 'id' and 'parameters'."""
         if key in data:
-            values = [data[key]["id"], None]
+            values = [data[key]["id"]]
+            
+            if not writer.free_format:
+                values.append(None)
+
             values += list(data[key]["parameters"])
 
         else:

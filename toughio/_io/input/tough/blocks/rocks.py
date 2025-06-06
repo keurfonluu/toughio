@@ -16,6 +16,7 @@ class ROCKS(DataBlock):
         3: "5d,5s,10f,10f,10f",
         4: "5d,5s,14f,14f,14f,14f",
         5: "5d,5s,10f,10f,10f,10f,10f,10f,10f",
+        6: "5d,10f,10f,10f,10f,10f,10f,10f",  # Free format
     }
     _space_between_blocks = True
 
@@ -67,12 +68,14 @@ class ROCKS(DataBlock):
                     # TOUGHREACT
                     if simulator == "toughreact" and nad >= 4:
                         line = f.next()
+
                         if line.strip():
                             rocks["rocks"][rock]["react_tp"] = self.read_model_record(
                                 line, self.readers[3]
                             )
 
                         line = f.next()
+
                         if line.strip():
                             rocks["rocks"][rock]["react_hcplaw"] = self.read_model_record(
                                 line, self.readers[4],
@@ -80,9 +83,17 @@ class ROCKS(DataBlock):
 
                     # Relative permeability / Capillary pressure
                     for key in ["relative_permeability", "capillarity"]:
-                        rocks["rocks"][rock][key] = self.read_model_record(
-                            f, self.readers[5],
-                        )
+                        line = f.next()
+
+                        if self.free_format or "," in line:
+                            rocks["rocks"][rock][key] = self.read_model_record(
+                                line, self.readers[6], 1
+                            )
+
+                        else:
+                            rocks["rocks"][rock][key] = self.read_model_record(
+                                line, self.readers[5], 2
+                            )
 
             else:
                 break
@@ -94,6 +105,7 @@ class ROCKS(DataBlock):
     def _write(self, parameters: dict, simulator: str, *args, **kwargs) -> list[str]:
         """Write ROCKS block data."""
         out = []
+        model_writer = self.writers[6] if self.free_format else self.writers[5]
 
         for k, v in parameters["rocks"].items():
             data = {
@@ -179,8 +191,8 @@ class ROCKS(DataBlock):
 
             # Relative permeability / Capillary pressure
             if nad >= 2:
-                out += self.write_model_record(data, "relative_permeability", self.writers[5])
-                out += self.write_model_record(data, "capillarity", self.writers[5])
+                out += self.write_model_record(data, "relative_permeability", model_writer)
+                out += self.write_model_record(data, "capillarity", model_writer)
 
         return out
 

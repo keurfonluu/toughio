@@ -7,7 +7,10 @@ from .....core import DataBlock, FileIterator
 
 class RPCAP(DataBlock):
     name = "RPCAP"
-    formats = {1: "5d,5s,10f,10f,10f,10f,10f,10f,10f"}
+    formats = {
+        1: "5d,5s,10f,10f,10f,10f,10f,10f,10f",
+        2: "5d,10f,10f,10f,10f,10f,10f,10f",  # Free format
+    }
 
     def _read(
         self,
@@ -19,17 +22,24 @@ class RPCAP(DataBlock):
         rpcap = {}
 
         for key in ["relative_permeability", "capillarity"]:
-            rpcap[key] = self.read_model_record(f, self.readers[1])
+            line = f.next()
+
+            if self.free_format or "," in line:
+                rpcap[key] = self.read_model_record(line, self.readers[2], 1)
+
+            else:
+                rpcap[key] = self.read_model_record(line, self.readers[1], 2)
 
         return rpcap
 
     def _write(self, parameters: dict, *args, **kwargs) -> list[str]:
         """Write RPCAP block data."""
         out = []
+        model_writer = self.writers[2] if self.free_format else self.writers[1]
 
         for key in ["relative_permeability", "capillarity"]:
             if key in parameters["default"]:
-                out += self.write_model_record(parameters["default"], key, self.writers[1])
+                out += self.write_model_record(parameters["default"], key, model_writer)
 
             else:
                 out += self.writers[1]()
