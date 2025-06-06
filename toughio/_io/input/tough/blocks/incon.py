@@ -33,8 +33,8 @@ class INCON(DataBlock):
         "7/toughreact": "7s,4d,4d,15f,15f,15f,15f",
         "8/toughreact": "8s,4d,3d,15f,15f,15f,15f",
         "9/toughreact": "9s,3d,3d,15f,15f,15f,15f",
-        "5/tough4-fixed": "5s,5d,5d,15f,5s,10f,10f,10f",
-        "5/tough4-free": "5s,15f,5s,10f,10f,10f",
+        "5/tough4-fixed": "5s,5d,5d,15f,5S,10f,10f,10f",
+        "5/tough4-free": "5s,15f,5S,10f,10f,10f",
     }
     _space_between_blocks = True
     _with_nseq = True
