@@ -396,8 +396,16 @@ class WellOutput(HistoryOutput):
             ).ravel()
             for key, value in self.to_dict().items()
         }
+        out = WellOutput(out)
 
-        return WellOutput(out)
+        # Make sure time and depth arrays are unique
+        if np.ndim(t) == 0:
+            out.data["Time"][:] = t
+
+        if np.ndim(z) == 0:
+            out.data["Depth"][:] = z
+
+        return out
 
     def _get_time_key(self, *args, **kwargs) -> str:
         """Get key of time data."""
