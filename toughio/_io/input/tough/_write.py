@@ -150,13 +150,6 @@ def write_buffer(
         block_writers["TIMBC"].space_between_values = True
         block_writers["TIMBC"].delimiter = ""
 
-    if simulator == "tough4":
-        # In TOUGH4, NSEQ and NADD are only allowed in INFILE
-        if free_format and "ENDCY" not in blocks:
-            for block in ["ELEME", "CONNE", "GENER", "INCON"]:
-                if block in blocks:
-                    block_writers[block]._with_nseq = False
-
     # Write blocks
     out = []
 

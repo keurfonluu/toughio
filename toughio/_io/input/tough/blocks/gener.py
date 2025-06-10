@@ -25,7 +25,6 @@ class GENER(DataBlock):
     }
     multiples = {0}
     _space_between_blocks = True
-    _with_nseq = True
 
     def _read(
         self,
@@ -59,7 +58,7 @@ class GENER(DataBlock):
         flag = False
 
         if simulator == "tough4":
-            if self.free_format and not self._with_nseq:
+            if self.free_format:
                 read_record = self._read_record_tough4_free
 
             else:
@@ -200,7 +199,7 @@ class GENER(DataBlock):
         out = []
 
         if simulator == "tough4":
-            if self.free_format and not self._with_nseq:
+            if self.free_format:
                 key = "5/tough4-free"
                 get_values = self._get_values_tough4_free
 
