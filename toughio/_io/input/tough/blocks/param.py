@@ -13,6 +13,7 @@ class PARAM(DataBlock):
     formats = {
         1: f"2d,2d,4d,4d,4d,{','.join(24 * ["1d"])},10s,10f,10f",
         2: "10f,10f,10f,10f,5s,5s,10f,10f,10f",
+        "2/tough4-free": "10f,10f,10f,10f,5s,10f,10f,10f",
         3: ",".join(8 * ["10f"]),
         4: "10f,10f,10s,10f,10f,10f",
         5: ",".join(4 * ["20f"]),
@@ -25,7 +26,7 @@ class PARAM(DataBlock):
         self,
         f: FileIterator | TextIO | str,
         n_variables: int | Sequence[int],
-        eos: Optional[str] = None,
+        eos: str,
         *args,
         **kwargs
     ) -> dict:
@@ -46,16 +47,25 @@ class PARAM(DataBlock):
         param["extra_options"] = {i + 1: x for i, x in enumerate(data[5:29]) if x is not None}
 
         # Record 2
-        data = self.readers[2](f)
+        line = f.next()
+
+        if self.free_format or "," in line:
+            ishift = 0
+            data = self.readers["2/tough4-free"](line)
+
+        else:
+            ishift = 1
+            data = self.readers[2](line)
+
         param["options"].update(
             {
                 "t_ini": data[0],
                 "t_max": data[1],
                 "t_steps": data[2],
                 "t_step_max": data[3],
-                "gravity": data[6],
-                "t_reduce_factor": data[7],
-                "mesh_scale_factor": data[8],
+                "gravity": data[5 + ishift],
+                "t_reduce_factor": data[6 + ishift],
+                "mesh_scale_factor": data[7 + ishift],
             }
         )
         wdata = data[4]
@@ -175,12 +185,19 @@ class PARAM(DataBlock):
             delten,
             data.get("t_step_max"),
             "wdata" if react_wdata and simulator == "toughreact" else None,
-            None,
+        ]
+        if not self.free_format:
+            values.append(None)
+        values += [
             data.get("gravity"),
             data.get("t_reduce_factor"),
             data.get("mesh_scale_factor"),
         ]
-        out += self.writers[2](values)
+        out += (
+            self.writers["2/tough4-free"](values)
+            if self.free_format
+            else self.writers[2](values)
+        )
 
         # Record 2.1
         if ndlt > 1:
