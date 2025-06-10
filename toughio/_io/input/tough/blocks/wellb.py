@@ -191,18 +191,25 @@ class WELLB(DataBlock):
         }
 
         for k, v in parameters.get("rocks", {}).items():
-            if not wellbore_keys.intersection(v):
+            data = {
+                k: v
+                for k, v in parameters.get("default", {}).items()
+                if k in wellbore_keys
+            }
+            data.update(v)
+
+            if not wellbore_keys.intersection(data):
                 continue
 
             values = [
                 k,
-                v.get("roughness"),
-                v.get("screen_fraction"),
-                v.get("area"),
-                v.get("factor"),
-                v.get("diameter"),
-                v.get("perimeter"),
-                v.get("heat_exchange"),
+                data.get("roughness"),
+                data.get("screen_fraction"),
+                data.get("area"),
+                data.get("factor"),
+                data.get("diameter"),
+                data.get("perimeter"),
+                data.get("heat_exchange"),
             ]
             out += self.writers["2/ROCKS"](values)
 
