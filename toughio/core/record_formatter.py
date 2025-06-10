@@ -88,24 +88,29 @@ class RecordFormatter:
                 data = data.replace("!", "//").split("//")[0].strip()
 
                 # Split and strip
-                data = [x.strip() for x in data.split(self.delimiter)]
+                if "*" in data:
+                    iterables = data.split(self.delimiter)
+                    data = []
+
+                    for x in iterables:
+                        if "*" in x:
+                            value, n = x.split("*")
+                            data += [value.strip()] * int(n)
+
+                        else:
+                            data.append(x.strip())
+
+                else:
+                    data = [x.strip() for x in data.split(self.delimiter)]
 
                 # Pad to format length
                 data.extend((len(self.format) - len(data)) * [None])
 
-                # Loop over items
-                out = []
-
-                for token, x in zip(self.format, data):
-                    if not x:
-                        out.append(None)
-
-                    elif "*" in x:
-                        value, n = x.split("*")
-                        out += [tokens[token[-1]]["converter"](value)] * int(n)
-
-                    else:
-                        out.append(tokens[token[-1]]["converter"](x))
+                # Loop over items                
+                out = [
+                    None if not x else tokens[token[-1]]["converter"](x)
+                    for token, x in zip(self.format, data)    
+                ]
 
             else:
                 i, out = 0, []
