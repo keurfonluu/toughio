@@ -9,7 +9,7 @@ __all__ = [
 ]
 
 
-def read(filename, mopr_11=0):
+def read(filename, mopr_11=0, **kwargs):
     """
     Read TOUGHREACT solute input file.
 

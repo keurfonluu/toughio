@@ -1,7 +1,7 @@
 from .. import tough
 
 
-def read(filename, eos=None):
+def read(filename, eos=None, **kwargs):
     """
     Read TOUGHREACT flow input file.
 
@@ -21,7 +21,7 @@ def read(filename, eos=None):
     return tough.read(filename, label_length=5, eos=eos, simulator="toughreact")
 
 
-def write(filename, parameters, block=None, ignore_blocks=None, eos=None):
+def write(filename, parameters, block=None, ignore_blocks=None, eos=None, **kwargs):
     """
     Write TOUGHREACT flow input file.
 

@@ -7,7 +7,7 @@ __all__ = [
 ]
 
 
-def write(filename, parameters, mopr_10=0, mopr_11=0, verbose=True):
+def write(filename, parameters, mopr_10=0, mopr_11=0, verbose=True, **kwargs):
     """
     Write TOUGHREACT solute input file.
 

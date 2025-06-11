@@ -17,6 +17,7 @@ def read(
     free_format: bool = False,
     eos: Optional[str] = None,
     simulator: Literal["tough", "tough3", "tough4", "toughreact"] = "tough",
+    **kwargs
 ) -> dict:
     """
     Read TOUGH input file.

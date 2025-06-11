@@ -8,7 +8,7 @@ __all__ = [
 ]
 
 
-def write(filename, parameters, verbose=True):
+def write(filename, parameters, verbose=True, **kwargs):
     """
     Write TOUGHREACT chemical input file.
 

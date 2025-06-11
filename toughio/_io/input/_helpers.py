@@ -1,3 +1,6 @@
+import pathlib
+from io import TextIOWrapper
+
 from ..._common import filetype_from_filename, register_format
 
 
@@ -11,15 +14,6 @@ __all__ = [
 _extension_to_filetype = {}
 _reader_map = {}
 _writer_map = {}
-_file_formats = {
-    "INFILE": "tough",
-    "MESH": "tough",
-    "INCON": "tough",
-    "GENER": "tough",
-    "flow.inp": "toughreact-flow",
-    "solute.inp": "toughreact-solute",
-    "chemical.inp": "toughreact-chemical",
-}
 
 
 def register(file_format, extensions, reader, writer=None):
@@ -83,11 +77,9 @@ def read(filename, file_format=None, **kwargs):
     If ``file_format == 'tough'``, can also read `MESH`, `INCON` and `GENER` files.
 
     """
-    if not (file_format is None or file_format in _reader_map):
-        raise ValueError()
+    file_format, simulator = _get_file_format_simulator(filename, file_format)
 
-    file_format = _get_file_format(filename, file_format, default="tough")
-    return _reader_map[file_format](filename, **kwargs)
+    return _reader_map[file_format](filename, simulator=simulator, **kwargs)
 
 
 def write(filename, parameters, file_format=None, **kwargs):
@@ -131,19 +123,18 @@ def write(filename, parameters, file_format=None, **kwargs):
         Only if ``file_format`` in {"toughreact-solute", "toughreact-chemical"}. If `True`, add comments to describe content of file.
 
     """
-    if not isinstance(parameters, dict):
-        raise TypeError()
-    if not (file_format is None or file_format in _writer_map):
-        raise ValueError()
-
-    file_format = _get_file_format(filename, file_format, default="tough")
-    _writer_map[file_format](filename, parameters, **kwargs)
+    file_format, simulator = _get_file_format_simulator(filename, file_format)
+    _writer_map[file_format](filename, parameters, simulator=simulator, **kwargs)
 
 
-def _get_file_format(filename, file_format, default):
+def _get_file_format_simulator(filename, file_format, default="tough"):
     """Get file format."""
-    if not file_format:
-        file_format = _file_format_from_filename(filename)
+    if file_format in _file_format_to_simulator:
+        return "tough", _file_format_to_simulator[file_format]
+
+    if not file_format and not isinstance(filename, TextIOWrapper):
+        filename = pathlib.Path(filename).name
+        file_format = _filename_to_file_format.get(filename)
 
     if not file_format:
         file_format = filetype_from_filename(filename, _extension_to_filetype, default)
@@ -151,18 +142,24 @@ def _get_file_format(filename, file_format, default):
     if not file_format:
         file_format = "tough"
 
-    return file_format
+    return file_format, "tough"
 
 
-def _file_format_from_filename(filename):
-    """Determine file format from its name."""
-    import pathlib
-    from io import TextIOWrapper
+_filename_to_file_format = {
+    "INFILE": "tough",
+    "MESH": "tough",
+    "INCON": "tough",
+    "GENER": "tough",
+    "flow.inp": "toughreact-flow",
+    "solute.inp": "toughreact-solute",
+    "chemical.inp": "toughreact-chemical",
+}
 
-    if not isinstance(filename, TextIOWrapper):
-        filename = pathlib.Path(filename).name
-
-        return _file_formats[filename] if filename in _file_formats else ""
-
-    else:
-        return ""
+_file_format_to_simulator = {
+    "tough": "tough",
+    "toughreact-flow": "toughreact",
+    "toughreact-solute": "toughreact",
+    "toughreact-chemical": "toughreact",
+    "tough3": "tough3",
+    "tough4": "tough4",
+}

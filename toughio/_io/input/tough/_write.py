@@ -19,6 +19,7 @@ def write(
     simulator: Literal["tough", "tough3", "tough4", "toughreact"] = "tough",
     block: Optional[Literal["all", "MESH", "GENER", "INCON"] | Sequence[str]] = None,
     ignore_blocks: Optional[Sequence[str]] = None,
+    **kwargs
 ) -> None:
     """
     Write TOUGH input file.

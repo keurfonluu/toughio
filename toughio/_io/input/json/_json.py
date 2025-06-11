@@ -5,13 +5,7 @@ import numpy as np
 from ...._common import open_file
 
 
-__all__ = [
-    "read",
-    "write",
-]
-
-
-def read(filename):
+def read(filename, **kwargs):
     """
     Import json TOUGH input file.
 
@@ -54,7 +48,7 @@ def read(filename):
     return parameters
 
 
-def write(filename, parameters):
+def write(filename, parameters, **kwargs):
     """
     Export TOUGH parameters to json.
 

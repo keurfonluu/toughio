@@ -9,7 +9,7 @@ __all__ = [
 ]
 
 
-def read(filename):
+def read(filename, **kwargs):
     """
     Read TOUGHREACT chemical input file.
 
