@@ -135,6 +135,9 @@ class INCON(DataBlock):
 
     def _read_record_tough4_fixed(self, line: str) -> tuple[str, dict]:
         """Read record 1 for TOUGH4 in fixed format."""
+        if "," in line:
+            return self._read_record_tough4_free(line)
+
         data = self.readers[f"5/tough4-fixed"](line)
         permeability = data[5:8]
         permeability = permeability[0] if len(set(permeability)) == 1 else permeability
@@ -156,6 +159,9 @@ class INCON(DataBlock):
 
     def _read_record_default(self, line: str, label_length: int) -> tuple[str, dict]:
         """Read record 1 for default format."""
+        if "," in line:
+            return self._read_record_tough4_free(line)
+            
         data = self.readers[label_length](line)
         userx = self.prune_values(data[4:])
 

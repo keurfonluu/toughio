@@ -140,6 +140,9 @@ class GENER(DataBlock):
 
     def _read_record_tough4_fixed(self, line: str) -> tuple[dict, dict]:
         """Read a record in fixed format for TOUGH4."""
+        if "," in line:
+            return self._read_record_tough4_free(line)
+
         data = self.readers["5/tough4-fixed"](line)
 
         return {
@@ -160,6 +163,9 @@ class GENER(DataBlock):
 
     def _read_record_default(self, line: str, label_length: int) -> tuple[dict, dict]:
         """Read a record in default format."""
+        if "," in line:
+            return self._read_record_tough4_free(line)
+            
         data = self.readers[label_length](line)
 
         return {

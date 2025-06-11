@@ -87,6 +87,9 @@ class CONNE(DataBlock):
 
     def _read_record_default(self, line: str, label_length: int) -> tuple[str, str, dict]:
         """Read a record in default format."""
+        if "," in line:
+            return self._read_record_tough4_free(line)
+            
         data = self.readers[label_length](line)
 
         return data[0], data[1], {
