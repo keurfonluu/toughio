@@ -138,9 +138,9 @@ class ELEME(DataBlock):
 
         return [
             material,
-            data.get("volume", 0.0),
-            data.get("heat_exchange_area", 0.0),
-            data.get("permeability_modifier", 0.0),
+            data.get("volume"),
+            data.get("heat_exchange_area"),
+            data.get("permeability_modifier"),
             *data.get("center", [None, None, None])
         ]
 
