@@ -8,6 +8,8 @@ from typing import Optional
 import numpy as np
 from numpy.typing import ArrayLike
 
+from .mesh import Mesh
+
 
 class Output(ABC):
     """
@@ -282,7 +284,7 @@ class ConnectionOutput(Output):
 
     def to_element(
         self,
-        mesh,
+        mesh: Mesh | dict | str | os.PathLike,
         linear_data: Optional[Sequence[str]] = None,
         ignore_elements: Optional[Sequence[str]] = None,
     ) -> ElementOutput:
@@ -291,8 +293,8 @@ class ConnectionOutput(Output):
 
         Parameters
         ----------
-        mesh : dict | PathLike
-            Mesh parameters or file name.
+        mesh : toughio.Mesh | dict | PathLike
+            Mesh or file name.
         linear_data : Sequence[str], optional
             Data keys corresponding to linear quantities. Linear quantities (e.g., Darcy's velocity) are not scaled by the interface area.
         ignore_elements : Sequence[str], optional
@@ -312,6 +314,9 @@ class ConnectionOutput(Output):
 
         if isinstance(mesh, (str, os.PathLike)):
             mesh = read_input(mesh, file_format="tough", blocks=["ELEME", "CONNE"])
+
+        elif isinstance(mesh, Mesh):
+            mesh = mesh.to_tough()
 
         linear_data = list(linear_data) if linear_data is not None else {"VEL_L", "VEL_G", "V(LIQ.)", "V(GAS)"}
         ignore_elements = set(ignore_elements) if ignore_elements is not None else set()
