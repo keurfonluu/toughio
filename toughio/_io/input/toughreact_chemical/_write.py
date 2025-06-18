@@ -1,14 +1,17 @@
-from ._helpers import section
+from __future__ import annotations
+
+from functools import wraps
+
 from .._common import getval, write_ffrecord
 from ...._common import open_file
 
 
-__all__ = [
-    "write",
-]
-
-
-def write(filename, parameters, verbose=True, **kwargs):
+def write(
+    filename,
+    parameters,
+    verbose=True,
+    **kwargs
+):
     """
     Write TOUGHREACT chemical input file.
 
@@ -52,6 +55,23 @@ def write_buffer(parameters, verbose):
     out += _write_end_comments(parameters) if "end_comments" in parameters else []
 
     return "\n".join(out)
+
+
+def section(header, footer="*"):
+    """Decorate section writing functions."""
+
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            out = [f"{header}"]
+            out += func(*args, **kwargs)
+            out += [f"{footer}"]
+
+            return out
+
+        return wrapper
+
+    return decorator
 
 
 @section("# Title", f"#{'-' * 79}")

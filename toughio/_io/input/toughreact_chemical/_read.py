@@ -4,11 +4,6 @@ from ...._common import open_file
 from ....core import FileIterator, ReadError
 
 
-__all__ = [
-    "read",
-]
-
-
 def read(filename, **kwargs):
     """
     Read TOUGHREACT chemical input file.

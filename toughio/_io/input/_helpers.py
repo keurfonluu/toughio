@@ -1,80 +1,45 @@
+from __future__ import annotations
+
+import os
 import pathlib
+from collections.abc import Callable, Sequence
 from io import TextIOWrapper
+from typing import Literal, Optional, TextIO
 
 from ..._common import filetype_from_filename, register_format
 
 
-__all__ = [
-    "register",
-    "read",
-    "write",
-]
-
-
-_extension_to_filetype = {}
-_reader_map = {}
-_writer_map = {}
-
-
-def register(file_format, extensions, reader, writer=None):
-    """
-    Register a new input format.
-
-    Parameters
-    ----------
-    file_format : str
-        File format to register.
-    extensions : array_like
-        List of extensions to associate to the new format.
-    reader : callable
-        Read fumction.
-    writer : callable or None, optional, default None
-        Write function.
-
-    """
-    register_format(
-        fmt=file_format,
-        ext_to_fmt=_extension_to_filetype,
-        reader_map=_reader_map,
-        writer_map=_writer_map,
-        extensions=extensions,
-        reader=reader,
-        writer=writer,
-    )
-
-
-def read(filename, file_format=None, **kwargs):
+def read(
+    filename: str | os.PathLike | TextIO,
+    file_format: Optional[
+        Literal[
+            "tough",
+            "tough3",
+            "tough4",
+            "toughreact-flow",
+            "toughreact-solute",
+            "toughreact-chemical",
+            "json",
+        ]
+    ] = None,
+    **kwargs
+):
     """
     Read TOUGH input file.
 
     Parameters
     ----------
-    filename : str, pathlike or buffer
+    filename : str | PathLike | TextIO
         Input file name or buffer.
-    file_format : str ('tough', 'toughreact-flow', 'toughreact-solute', 'toughreact-chemical', 'json') or None, optional, default None
+    file_format : {'tough', 'tough3', 'tough4', 'toughreact-flow', 'toughreact-solute', 'toughreact-chemical', 'json'}, optional
         Input file format.
-
-    Other Parameters
-    ----------------
-    blocks : list of str or None, optional, default None
-        Only if ``file_format = "tough"``. Blocks to read. If None, all blocks are read.
-    label_length : int or None, optional, default None
-        Only if ``file_format = "tough"``. Number of characters in cell labels.
-    n_variables : int or None, optional, default None
-        Only if ``file_format = "tough"``. Number of primary variables.
-    eos : str or None, optional, default None
-        Only if ``file_format = "tough"``. Equation of State.
-    mopr_11 : int, optional, default 0
-        Only if ``file_format = "toughreact-solute"``. MOPR(11) value in file 'flow.inp'.
+    **kwargs, dict
+        Additional keyword arguments passed to the reader function.
 
     Returns
     -------
     dict
         TOUGH input parameters.
-
-    Note
-    ----
-    If ``file_format == 'tough'``, can also read `MESH`, `INCON` and `GENER` files.
 
     """
     file_format, simulator = _get_file_format_simulator(filename, file_format)
@@ -82,52 +47,46 @@ def read(filename, file_format=None, **kwargs):
     return _reader_map[file_format](filename, simulator=simulator, **kwargs)
 
 
-def write(filename, parameters, file_format=None, **kwargs):
+def write(
+    filename: str | os.PathLike | TextIO,
+    parameters: dict,
+    file_format: Optional[
+        Literal[
+            "tough",
+            "tough3",
+            "tough4",
+            "toughreact-flow",
+            "toughreact-solute",
+            "toughreact-chemical",
+            "json",
+        ]
+    ] = None,
+    **kwargs
+):
     """
     Write TOUGH input file.
 
     Parameters
     ----------
-    filename : str, pathlike or buffer
+    filename : str | PathLike | TextIO
         Output file name or buffer.
     parameters : dict
         Parameters to export.
-    file_format : str ('tough', 'toughreact-flow', 'toughreact-solute', 'toughreact-chemical', 'json') or None, optional, default None
+    file_format : {'tough', 'tough3', 'tough4', 'toughreact-flow', 'toughreact-solute', 'toughreact-chemical', 'json'}, optional
         Output file format.
-
-    Other Parameters
-    ----------------
-    block : str {'all', 'gener', 'mesh', 'incon'} or None, optional, default None
-        Only if ``file_format = "tough"``. Blocks to be written:
-
-         - 'all': write all blocks,
-         - 'gener': only write block GENER,
-         - 'mesh': only write blocks ELEME, COORD and CONNE,
-         - 'incon': only write block INCON,
-         - None: write all blocks except blocks defined in `ignore_blocks`.
-
-    ignore_blocks : list of str or None, optional, default None
-        Only if ``file_format = "tough"`` and `block` is None. Blocks to ignore.
-    space_between_blocks : bool, optional, default False
-        Only if ``file_format = "tough"``. Add an empty record between blocks.
-    space_between_values : bool, optional, default True
-        Only if ``file_format = "tough"``. Add a white space between floating point values.
-    eos : str or None, optional, default None
-        Only if ``file_format = "tough"``. Equation of State.
-        If `eos` is defined in `parameters`, this option will be ignored.
-    mopr_10 : int, optional, default 0
-        Only if ``file_format = "toughreact-solute"``. MOPR(10) value in file 'flow.inp'.
-    mopr_11 : int, optional, default 0
-        Only if ``file_format = "toughreact-solute"``. MOPR(11) value in file 'flow.inp'.
-    verbose : bool, optional, default True
-        Only if ``file_format`` in {"toughreact-solute", "toughreact-chemical"}. If `True`, add comments to describe content of file.
+    **kwargs, dict
+        Additional keyword arguments passed to the writer function.
 
     """
     file_format, simulator = _get_file_format_simulator(filename, file_format)
     _writer_map[file_format](filename, parameters, simulator=simulator, **kwargs)
 
 
-def _get_file_format_simulator(filename, file_format, default="tough"):
+def _get_file_format_simulator(
+    filename: str | os.PathLike,
+    file_format: str | None,
+    default: str = "tough",
+) -> tuple[str, str]:
     """Get file format."""
     if file_format in _file_format_to_simulator:
         return "tough", _file_format_to_simulator[file_format]
@@ -144,6 +103,43 @@ def _get_file_format_simulator(filename, file_format, default="tough"):
 
     return file_format, "tough"
 
+
+
+def register(
+    file_format: str,
+    extensions: Sequence[str],
+    reader: Callable,
+    writer: Optional[Callable] = None,
+) -> None:
+    """
+    Register a new input format.
+
+    Parameters
+    ----------
+    file_format : str
+        File format to register.
+    extensions : Sequence[str]
+        List of extensions to associate to the new format.
+    reader : Callable
+        Read function.
+    writer : Callable, optional
+        Write function.
+
+    """
+    register_format(
+        fmt=file_format,
+        ext_to_fmt=_extension_to_filetype,
+        reader_map=_reader_map,
+        writer_map=_writer_map,
+        extensions=extensions,
+        reader=reader,
+        writer=writer,
+    )
+
+
+_extension_to_filetype = {}
+_reader_map = {}
+_writer_map = {}
 
 _filename_to_file_format = {
     "INFILE": "tough",

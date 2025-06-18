@@ -1,17 +1,21 @@
+from __future__ import annotations
+
 import json
+import os
+from typing import Any, TextIO
 
 import numpy as np
 
 from ...._common import open_file
 
 
-def read(filename, **kwargs):
+def read(filename: str | os.PathLike | TextIO, **kwargs):
     """
     Import json TOUGH input file.
 
     Parameters
     ----------
-    filename : str, pathlike or buffer
+    filename : str | PathLike | TextIO
         Input file name or buffer.
 
     Returns
@@ -21,7 +25,7 @@ def read(filename, **kwargs):
 
     """
 
-    def to_int(data):
+    def to_int(data: dict) -> dict:
         """Return dict with integer keys instead of strings."""
         return {int(k): data[k] for k in sorted(data)}
 
@@ -35,26 +39,31 @@ def read(filename, **kwargs):
         if key in parameters:
             parameters[key] = to_int(parameters[key])
 
-    if "selections" in parameters and "integers" in parameters["selections"]:
-        parameters["selections"]["integers"] = to_int(
-            parameters["selections"]["integers"]
-        )
+    if "selections" in parameters:
+        if "integers" in parameters["selections"]:
+            parameters["selections"]["integers"] = to_int(
+                parameters["selections"]["integers"]
+            )
 
-    if "selections" in parameters and "floats" in parameters["selections"]:
-        parameters["selections"]["floats"] = to_int(
-            parameters["selections"]["floats"]
-        )
+        if "floats" in parameters["selections"]:
+            parameters["selections"]["floats"] = to_int(
+                parameters["selections"]["floats"]
+            )
 
     return parameters
 
 
-def write(filename, parameters, **kwargs):
+def write(
+    filename: str | os.PathLike | TextIO,
+    parameters: dict,
+    **kwargs
+):
     """
     Export TOUGH parameters to json.
 
     Parameters
     ----------
-    filename : str, pathlike or buffer
+    filename : str | PathLike | TextIO
         Output file name or buffer.
     parameters : dict
         Parameters to export.
@@ -62,16 +71,20 @@ def write(filename, parameters, **kwargs):
     """
     from copy import deepcopy
 
-    def jsonify(x):
+    def jsonify(x: Any) -> Any:
         """JSON serialize data."""
         if isinstance(x, (np.int32, np.int64)):
             return int(x)
+
         elif isinstance(x, (list, tuple)):
             return [jsonify(xx) for xx in x]
+
         elif isinstance(x, np.ndarray):
             return x.tolist()
+
         elif isinstance(x, dict):
             return {k: jsonify(v) for k, v in x.items()}
+            
         else:
             return x
 
