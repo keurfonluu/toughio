@@ -33,8 +33,7 @@ class OUTPT(DataBlock):
         """Write OUTPT block data."""
         outpt = parameters["react"]["output"]
 
-        values = [outpt["format"]]
-        values += outpt.get("shape", [])[:3]
+        values = [outpt["format"], *outpt.get("shape", [])[:3]]
         out = [f"{' '.join(str(x) for x in values)}\n"]
 
         return out

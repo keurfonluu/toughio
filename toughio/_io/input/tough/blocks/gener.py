@@ -273,7 +273,7 @@ class GENER(DataBlock):
             values = get_values(data, ltab, itab)
         
             if simulator == "toughreact":
-                values.append(data.get("ktab"))
+                values.append(ktab)
 
             out += self.writers[key](values)
 

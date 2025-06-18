@@ -1,37 +1,52 @@
+from __future__ import annotations
+
+import os
+from collections.abc import Sequence
+from typing import Optional, TextIO
+
 from .._common import getval, write_ffrecord
-from ...._common import open_file
+from ....._common import open_file
 
 
-__all__ = [
-    "write",
-]
-
-
-def write(filename, parameters, mopr_10=0, mopr_11=0, verbose=True, **kwargs):
+def write(
+    filename: str | os.PathLike | TextIO,
+    parameters: dict,
+    mopr_10: int = 0,
+    mopr_11: int = 0,
+    verbose: bool = True,
+    **kwargs
+) -> None:
     """
     Write TOUGHREACT solute input file.
 
     Parameters
     ----------
-    filename : str
-        Input file name.
+    filename : str | PathLike | TextIO
+        Output file name or buffer.
     parameters : dict
         Parameters to export.
-    mopr_10 : int, optional, default 0
+    mopr_10 : int, default 0
         MOPR(10) value in file 'flow.inp'.
-    mopr_11 : int, optional, default 0
+    mopr_11 : int, default 0
         MOPR(11) value in file 'flow.inp'.
-    verbose : bool, optional, default True
+    verbose : bool, default True
         If `True`, add comments to describe content of file.
 
     """
     buffer = write_buffer(parameters, mopr_10, mopr_11, verbose)
+
     with open_file(filename, "w") as f:
         for record in buffer:
             f.write(record)
 
 
-def write_buffer(parameters, mopr_10=0, mopr_11=0, verbose=True, sections=None):
+def write_buffer(
+    parameters: dict,
+    mopr_10: int = 0,
+    mopr_11: int = 0,
+    verbose: bool = True,
+    sections: Optional[Sequence[str]] = None,
+) -> str:
     """Write TOUGHREACT solute input file."""
     from ._common import sections as sections_
 

@@ -1,23 +1,27 @@
+from __future__ import annotations
+
+import os
+from typing import TextIO
+
 from .._common import read_end_comments
-from ..._common import read_record, to_float
-from ...._common import open_file, prune_values
-from ....core import FileIterator, ReadError
+from ...._common import read_record, to_float
+from ....._common import open_file, prune_values
+from .....core import FileIterator, ReadError
 
 
-__all__ = [
-    "read",
-]
-
-
-def read(filename, mopr_11=0, **kwargs):
+def read(
+    filename: str | os.PathLike | TextIO,
+    mopr_11: int = 0,
+    **kwargs,
+) -> dict:
     """
     Read TOUGHREACT solute input file.
 
     Parameters
     ----------
-    filename : str
-        Input file name.
-    mopr_11 : int, optional, default 0
+    filename : str | PathLike | TextIO
+        Input file name or buffer.
+    mopr_11 : int, default 0
         MOPR(11) value in file 'flow.inp'.
 
     """
@@ -27,7 +31,7 @@ def read(filename, mopr_11=0, **kwargs):
     return out
 
 
-def read_buffer(f, mopr_11=0):
+def read_buffer(f: TextIO, mopr_11: int = 0) -> dict:
     """Read TOUGHREACT solute input file."""
     parameters = {}
     fiter = FileIterator(f)

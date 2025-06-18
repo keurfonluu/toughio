@@ -1,7 +1,7 @@
 import logging
 
-from .._common import to_str
-from ..._common import prune_values
+from ..._common import to_str
+from ...._common import prune_values
 
 
 def getval(parameters, keys, default):

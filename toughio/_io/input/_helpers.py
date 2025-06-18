@@ -88,9 +88,6 @@ def _get_file_format_simulator(
     default: str = "tough",
 ) -> tuple[str, str]:
     """Get file format."""
-    if file_format in _file_format_to_simulator:
-        return "tough", _file_format_to_simulator[file_format]
-
     if not file_format and not isinstance(filename, TextIOWrapper):
         filename = pathlib.Path(filename).name
         file_format = _filename_to_file_format.get(filename)
@@ -101,8 +98,7 @@ def _get_file_format_simulator(
     if not file_format:
         file_format = "tough"
 
-    return file_format, "tough"
-
+    return file_format, _file_format_to_simulator.get(file_format, "tough")
 
 
 def register(

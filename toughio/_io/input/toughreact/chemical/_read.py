@@ -1,16 +1,24 @@
+from __future__ import annotations
+
+import os
+from typing import TextIO
+
 from .._common import read_end_comments
-from ..._common import to_float
-from ...._common import open_file
-from ....core import FileIterator, ReadError
+from ...._common import to_float
+from ....._common import open_file
+from .....core import FileIterator, ReadError
 
 
-def read(filename, **kwargs):
+def read(
+    filename: str | os.PathLike | TextIO,
+    **kwargs
+) -> dict:
     """
     Read TOUGHREACT chemical input file.
 
     Parameters
     ----------
-    filename : str, pathlike or buffer
+    filename : str | PathLike | TextIO
         Input file name or buffer.
 
     """
@@ -20,7 +28,7 @@ def read(filename, **kwargs):
     return out
 
 
-def read_buffer(f):
+def read_buffer(f: TextIO) -> dict:
     """Read TOUGHREACT chemical input file."""
     parameters = {}
     fiter = FileIterator(f)

@@ -7,7 +7,7 @@ from .....core import DataBlock, FileIterator
 
 class REACT(DataBlock):
     name = "REACT"
-    formats = {1: "25d"}
+    formats = {1: ",".join(25 * ["1d"])}
 
     def _read(
         self,

@@ -1,37 +1,40 @@
 from __future__ import annotations
 
+import os
+from typing import TextIO
 from functools import wraps
 
 from .._common import getval, write_ffrecord
-from ...._common import open_file
+from ....._common import open_file
 
 
 def write(
-    filename,
-    parameters,
-    verbose=True,
+    filename: str | os.PathLike | TextIO,
+    parameters: dict,
+    verbose: bool = True,
     **kwargs
-):
+) -> None:
     """
     Write TOUGHREACT chemical input file.
 
     Parameters
     ----------
-    filename : str, pathlike or buffer
+    filename : str | PathLike | TextIO
         Output file name or buffer.
     parameters : dict
         Parameters to export.
-    verbose : bool, optional, default True
+    verbose : bool, default True
         If `True`, add comments to describe content of file.
 
     """
     buffer = write_buffer(parameters, verbose)
+
     with open_file(filename, "w") as f:
         for record in buffer:
             f.write(record)
 
 
-def write_buffer(parameters, verbose):
+def write_buffer(parameters: dict, verbose: bool) -> str:
     """Write TOUGHREACT chemical input file."""
     # Define input file contents
     out = []
