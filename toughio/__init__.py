@@ -1,4 +1,4 @@
-from . import _cli, meshmaker
+from . import _cli, meshmaker, properties
 from .__about__ import __version__
 from ._io import *
 from ._run import run
