@@ -9,7 +9,7 @@ import numpy as np
 
 def thermal_expansion_coefficient(
     temperature: ArrayLike,
-    density: Literal["water"] | Callable = "water",
+    density: Literal["brine", "water"] | Callable = "water",
     eps: float = 1.0e-8,
     *args,
     **kwargs
@@ -21,7 +21,7 @@ def thermal_expansion_coefficient(
     ----------
     temperature : ArrayLike
         Temperature(s) (in °C).
-    density : {'water'} | Callable, default 'water'
+    density : {'brine', 'water'} | Callable, default 'water'
         Density function or identifier.
     pressure : float, default 101325.0
         Reference pressure (in Pa).
@@ -36,10 +36,13 @@ def thermal_expansion_coefficient(
         Coefficient(s) of thermal expansion (in 1/°C).
     
     """
-    from . import water
+    from . import brine, water
 
     if isinstance(density, str):
-        if density == "water":
+        if density == "brine":
+            density = brine.density
+            
+        elif density == "water":
             density = water.density
 
         else:

@@ -8,8 +8,8 @@ import numpy as np
 
 def density(
     temperature: ArrayLike,
-    pressure: ArrayLike,
-    salt_mass_fraction: ArrayLike,
+    pressure: ArrayLike = 101325.0,
+    salt_mass_fraction: ArrayLike = 0.035,
     method: Literal["STOMP"] = "STOMP",
 ) -> ArrayLike:
     """
@@ -19,9 +19,9 @@ def density(
     ----------
     temperature : ArrayLike
         Temperature (in °C, <= 350.0).
-    pressure : ArrayLike
+    pressure : ArrayLike, default 101325.0
         Pressure (in Pa, <= 1.0e8).
-    salt_mass_fraction : ArrayLike
+    salt_mass_fraction : ArrayLike, default 0.035
         Salt mass fraction.
     method : {'STOMP'}, default 'STOMP'
         Method to use for density calculation.
