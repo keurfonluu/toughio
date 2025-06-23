@@ -1,4 +1,10 @@
+from __future__ import annotations
+
+from collections.abc import Callable, Sequence
+from typing import Literal, Optional
+
 import glob
+import numpy as np
 import os
 import pathlib
 import platform
@@ -15,20 +21,22 @@ _check_exec = True  # Bool to be monkeypatched in tests
 
 
 def run(
-    exec,
-    input_filename,
-    other_filenames=None,
-    command=None,
-    workers=None,
-    docker=None,
-    wsl=False,
-    working_dir=None,
-    use_temp=False,
-    ignore_patterns=None,
-    silent=False,
-    petsc_args=None,
-    docker_args=None,
-    container_name=None,
+    exec: str | os.PathLike,
+    input_filename: str | os.PathLike | dict,
+    other_filenames: Optional[Sequence[str | os.PathLike] | dict] = None,
+    simulator: Optional[Literal["tough2", "tough3", "tough4", "toughreact"]] = None,
+    command: Optional[Callable] = None,
+    workers: Optional[int | tuple[int, int]] = None,
+    docker: Optional[str] = None,
+    wsl: bool = False,
+    working_dir: Optional[str | os.PathLike] = None,
+    use_temp: bool = False,
+    ignore_patterns: Optional[Sequence[str]] = None,
+    silent: bool = False,
+    petsc_args: Optional[Sequence[str]] = None,
+    docker_args: Optional[Sequence[str]] = None,
+    tough4_args: Optional[Sequence[str]] = None,
+    container_name: Optional[str] = None,
     **kwargs,
 ):
     """
@@ -36,78 +44,65 @@ def run(
 
     Parameters
     ----------
-    exec : str or pathlike
+    exec : str | PathLike
         Path to TOUGH executable.
-    input_filename : str or pathlike
+    input_filename : str | PathLike | dict
         TOUGH input file name.
-    other_filenames : list, dict or None, optional, default None
-        Other simulation files to copy to working directory (e.g., MESH, INCON, GENER) if not already present. If ``other_filenames`` is a dict, must be in the form ``{old: new}``, where ``old`` is the current name of the file to copy, and ``new`` is the name of the file copied.
-    command : callable or None, optional, default None
-        Command to execute TOUGH. Must be in the form ``f(exec, inp, [out])``, where ``exec`` is the path to TOUGH executable, ``inp`` is the input file name, and ``out`` is the output file name (optional).
-    workers : int or None, optional, default None
-        Number of MPI workers to invoke.
-    docker : str, optional, default None
+    other_filenames : Sequence[str | PathLike] | dict, optional
+        Other simulation files to copy to working directory (e.g., MESH, INCON, GENER)
+        if not already present. If *other_filenames* is a dict, must be in the form
+        ``{old: new}``, where ``old`` is the current name of the file to copy, and
+        ``new`` is the name of the file copied.
+    simulator : {'tough2', 'tough3', 'tough4'}, default 'tough3'
+        TOUGH simulator to use.
+    command : Callable, optional
+        Command to execute TOUGH. Must be in the form ``f(exec, inp, [out])``, where
+        ``exec`` is the path to TOUGH executable, ``inp`` is the input file name, and
+        ``out`` is the output file name (optional). Ignored if *simulator* is specified.
+    workers : int | tuple[int, int], optional
+        Number of MPI workers and/or OpenMP threads to invoke. If *workers* is an
+        integer and *simulator* is 'tough4', *workers* is the number of OpenMP threads.
+    docker : str, optional
         Name of Docker image.
-    wsl : bool, optional, default False
+    wsl : bool, default False
         Only for Windows. If `True`, run the final command as a Bash command.
-    working_dir : str, pathlike or None, optional, default None
+    working_dir : str | PathLike, optional
         Working directory. Input and output files will be generated in this directory.
-    use_temp : bool, optional, default False
-        If `True`, run simulation in a temporary directory, and copy simulation files to `working_dir` at the end of the simulation. This option may be required when running TOUGH through a Docker.
-    ignore_patterns : list or None, optional, default None
+    use_temp : bool, default False
+        If `True`, run simulation in a temporary directory, and copy simulation files
+        to *working_dir* at the end of the simulation. This option may be required when
+        running TOUGH through a Docker.
+    ignore_patterns : Sequence[str], optional
         If provided, output files that match the glob-style patterns will be discarded.
-    silent : bool, optional, default False
+    silent : bool, default False
         If `True`, nothing will be printed to standard output.
-    petsc_args : list or None, optional, default None
+    petsc_args : Sequence[str], optional
         List of arguments passed to PETSc solver (written to `.petscrc`).
-    docker_args : list or None, optional, default None
+    docker_args : Sequence[str], optional
         List of arguments passed to `docker run` command.
-    container_name : str or None, optional, default None
+    tough4_args : Sequence[str], optional
+        List of arguments passed to TOUGH4 command.
+    container_name : str, optional
         Name of Docker container.
-
-    Other Parameters
-    ----------------
-    block : str {'all', 'gener', 'mesh', 'incon'} or None, optional, default None
-        Only if ``file_format = "tough"``. Blocks to be written:
-
-         - 'all': write all blocks,
-         - 'gener': only write block GENER,
-         - 'mesh': only write blocks ELEME, COORD and CONNE,
-         - 'incon': only write block INCON,
-         - None: write all blocks except blocks defined in `ignore_blocks`.
-
-    ignore_blocks : list of str or None, optional, default None
-        Only if ``file_format = "tough"`` and `block` is None. Blocks to ignore.
-    space_between_blocks : bool, optional, default False
-        Only if ``file_format = "tough"``. Add an empty record between blocks.
-    space_between_blocks : bool, optional, default True
-        Only if ``file_format = "tough"``. Add a white space between floating point values.
-    eos : str or None, optional, default None
-        Only if ``file_format = "tough"``. Equation of State.
-        If `eos` is defined in `parameters`, this option will be ignored.
-    mopr_10 : int, optional, default 0
-        Only if ``file_format = "toughreact-solute"``. MOPR(10) value in file 'flow.inp'.
-    mopr_11 : int, optional, default 0
-        Only if ``file_format = "toughreact-solute"``. MOPR(11) value in file 'flow.inp'.
-    verbose : bool, optional, default True
-        Only if ``file_format`` in {"toughreact-solute", "toughreact-chemical"}. If `True`, add comments to describe content of file.
+    **kwargs
+        Additional keyword arguments. See `toughio.write_input` for details.
 
     Returns
     -------
-    :class:`subprocess.CompletedProcess`
+    subprocess.CompletedProcess
         Subprocess completion status.
 
     """
     from . import write_input
 
+    simulator = simulator if simulator else "tough3"
+
+    # Additional files required for simulation
     other_filenames = (
         {k: k for k in other_filenames}
         if isinstance(other_filenames, (list, tuple))
         else other_filenames if other_filenames else {}
     )
-
-    if command is None:
-        command = lambda exec, inp, out: f"{exec} {inp} {out}"
 
     ignore_patterns = list(ignore_patterns) if ignore_patterns else []
     ignore_patterns += [".OUTPUT*", "TABLE", "MESHA", "MESHB"]
@@ -214,12 +209,49 @@ def run(
     # Output filename
     output_filename = f"{input_filename.stem}.out"
 
+    # MPI/OpenMP workers
+    n_mpi, n_omp = None, None
+
+    if workers is not None:
+        if np.ndim(workers) == 0:
+            if simulator == "tough4":
+                n_omp = workers
+
+            else:
+                n_mpi = workers
+
+        else:
+            n_omp, n_mpi = workers[:2]
+
     # TOUGH command
-    cmd = command(exec, str(input_filename.name), str(output_filename))
+    if simulator in {"tough2", "toughreact"}:
+        cmd = f"{exec} < {input_filename.name} > {output_filename}"
+
+    elif simulator == "tough3":
+        cmd = f"{exec} {input_filename.name} {output_filename}"
+
+    elif simulator == "tough4":
+        cmd = f"{exec} -f {input_filename.name}"
+        tough4_args = tough4_args if tough4_args else []
+
+        # Use OpenMP
+        if n_omp:
+            try:
+                i = tough4_args.index("-t")
+                tough4_args[i + 1] = n_omp
+
+            except ValueError:
+                tough4_args += ["-t", n_omp]
+        
+        if tough4_args:
+            cmd = f"{cmd} {' '.join(map(str, tough4_args))}"
+
+    else:
+        cmd = command(exec, str(input_filename.name), str(output_filename))
 
     # Use MPI
-    if workers is not None and workers > 1:
-        cmd = f"mpiexec -n {workers} {cmd}"
+    if n_mpi:
+        cmd = f"mpiexec -n {n_mpi} {cmd}"
 
     # Use Docker
     is_windows = platform.system().startswith("Win")
@@ -248,7 +280,7 @@ def run(
             "--workdir",
             "/shared",
         ]
-        cmd = f"docker run {' '.join(str(arg) for arg in docker_args)} {docker} {cmd}"
+        cmd = f"docker run {' '.join(map(str, docker_args))} {docker} {cmd}"
 
     # Use WSL
     if wsl and is_windows:
@@ -316,7 +348,7 @@ def run(
             simulation_dir,
             working_dir,
             ignore=shutil.ignore_patterns(*ignore_patterns),
-            dirs_exist_ok=True,  # Doesn't work with Python 3.7
+            dirs_exist_ok=True,
         )
         shutil.rmtree(simulation_dir, ignore_errors=True)
         os.remove(working_dir / "tempdir.txt")
