@@ -8,13 +8,17 @@ import numpy as np
 import os
 import pathlib
 import platform
+import re
 import secrets
 import shutil
 import signal
 import subprocess
 import tempfile
+import time
+import threading
 
 import psutil
+from tqdm import tqdm
 
 
 _check_exec = True  # Bool to be monkeypatched in tests
@@ -38,7 +42,7 @@ def run(
     tough4_args: Optional[Sequence[str]] = None,
     container_name: Optional[str] = None,
     **kwargs,
-):
+) -> subprocess.CompletedProcess:
     """
     Run TOUGH executable.
 
@@ -93,7 +97,7 @@ def run(
         Subprocess completion status.
 
     """
-    from . import write_input
+    from . import read_input, write_input
 
     simulator = simulator if simulator else "tough3"
 
@@ -180,7 +184,7 @@ def run(
             shutil.copy(input_path, input_filename)
 
     else:
-        write_input(simulation_dir / "INFILE", input_filename, **kwargs)
+        write_input(simulation_dir / "INFILE", input_filename, file_format=simulator, **kwargs)
         input_filename = simulation_dir / "INFILE"
 
     # Copy other simulation files to working directory
@@ -224,6 +228,9 @@ def run(
             n_omp, n_mpi = workers[:2]
 
     # TOUGH command
+    if not docker and not wsl:
+        exec = f'"{pathlib.Path(exec).absolute()}"'
+
     if simulator in {"tough2", "toughreact"}:
         cmd = f"{exec} < {input_filename.name} > {output_filename}"
 
@@ -286,6 +293,27 @@ def run(
     if wsl and is_windows:
         cmd = f"bash -c '{cmd}'"
 
+    # Progress bar
+    if not silent and simulator == "tough4":
+        log_filename = simulation_dir / "TMsimulation.log"
+
+        # Read useful variables
+        parameters = read_input(input_filename, blocks=["PARAM"])
+        t_ini = parameters.get("options", {}).get("t_ini", 0.0)
+        t_max = parameters.get("options", {}).get("t_max")
+
+        # Delete log file if it exists
+        log_filename.unlink(missing_ok=True)
+
+        # Start thread to monitor log file
+        stop_event = threading.Event()
+        monitor_thread = threading.Thread(
+            target=display_progress_bar,
+            args=(log_filename, stop_event, simulator, t_ini, t_max),
+            daemon=True,
+        )
+        monitor_thread.start()
+
     # Run simulation
     try:
         # See <https://www.koldfront.dk/making_subprocesspopen_in_python_3_play_nice_with_elaborate_output_1594>
@@ -300,6 +328,7 @@ def run(
 
         stdout = []
         cr = False
+
         for line in open(os.dup(p.stdout.fileno()), newline=""):
             # Handle carriage return
             # newline in open is converting \r\n as \r moving \r at the end of the previous string
@@ -308,7 +337,7 @@ def run(
             cr = line.endswith("\r")
             line = line[:-2] if cr else line
 
-            if not silent:
+            if not silent and simulator != "tough4":
                 print(line, end="", flush=True)
                 stdout.append(line)
 
@@ -342,6 +371,10 @@ def run(
         stdout="".join(stdout),
     )
 
+    if not silent and simulator == "tough4":
+        stop_event.set()
+        monitor_thread.join()
+
     # Copy files from temporary directory and delete it
     if use_temp:
         shutil.copytree(
@@ -364,3 +397,108 @@ def run(
         os.remove(pattern)
 
     return status
+
+
+def display_progress_bar(
+    filename: str | os.PathLike,
+    stop_event: threading.Event,
+    simulator: Optional[Literal["tough2", "tough3", "tough4", "toughreact"]] = None,
+    t_ini: Optional[float] = None,
+    t_max: Optional[float] = None,
+) -> None:
+    """Display a progress bar."""
+    file = None
+    simulator = simulator if simulator else "tough"
+    message = f"Starting {simulator.upper()} simulation"
+    pattern1 = re.compile(
+        r"At\s*\[\s*(\d+)\s*,\s*(\d+)\s*\]:\s*TimeStep\s*=\s*([+-]?\d*\.?\d+E[+-]?\d+|\d+)\s*MAX\{Residual\}\s*=\s*([+-]?\d*\.?\d+E[+-]?\d+|\d+)",
+        re.IGNORECASE
+    )
+    pattern2 = re.compile(
+        r"\(\s*(\d+)\s*,\s*(\d+)\s*\)\s*ST\s*=\s*([+-]?\d*\.?\d+E[+-]?\d+|\d+)\s*DT\s*=\s*([+-]?\d*\.?\d+E[+-]?\d+|\d+)",
+        re.IGNORECASE
+    )
+    factor, t_unit = pretty_time(t_max) if t_max else (1.0, "sec")
+
+    with tqdm(total=t_max * factor, initial=t_ini * factor, bar_format=f"{message}...") as pbar:
+        l_bar = "{desc}: {percentage:3.0f}%|"
+
+        try:
+            while not stop_event.is_set():
+                if file is None:
+                    try:
+                        file = open(filename, "r")
+
+                    except FileNotFoundError:
+                        time.sleep(0.01)
+                        continue
+
+                where = file.tell()
+                line = file.readline()
+
+                if not line:
+                    time.sleep(0.01)
+                    file.seek(where)
+
+                else:
+                    if line.strip().startswith("...ITERATING"):
+                        match = pattern1.search(line)
+                        it = int(match.group(1))
+                        itr = int(match.group(2))
+                        dt = float(match.group(3))
+                        r_bar = f"| {{n:.2f}}/{{total:.2f}} {t_unit} [it={it}({itr}), dt={dt * factor:.2f} {t_unit}] ({{elapsed}})"
+                        pbar.bar_format = f"{l_bar}{{bar}}{r_bar}"
+                        pbar.update(0.0)
+
+                    else:
+                        match2 = pattern2.search(line)
+
+                        if match2:
+                            it = int(match2.group(1))
+                            itr = int(match2.group(2))
+                            dt = float(match2.group(4))
+                            r_bar = f"| {{n:.2f}}/{{total:.2f}} {t_unit} [it={it}({itr}), dt={dt * factor:.2f} {t_unit}] ({{elapsed}})"
+                            pbar.bar_format = f"{l_bar}{{bar}}{r_bar}"
+                            pbar.update(dt * factor)
+
+                        else:
+                            continue
+
+        finally:
+            if file is not None:
+                file.close()
+
+        pbar.bar_format = f"End of {simulator.upper()} simulation ({{elapsed}})"
+        pbar.update(0.0)
+    
+
+def pretty_time(seconds: float) -> tuple[float, str]:
+    """
+    Convert seconds to a human-readable format.
+    
+    Parameters
+    ----------
+    seconds : float
+        Time in seconds.
+
+    Returns
+    -------
+    float
+        Factor to convert seconds to the appropriate time unit.
+    str
+        Time unit as a string.
+
+    """
+    if seconds < 86400.0:
+        factor = 1.0
+        t_unit = "sec"
+
+    elif seconds < 31557600.0:
+        factor = 1.0 / 86400.0
+        t_unit = "day"
+
+    else:
+        factor = 1.0 / 31557600.0
+        t_unit = "yr"
+
+    return factor, t_unit
