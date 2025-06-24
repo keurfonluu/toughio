@@ -419,10 +419,10 @@ def display_progress_bar(
         r"\(\s*(\d+)\s*,\s*(\d+)\s*\)\s*ST\s*=\s*([+-]?\d*\.?\d+E[+-]?\d+|\d+)\s*DT\s*=\s*([+-]?\d*\.?\d+E[+-]?\d+|\d+)",
         re.IGNORECASE
     )
-    factor, t_unit = pretty_time(t_max) if t_max else (1.0, "sec")
 
-    with tqdm(total=t_max * factor, initial=t_ini * factor, bar_format=f"{message}...") as pbar:
+    with tqdm(initial=t_ini, total=t_max, bar_format=f"{message}...") as pbar:
         l_bar = "{desc}: {percentage:3.0f}%|"
+        total = pretty_time(pbar.total) if pbar.total else "end"
 
         try:
             while not stop_event.is_set():
@@ -447,9 +447,7 @@ def display_progress_bar(
                         it = int(match.group(1))
                         itr = int(match.group(2))
                         dt = float(match.group(3))
-                        r_bar = f"| {{n:.2f}}/{{total:.2f}} {t_unit} [it={it}({itr}), dt={dt * factor:.2f} {t_unit}] ({{elapsed}})"
-                        pbar.bar_format = f"{l_bar}{{bar}}{r_bar}"
-                        pbar.update(0.0)
+                        dt_update = 0.0
 
                     else:
                         match2 = pattern2.search(line)
@@ -458,22 +456,25 @@ def display_progress_bar(
                             it = int(match2.group(1))
                             itr = int(match2.group(2))
                             dt = float(match2.group(4))
-                            r_bar = f"| {{n:.2f}}/{{total:.2f}} {t_unit} [it={it}({itr}), dt={dt * factor:.2f} {t_unit}] ({{elapsed}})"
-                            pbar.bar_format = f"{l_bar}{{bar}}{r_bar}"
-                            pbar.update(dt * factor)
+                            dt_update = dt
 
                         else:
                             continue
+
+                    n = pretty_time(pbar.n + dt_update)
+                    r_bar = f"| {n}/{total} [it={it}({itr}), dt={pretty_time(dt)}] ({{elapsed}})"
+                    pbar.bar_format = f"{l_bar}{{bar}}{r_bar}"
+                    pbar.update(dt_update)
 
         finally:
             if file is not None:
                 file.close()
 
-        pbar.bar_format = f"End of {simulator.upper()} simulation ({{elapsed}})"
+        pbar.bar_format = f"End of {simulator.upper()} simulation at t={pretty_time(pbar.n)} ({{elapsed}})"
         pbar.update(0.0)
     
 
-def pretty_time(seconds: float) -> tuple[float, str]:
+def pretty_time(seconds: float) -> str:
     """
     Convert seconds to a human-readable format.
     
@@ -484,25 +485,21 @@ def pretty_time(seconds: float) -> tuple[float, str]:
 
     Returns
     -------
-    float
-        Factor to convert seconds to the appropriate time unit.
     str
-        Time unit as a string.
+        Human-readable time string.
 
     """
-    if seconds < 86400.0:
-        factor = 1.0
-        t_unit = "sec"
+    if seconds < 3600.0:
+        return f"{seconds:.2f} sec"
 
+    elif seconds < 86400.0:
+        return f"{seconds / 3600.0:.2f} hr"
+        
     elif seconds < 31557600.0:
-        factor = 1.0 / 86400.0
-        t_unit = "day"
+        return f"{seconds / 86400.0:.2f} day"
 
     else:
-        factor = 1.0 / 31557600.0
-        t_unit = "yr"
-
-    return factor, t_unit
+        return f"{seconds / 31557600.0:.2f} yr"
 
 
 def move_file(filename: str | os.PathLike, directory: str | os.PathLike) -> None:
