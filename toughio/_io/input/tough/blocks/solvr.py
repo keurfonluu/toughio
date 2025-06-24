@@ -12,7 +12,6 @@ class SOLVR(DataBlock):
     def _read(
         self,
         f: FileIterator | TextIO | str,
-        simulator: str,
         *args,
         **kwargs
     ) -> dict:
@@ -27,11 +26,8 @@ class SOLVR(DataBlock):
             "o_precond": data[2],
             "rel_iter_max": data[3],
             "eps": data[4],
+            "n_iteration": data[5],
         }
-
-        if simulator == "tough4":
-            solvr["solver"]["n_iteration"] = data[5]
-
         solvr["solver"] = self.prune_values(solvr["solver"])
 
         return solvr
