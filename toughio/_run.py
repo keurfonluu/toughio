@@ -25,10 +25,10 @@ _check_exec = True  # Bool to be monkeypatched in tests
 
 
 def run(
-    exec: str | os.PathLike,
     input_filename: str | os.PathLike | dict,
     other_filenames: Optional[Sequence[str | os.PathLike] | dict] = None,
     simulator: Optional[Literal["tough2", "tough3", "tough4", "toughreact"]] = None,
+    exec: Optional[str | os.PathLike] = None,
     command: Optional[Callable] = None,
     workers: Optional[int | tuple[int, int]] = None,
     docker: Optional[str] = None,
@@ -48,8 +48,6 @@ def run(
 
     Parameters
     ----------
-    exec : str | PathLike
-        Path to TOUGH executable.
     input_filename : str | PathLike | dict
         TOUGH input file name.
     other_filenames : Sequence[str | PathLike] | dict, optional
@@ -59,6 +57,11 @@ def run(
         ``new`` is the name of the file copied.
     simulator : {'tough2', 'tough3', 'tough4'}, default 'tough3'
         TOUGH simulator to use.
+    exec : str | PathLike, optional
+        Path to TOUGH executable. If None, use the environment variable:
+
+         - TOUGH4: TOUGHIO_TOUGH4_EXEC
+
     command : Callable, optional
         Command to execute TOUGH. Must be in the form ``f(exec, inp, [out])``, where
         ``exec`` is the path to TOUGH executable, ``inp`` is the input file name, and
@@ -100,6 +103,10 @@ def run(
     from . import read_input, write_input
 
     simulator = simulator if simulator else "tough3"
+    exec = exec if exec else os.getenv(f"TOUGHIO_{simulator.upper()}_EXEC")
+
+    if not exec:
+        raise ValueError(f"executable for {simulator} not specified")
 
     # Additional files required for simulation
     other_filenames = (
