@@ -3,7 +3,6 @@ from __future__ import annotations
 from collections.abc import Callable, Sequence
 from typing import Literal, Optional
 
-import glob
 import numpy as np
 import os
 import pathlib
@@ -382,26 +381,21 @@ def run(
         stop_event.set()
         monitor_thread.join()
 
-    # Copy files from temporary directory and delete it
+    # Move files from temporary directory and delete it
     if use_temp:
-        shutil.copytree(
-            simulation_dir,
-            working_dir,
-            ignore=shutil.ignore_patterns(*ignore_patterns),
-            dirs_exist_ok=True,
-        )
+        for filename in simulation_dir.rglob("*"):
+            match_pattern = False
+
+            for pattern in ignore_patterns:
+                if filename.match(pattern):
+                    match_pattern = True
+                    break
+
+            if not match_pattern:
+                move_file(filename, working_dir)
+            
         shutil.rmtree(simulation_dir, ignore_errors=True)
         os.remove(working_dir / "tempdir.txt")
-
-    # Clean up working directory
-    patterns = [
-        pathlib.Path(filename)
-        for pattern in ignore_patterns
-        for filename in glob.glob(f"{str(simulation_dir)}/{pattern}")
-    ]
-
-    for pattern in patterns:
-        os.remove(pattern)
 
     return status
 
@@ -509,3 +503,15 @@ def pretty_time(seconds: float) -> tuple[float, str]:
         t_unit = "yr"
 
     return factor, t_unit
+
+
+def move_file(filename: str | os.PathLike, directory: str | os.PathLike) -> None:
+    """Move a file and delete if it already exists in target directory."""
+    filename = pathlib.Path(filename)
+    directory = pathlib.Path(directory)
+    target = directory / filename.name
+
+    if target.is_file():
+        os.remove(target)
+
+    filename.rename(target)
