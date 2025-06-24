@@ -7,12 +7,14 @@ pytestmark = pytest.mark.parametrize(
     "params",
     [
         ("tough", False),
-        ("tough", True),
+        ("tough4", False),
+        ("tough4", True),
         ("json", None),
     ],
     ids=[
-        "tough-fixed",
-        "tough-free",
+        "tough",
+        "tough4-fixed",
+        "tough4-free",
         "json",
     ],
     indirect=True,
@@ -29,11 +31,8 @@ def write_read(params, helpers):
     file_format, free_format = params
 
     def _write_read(x, writer_kws=None, reader_kws=None, **kwargs):
-        writer_kws_ = {"file_format": file_format}
-        reader_kws_ = {"file_format": file_format}
-        if file_format == "tough":
-            writer_kws_["free_format"] = free_format
-            reader_kws_["free_format"] = free_format
+        writer_kws_ = {"file_format": file_format, "free_format": free_format}
+        reader_kws_ = {"file_format": file_format, "free_format": free_format}
         writer_kws_.update(writer_kws if writer_kws is not None else {})
         reader_kws_.update(reader_kws if reader_kws is not None else {})
 
@@ -49,6 +48,7 @@ def write_read(params, helpers):
 
     _write_read.file_format = file_format
     _write_read.free_format = free_format
+
     return _write_read
 
 
@@ -132,8 +132,10 @@ def test_param(write_read, t_steps, num_pvars, helpers):
 def test_multi(write_read, isothermal, helpers):
     import random
     from toughio._io.input.tough.blocks.multi import eos_values as eos
-    if write_read.file_format == "json":
-        pytest.skip("MULTI block not supported for JSON format")
+
+    if write_read.file_format in {"json", "tough4"} or write_read.free_format:
+        pytest.skip("MULTI block not supported for JSON format or free format")
+
     parameters_ref = {
         "eos": random.choice(
             [k for k in eos if k not in {"eos7", "eos8", "eos9", "tmvoc"}]
@@ -150,6 +152,28 @@ def test_multi(write_read, isothermal, helpers):
     ]
     assert helpers.allclose(parameters_ref, parameters, ignore_keys=["eos"])
     assert helpers.allclose(multi_ref, multi)
+
+
+def test_solvr(write_read, helpers):
+    parameters_ref = {
+        "solver": {
+            "method": np.random.randint(10),
+            "z_precond": helpers.random_string(4),
+            "o_precond": helpers.random_string(5),
+            "rel_iter_max": np.random.randint(10),
+            "eps": np.random.rand(),
+        }
+    }
+
+    parameters = write_read(parameters_ref)
+    assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
+
+    # TOUGH4
+    if write_read.free_format or write_read.file_format == "json":
+        parameters_ref["solver"]["method"] = helpers.random_string(5)
+        parameters_ref["solver"]["n_iteration"] = np.random.randint(10)
+        parameters = write_read(parameters_ref)
+        assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
 
 @pytest.mark.parametrize("n_phase", [lambda: np.random.randint(8) + 1])
@@ -206,24 +230,20 @@ def test_roft(write_read, n_roft, helpers):
     assert helpers.allclose(parameters_ref, parameters)
 
 
-@pytest.mark.parametrize("num_floats", [None, 8])
+@pytest.mark.parametrize("num_floats", [0, 64])
 def test_selec(write_read, num_floats, helpers):
-    floats = (
-        np.random.rand(num_floats)
-        if num_floats is not None and num_floats <= 8
-        else np.random.rand(np.random.randint(100) + 1, np.random.randint(8) + 1)
-    )
     parameters_ref = {
         "selections": {
             "integers": {k + 1: v for k, v in enumerate(np.random.randint(100, size=16))},
-            "floats": floats,
         },
     }
-    parameters_ref["selections"]["integers"][1] = (
-        len(parameters_ref["selections"]["floats"])
-        if np.ndim(parameters_ref["selections"]["floats"]) == 2
-        else 1
-    )
+    parameters_ref["selections"]["integers"][1] = np.ceil(num_floats / 8)
+
+    if num_floats:
+        parameters_ref["selections"]["floats"] = {
+            k + 1: v for k, v in enumerate(np.random.rand(num_floats))
+        }
+
     parameters = write_read(parameters_ref)
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
@@ -327,6 +347,52 @@ def test_indom(write_read, num_pvars, num_items, helpers):
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
 
+@pytest.mark.parametrize("label_length", [5, 6])
+def test_gener(write_read, label_length, helpers):
+    if write_read.file_format == "tough4" and not write_read.free_format and label_length != 5:
+        pytest.skip("TOUGH4 fixed format only supports label length of 5")
+
+    n_rnd = np.random.randint(100) + 2
+    parameters_ref = {
+        "generators": [
+            {
+                "label": helpers.random_label(label_length),
+                "name": helpers.random_string(5),
+                "type": helpers.random_string(4),
+                "rates": np.random.rand(),
+                "specific_enthalpy": np.random.rand(),
+                "layer_thickness": np.random.rand(),
+            },
+            {
+                "label": helpers.random_label(label_length),
+                "type": helpers.random_string(4),
+                "times": np.random.rand(n_rnd),
+                "rates": np.random.rand(n_rnd),
+                "specific_enthalpy": np.random.rand(n_rnd),
+                "layer_thickness": np.random.rand(),
+            },
+        ],
+    }
+
+    if not write_read.free_format:
+        for generator in parameters_ref["generators"]:
+            generator["nseq"] = np.random.randint(10)
+            generator["nadd"] = np.random.randint(10)
+            generator["nads"] = np.random.randint(10)
+
+    if write_read.file_format in {"tough4", "json"}:
+        for generator in parameters_ref["generators"]:
+            generator["lots"] = np.random.rand(3)
+
+    parameters = write_read(parameters_ref)
+    assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
+
+    # Test GENER file
+    if write_read.file_format != "json":
+        parameters = write_read(parameters_ref, writer_kws={"blocks": "GENER"})
+        assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
+
+
 @pytest.mark.parametrize("n_items", [lambda: np.random.randint(10) + 2])
 def test_gener_delv(write_read, n_items, helpers):
     n_items = n_items() if callable(n_items) else n_items
@@ -335,9 +401,6 @@ def test_gener_delv(write_read, n_items, helpers):
             {
                 "label": helpers.random_label(5),
                 "name": helpers.random_string(5),
-                "nseq": np.random.randint(10),
-                "nadd": np.random.randint(10),
-                "nads": np.random.randint(10),
                 "type": "DELV",
                 "rates": np.random.rand(),
                 "specific_enthalpy": np.random.rand(),
@@ -346,6 +409,13 @@ def test_gener_delv(write_read, n_items, helpers):
             for _ in range(n_items)
         ],
     }
+
+    if not write_read.free_format:
+        for generator in parameters_ref["generators"]:
+            generator["nseq"] = np.random.randint(10)
+            generator["nadd"] = np.random.randint(10)
+            generator["nads"] = np.random.randint(10)
+
     parameters_ref["generators"][0]["n_layer"] = n_items
     parameters = write_read(parameters_ref)
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
@@ -369,87 +439,92 @@ def test_timbc(write_read, n_items, helpers):
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-8)
 
 
-@pytest.mark.parametrize("keys", [[
-    "nseq", "nadd", "material", "volume", "heat_exchange_area", "permeability_modifier", "center"
-]])
-@pytest.mark.parametrize("label_length,coord", [
+@pytest.mark.parametrize("label_length, coord", [
     (5, False), (6, False), (5, True), (6, True)
 ])
-def test_eleme(write_read, keys, label_length, coord, helpers):
-    labels = [helpers.random_label(label_length) for _ in range(np.random.randint(10) + 1)]
+def test_eleme_conne(write_read, label_length, coord, helpers):
+    if write_read.file_format == "tough4" and not write_read.free_format and label_length != 5:
+        pytest.skip("TOUGH4 fixed format only supports label length of 5")
+
+    element_labels = [helpers.random_label(label_length) for _ in range(np.random.randint(10) + 1)]
+    connection_labels = ["".join(helpers.random_label(label_length) for _ in range(2)) for _ in range(np.random.randint(10) + 1)]
     parameters_ref = {
         "elements": {
             label: {
-                key: (
-                    np.random.randint(10) if key in {"nseq", "nadd"}
-                    else (
-                        helpers.random_string(5) if key == "material"
-                        else np.random.rand(3) if key == "center" else np.random.rand()
-                    )
-                )
-                for key in keys
+                "material": helpers.random_string(5),
+                "volume": np.random.rand(),
+                "heat_exchange_area": np.random.rand(),
+                "permeability_modifier": np.random.rand(),
+                "center": np.random.rand(3),
             }
-            for label in labels
+            for label in element_labels
+        },
+        "connections": {
+            label: {
+                "permeability_direction": np.random.randint(1, 4),
+                "nodal_distances": np.random.rand(2),
+                "interface_area": np.random.rand(),
+                "gravity_cosine_angle": np.random.rand(),
+                "radiant_emittance_factor": np.random.rand(),
+            }
+            for label in connection_labels
         },
         "coordinates": coord,
     }
-    parameters = write_read(parameters_ref)
-    assert helpers.allclose(parameters_ref, parameters, atol=1.0e-3)
 
+    if not write_read.free_format:
+        for v in parameters_ref["elements"].values():
+            v["nseq"] = np.random.randint(10)
+            v["nadd"] = np.random.randint(10)
 
-@pytest.mark.parametrize("label_length", [5, 6])
-def test_conne(write_read, label_length, helpers):
-    labels = ["".join(helpers.random_label(label_length) for _ in range(2)) for _ in range(np.random.randint(10) + 1)]
-    keys = [
-        "nseq", "nadd", "permeability_direction", "nodal_distances", "interface_area", "gravity_cosine_angle", "radiant_emittance_factor"
-    ]
-    parameters_ref = {
-        "connections": {
-            label: {
-                key: (
-                    np.random.randint(10) if key == "nseq"
-                    else (
-                        np.random.randint(10, size=2) if key == "nadd"
-                        else (
-                            np.random.randint(1, 4) if key == "permeability_direction"
-                            else (
-                                np.random.rand(2) if key == "nodal_distances" else np.random.rand()
-                            )
-                        )
-                    )
-                )
-                for key in keys
-            }
-            for label in labels
-        }
-    }
+        for v in parameters_ref["connections"].values():
+            v["nseq"] = np.random.randint(10)
+            v["nadd"] = np.random.randint(10, size=2)
+
     parameters = write_read(parameters_ref)
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
+    # Test MESH file
+    if write_read.file_format != "json":
+        parameters_ref["coordinates"] = False
+        parameters = write_read(parameters_ref, writer_kws={"blocks": "MESH"})
+        assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
-@pytest.mark.parametrize("label_length,num_pvars,num_items", [
+
+@pytest.mark.parametrize("label_length, num_pvars, num_items", [
     (5, 4, None), (5, 10, None), (6, 4, None), (5, 4, 1), (5, 10, 1), (6, 4, None)
 ])
 def test_incon(write_read, label_length, num_pvars, num_items, helpers):
+    if write_read.file_format == "tough4" and not write_read.free_format and label_length != 5:
+        pytest.skip("TOUGH4 fixed format only supports label length of 5")
+
     num_items = num_items if num_items else np.random.randint(10) + 1
     labels = [helpers.random_label(label_length) for _ in range(num_items)]
-    keys = ["porosity", "userx", "values"]
     parameters_ref = {
         "initial_conditions": {
             label: {
-                key: (
-                    np.random.rand() if key == "porosity"
-                    else (
-                        np.random.rand(np.random.randint(5) + 1) if key == "userx" else np.random.rand(num_pvars)
-                    )
-                )
-                for key in keys
+                "porosity": np.random.rand(),
+                "values": np.random.rand(num_pvars),
             }
             for label in labels
         }
     }
+
+    if write_read.file_format in {"tough", "json"}:
+        for v in parameters_ref["initial_conditions"].values():
+            v["userx"] = np.random.rand(5)
+
+    if write_read.file_format in {"tough4", "json"}:
+        for v in parameters_ref["initial_conditions"].values():
+            v["permeability"] = np.random.rand(5)
+
     parameters = write_read(parameters_ref)
-    assert helpers.allclose(parameters_ref, parameters, atol=1.0e-3)
+    assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
+
+    # Test INCON file
+    if write_read.file_format != "json":
+        parameters = write_read(parameters_ref, writer_kws={"blocks": "INCON"})
+        assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
 
 def test_meshm_xyz(write_read, helpers):
@@ -513,6 +588,9 @@ def test_minc(write_read, helpers):
 
 @pytest.mark.parametrize("eos", ["eco2m", "tmvoc"])
 def test_phase_composition(write_read, eos, helpers):
+    if write_read.file_format == "tough4":
+        pytest.skip("TOUGH4 free format does not support phase composition")
+
     parameters_ref = {
         "eos": eos,
         "n_component": 1,
@@ -537,3 +615,79 @@ def test_phase_composition(write_read, eos, helpers):
     reader_kws = {"eos": eos} if write_read.file_format != "json" else {}
     parameters = write_read(parameters_ref, reader_kws=reader_kws)
     assert helpers.allclose(parameters_ref, parameters, ignore_keys=["eos"])
+
+
+def test_modde(write_read, helpers):
+    if write_read.file_format == "tough":
+        pytest.skip("TOUGH format does not support MODDE block")
+
+    parameters_ref = {
+        "eos": "eos1",
+        "incon_type": "1LINE",
+        "cubic_type": "PR",
+        "label_length": 5,
+        "isothermal": True,
+        "do_diffusion": False,
+        "include_water2": True,
+        "do_wellbore": False,
+        "two_phase_co2": False,
+    }
+
+    parameters = write_read(parameters_ref)
+    assert helpers.allclose(parameters_ref, parameters)
+
+
+def test_wellb(write_read, helpers):
+    if write_read.file_format == "tough":
+        pytest.skip("TOUGH format does not support WELLB block")
+
+    parameters_ref = {
+        "rocks": {
+            helpers.random_string(5): {
+                "roughness": np.random.rand(),
+                "screen_fraction": np.random.rand(),
+                "area": np.random.rand(),
+                "factor": np.random.rand(),
+                "diameter": np.random.rand(),
+                "perimeter": np.random.rand(),
+                "heat_exchange": np.random.rand(),
+            }
+            for _ in range(np.random.randint(5) + 1)
+        },
+        "wellbore": {
+            "solid_fraction": np.random.rand(),
+            "cmax": np.random.rand(),
+            "ku_crit": np.random.rand(),
+            "well_fraction": np.random.rand(),
+            "roughness": np.random.rand(),
+            "sg1": np.random.rand(),
+            "heat_exchange": bool(np.random.randint(2)),
+            "geothermal": {
+                "flag": np.random.randint(2),
+                "temperature_ref": np.random.rand(),
+                "temperature_grad": np.random.rand(np.random.randint(5) + 2),
+                "temperature_z": np.random.rand(np.random.randint(5) + 2),
+            },
+            "flows": [
+                {
+                    "label": helpers.random_string(5),
+                    "rate_ini": np.random.rand(),
+                    "time_max": np.random.rand(),
+                    "rate_max": np.random.rand(),
+                    "rate_end": np.random.rand(),
+                    "times": np.random.rand(i + 1),
+                    "rates": np.random.rand(i + 1),
+                }
+                for i in range(np.random.randint(10) + 1)
+            ],
+            "branches": [
+                helpers.random_string(10) for _ in range(np.random.randint(10) + 1)
+            ],
+            "free_elements": [
+                helpers.random_string(5) for _ in range(np.random.randint(10) + 1)
+            ],
+        },
+    }
+    
+    parameters = write_read(parameters_ref)
+    assert helpers.allclose(parameters_ref, parameters)

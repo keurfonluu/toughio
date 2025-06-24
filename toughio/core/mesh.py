@@ -3,9 +3,9 @@ from __future__ import annotations
 import copy
 import os
 import pathlib
-from abc import ABC, abstractmethod
-from collections.abc import Callable, Sequence
-from typing import Literal, Optional
+from abc import ABC
+from collections.abc import Sequence
+from typing import Optional
 
 import meshio
 import numpy as np
@@ -15,8 +15,7 @@ from numpy.typing import ArrayLike
 from scipy.spatial import KDTree
 from typing_extensions import Self
 
-from ._typing import GridLike
-from .well import WellCasing
+from .well import Pipe, WellCasing
 
 
 class BaseMesh(ABC):
@@ -214,7 +213,7 @@ class BaseMesh(ABC):
 
         self.metadata[material_key][material] = imat
 
-    def extract_cells_by_material(self, material: int | str | Sequence[int | str], invert: bool = False) -> Mesh:
+    def extract_cells_by_material(self, material: int | str | Sequence[int | str], invert: bool = False) -> Self:
         """
         Extract cells with given material names or IDS.
 
@@ -235,7 +234,7 @@ class BaseMesh(ABC):
 
         return self[mask]
 
-    def extract_slice(self, normal: str | ArrayLike, origin: Optional[ArrayLike] = None) -> toughio.Mesh:
+    def extract_slice(self, normal: str | ArrayLike, origin: Optional[ArrayLike] = None) -> Self:
         """
         Extract cells along a plane defined by its origin and normal vector.
 
