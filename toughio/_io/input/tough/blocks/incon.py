@@ -79,7 +79,7 @@ class INCON(DataBlock):
             read_record = partial(self._read_record_default, label_length=label_length)
 
         while True:
-            if line.strip() and not line.startswith("+++"):
+            if line.strip() and not line.startswith(("+++", ":::")):
                 # Record 1
                 label, tmp = read_record(line)
                 label = label_format.format(label)

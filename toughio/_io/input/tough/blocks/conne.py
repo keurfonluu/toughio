@@ -52,7 +52,7 @@ class CONNE(DataBlock):
             read_record = partial(self._read_record_default, label_length=label_length)
 
         while True:
-            if line.strip() and not line.startswith("+++"):
+            if line.strip() and not line.startswith(("+++", ":::")):
                 l1, l2, tmp = read_record(line)
                 label = label_format.format(f"{l1}{l2}")
                 conne["connections"][label] = self.prune_values(tmp)

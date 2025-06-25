@@ -71,7 +71,7 @@ class GENER(DataBlock):
             table_reader = self.readers[0]
 
         while True:
-            if line.strip() and not line.startswith("+++"):
+            if line.strip() and not line.startswith(("+++", ":::")):
                 tmp, other = read_record(line)
                 tmp["label"] = label_format.format(tmp["label"])
                 ktab = other.get("ktab")  # TOUGHREACT
