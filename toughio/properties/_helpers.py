@@ -7,6 +7,40 @@ from numpy.typing import ArrayLike
 import numpy as np
 
 
+def conductivity_to_permeability(
+    conductivity: ArrayLike,
+    temperature: ArrayLike = 25.0,
+    pressure: ArrayLike = 101325.0,
+    gravity: ArrayLike = 9.80665,
+) -> ArrayLike:
+    """
+    Convert hydraulic conductivity to intrinsic permeability.
+
+    Parameters
+    ----------
+    conductivity : ArrayLike
+        Hydraulic conductivity (in m/s).
+    temperature : ArrayLike, default 25.0
+        Temperature(s) (in °C).
+    pressure : ArrayLike, default 101325.0
+        Pressure(s) (in Pa).
+    gravity : ArrayLike, default 9.80665
+        Gravitational acceleration (in m/s²).
+    
+    Returns
+    -------
+    ArrayLike
+        Intrinsic permeability (in m²).
+
+    """
+    from .water import density, viscosity
+    
+    rho = density(temperature, pressure)
+    eta = viscosity(temperature, pressure)
+
+    return conductivity * eta / (rho * gravity)
+
+
 def thermal_expansion_coefficient(
     temperature: ArrayLike,
     density: Literal["brine", "water"] | Callable = "water",
@@ -15,7 +49,7 @@ def thermal_expansion_coefficient(
     **kwargs
 ) -> ArrayLike:
     """
-    Calculate the coefficient(s) of thermal expansion of water.
+    Calculate the coefficient(s) of thermal expansion.
 
     Parameters
     ----------
