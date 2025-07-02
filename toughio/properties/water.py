@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal
+from typing import Literal, Optional
 from numpy.typing import ArrayLike
 
 import numpy as np
@@ -117,3 +117,48 @@ def vapor_saturation_pressure(
     ps = pc * 2.212e7
 
     return ps
+
+
+def viscosity(
+    temperature: ArrayLike = 25.0,
+    pressure: ArrayLike = 101325.0,
+    saturation_pressure: Optional[ArrayLike] = None,
+    kinematic: bool = False,
+) -> ArrayLike:
+    """
+    Calculate the viscosity of water.
+
+    Parameters
+    ----------
+    temperature : ArrayLike, default 25.0
+        Temperature(s) (in °C).
+    pressure : ArrayLike, default 101325.0
+        Pressure(s) (in Pa).
+    saturation_pressure : ArrayLike, optional
+        Saturation pressure(s) (in Pa).
+    kinematic : bool, default False
+        If True, return kinematic viscosity (in m²/s) instead of dynamic viscosity (in Pa·s).
+    
+    Returns
+    -------
+    ArrayLike
+        Dynamic viscosity (in Pa·s) or kinematic viscosity (in m²/s) of water.
+
+    """
+    temperature = np.asanyarray(temperature)
+    pressure = np.asanyarray(pressure)
+    saturation_pressure = (
+        np.asanyarray(saturation_pressure)
+        if saturation_pressure is not None
+        else vapor_saturation_pressure(temperature)
+    )
+
+    phi = 1.0467 * (temperature - 31.85)
+    fac = 1.0 + phi * (pressure - saturation_pressure) * 1.0e-11
+    visco = 1.0e-7 * fac * 241.4 * 10.0 ** (247.8 / (temperature + 133.15))
+
+    if kinematic:
+        rho = density(temperature, pressure)
+        visco /= rho
+
+    return visco
