@@ -511,4 +511,4 @@ def move_file(filename: str | os.PathLike, directory: str | os.PathLike) -> None
     if target.is_file():
         os.remove(target)
 
-    filename.rename(target)
+    shutil.move(filename, target)
