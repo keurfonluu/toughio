@@ -12,7 +12,7 @@ class Labeler:
 
     Parameters
     ----------
-    label_length : int
+    label_length : int, default 5
         Number of characters.
 
     """
@@ -20,11 +20,11 @@ class Labeler:
     __name__: str = "Labeler"
     __qualname__: str = "toughio.Labeler"
 
-    def __init__(self, label_length: int) -> None:
+    def __init__(self, label_length: int = 5) -> None:
         """Initialize a labeler."""
         self.label_length = label_length
 
-    def __call__(self, n: int) -> ArrayLike:
+    def __call__(self, n: int, offset: int = 0) -> ArrayLike:
         """
         Generate *n* labels.
 
@@ -32,6 +32,8 @@ class Labeler:
         ----------
         n : int:
             Number of labels to generate.
+        offset : int, default 0
+            Offset to start the label generation from.
 
         Returns
         -------
@@ -45,7 +47,7 @@ class Labeler:
         numer = np.array([fmt.format(i) for i in range(10 ** l)])
         nomen = np.concatenate(([f"{i + 1:1}" for i in range(9)], alpha))
 
-        q1, r1 = np.divmod(np.arange(n), numer.size)
+        q1, r1 = np.divmod(np.arange(n) + offset, numer.size)
         q2, r2 = np.divmod(q1, nomen.size)
         q3, r3 = np.divmod(q2, nomen.size)
         _, r4 = np.divmod(q3, nomen.size)
