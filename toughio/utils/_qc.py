@@ -74,7 +74,13 @@ def plot_eleme_conne(
 
     for k, v in parameters["connections"].items():
         l1, l2 = k[:5], k[5:]
-        line = pv.Line(points[l1], points[l2])
+
+        try:
+            line = pv.Line(points[l1], points[l2])
+
+        except KeyError:
+            continue
+        
         connections.setdefault(v["permeability_direction"], []).append(line)
 
     # Plot
