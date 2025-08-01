@@ -137,6 +137,10 @@ class SELEC(DataBlock):
             ]
 
         return out
+    
+    def _write_header(self) -> str:
+        """Write the header for the SELEC block."""
+        return "SELEC----2----3----4----5----6----7----8----9---10---11---12---13---14---15---16\n"
 
     def _write_conditions(self, parameters: dict, *args, **kwargs) -> bool:
         """Check if SELEC block should be written."""
