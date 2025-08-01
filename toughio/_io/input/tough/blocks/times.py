@@ -9,8 +9,12 @@ from .....core import DataBlock, FileIterator
 
 class TIMES(DataBlock):
     name = "TIMES"
-    formats = {1: "5d,5d,10f,10f", 2: ",".join(8 * ["10f"])}
-    multiples = {2}
+    formats = {
+        1: "5d,5d,10f,10f",
+        "2/fixed": ",".join(8 * ["10f"]),
+        "2/free": ",".join(20 * ["10f"]),
+    }
+    multiples = {"2/fixed", "2/free"}
 
     def _read(
         self,
@@ -27,7 +31,13 @@ class TIMES(DataBlock):
 
         # Record 2
         while len(times["times"]) < n_times:
-            data = self.readers[2](f)
+            line = f.next()
+            key = (
+                "2/free"
+                if self.free_format or "," in line
+                else "2/fixed"
+            )
+            data = self.readers[key](line)
             times["times"] += self.prune_values(data)
 
         return times
@@ -41,7 +51,8 @@ class TIMES(DataBlock):
         out = self.writers[1]([len(data)])
 
         # Record 2
-        out += self.writers[2](data)
+        key = "2/free" if self.free_format else "2/fixed"
+        out += self.writers[key](data)
 
         return out
 
