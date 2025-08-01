@@ -83,7 +83,10 @@ def read_buffer(
         for block in registered_blocks
     }
 
-    if simulator != "tough4":
+    if simulator == "tough4":
+        block_readers["SELEC"].free_format = False
+
+    else:
         block_readers["TIMBC"].free_format = True
         block_readers["TIMBC"].delimiter = None
 

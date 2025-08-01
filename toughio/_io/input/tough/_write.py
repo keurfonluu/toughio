@@ -146,10 +146,15 @@ def write_buffer(
         if block.name in blocks
     }
 
-    if "TIMBC" in blocks and simulator != "tough4":
-        block_writers["TIMBC"].free_format = True
-        block_writers["TIMBC"].space_between_values = True
-        block_writers["TIMBC"].delimiter = ""
+    if simulator == "tough4":
+        if "SELEC" in blocks:
+            block_writers["SELEC"].free_format = False
+
+    else:
+        if "TIMBC" in blocks:
+            block_writers["TIMBC"].free_format = True
+            block_writers["TIMBC"].space_between_values = True
+            block_writers["TIMBC"].delimiter = ""
 
     # Write blocks
     out = []

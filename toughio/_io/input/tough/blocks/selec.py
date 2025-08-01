@@ -95,6 +95,7 @@ class SELEC(DataBlock):
 
     def _write(self, parameters: dict, simulator: str, *args, **kwargs) -> list[str]:
         """Write SELEC block data."""
+        out = []
         integers = parameters["selections"].get("integers", {})
         floats = parameters["selections"].get("floats", {})
 
@@ -105,7 +106,7 @@ class SELEC(DataBlock):
             # Record 1
             values = [integers.get(k + 1) for k in range(16)]
             values[0] = IE1
-            out = self.writers[1](values)
+            out += self.writers[1](values)
 
             # Record 2
             for i in range(IE1):
@@ -113,10 +114,26 @@ class SELEC(DataBlock):
                 out += self.writers[2](values)
 
         else:
+            # Keep old format for IE <= 16 and FE <= 8
+            integers_old = {k: v for k, v in integers.items() if k <= 16}
+            floats_old = {k: v for k, v in floats.items() if k <= 8}
+
+            if floats_old:
+                integers_old[1] = 1
+
+            if integers_old:
+                values = [integers_old.get(k + 1) for k in range(16)]
+                out += self.writers[1](values)
+
+                if floats_old:
+                    values = [floats_old.get(k + 1) for k in range(8)]
+                    out += self.writers[2](values)
+
+            # New format for IE > 16 and FE > 8
             equal = " = " if self.space_between_values else "="
-            out = [
-                *[f"IE({k}){equal}{v}\n" for k, v in sorted(integers.items())],
-                *[f"FE({k}){equal}{v}\n" for k, v in sorted(floats.items())]
+            out += [
+                *[f"IE({k}){equal}{v}\n" for k, v in sorted(integers.items()) if k > 16],
+                *[f"FE({k}){equal}{v}\n" for k, v in sorted(floats.items()) if k > 8],
             ]
 
         return out

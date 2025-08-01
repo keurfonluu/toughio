@@ -237,12 +237,17 @@ def test_selec(write_read, num_floats, helpers):
             "integers": {k + 1: v for k, v in enumerate(np.random.randint(100, size=16))},
         },
     }
-    parameters_ref["selections"]["integers"][1] = np.ceil(num_floats / 8)
-
+    
     if num_floats:
+        parameters_ref["selections"]["integers"][1] = (
+            np.ceil(num_floats / 8) if write_read.file_format != "tough4" else 1
+        )
         parameters_ref["selections"]["floats"] = {
             k + 1: v for k, v in enumerate(np.random.rand(num_floats))
         }
+
+    else:
+        parameters_ref["selections"]["integers"][1] = 0
 
     parameters = write_read(parameters_ref)
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
