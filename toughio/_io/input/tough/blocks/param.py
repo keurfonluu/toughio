@@ -156,8 +156,8 @@ class PARAM(DataBlock):
         # Record 1
         mop = [parameters.get("extra_options", {}).get(k + 1) for k in range(24)]
         values = [
-            data.get("n_iteration"),
-            data.get("verbosity"),
+            data.get("n_iteration", 0),
+            data.get("verbosity", 0),
             data.get("n_cycle"),
             data.get("n_second"),
             data.get("n_cycle_print"),
@@ -180,7 +180,7 @@ class PARAM(DataBlock):
         # Record 2
         react_wdata = data.get("react_wdata", [])
         values = [
-            data.get("t_ini"),
+            data.get("t_ini", 0.0),
             data.get("t_max"),
             delten,
             data.get("t_step_max"),
