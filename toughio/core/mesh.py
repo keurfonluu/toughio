@@ -993,7 +993,7 @@ class BaseMesh(ABC):
     def _compute_connection_properties(self) -> tuple[ArrayLike, ArrayLike, ArrayLike, ArrayLike]:
         """Compute connection properties."""
         poly = (
-            pvg.extract_cell_geometry(self.pyvista, remove_empty_cells=True)
+            pvg.extract_cell_geometry(self.pyvista, remove_ghost_cells=True)
             .compute_cell_sizes(length=True, area=True, volume=False)
         )
         mask = (poly["vtkOriginalCellIds"] >= 0).all(axis=1)
