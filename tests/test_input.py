@@ -155,25 +155,30 @@ def test_multi(write_read, isothermal, helpers):
 
 
 def test_solvr(write_read, helpers):
-    parameters_ref = {
-        "solver": {
-            "method": np.random.randint(10),
-            "z_precond": helpers.random_string(4),
-            "o_precond": helpers.random_string(5),
-            "rel_iter_max": np.random.randint(10),
-            "eps": np.random.rand(),
+    if write_read.free_format or write_read.file_format == "json":
+        parameters_ref = {
+            "solver": {
+                "lib": helpers.random_string(5),
+                "method": helpers.random_string(5),
+                "precond": helpers.random_string(5),
+                "eps": np.random.rand(),
+                "n_iteration": np.random.randint(10),
+            }
         }
-    }
+
+    else:
+        parameters_ref = {
+            "solver": {
+                "method": np.random.randint(10),
+                "z_precond": helpers.random_string(4),
+                "o_precond": helpers.random_string(5),
+                "rel_iter_max": np.random.randint(10),
+                "eps": np.random.rand(),
+            }
+        }
 
     parameters = write_read(parameters_ref)
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
-
-    # TOUGH4
-    if write_read.free_format or write_read.file_format == "json":
-        parameters_ref["solver"]["method"] = helpers.random_string(5)
-        parameters_ref["solver"]["n_iteration"] = np.random.randint(10)
-        parameters = write_read(parameters_ref)
-        assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
 
 
 @pytest.mark.parametrize("n_phase", [lambda: np.random.randint(8) + 1])
