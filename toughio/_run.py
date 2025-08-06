@@ -464,7 +464,7 @@ def display_progress_bar(
                     n = pretty_time(pbar.n + dt_update)
                     r_bar = f"| {n}/{total} [it={it}({itr}), dt={pretty_time(dt)}] ({{elapsed}})"
                     pbar.bar_format = f"{l_bar}{{bar}}{r_bar}"
-                    pbar.update(dt_update)
+                    pbar.update(min(dt_update, pbar.total - pbar.n))
 
         finally:
             if file is not None:
