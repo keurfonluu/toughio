@@ -11,7 +11,7 @@ from .....core import DataBlock, FileIterator
 class PARAM(DataBlock):
     name = "PARAM"
     formats = {
-        1: f"2d,2d,4d,4d,4d,{','.join(24 * ["1d"])},10s,10f,10f",
+        1: f"2d,2d,4d,4d,4d,{','.join(24 * ['1d'])},10s,10f,10f",
         2: "10f,10f,10f,10f,5s,5s,10f,10f,10f",
         "2/tough4-free": "10f,10f,10f,10f,5s,10f,10f,10f",
         3: ",".join(8 * ["10f"]),
