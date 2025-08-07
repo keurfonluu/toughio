@@ -13,6 +13,7 @@ class SOLVR(DataBlock):
     def _read(
         self,
         f: FileIterator | TextIO | str,
+        simulator: str,
         *args,
         **kwargs
     ) -> dict:
@@ -23,7 +24,7 @@ class SOLVR(DataBlock):
         line = f.next()
         data = self.readers[1](line)
 
-        if self.free_format or "," in line:
+        if simulator == "tough4" or "," in line:
             tmp = {
                 "lib": int(data[0]) if data[0].isdigit() else data[0],
                 "method": data[1],
@@ -45,9 +46,9 @@ class SOLVR(DataBlock):
 
         return solvr
 
-    def _write(self, parameters: dict, *args, **kwargs) -> list[str]:
+    def _write(self, parameters: dict, simulator: str, *args, **kwargs) -> list[str]:
         """Write SOLVR block data."""
-        if self.free_format:
+        if simulator == "tough4":
             values = [
                 str(parameters["solver"].get("lib", "")),
                 parameters["solver"].get("method"),
