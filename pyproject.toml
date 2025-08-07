@@ -44,6 +44,7 @@ dependencies = [
     "pyvista-gridder",
     "psutil >= 5.0",
     "scipy >= 0.9",
+    "tqdm",
 ]
 
 [project.urls]
