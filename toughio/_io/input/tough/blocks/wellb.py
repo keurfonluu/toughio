@@ -11,7 +11,7 @@ class WELLB(DataBlock):
     name = "WELLB"
     formats = {
         1: "10f,10f,10f,10f,10f,10f,10s",
-        "2/GEOTH": "5s,5f,10f,10f,10f,10f,10f,10f,10f,10f,10f",
+        "2/GEOTH": "5s,5d,10f,10f,10f,10f,10f,10f,10f,10f,10f",
         "2/REGFX": "10s,20s,10f,10f,10f,10f,10d",
         "2/OFFMA": "10s," + ",".join(["20s"] * 10),
         "2/FREEE": "10s," + ",".join(["10s"] * 10),
