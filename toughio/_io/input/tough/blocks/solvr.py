@@ -7,8 +7,25 @@ from .....core import DataBlock, FileIterator
 
 class SOLVR(DataBlock):
     name = "SOLVR"
-    formats = {
-        1: "1s,4S,5S,10f,10f,10d"}
+    formats = {1: "1s,4S,5S,10f,10f,10d"}
+    _tough4_solvers = {
+        "AMGCL": 1,
+        "PETSC": 2,
+        "FASP": 3,
+        "VIENNACL": 4,
+        "TRILINOS": 5,
+        "AMGX": 6,
+        "ROCALUTION": 7,
+        "TOUGH": 8,
+        1: "AMGCL",
+        2: "PETSC",
+        3: "FASP",
+        4: "VIENNACL",
+        5: "TRILINOS",
+        6: "AMGX",
+        7: "ROCALUTION",
+        8: "TOUGH",
+    }
 
     def _read(
         self,
@@ -49,8 +66,16 @@ class SOLVR(DataBlock):
     def _write(self, parameters: dict, simulator: str, *args, **kwargs) -> list[str]:
         """Write SOLVR block data."""
         if simulator == "tough4":
+            lib = parameters["solver"].get("lib", "" if self.free_format else 0)
+            
+            if (
+                (self.free_format and isinstance(lib, int))
+                or (not self.free_format and isinstance(lib, str))
+            ):
+                lib = self._tough4_solvers[lib]
+
             values = [
-                str(parameters["solver"].get("lib", "")),
+                str(lib),
                 parameters["solver"].get("method"),
                 parameters["solver"].get("precond"),
                 None,

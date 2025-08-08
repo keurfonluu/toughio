@@ -160,7 +160,7 @@ def test_solvr(write_read, helpers):
     if write_read.file_format in {"json", "tough4"}:
         parameters_ref["solver"].update(
             {
-                "lib": helpers.random_string(5) if write_read.free_format else np.random.randint(10),
+                "lib": "PETSC" if write_read.free_format else np.random.randint(10),
                 "method": helpers.random_string(4),
                 "precond": helpers.random_string(5),
                 "n_iteration": np.random.randint(10),
