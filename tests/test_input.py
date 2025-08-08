@@ -673,7 +673,7 @@ def test_wellb(write_read, helpers):
             "sg1": np.random.rand(),
             "heat_exchange": bool(np.random.randint(2)),
             "geothermal": {
-                "flag": np.random.randint(2),
+                "well_only": bool(np.random.randint(2)),
                 "temperature_ref": np.random.rand(),
                 "temperature_grad": np.random.rand(np.random.randint(5) + 2),
                 "temperature_z": np.random.rand(np.random.randint(5) + 2),

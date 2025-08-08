@@ -59,7 +59,7 @@ class WELLB(DataBlock):
             if line.startswith("GEOTH"):
                 data = self.readers["2/GEOTH"](line)
                 tmp = {
-                    "flag": data[1],
+                    "well_only": int(data[1]) == 0,
                     "temperature_ref": data[2],
                     "temperature_grad": self.prune_values(data[3::2]),
                     "temperature_z": self.prune_values(data[4::2]),
@@ -136,9 +136,10 @@ class WELLB(DataBlock):
         # Record 2
         # Geothermal
         if "geothermal" in data:
+            well_only = int(not data.get("geothermal").get("well_only", True))
             values = [
                 "GEOTH",
-                data.get("geothermal").get("flag"),
+                well_only,
                 data.get("geothermal").get("temperature_ref"),
             ]
 
