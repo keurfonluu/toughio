@@ -15,7 +15,7 @@ class MODDE(DataBlock):
     _components = {
         "eos1": "water2",
         "eos7": "brine",
-        "eco2": "co2",
+        "eco2": "salt",
     }
 
     def _read(
