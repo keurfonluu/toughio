@@ -18,6 +18,11 @@ class MODDE(DataBlock):
         "eco2": "salt",
     }
 
+    def __init__(self, *args, **kwargs):
+        """Initialize MODDE block."""
+        super().__init__(*args, **kwargs)
+        self._free_format = True
+
     def _read(
         self,
         f: FileIterator | TextIO | str,
