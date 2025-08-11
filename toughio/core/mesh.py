@@ -1032,14 +1032,7 @@ class BaseMesh(ABC):
     @property
     def centers(self) -> ArrayLike:
         """Return cell center array."""
-        # Ghost cells are converted to empty cells after casting which yield no center
-        mesh = self._cast_to_unstructured_grid(self.pyvista)
-        
-        # Handle empty cells (that exists in the mesh but are not ghost cells)
-        cell_centers = np.full((mesh.n_cells, 3), np.nan)
-        cell_centers[mesh.celltypes != pv.CellType.EMPTY_CELL] = mesh.cell_centers(vertex=False).points
-
-        return cell_centers
+        return pvg.get_cell_centers(self.pyvista)
 
     @property
     def data(self) -> dict:
