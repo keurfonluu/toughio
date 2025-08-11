@@ -45,6 +45,7 @@ dependencies = [
     "psutil >= 5.0",
     "scipy >= 0.9",
     "tqdm",
+    "vtk < 9.5",
 ]
 
 [project.urls]
