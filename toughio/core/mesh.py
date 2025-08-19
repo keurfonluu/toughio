@@ -1437,9 +1437,9 @@ class CylindricMesh(BaseMesh):
             self.metadata["WellConnection"] = connections
 
         # Wellheads
-        for wellhead in well.wellheads:
+        for i, wellhead in enumerate(well.wellheads):
             whid = self.find_nearest_cell((wellhead.radius, 0.0, wellhead.zmax), material=wellhead.material)
-            self.set_label(f"*{self.labels[whid][1:]}", whid)
+            self.set_label(f"#WH{i + 1:02d}", whid)
 
     def copy(self, deep: bool = True) -> Self:
         """
