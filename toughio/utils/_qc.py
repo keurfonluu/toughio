@@ -3,12 +3,13 @@ from __future__ import annotations
 import os
 from typing import Optional
 
-import numpy as np
 import pyvista as pv
+
+from ..core import CylindricMesh, Mesh
 
 
 def plot_eleme_conne(
-    parameters: dict | str | os.PathLike,
+    parameters: dict | str | os.PathLike | CylindricMesh | Mesh,
     plotter: Optional[pv.Plotter] = None,
     *,
     xscale: Optional[float] = None,
@@ -27,8 +28,8 @@ def plot_eleme_conne(
 
     Parameters
     ----------
-    parameters : dict | str | PathLike
-        Input file name or parameters.
+    parameters : dict | str | PathLike | CylindricMesh | Mesh
+        Input file name, parameters or mesh.
     xscale : float, optional
         Scaling in the X direction.
     yscale : float, optional
@@ -55,6 +56,9 @@ def plot_eleme_conne(
 
     if not (show_elements or show_connections):
         raise ValueError()
+    
+    if isinstance(parameters, (CylindricMesh, Mesh)):
+        parameters = parameters.to_tough()
 
     if not isinstance(parameters, dict):
         parameters = read_input(parameters, blocks=["ELEME", "CONNE"])
