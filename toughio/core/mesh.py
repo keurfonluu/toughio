@@ -1423,7 +1423,7 @@ class CylindricMesh(BaseMesh):
 
             # Well-formation connection
             else:
-                key = id1
+                key = str(id1)
 
             connections.setdefault(key, []).append(
                 {
@@ -1535,14 +1535,14 @@ class CylindricMesh(BaseMesh):
                         connection_key = f"{min(abs(wid1), abs(wid2))}-{max(abs(wid1), abs(wid2))}"
 
                     # Well-formation connection
-                    elif wid1 in well_connections or wid2 in well_connections:
+                    elif str(wid1) in well_connections or str(wid2) in well_connections:
                         key = "formation"
 
-                        if wid1 in well_connections:
-                            connection_key = wid1
+                        if str(wid1) in well_connections:
+                            connection_key = str(wid1)
 
                         else:
-                            connection_key = wid2
+                            connection_key = str(wid2)
 
                     else:
                         connection_key = None
