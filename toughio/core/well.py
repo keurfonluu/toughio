@@ -347,7 +347,7 @@ class WellCasing:
         p.show()
 
     @property
-    def connections(self) -> list[dict]:
+    def connections(self) -> Sequence[dict]:
         """Return well connections."""
         return self.metadata["Connections"]
 
@@ -362,7 +362,7 @@ class WellCasing:
         return self._metadata
 
     @property
-    def pipes(self) -> list[Pipe]:
+    def pipes(self) -> Sequence[Pipe]:
         """Return pipe sections."""
         return self._pipes
 
