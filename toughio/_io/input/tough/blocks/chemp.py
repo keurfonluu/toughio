@@ -13,12 +13,7 @@ class CHEMP(DataBlock):
         3: ",".join(5 * ["10f"]),
     }
 
-    def _read(
-        self,
-        f: FileIterator | TextIO | str,
-        *args,
-        **kwargs
-    ) -> dict:
+    def _read(self, f: FileIterator | TextIO | str, *args, **kwargs) -> dict:
         """Read CHEMP block data."""
         chemp = {"chemical_properties": {}}
 
@@ -86,7 +81,7 @@ class CHEMP(DataBlock):
     def _write(self, parameters: dict, *args, **kwargs) -> list[str]:
         """Write CHEMP block data."""
         data = parameters["chemical_properties"]
-        
+
         # Record 1
         out = self.writers[1]([len(data)])
 
@@ -95,7 +90,8 @@ class CHEMP(DataBlock):
             out += self.writers[2]([k])
 
             values = [
-                v.get(key) for key in [
+                v.get(key)
+                for key in [
                     "temperature_crit",
                     "pressure_crit",
                     "compressibility_crit",
@@ -106,7 +102,8 @@ class CHEMP(DataBlock):
             out += self.writers[3](values)
 
             values = [
-                v.get(key) for key in [
+                v.get(key)
+                for key in [
                     "boiling_point",
                     "vapor_pressure_a",
                     "vapor_pressure_b",
@@ -117,7 +114,8 @@ class CHEMP(DataBlock):
             out += self.writers[3](values)
 
             values = [
-                v.get(key) for key in [
+                v.get(key)
+                for key in [
                     "molecular_weight",
                     "heat_capacity_a",
                     "heat_capacity_b",
@@ -128,7 +126,8 @@ class CHEMP(DataBlock):
             out += self.writers[3](values)
 
             values = [
-                v.get(key) for key in [
+                v.get(key)
+                for key in [
                     "napl_density_ref",
                     "napl_temperature_ref",
                     "gas_diffusivity_ref",
@@ -139,7 +138,8 @@ class CHEMP(DataBlock):
             out += self.writers[3](values)
 
             values = [
-                v.get(key) for key in [
+                v.get(key)
+                for key in [
                     "napl_viscosity_a",
                     "napl_viscosity_b",
                     "napl_viscosity_c",
@@ -150,7 +150,8 @@ class CHEMP(DataBlock):
             out += self.writers[3](values)
 
             values = [
-                v.get(key) for key in [
+                v.get(key)
+                for key in [
                     "solubility_a",
                     "solubility_b",
                     "solubility_c",
@@ -160,7 +161,8 @@ class CHEMP(DataBlock):
             out += self.writers[3](values)
 
             values = [
-                v.get(key) for key in [
+                v.get(key)
+                for key in [
                     "oc_coeff",
                     "oc_fraction",
                     "oc_decay",

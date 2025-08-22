@@ -9,12 +9,7 @@ class OUTPT(DataBlock):
     name = "OUTPT"
     formats = {}
 
-    def _read(
-        self,
-        f: FileIterator | TextIO | str,
-        *args,
-        **kwargs
-    ) -> dict:
+    def _read(self, f: FileIterator | TextIO | str, *args, **kwargs) -> dict:
         """Read OUTPT block data."""
         outpt = {"react": {"output": {}}}
 
@@ -38,7 +33,9 @@ class OUTPT(DataBlock):
 
         return out
 
-    def _write_conditions(self, parameters: dict, simulator: str, *args, **kwargs) -> bool:
+    def _write_conditions(
+        self, parameters: dict, simulator: str, *args, **kwargs
+    ) -> bool:
         """Check if OUTPT block should be written."""
         return (
             parameters.get("react", {}).get("output", {}).get("format") is not None

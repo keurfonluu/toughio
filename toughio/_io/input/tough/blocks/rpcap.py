@@ -12,12 +12,7 @@ class RPCAP(DataBlock):
         2: "5d,10f,10f,10f,10f,10f,10f,10f",  # Free format
     }
 
-    def _read(
-        self,
-        f: FileIterator | TextIO | str,
-        *args,
-        **kwargs
-    ) -> dict:
+    def _read(self, f: FileIterator | TextIO | str, *args, **kwargs) -> dict:
         """Read RPCAP block data."""
         rpcap = {}
 
@@ -49,8 +44,10 @@ class RPCAP(DataBlock):
     def _write_conditions(self, parameters: dict, *args, **kwargs) -> bool:
         """Check if RPCAP block should be written."""
         return (
-            parameters.get("default", {}).get("relative_permeability", {}).get("id") is not None
-            or parameters.get("default", {}).get("capillarity", {}).get("id") is not None
+            parameters.get("default", {}).get("relative_permeability", {}).get("id")
+            is not None
+            or parameters.get("default", {}).get("capillarity", {}).get("id")
+            is not None
         )
 
     def update(

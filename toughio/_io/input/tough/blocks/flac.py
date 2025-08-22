@@ -15,11 +15,7 @@ class FLAC(DataBlock):
     _space_between_blocks = True
 
     def _read(
-        self,
-        f: FileIterator | TextIO | str,
-        parameters: dict,
-        *args,
-        **kwargs
+        self, f: FileIterator | TextIO | str, parameters: dict, *args, **kwargs
     ) -> dict:
         """Read FLAC block data."""
         flac = {"flac": {}}
@@ -32,8 +28,12 @@ class FLAC(DataBlock):
 
         # Additional records
         for rock in parameters["rocks"]:
-            parameters["rocks"][rock]["permeability_model"] = self.read_model_record(f, self.readers[2], 1)
-            parameters["rocks"][rock]["equivalent_pore_pressure"] = self.read_model_record(f, self.readers[3], 2)
+            parameters["rocks"][rock]["permeability_model"] = self.read_model_record(
+                f, self.readers[2], 1
+            )
+            parameters["rocks"][rock]["equivalent_pore_pressure"] = (
+                self.read_model_record(f, self.readers[3], 2)
+            )
 
         flac["flac"] = self.prune_values(flac["flac"])
 
@@ -61,7 +61,9 @@ class FLAC(DataBlock):
 
             # Equivalent pore pressure
             values = [data.get("equivalent_pore_pressure", {}).get("id", 3), None]
-            values += list(data.get("equivalent_pore_pressure", {}).get("parameters", []))
+            values += list(
+                data.get("equivalent_pore_pressure", {}).get("parameters", [])
+            )
             out += self.writers[3](values)
 
         return out

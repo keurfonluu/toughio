@@ -9,15 +9,10 @@ class DIFFU(DataBlock):
     name = "DIFFU"
     formats = {1: ",".join(8 * ["10f"])}
 
-    def _read(
-        self,
-        f: FileIterator | TextIO | str,
-        *args,
-        **kwargs
-    ) -> dict:
+    def _read(self, f: FileIterator | TextIO | str, *args, **kwargs) -> dict:
         """Read DIFFU block data."""
         diffu = {"diffusion": []}
-        
+
         # Read records
         while True:
             i = f.tell()

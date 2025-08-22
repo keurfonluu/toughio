@@ -14,12 +14,7 @@ class END_COMMENTS(DataBlock):
         super().__init__(*args, **kwargs)
         self._space_between_blocks = False
 
-    def _read(
-        self,
-        f: FileIterator | TextIO | str,
-        *args,
-        **kwargs
-    ) -> dict:
+    def _read(self, f: FileIterator | TextIO | str, *args, **kwargs) -> dict:
         """Read END COMMENTS block data."""
         # Save end comments
         end_comments = []
@@ -35,7 +30,7 @@ class END_COMMENTS(DataBlock):
         end_comments = [comment if comment else None for comment in end_comments]
         end_comments = self.prune_values(end_comments)
         end_comments = [comment if comment else "" for comment in end_comments]
-        
+
         return {"end_comments": end_comments} if end_comments else {}
 
     def _write(self, parameters: dict, *args, **kwargs) -> list[str]:

@@ -17,7 +17,9 @@ class BaseCurve(ABC):
 
     def __repr__(self) -> str:
         """Display curve informations."""
-        out = [f"{self.name} {self.__class__.__name__.lower()} model (I{self._short} = {self.id}):"]
+        out = [
+            f"{self.name} {self.__class__.__name__.lower()} model (I{self._short} = {self.id}):"
+        ]
         out += [
             f"    {self._short}({i + 1}) = {parameter}"
             for i, parameter in enumerate(self.parameters)

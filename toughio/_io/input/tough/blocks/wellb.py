@@ -21,11 +21,7 @@ class WELLB(DataBlock):
     _space_between_blocks = True
 
     def _read(
-        self,
-        f: FileIterator | TextIO | str,
-        parameters: dict,
-        *args,
-        **kwargs
+        self, f: FileIterator | TextIO | str, parameters: dict, *args, **kwargs
     ) -> dict:
         """Read WELLB block data."""
         from . import registered_blocks
@@ -64,8 +60,16 @@ class WELLB(DataBlock):
                     "temperature_grad": self.prune_values(data[3::2]),
                     "temperature_z": self.prune_values(data[4::2]),
                 }
-                tmp["temperature_grad"] = tmp["temperature_grad"][0] if len(tmp["temperature_grad"]) == 1 else tmp["temperature_grad"]
-                tmp["temperature_z"] = tmp["temperature_z"][0] if len(tmp["temperature_z"]) == 1 else tmp["temperature_z"]
+                tmp["temperature_grad"] = (
+                    tmp["temperature_grad"][0]
+                    if len(tmp["temperature_grad"]) == 1
+                    else tmp["temperature_grad"]
+                )
+                tmp["temperature_z"] = (
+                    tmp["temperature_z"][0]
+                    if len(tmp["temperature_z"]) == 1
+                    else tmp["temperature_z"]
+                )
                 wellb["geothermal"] = self.prune_values(tmp)
 
             elif line.startswith("REGFX"):
@@ -127,7 +131,7 @@ class WELLB(DataBlock):
             data.get("roughness"),
             data.get("sg1"),
         ]
-        
+
         if "heat_exchange" in data:
             values.append("true" if data.get("heat_exchange") else "false")
 
@@ -145,7 +149,7 @@ class WELLB(DataBlock):
 
             grads = data.get("geothermal").get("temperature_grad", [])
             elevs = data.get("geothermal").get("temperature_z", [])
-            
+
             grads = [grads] if np.ndim(grads) == 0 else grads
             elevs = [elevs] if np.ndim(elevs) == 0 else elevs
 
@@ -216,6 +220,8 @@ class WELLB(DataBlock):
 
         return out
 
-    def _write_conditions(self, parameters: dict, simulator: str, *args, **kwargs) -> bool:
+    def _write_conditions(
+        self, parameters: dict, simulator: str, *args, **kwargs
+    ) -> bool:
         """Check if WELLB block should be written."""
         return bool(parameters.get("wellbore", {})) and simulator == "tough4"

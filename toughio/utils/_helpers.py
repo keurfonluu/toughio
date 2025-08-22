@@ -57,12 +57,12 @@ def dump_outputs(
         If True, move dumped files to a tarball.
     return_dumped_filenames : bool, default False
         If True, return a list of of the output file names that have been dumped.
-    
+
     Returns
     -------
     sequence of str
         List of output file names that have been dumped. Only provided if *return_dumped_filenames* is True.
-    
+
     """
     from .. import read_output, read_table
 
@@ -72,44 +72,32 @@ def dump_outputs(
         raise ValueError(f"'{str(path)}' is not a directory")
 
     connection_output_pattern = path / (
-        connection_output_pattern
-        if connection_output_pattern
-        else "OUTPUT_CONNE*"
+        connection_output_pattern if connection_output_pattern else "OUTPUT_CONNE*"
     )
     connection_output_filenames = sorted(glob.glob(str(connection_output_pattern)))
 
     element_output_pattern = path / (
-        element_output_pattern
-        if element_output_pattern
-        else "OUTPUT_ELEME*"
+        element_output_pattern if element_output_pattern else "OUTPUT_ELEME*"
     )
     element_output_filenames = sorted(glob.glob(str(element_output_pattern)))
 
     connection_history_pattern = path / (
-        connection_history_pattern
-        if connection_history_pattern
-        else "COFT_*"
+        connection_history_pattern if connection_history_pattern else "COFT_*"
     )
     connection_history_filenames = sorted(glob.glob(str(connection_history_pattern)))
 
     element_history_pattern = path / (
-        element_history_pattern
-        if element_history_pattern
-        else "FOFT_*"
+        element_history_pattern if element_history_pattern else "FOFT_*"
     )
     element_history_filenames = sorted(glob.glob(str(element_history_pattern)))
 
     generator_history_pattern = path / (
-        generator_history_pattern
-        if generator_history_pattern
-        else "GOFT_*"
+        generator_history_pattern if generator_history_pattern else "GOFT_*"
     )
     generator_history_filenames = sorted(glob.glob(str(generator_history_pattern)))
 
     rock_history_pattern = path / (
-        rock_history_pattern
-        if rock_history_pattern
-        else "ROFT_*"
+        rock_history_pattern if rock_history_pattern else "ROFT_*"
     )
     rock_history_filenames = sorted(glob.glob(str(rock_history_pattern)))
 
@@ -124,8 +112,10 @@ def dump_outputs(
 
     if not filenames_to_dump:
         raise ValueError(f"could not find any output file in '{str(path)}'")
-        
-    with H5File(filename, mode="w", compression_opts=compression_opts, exist_ok=exist_ok) as f:
+
+    with H5File(
+        filename, mode="w", compression_opts=compression_opts, exist_ok=exist_ok
+    ) as f:
         if with_mesh:
             f.dump(Mesh(with_mesh))
 

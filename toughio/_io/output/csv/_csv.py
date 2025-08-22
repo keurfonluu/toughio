@@ -72,7 +72,8 @@ def read(filename, file_type, labels_order=None, time_steps=None):
     return to_output(
         file_type,
         labels_order,
-        headers, times,
+        headers,
+        times,
         labels,
         data,
         return_list,

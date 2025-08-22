@@ -29,12 +29,7 @@ class MESHM(DataBlock):
     multiples = {"3/XYZ", "2/RZ2D/RADII", "2/RZ2D/LAYER", "3/MINC"}
     _space_between_blocks = True
 
-    def _read(
-        self,
-        f: FileIterator | TextIO | str,
-        *args,
-        **kwargs
-    ) -> dict:
+    def _read(self, f: FileIterator | TextIO | str, *args, **kwargs) -> dict:
         """Read MESHM block data."""
         # Mesh type
         data = self.readers[0](f)
@@ -140,7 +135,10 @@ class MESHM(DataBlock):
                             data = self.readers["2/RZ2D/LAYER"](f)
                             thicknesses += self.prune_values(data)
 
-                        tmp = {"type": data_type.lower(), "thicknesses": thicknesses[:n]}
+                        tmp = {
+                            "type": data_type.lower(),
+                            "thicknesses": thicknesses[:n],
+                        }
                         meshm["meshmaker"]["parameters"].append(tmp)
 
                         # LAYER closes the block RZ2D
@@ -267,7 +265,7 @@ class MESHM(DataBlock):
         """Write MINC data."""
         data = parameters["minc"]
         volumes = data.get("volumes", [])
-        
+
         # Mesh type
         out = self.writers[0](["MINC"])
 

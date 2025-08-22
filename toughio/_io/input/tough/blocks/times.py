@@ -16,12 +16,7 @@ class TIMES(DataBlock):
     }
     multiples = {"2/fixed", "2/free"}
 
-    def _read(
-        self,
-        f: FileIterator | TextIO | str,
-        *args,
-        **kwargs
-    ) -> dict:
+    def _read(self, f: FileIterator | TextIO | str, *args, **kwargs) -> dict:
         """Read TIMES block data."""
         times = {"times": []}
 
@@ -32,11 +27,7 @@ class TIMES(DataBlock):
         # Record 2
         while len(times["times"]) < n_times:
             line = f.next()
-            key = (
-                "2/free"
-                if self.free_format or "," in line
-                else "2/fixed"
-            )
+            key = "2/free" if self.free_format or "," in line else "2/fixed"
             data = self.readers[key](line)
             times["times"] += self.prune_values(data)
 

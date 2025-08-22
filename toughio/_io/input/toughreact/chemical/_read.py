@@ -9,10 +9,7 @@ from ....._common import open_file
 from .....core import FileIterator, ReadError
 
 
-def read(
-    filename: str | os.PathLike | TextIO,
-    **kwargs
-) -> dict:
+def read(filename: str | os.PathLike | TextIO, **kwargs) -> dict:
     """
     Read TOUGHREACT chemical input file.
 

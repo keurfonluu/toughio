@@ -1,9 +1,9 @@
 from __future__ import annotations
 
+import re
 from typing import TextIO
 
 import numpy as np
-import re
 
 from .....core import DataBlock, FileIterator
 
@@ -38,11 +38,7 @@ class SELEC(DataBlock):
         return i, v
 
     def _read(
-        self,
-        f: FileIterator | TextIO | str,
-        simulator: str,
-        *args,
-        **kwargs
+        self, f: FileIterator | TextIO | str, simulator: str, *args, **kwargs
     ) -> dict:
         """Read SELEC block data."""
         from . import registered_blocks
@@ -56,7 +52,9 @@ class SELEC(DataBlock):
         if not line.upper().startswith(("IE", "FE")):
             data = self.readers[1](line)
 
-            selec["selections"]["integers"] = {k + 1: v for k, v in enumerate(data) if v is not None}
+            selec["selections"]["integers"] = {
+                k + 1: v for k, v in enumerate(data) if v is not None
+            }
 
             if selec["selections"]["integers"].get(1, 0):
                 selec["selections"]["floats"] = {}
@@ -132,12 +130,16 @@ class SELEC(DataBlock):
             # New format for IE > 16 and FE > 8
             equal = " = " if self.space_between_values else "="
             out += [
-                *[f"IE({k}){equal}{v}\n" for k, v in sorted(integers.items()) if k > 16],
+                *[
+                    f"IE({k}){equal}{v}\n"
+                    for k, v in sorted(integers.items())
+                    if k > 16
+                ],
                 *[f"FE({k}){equal}{v}\n" for k, v in sorted(floats.items()) if k > 8],
             ]
 
         return out
-    
+
     def _write_header(self) -> str:
         """Write the header for the SELEC block."""
         return "SELEC----2----3----4----5----6----7----8----9---10---11---12---13---14---15---16\n"

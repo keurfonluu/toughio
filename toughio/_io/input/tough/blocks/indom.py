@@ -21,7 +21,7 @@ class INDOM(DataBlock):
         n_variables: int | Sequence[int],
         eos: Optional[str] = None,
         *args,
-        **kwargs
+        **kwargs,
     ) -> dict:
         """Read INDOM block data."""
         indom = {"rocks": {}}

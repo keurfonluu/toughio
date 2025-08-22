@@ -4,9 +4,9 @@ import os
 from collections.abc import Sequence
 from typing import Literal, Optional, TextIO
 
+from .blocks import registered_blocks
 from ...._common import open_file
 from ....core import FileIterator, ReadError
-from .blocks import registered_blocks
 
 
 def read(
@@ -17,7 +17,7 @@ def read(
     free_format: bool = False,
     eos: Optional[str] = None,
     simulator: Literal["tough", "tough3", "tough4", "toughreact"] = "tough",
-    **kwargs
+    **kwargs,
 ) -> dict:
     """
     Read TOUGH input file.
@@ -56,14 +56,14 @@ def read(
         raise ValueError()
 
     blocks = (
-        blocks
-        if blocks is not None
-        else [block.name for block in registered_blocks]
+        blocks if blocks is not None else [block.name for block in registered_blocks]
     )
     blocks = tuple(blocks)
 
     with open_file(filename, "r") as f:
-        out = read_buffer(f, blocks, label_length, n_variables, free_format, eos, simulator)
+        out = read_buffer(
+            f, blocks, label_length, n_variables, free_format, eos, simulator
+        )
 
     return out
 
@@ -79,8 +79,7 @@ def read_buffer(
 ):
     """Read TOUGH input file."""
     block_readers = {
-        block.name: block(free_format=free_format)
-        for block in registered_blocks
+        block.name: block(free_format=free_format) for block in registered_blocks
     }
 
     if simulator == "tough4":

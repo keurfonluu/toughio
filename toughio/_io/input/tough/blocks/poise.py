@@ -9,12 +9,7 @@ class POISE(DataBlock):
     name = "POISE"
     formats = {}
 
-    def _read(
-        self,
-        f: FileIterator | TextIO | str,
-        *args,
-        **kwargs
-    ) -> dict:
+    def _read(self, f: FileIterator | TextIO | str, *args, **kwargs) -> dict:
         """Read POISE block data."""
         poise = {"react": {"poiseuille": {}}}
 
@@ -33,7 +28,7 @@ class POISE(DataBlock):
     def _write(self, parameters: dict, *args, **kwargs) -> list[str]:
         """Write POISE block data."""
         poise = parameters["react"]["poiseuille"]
-        
+
         for key in ["start", "end", "aperture"]:
             if key not in poise:
                 raise ValueError()
@@ -48,11 +43,12 @@ class POISE(DataBlock):
 
         return out
 
-    def _write_conditions(self, parameters: dict, simulator: str, *args, **kwargs) -> bool:
+    def _write_conditions(
+        self, parameters: dict, simulator: str, *args, **kwargs
+    ) -> bool:
         """Check if POISE block should be written."""
         return (
-            parameters.get("react", {}).get("poiseuille")
-            and simulator == "toughreact"
+            parameters.get("react", {}).get("poiseuille") and simulator == "toughreact"
         )
 
     def update(

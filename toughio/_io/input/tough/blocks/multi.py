@@ -9,12 +9,7 @@ class MULTI(DataBlock):
     name = "MULTI"
     formats = {1: ",".join(5 * ["5d"])}
 
-    def _read(
-        self,
-        f: FileIterator | TextIO | str,
-        *args,
-        **kwargs
-    ) -> dict:
+    def _read(self, f: FileIterator | TextIO | str, *args, **kwargs) -> dict:
         """Read MULTI block data."""
         multi = {}
 
@@ -58,7 +53,9 @@ class MULTI(DataBlock):
 
         return out
 
-    def _write_conditions(self, parameters: dict, eos: str, simulator: str, *args, **kwargs) -> bool:
+    def _write_conditions(
+        self, parameters: dict, eos: str, simulator: str, *args, **kwargs
+    ) -> bool:
         """Check if MULTI block should be written."""
         return (
             parameters.get("eos", eos)

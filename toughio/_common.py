@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import os
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Iterator, Sequence
 from contextlib import contextmanager
 from io import TextIOWrapper
-from typing import Any, Optional
+from typing import Any, Literal, Optional
 
 import numpy as np
 
@@ -76,8 +76,11 @@ def filetype_from_filename(
 
 
 @contextmanager
-def open_file(path_or_buffer: str | os.PathLike | TextIOWrapper, mode: Literal["r", "w"]) -> TextIOWrapper:
+def open_file(
+    path_or_buffer: str | os.PathLike | TextIOWrapper, mode: Literal["r", "w"]
+) -> Iterator[TextIOWrapper]:
     """Open file or buffer."""
+
     def is_buffer(obj: Any, mode: Literal["r", "w"]) -> bool:
         return ("r" in mode and hasattr(obj, "read")) or (
             "w" in mode and hasattr(obj, "write")
@@ -91,7 +94,9 @@ def open_file(path_or_buffer: str | os.PathLike | TextIOWrapper, mode: Literal["
             yield f
 
 
-def prune_values(data: dict | Sequence[float], value: Optional[float] = None) -> dict | Sequence[float]:
+def prune_values(
+    data: dict | Sequence[float], value: Optional[float] = None
+) -> dict | Sequence[float]:
     """Remove values from dict or trailing values from list."""
     if isinstance(data, dict):
         return {k: v for k, v in data.items() if v != value}
@@ -101,135 +106,3 @@ def prune_values(data: dict | Sequence[float], value: Optional[float] = None) ->
 
     else:
         return data
-
-
-block_to_format = {
-    "DIMEN": ",".join(8 * ["10d"]),
-    "ROCKS": {
-        1: "5s,5d,10f,10f,10f,10f,10f,10f,10f",
-        2: "10f,10f,10f,10f,10f,10f,10f,10f,10f",  # Tortuosity can be <0 in TOUGHREACT
-        # TOUGHREACT
-        3: "5d,5s,10f,10f,10f",
-        4: "5d,5s,14f,14f,14f,14f",
-    },
-    "RPCAP": "5d,5s,10f,10f,10f,10f,10f,10f,10f",
-    "FLAC": {
-        1: ",".join(16 * ["5d"]),
-        2: "10d,10f,10f,10f,10f,10f,10f,10f",
-        3: "5d,5s,10f,10f,10f,10f,10f,10f,10f",
-    },
-    "CHEMP": {
-        1: "5d",
-        2: "20s",
-        3: ",".join(5 * ["10f"]),
-    },
-    "NCGAS": {1: "5d", 2: "10s"},
-    "MULTI": ",".join(5 * ["5d"]),
-    "SELEC": {1: ",".join(16 * ["5d"]), 2: ",".join(8 * ["10f"])},
-    "SOLVR": "1d,2s,2s,3s,2s,10f,10f",
-    "PARAM": {
-        1: "2d,2d,4d,4d,4d,24S,10s,10f,10f",
-        2: "10f,10f,10f,10f,5s,5s,10f,10f,10f",
-        3: ",".join(8 * ["10f"]),
-        4: "10f,10f,10s,10f,10f,10f",
-        5: ",".join(4 * ["20f"]),
-    },
-    "INDOM": {0: ",".join(4 * ["20f"]), 5: "5s,5d"},  # 5d is for ECO2M and TMVOC
-    "MOMOP": "50S",
-    "TIMES": {1: "5d,5d,10f,10f", 2: ",".join(8 * ["10f"])},
-    "HYSTE": ",".join(3 * ["5d"]),
-    "FOFT": {5: "5s,5s,5d", 6: "6s,4s,5d", 7: "7s,3s,5d", 8: "8s,2s,5d", 9: "9s,1s,5d"},
-    "COFT": {
-        5: "10s,10s,5d",
-        6: "12s,8s,5d",
-        7: "14s,6s,5d",
-        8: "16s,4s,5d",
-        9: "18s,2s,5d",
-    },
-    "GOFT": {5: "5s,5s,5s,5d", 6: "6s,4s,5s,5d", 7: "7s,3s,5s,5d", 8: "8s,2s,5s,5d", 9: "9s,1s,5s,5d"},
-    "ROFT": "5s,5s",
-    "GENER": {
-        0: ",".join(4 * ["14f"]),
-        # Last integer is for KTAB value in TOUGHREACT
-        5: "5s,5s,5d,5d,5d,5d,5s,4s,1s,10f,10f,10f,2d",
-        6: "6s,5s,6d,4d,4d,5d,5s,4s,1s,10f,10f,10f,2d",
-        7: "7s,5s,5d,4d,4d,5d,5s,4s,1s,10f,10f,10f,2d",
-        8: "8s,5s,4d,4d,4d,5d,5s,4s,1s,10f,10f,10f,2d",
-        9: "9s,5s,5d,3d,3d,5d,5s,4s,1s,10f,10f,10f,2d",
-    },
-    "DIFFU": ",".join(8 * ["10f"]),
-    "OUTPU": {1: "20s", 2: "15s", 3: "20s,5d,5d"},
-    "ELEME": {
-        5: "5s,5d,5d,5s,10f,10f,10f,10f,10f,10f",
-        6: "6s,5d,4d,5s,10f,10f,10f,10f,10f,10f",
-        7: "7s,4d,4d,5s,10f,10f,10f,10f,10f,10f",
-        8: "8s,4d,3d,5s,10f,10f,10f,10f,10f,10f",
-        9: "9s,3d,3d,5s,10f,10f,10f,10f,10f,10f",
-    },
-    "COORD": ",".join(3 * ["20f"]),
-    "CONNE": {
-        5: "10s,5d,5d,5d,5d,10f,10f,10f,10f,10f",
-        6: "12s,5d,4d,4d,5d,10f,10f,10f,10f,10f",
-        7: "14s,5d,3d,3d,5d,10f,10f,10f,10f,10f",
-        8: "16s,3d,3d,3d,5d,10f,10f,10f,10f,10f",
-        9: "18s,3d,2d,2d,5d,10f,10f,10f,10f,10f",
-    },
-    "INCON": {
-        0: ",".join(4 * ["20f"]),
-        "default": {
-            5: "5s,5d,5d,15f,10f,10f,10f,10f,10f,10f",
-            6: "6s,5d,4d,15f,10f,10f,10f,10f,10f,10f",
-            7: "7s,4d,4d,15f,10f,10f,10f,10f,10f,10f",
-            8: "8s,4d,3d,15f,10f,10f,10f,10f,10f,10f",
-            9: "9s,3d,3d,15f,10f,10f,10f,10f,10f,10f",
-        },
-        "eco2m": {
-            5: "5s,5d,5d,15f,2d",
-            6: "6s,5d,4d,15f,2d",
-            7: "7s,4d,4d,15f,2d",
-            8: "8s,4d,3d,15f,2d",
-            9: "9s,3d,3d,15f,2d",
-        },
-        "tmvoc": {
-            5: "5s,5d,5d,15f,2d",
-            6: "6s,5d,4d,15f,2d",
-            7: "7s,4d,4d,15f,2d",
-            8: "8s,4d,3d,15f,2d",
-            9: "9s,3d,3d,15f,2d",
-        },
-        "toughreact": {
-            5: "5s,5d,5d,15f,15f,15f,15f",
-            6: "6s,5d,4d,15f,15f,15f,15f",
-            7: "7s,4d,4d,15f,15f,15f,15f",
-            8: "8s,4d,3d,15f,15f,15f,15f",
-            9: "9s,3d,3d,15f,15f,15f,15f",
-        },
-    },
-    "MESHM": {
-        1: "5s",
-        "XYZ": {
-            1: "10f",
-            2: "5s,5d,10f",
-            3: ",".join(8 * ["10f"]),
-        },
-        "RZ2D": {
-            1: "5s",
-            "RADII": {
-                1: "5d",
-                2: ",".join(8 * ["10f"]),
-            },
-            "EQUID": "5d,5s,10f",
-            "LOGAR": "5d,5s,10f,10f",
-            "LAYER": {
-                1: "5d",
-                2: ",".join(8 * ["10f"]),
-            },
-        },
-        "MINC": {
-            1: "5s,5s,5s,5s",
-            2: "3d,3d,4s,10f,10f,10f,10f,10f,10f,10f",
-            3: ",".join(8 * ["10f"]),
-        },
-    },
-    "REACT": "25S",
-}

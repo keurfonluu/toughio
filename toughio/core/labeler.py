@@ -39,12 +39,12 @@ class Labeler:
         -------
         ArrayLike
             List of *n* labels.
-    
+
         """
         l = self.label_length - 3
         fmt = f"{{: >{l}}}"
         alpha = np.array(list(ascii_uppercase))
-        numer = np.array([fmt.format(i) for i in range(10 ** l)])
+        numer = np.array([fmt.format(i) for i in range(10**l)])
         nomen = np.concatenate(([f"{i + 1:1}" for i in range(9)], alpha))
 
         q1, r1 = np.divmod(np.arange(n) + offset, numer.size)
@@ -52,7 +52,9 @@ class Labeler:
         q3, r3 = np.divmod(q2, nomen.size)
         _, r4 = np.divmod(q3, nomen.size)
 
-        return np.array(["".join(name) for name in zip(alpha[r4], nomen[r3], nomen[r2], numer[r1])])
+        return np.array(
+            ["".join(name) for name in zip(alpha[r4], nomen[r3], nomen[r2], numer[r1])]
+        )
 
     @property
     def label_length(self) -> int:

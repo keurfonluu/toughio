@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from typing import Literal
-from numpy.typing import ArrayLike
 
 import numpy as np
+from numpy.typing import ArrayLike
 
 
 def density(
@@ -14,7 +14,7 @@ def density(
 ) -> ArrayLike:
     """
     Calculate the density of brine.
-    
+
     Parameters
     ----------
     temperature : ArrayLike
@@ -62,7 +62,9 @@ def density(
         rhowi = 1.0e3 / rhow
 
         # Equation (2.19)
-        phi = CHX(rhowi) + (-13.644 + 13.97 * rhowi) * (rhowi / (3.1975 - rhowi)) ** 2 * np.sqrt(bsalt)
+        phi = CHX(rhowi) + (-13.644 + 13.97 * rhowi) * (
+            rhowi / (3.1975 - rhowi)
+        ) ** 2 * np.sqrt(bsalt)
         rhob = (1.0e3 + bsalt * Mw_salt) / (1.0e3 * rhowi + phi * bsalt) * 1.0e3
 
     else:

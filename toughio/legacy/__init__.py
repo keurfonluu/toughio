@@ -1,3 +1,5 @@
+"""Legacy functions for backward compatibility."""
+
 from . import flac3d
 from ._helpers import (
     extrude_to_3d,

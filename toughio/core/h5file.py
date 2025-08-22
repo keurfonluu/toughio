@@ -63,12 +63,14 @@ class H5File:
 
         if self.mode == "w":
             import datetime
-        
+
             # Add version info
             node = self._get_node("VersionInfo")
             self._dump_data("version", "1.0", node=node)
             self._dump_data("user", os.getlogin(), node=node)
-            self._dump_data("date", str(datetime.datetime.now().astimezone().isoformat()), node=node)
+            self._dump_data(
+                "date", str(datetime.datetime.now().astimezone().isoformat()), node=node
+            )
 
         return self
 
@@ -101,6 +103,7 @@ class H5File:
             Mesh or output to dump to container.
 
         """
+
         def check_name(name: str, node: h5py.Group) -> str:
             """Check if name exists in node, increment otherwise."""
             count = 0
@@ -125,12 +128,16 @@ class H5File:
             # /Mesh
             node = self._get_node("Mesh")
 
-            type_ = "StructuredGrid" if isinstance(obj.pyvista, pv.StructuredGrid) else "UnstructuredGrid"
+            type_ = (
+                "StructuredGrid"
+                if isinstance(obj.pyvista, pv.StructuredGrid)
+                else "UnstructuredGrid"
+            )
             self._dump_data("type", type_, node=node)
 
             # /Mesh/pyvista
             node = self._get_node("pyvista", node=node)
-            
+
             if isinstance(obj.pyvista, pv.UnstructuredGrid):
                 cells = pvg.get_cell_connectivity(obj.pyvista, flatten=True)
 
@@ -148,7 +155,7 @@ class H5File:
 
             self._dump_dict("data", obj.data, node=node)
             self._dump_dict("metadata", obj.metadata, node=node)
-        
+
         elif isinstance(obj, (ConnectionOutput, ElementOutput)):
             # /Output
             node = self._get_node("Output")
@@ -188,9 +195,7 @@ class H5File:
                 {
                     "time": obj.time,
                     "labels": (
-                        obj.labels.tolist()
-                        if obj.labels is not None
-                        else obj.labels
+                        obj.labels.tolist() if obj.labels is not None else obj.labels
                     ),
                 },
                 node=node,
@@ -203,7 +208,9 @@ class H5File:
             type_ = obj.type.capitalize()
 
             if type_ not in {"Connection", "Element", "Generator", "Rock"}:
-                raise ValueError(f"could not dump history output with type '{obj.type}'")
+                raise ValueError(
+                    f"could not dump history output with type '{obj.type}'"
+                )
 
             # /History/{type_}
             node = self._get_node(type_, node)
@@ -220,7 +227,11 @@ class H5File:
             node = self._get_node(name, node=node)
 
             self._dump_dict("data", obj.to_dict(unit=False), node=node)
-            self._dump_dict("metadata", {k: v for k, v in obj.metadata.items() if k not in {"label", "type"}}, node=node)
+            self._dump_dict(
+                "metadata",
+                {k: v for k, v in obj.metadata.items() if k not in {"label", "type"}},
+                node=node,
+            )
 
         else:
             raise ValueError(f"could not dump {name} to file")
@@ -688,11 +699,7 @@ class H5File:
             raise ValueError(f"could not load '{name}' as array")
 
     def _dump_dict(
-        self,
-        name: str,
-        data: dict,
-        node: Optional[h5py.Group] = None,
-        **kwargs
+        self, name: str, data: dict, node: Optional[h5py.Group] = None, **kwargs
     ) -> None:
         """Dump a dict."""
         node = node if node else self._h5file

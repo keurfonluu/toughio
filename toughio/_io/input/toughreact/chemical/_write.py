@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import os
-from typing import TextIO
 from functools import wraps
+from typing import TextIO
 
 from .._common import getval, write_ffrecord
 from ....._common import open_file
@@ -12,7 +12,7 @@ def write(
     filename: str | os.PathLike | TextIO,
     parameters: dict,
     verbose: bool = True,
-    **kwargs
+    **kwargs,
 ) -> None:
     """
     Write TOUGHREACT chemical input file.

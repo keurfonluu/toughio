@@ -10,12 +10,7 @@ class ROFT(DataBlock):
     formats = {1: "5s,5s"}
     _space_between_blocks = True
 
-    def _read(
-        self,
-        f: FileIterator | TextIO | str,
-        *args,
-        **kwargs
-    ) -> dict:
+    def _read(self, f: FileIterator | TextIO | str, *args, **kwargs) -> dict:
         """Read ROFT block data."""
         history = {"rock_history": []}
 

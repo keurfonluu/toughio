@@ -10,15 +10,10 @@ class NCGAS(DataBlock):
     formats = {1: "5d", 2: "10s"}
     multiples = {2}
 
-    def _read(
-        self,
-        f: FileIterator | TextIO | str,
-        *args,
-        **kwargs
-    ) -> dict:
+    def _read(self, f: FileIterator | TextIO | str, *args, **kwargs) -> dict:
         """Read NCGAS block data."""
         ncgas = {"non_condensible_gas": []}
-        
+
         # Record 1
         data = self.readers[1](f)
         n = data[0]

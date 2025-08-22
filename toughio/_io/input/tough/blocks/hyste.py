@@ -9,15 +9,14 @@ class HYSTE(DataBlock):
     name = "HYSTE"
     formats = {1: ",".join(3 * ["5d"])}
 
-    def _read(
-        self,
-        f: FileIterator | TextIO | str,
-        *args,
-        **kwargs
-    ) -> dict:
+    def _read(self, f: FileIterator | TextIO | str, *args, **kwargs) -> dict:
         """Read HYSTE block data."""
         data = self.readers[1](f)
-        hyste = {"hysteresis_options": {i + 1: x for i, x in enumerate(data) if x is not None}}
+        hyste = {
+            "hysteresis_options": {
+                i + 1: x for i, x in enumerate(data) if x is not None
+            }
+        }
 
         return hyste
 

@@ -5,4 +5,9 @@ from typing import Union
 import pyvista as pv
 
 
-GridLike = Union[pv.ExplicitStructuredGrid, pv.RectilinearGrid, pv.StructuredGrid, pv.UnstructuredGrid]
+GridLike = Union[
+    pv.ExplicitStructuredGrid,
+    pv.RectilinearGrid,
+    pv.StructuredGrid,
+    pv.UnstructuredGrid,
+]

@@ -21,11 +21,7 @@ class ROCKS(DataBlock):
     _space_between_blocks = True
 
     def _read(
-        self,
-        f: FileIterator | TextIO | str,
-        simulator: str,
-        *args,
-        **kwargs
+        self, f: FileIterator | TextIO | str, simulator: str, *args, **kwargs
     ) -> dict:
         """Read ROCKS block data."""
         rocks = {"rocks": {}}
@@ -77,8 +73,11 @@ class ROCKS(DataBlock):
                         line = f.next()
 
                         if line.strip():
-                            rocks["rocks"][rock]["react_hcplaw"] = self.read_model_record(
-                                line, self.readers[4],
+                            rocks["rocks"][rock]["react_hcplaw"] = (
+                                self.read_model_record(
+                                    line,
+                                    self.readers[4],
+                                )
                             )
 
                     # Relative permeability / Capillary pressure
@@ -111,7 +110,8 @@ class ROCKS(DataBlock):
             data = {
                 k: v
                 for k, v in parameters.get("default", {}).items()
-                if k not in {
+                if k
+                not in {
                     "initial_condition",
                     "relative_permeability",
                     "capillarity",
@@ -137,7 +137,11 @@ class ROCKS(DataBlock):
                     "porosity_crit",
                 ]
             )
-            nad = 2 if "relative_permeability" in data or "capillarity" in data else int(cond)
+            nad = (
+                2
+                if "relative_permeability" in data or "capillarity" in data
+                else int(cond)
+            )
 
             if simulator == "toughreact":
                 nad = 4 if "react_tp" in data else nad
@@ -146,7 +150,7 @@ class ROCKS(DataBlock):
             # Permeability
             per = data.get("permeability", None)
             per = [per] * 3 if not np.ndim(per) else per
-            
+
             if not (isinstance(per, (list, tuple, np.ndarray)) and len(per) == 3):
                 raise TypeError()
 
@@ -167,7 +171,8 @@ class ROCKS(DataBlock):
             # Record 2
             if cond:
                 values = [
-                    data.get(key) for key in [
+                    data.get(key)
+                    for key in [
                         "compressibility",
                         "expansivity",
                         "conductivity_dry",
@@ -191,7 +196,9 @@ class ROCKS(DataBlock):
 
             # Relative permeability / Capillary pressure
             if nad >= 2:
-                out += self.write_model_record(data, "relative_permeability", model_writer)
+                out += self.write_model_record(
+                    data, "relative_permeability", model_writer
+                )
                 out += self.write_model_record(data, "capillarity", model_writer)
 
         return out

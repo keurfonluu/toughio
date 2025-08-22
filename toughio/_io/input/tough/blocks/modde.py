@@ -23,12 +23,7 @@ class MODDE(DataBlock):
         super().__init__(*args, **kwargs)
         self._free_format = True
 
-    def _read(
-        self,
-        f: FileIterator | TextIO | str,
-        *args,
-        **kwargs
-    ) -> dict:
+    def _read(self, f: FileIterator | TextIO | str, *args, **kwargs) -> dict:
         """Read MODDE block data."""
         modde = {}
 
@@ -52,7 +47,9 @@ class MODDE(DataBlock):
             modde["do_diffusion"] = data[1].lower() == "true"
 
         if data[2] and modde["eos"] in self._components:
-            modde[f"include_{self._components[modde['eos']]}"] = data[2].lower() == "true"
+            modde[f"include_{self._components[modde['eos']]}"] = (
+                data[2].lower() == "true"
+            )
 
         if data[3]:
             modde["do_wellbore"] = data[3].lower() == "true"
@@ -63,7 +60,7 @@ class MODDE(DataBlock):
         # Number of primary variables
         if modde["incon_type"] == "1LINE":
             n_variables = -1
-        
+
         elif modde["incon_type"] == "2LINES":
             n_variables = -2
 
@@ -104,7 +101,9 @@ class MODDE(DataBlock):
         values = [
             parameters.get("isothermal"),
             parameters.get("do_diffusion"),
-            parameters.get(f"include_{self._components.get(parameters.get('eos', '').lower(), '')}"),
+            parameters.get(
+                f"include_{self._components.get(parameters.get('eos', '').lower(), '')}"
+            ),
             parameters.get("do_wellbore"),
             parameters.get("two_phase_co2"),
         ]
@@ -114,7 +113,9 @@ class MODDE(DataBlock):
 
         return out
 
-    def _write_conditions(self, parameters: dict, simulator: str, *args, **kwargs) -> bool:
+    def _write_conditions(
+        self, parameters: dict, simulator: str, *args, **kwargs
+    ) -> bool:
         """Check if MODDE block should be written."""
         return bool(parameters.get("eos")) and simulator == "tough4"
 

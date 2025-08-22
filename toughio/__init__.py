@@ -1,3 +1,5 @@
+"""Pre- and post-processing Python library for TOUGH."""
+
 from . import _cli, meshmaker, properties
 from .__about__ import __version__
 from ._io import *

@@ -41,11 +41,7 @@ class HistoryOutput(UserDict):
 
     def _repr_html_(self) -> str:
         """Represent an history output as an HTML dataframe."""
-        return (
-            self.to_dataframe()._repr_html_()
-            if self.ndim
-            else repr(self)
-        )
+        return self.to_dataframe()._repr_html_() if self.ndim else repr(self)
 
     def __contains__(self, key: str) -> bool:
         """Return True if history output contains a key."""
@@ -76,13 +72,17 @@ class HistoryOutput(UserDict):
         ndim = self.ndim
 
         if ndim is not None and np.ndim(value) != ndim:
-            raise ValueError(f"could not add data '{key}' with dim {np.ndim(value)} (expected dim {ndim})")
+            raise ValueError(
+                f"could not add data '{key}' with dim {np.ndim(value)} (expected dim {ndim})"
+            )
 
         # Check size
         size = self.size
 
         if size is not None and np.size(value) != size:
-            raise ValueError(f"could not add data '{key}' with size {np.size(value)} (expected size {size})")
+            raise ValueError(
+                f"could not add data '{key}' with size {np.size(value)} (expected size {size})"
+            )
 
         # Add data
         key, unit = self._get_key_unit(key)
@@ -105,7 +105,7 @@ class HistoryOutput(UserDict):
         out = self.__add__(obj)
         self.clear()
         self.update(out)
-        
+
         for k, v in obj.metadata.items():
             if k in self.metadata and isinstance(v, dict):
                 self.metadata[k].update(v)
@@ -120,7 +120,9 @@ class HistoryOutput(UserDict):
         xp = self.time
 
         if xp is None or np.size(xp) == 1:
-            raise ValueError("could not interpolate history output with scalar time data")
+            raise ValueError(
+                "could not interpolate history output with scalar time data"
+            )
 
         out = {
             key: np.interp(x, xp, value, left=np.nan, right=np.nan)
@@ -165,7 +167,9 @@ class HistoryOutput(UserDict):
 
         return self.__class__(copy_(self), copy_(self.metadata))
 
-    def items(self, unit: bool = False) -> tuple[str, ArrayLike] | tuple[str, ArrayLike, str | None]:
+    def items(
+        self, unit: bool = False
+    ) -> tuple[str, ArrayLike] | tuple[str, ArrayLike, str | None]:
         """
         Iterate over (key, value) pairs or (key, value, unit) trios.
 
@@ -198,7 +202,9 @@ class HistoryOutput(UserDict):
             for key, value in super().items():
                 yield key, value
 
-    def concatenate(self, obj: HistoryOutput | Sequence[HistoryOutput], shift: bool = False) -> HistoryOutput:
+    def concatenate(
+        self, obj: HistoryOutput | Sequence[HistoryOutput], shift: bool = False
+    ) -> HistoryOutput:
         """
         Concatenate history outputs.
 
@@ -208,7 +214,7 @@ class HistoryOutput(UserDict):
             History output(s) to concatenate this output with.
         shift : bool, default False
             If True, shift times of *obj* by the last time value of this output.
-        
+
         Returns
         -------
         toughio.HistoryOutput
@@ -220,17 +226,21 @@ class HistoryOutput(UserDict):
 
         elif not obj:
             return self.copy()
-        
+
         elif isinstance(obj, HistoryOutput):
             obj1, obj2 = self, obj
             time1, time2 = obj1.time, obj2.time
 
             if time1 is None or time2 is None:
-                raise ValueError("could not concatenate history output without time data")
+                raise ValueError(
+                    "could not concatenate history output without time data"
+                )
 
             if sorted(obj1) != sorted(obj2):
-                raise ValueError("could not concatenate history output with different data")
-            
+                raise ValueError(
+                    "could not concatenate history output with different data"
+                )
+
             if shift:
                 obj2 = obj2.shift(time1[-1])
                 mask2 = np.ones_like(time2, dtype=bool)
@@ -255,7 +265,9 @@ class HistoryOutput(UserDict):
                 if value and value == getattr(obj2, name):
                     setattr(output, name, value)
 
-        elif isinstance(obj, (list, tuple)) and all(isinstance(x, HistoryOutput) for x in obj):
+        elif isinstance(obj, (list, tuple)) and all(
+            isinstance(x, HistoryOutput) for x in obj
+        ):
             output = self
 
             for x in obj:
@@ -334,7 +346,7 @@ class HistoryOutput(UserDict):
                 raise ValueError(f"invalid time unit '{time_unit}'")
 
             xlabel = f"Time ({time_unit})"
-        
+
         try:
             unit = self.units[y]
 
@@ -518,11 +530,7 @@ class HistoryOutput(UserDict):
     @property
     def ndim(self) -> int:
         """Return data dimension."""
-        return (
-            np.ndim(self[list(self.keys())[0]])
-            if len(self)
-            else None
-        )
+        return np.ndim(self[list(self.keys())[0]]) if len(self) else None
 
     @property
     def size(self) -> int:

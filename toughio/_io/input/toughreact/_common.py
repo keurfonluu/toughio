@@ -40,7 +40,7 @@ def write_ffrecord(
     """Write free-format record."""
     if verbose:
         if fmt:
-            values = [to_str(value, f) for value, f, in zip(values, fmt)]
+            values = [to_str(value, f) for value, f in zip(values, fmt)]
             return [f"{' '.join(values)}{end}"]
 
         else:

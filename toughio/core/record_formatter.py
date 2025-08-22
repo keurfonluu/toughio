@@ -73,7 +73,9 @@ class RecordFormatter:
             else:
                 self._delimiter = ""
 
-    def __call__(self, arg: Optional[str | FileIterator | Sequence[Any]] = None) -> str | list[str]:
+    def __call__(
+        self, arg: Optional[str | FileIterator | Sequence[Any]] = None
+    ) -> str | list[str]:
         """Read or write record given format."""
         # Reader
         if self.mode == "r":
@@ -106,15 +108,15 @@ class RecordFormatter:
                 # Pad to format length
                 data.extend((len(self.format) - len(data)) * [None])
 
-                # Loop over items                
+                # Loop over items
                 out = [
                     None if not x else tokens[token[-1]]["converter"](x)
-                    for token, x in zip(self.format, data)    
+                    for token, x in zip(self.format, data)
                 ]
 
             else:
                 i, out = 0, []
-                
+
                 for token in self.format:
                     n = int(token[:-1].split(".")[0])
                     tmp = data[i : i + n].strip()
@@ -131,8 +133,7 @@ class RecordFormatter:
 
             if not self.multiple:
                 values = [
-                    self.to_str(value, fmt)
-                    for value, fmt in zip(values, self.format)
+                    self.to_str(value, fmt) for value, fmt in zip(values, self.format)
                 ]
                 records = [values]
 
@@ -149,8 +150,8 @@ class RecordFormatter:
 
             if self.free_format:
                 out = [
-                   f"{self.delimiter.join(record).rstrip(self.delimiter)}\n"
-                   for record in records 
+                    f"{self.delimiter.join(record).rstrip(self.delimiter)}\n"
+                    for record in records
                 ]
 
             else:

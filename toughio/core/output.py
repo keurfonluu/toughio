@@ -308,7 +308,7 @@ class ConnectionOutput(Output):
         References
         ----------
         .. [1] Painter, S. L., Gable, C. W., and Kelkar, S. (2012). "Pathline tracing on fully unstructured control-volume grids". Computational Geosciences, 16(4), 1125-1134
-        
+
         """
         from .. import read_input
 
@@ -318,10 +318,15 @@ class ConnectionOutput(Output):
         elif isinstance(mesh, Mesh):
             mesh = mesh.to_tough()
 
-        linear_data = list(linear_data) if linear_data is not None else {"VEL_L", "VEL_G", "V(LIQ.)", "V(GAS)"}
+        linear_data = (
+            list(linear_data)
+            if linear_data is not None
+            else {"VEL_L", "VEL_G", "V(LIQ.)", "V(GAS)"}
+        )
         ignore_elements = set(ignore_elements) if ignore_elements is not None else set()
         centers = {
-            k: np.asarray(v["center"]) for k, v in mesh["elements"].items()
+            k: np.asarray(v["center"])
+            for k, v in mesh["elements"].items()
             if k not in ignore_elements
         }
         face_areas = {k: v["interface_area"] for k, v in mesh["connections"].items()}
@@ -381,15 +386,24 @@ class ConnectionOutput(Output):
         for i, connection in enumerate(connections):
             if linear:
                 G = connection["normals"]
-                Q[i][:, linear] = np.linalg.pinv(G.T @ G) @ G.T @ data_linear[:, connection["index"]].T
+                Q[i][:, linear] = (
+                    np.linalg.pinv(G.T @ G)
+                    @ G.T
+                    @ data_linear[:, connection["index"]].T
+                )
 
             if volume:
                 G = connection["areas"][:, np.newaxis] * connection["normals"]
-                Q[i][:, volume] = np.linalg.pinv(G.T @ G) @ G.T @ data_volume[:, connection["index"]].T
+                Q[i][:, volume] = (
+                    np.linalg.pinv(G.T @ G)
+                    @ G.T
+                    @ data_volume[:, connection["index"]].T
+                )
 
         return ElementOutput(
             data={
-                k: v for k, v in zip(self.data, Q.transpose((2, 0, 1)))
+                k: v
+                for k, v in zip(self.data, Q.transpose((2, 0, 1)))
                 if k not in {"X", "Y", "Z"}
             },
             time=self.time,

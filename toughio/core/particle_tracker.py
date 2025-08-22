@@ -14,7 +14,7 @@ from .mesh import Mesh
 class ParticleTracker:
     """
     Particle tracker class.
-    
+
     Parameters
     ----------
     mesh : toughio.Mesh | meshio.Mesh | pyvista.UnstructuredGrid
@@ -44,7 +44,7 @@ class ParticleTracker:
         ----------
         point : ArrayLike
             Coordinates of query point.
-        
+
         Returns
         -------
         ArrayLike
@@ -292,7 +292,9 @@ class ParticleTracker:
 
         elif isinstance(value, np.ndarray):
             if value.shape != (self.mesh.n_cells, 3):
-                raise ValueError(f"velocity array size mismatch (expected {(self.mesh.n_cells, 3)}, got {value.shape})")
+                raise ValueError(
+                    f"velocity array size mismatch (expected {(self.mesh.n_cells, 3)}, got {value.shape})"
+                )
 
             velocity = value
 

@@ -14,12 +14,7 @@ class START(DataBlock):
         super().__init__(*args, **kwargs)
         self._space_between_blocks = False
 
-    def _read(
-        self,
-        f: FileIterator | TextIO | str,
-        *args,
-        **kwargs
-    ) -> dict:
+    def _read(self, f: FileIterator | TextIO | str, *args, **kwargs) -> dict:
         """Read START block data."""
         return {"start": True}
 

@@ -19,7 +19,7 @@ def write(
     simulator: Literal["tough", "tough3", "tough4", "toughreact"] = "tough",
     block: Optional[Literal["all", "MESH", "GENER", "INCON"] | Sequence[str]] = None,
     ignore_blocks: Optional[Sequence[str]] = None,
-    **kwargs
+    **kwargs,
 ) -> None:
     """
     Write TOUGH input file.
@@ -54,7 +54,7 @@ def write(
          - 'GENER': only write block GENER
          - 'INCON': only write block INCON
          - None: write all blocks except blocks defined in *ignore_blocks*.
-        
+
         Ignored if *blocks* is not None.
 
     ignore_blocks : Sequence[str], optional
@@ -104,7 +104,7 @@ def write(
 
         else:
             raise ValueError(f"invalid block option '{blocks}'")
-            
+
     else:
         blocks = set(blocks)
 
@@ -133,7 +133,7 @@ def write_buffer(
     space_between_values: bool = True,
     free_format: bool = False,
     eos: Optional[str] = None,
-    simulator: Literal["tough", "toughreact"] = "tough",	
+    simulator: Literal["tough", "toughreact"] = "tough",
 ) -> list[str]:
     """Write TOUGH input file as a list of 80-character long record strings."""
     block_writers = {

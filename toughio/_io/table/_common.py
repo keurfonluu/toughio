@@ -29,7 +29,7 @@ def to_output(
 
     """
     output = HistoryOutput(output)
-    
+
     # Extract label
     if isinstance(filename, io.TextIOWrapper):
         try:
@@ -53,7 +53,7 @@ def to_output(
 
     elif filename.upper().startswith(("COFT_", "ROFT_")):
         label_length = len(label) // 2
-        l1, l2 = label[:label_length], label[label_length + 1:]
+        l1, l2 = label[:label_length], label[label_length + 1 :]
         output.label = f"{l1.strip('_')}-{l2.strip('_')}"
         output.type = "connection" if filename.upper().startswith("COFT") else "rock"
 

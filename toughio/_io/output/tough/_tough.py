@@ -66,7 +66,7 @@ def read(filename, file_type, labels_order=None, time_steps=None):
                 iend = tmp.index(" ")
 
                 if iend < 2:
-                    tmp = f"{tmp[:iend]}0{tmp[iend + 1:]}"
+                    tmp = f"{tmp[:iend]}0{tmp[iend + 1 :]}"
 
                 else:
                     break

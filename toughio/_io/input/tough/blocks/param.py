@@ -28,7 +28,7 @@ class PARAM(DataBlock):
         n_variables: int | Sequence[int],
         eos: str,
         *args,
-        **kwargs
+        **kwargs,
     ) -> dict:
         """Read PARAM block data."""
         param = {}
@@ -44,7 +44,9 @@ class PARAM(DataBlock):
             "temperature_dependence_gas": data[30],
             "effective_strength_vapor": data[31],
         }
-        param["extra_options"] = {i + 1: x for i, x in enumerate(data[5:29]) if x is not None}
+        param["extra_options"] = {
+            i + 1: x for i, x in enumerate(data[5:29]) if x is not None
+        }
 
         # Record 2
         line = f.next()
@@ -136,7 +138,7 @@ class PARAM(DataBlock):
             "data": param,
             "n_variables": n_variables,
         }
-        
+
     def _write(
         self,
         parameters: dict,
@@ -223,10 +225,16 @@ class PARAM(DataBlock):
 
         # Record 4 (ECO2M, TMVOC)
         if eos in {"eco2m", "tmvoc"}:
-            out += self.writers[6]([parameters.get("default", {}).get("phase_composition")])
+            out += self.writers[6](
+                [parameters.get("default", {}).get("phase_composition")]
+            )
 
         # Record 5
-        out += self.writers[5](parameters.get("default", {}).get("initial_condition", [None for _ in range(6)]))
+        out += self.writers[5](
+            parameters.get("default", {}).get(
+                "initial_condition", [None for _ in range(6)]
+            )
+        )
 
         return out
 
@@ -245,7 +253,10 @@ class PARAM(DataBlock):
             bool(parameters.get("options", {}))
             or bool(parameters.get("extra_options", {}))
             or any(parameters.get("default", {}).get("initial_condition", []))
-            or (eos in {"eco2m", "tmvoc"} and parameters.get("default", {}).get("phase_composition") is not None)
+            or (
+                eos in {"eco2m", "tmvoc"}
+                and parameters.get("default", {}).get("phase_composition") is not None
+            )
         )
 
     def update(

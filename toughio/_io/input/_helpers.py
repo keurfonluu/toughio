@@ -22,7 +22,7 @@ def read(
             "json",
         ]
     ] = None,
-    **kwargs
+    **kwargs,
 ):
     """
     Read TOUGH input file.
@@ -61,7 +61,7 @@ def write(
             "json",
         ]
     ] = None,
-    **kwargs
+    **kwargs,
 ):
     """
     Write TOUGH input file.

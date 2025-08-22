@@ -9,15 +9,14 @@ class REACT(DataBlock):
     name = "REACT"
     formats = {1: ",".join(25 * ["1d"])}
 
-    def _read(
-        self,
-        f: FileIterator | TextIO | str,
-        *args,
-        **kwargs
-    ) -> dict:
+    def _read(self, f: FileIterator | TextIO | str, *args, **kwargs) -> dict:
         """Read REACT block data."""
         data = self.readers[1](f)
-        react = {"react": {"options": {i + 1: x for i, x in enumerate(data) if x is not None}}}
+        react = {
+            "react": {
+                "options": {i + 1: x for i, x in enumerate(data) if x is not None}
+            }
+        }
 
         return react
 
@@ -28,7 +27,9 @@ class REACT(DataBlock):
 
         return out
 
-    def _write_conditions(self, parameters: dict, simulator: str, *args, **kwargs) -> bool:
+    def _write_conditions(
+        self, parameters: dict, simulator: str, *args, **kwargs
+    ) -> bool:
         """Check if REACT block should be written."""
         return (
             bool(parameters.get("react", {}).get("options", {}))

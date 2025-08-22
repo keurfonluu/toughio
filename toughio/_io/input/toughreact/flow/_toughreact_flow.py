@@ -4,11 +4,7 @@ import os
 from typing import TextIO
 
 
-def read(
-    filename: str | os.PathLike | TextIO,
-    *args,
-    **kwargs
-) -> dict:
+def read(filename: str | os.PathLike | TextIO, *args, **kwargs) -> dict:
     """
     Read TOUGHREACT flow input file.
 
@@ -31,10 +27,7 @@ def read(
 
 
 def write(
-    filename: str | os.PathLike | TextIO,
-    parameters: dict,
-    *args,
-    **kwargs
+    filename: str | os.PathLike | TextIO, parameters: dict, *args, **kwargs
 ) -> None:
     """
     Write TOUGHREACT flow input file.

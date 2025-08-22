@@ -1,3 +1,5 @@
+"""MESHMAKER module."""
+
 from ._helpers import from_meshmaker
 from ._meshmaker import cylindric_grid, structured_grid
 from ._triangulate import triangulate

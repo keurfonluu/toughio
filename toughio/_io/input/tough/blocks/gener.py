@@ -32,9 +32,10 @@ class GENER(DataBlock):
         label_length: int,
         simulator: str,
         *args,
-        **kwargs
+        **kwargs,
     ) -> dict:
         """Read GENER block data."""
+
         def read_table(f: FileIterator, n: int, reader: RecordFormatter) -> list:
             table = []
 
@@ -165,7 +166,7 @@ class GENER(DataBlock):
         """Read a record in default format."""
         if "," in line:
             return self._read_record_tough4_free(line)
-            
+
         data = self.readers[label_length](line)
 
         return {
@@ -194,10 +195,7 @@ class GENER(DataBlock):
         """Write GENER block data."""
         # Label length
         label_length = max(
-            [
-                len(generator.get("label", ""))
-                for generator in parameters["generators"]
-            ]
+            [len(generator.get("label", "")) for generator in parameters["generators"]]
         )
         label_length = max(label_length, 5)
 
@@ -254,11 +252,7 @@ class GENER(DataBlock):
 
                         data[k] = data[k][0]
 
-            itab = (
-                "1"
-                if np.ndim(data.get("specific_enthalpy")) > 0
-                else None
-            )
+            itab = "1" if np.ndim(data.get("specific_enthalpy")) > 0 else None
 
             # TOUGHREACT
             ktab = len(data.get("conductivity_times", []))
@@ -271,7 +265,7 @@ class GENER(DataBlock):
 
             # Record 1
             values = get_values(data, ltab, itab)
-        
+
             if simulator == "toughreact":
                 values.append(ktab)
 
@@ -286,7 +280,9 @@ class GENER(DataBlock):
 
                 # Record 4
                 if data.get("specific_enthalpy") is not None:
-                    if isinstance(data.get("specific_enthalpy"), (list, tuple, np.ndarray)):
+                    if isinstance(
+                        data.get("specific_enthalpy"), (list, tuple, np.ndarray)
+                    ):
                         specific_enthalpy = data.get("specific_enthalpy")
 
                     else:
@@ -301,7 +297,9 @@ class GENER(DataBlock):
 
         return out
 
-    def _get_values_tough4_free(self, data: dict, ltab: int, itab: int) -> Sequence[Any]:
+    def _get_values_tough4_free(
+        self, data: dict, ltab: int, itab: int
+    ) -> Sequence[Any]:
         """Get values for TOUGH4 free format."""
         return [
             data.get("label", ""),
@@ -311,12 +309,16 @@ class GENER(DataBlock):
             data.get("type"),
             itab,
             None if ltab > 1 and data.get("type") != "DELV" else data.get("rates"),
-            None if ltab > 1 and data.get("type") != "DELV" else data.get("specific_enthalpy"),
+            None
+            if ltab > 1 and data.get("type") != "DELV"
+            else data.get("specific_enthalpy"),
             data.get("layer_thickness"),
             *data.get("lots", []),
         ]
 
-    def _get_values_tough4_fixed(self, data: dict, ltab: int, itab: int) -> Sequence[Any]:
+    def _get_values_tough4_fixed(
+        self, data: dict, ltab: int, itab: int
+    ) -> Sequence[Any]:
         """Get values for TOUGH4 fixed format."""
         return [
             data.get("label", ""),
@@ -329,7 +331,9 @@ class GENER(DataBlock):
             data.get("type"),
             itab,
             None if ltab > 1 and data.get("type") != "DELV" else data.get("rates"),
-            None if ltab > 1 and data.get("type") != "DELV" else data.get("specific_enthalpy"),
+            None
+            if ltab > 1 and data.get("type") != "DELV"
+            else data.get("specific_enthalpy"),
             data.get("layer_thickness"),
             *data.get("lots", []),
         ]
@@ -347,7 +351,9 @@ class GENER(DataBlock):
             data.get("type"),
             itab,
             None if ltab > 1 and data.get("type") != "DELV" else data.get("rates"),
-            None if ltab > 1 and data.get("type") != "DELV" else data.get("specific_enthalpy"),
+            None
+            if ltab > 1 and data.get("type") != "DELV"
+            else data.get("specific_enthalpy"),
             data.get("layer_thickness"),
         ]
 

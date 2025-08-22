@@ -17,12 +17,7 @@ class RelativePermeabilityModel(BaseCurve):
 
     def _eval(self, sl: ArrayLike, *args) -> None: ...
 
-    def plot(
-        self,
-        n: int = 100,
-        ax: Optional[Axes] = None,
-        **kwargs
-    ) -> None:
+    def plot(self, n: int = 100, ax: Optional[Axes] = None, **kwargs) -> None:
         """
         Plot relative permeability curve.
 
@@ -75,7 +70,7 @@ class Linear(RelativePermeabilityModel):
 
         if sgmin >= sgmax:
             raise ValueError("sgmin must be lower than sgmax")
-        
+
         super().__init__(slmin, sgmin, slmax, sgmax)
         self._id = 1
         self._name = "Linear"
@@ -310,7 +305,14 @@ class Verma(RelativePermeabilityModel):
 
     """
 
-    def __init__(self, slr: float = 0.2, sls: float = 0.895, a: float = 1.259, b: float = -1.7615, c: float = 0.5089) -> None:
+    def __init__(
+        self,
+        slr: float = 0.2,
+        sls: float = 0.895,
+        a: float = 1.259,
+        b: float = -1.7615,
+        c: float = 0.5089,
+    ) -> None:
         super().__init__(slr, sls, a, b, c)
         self._id = 8
         self._name = "Verma"

@@ -28,11 +28,7 @@ class SOLVR(DataBlock):
     }
 
     def _read(
-        self,
-        f: FileIterator | TextIO | str,
-        simulator: str,
-        *args,
-        **kwargs
+        self, f: FileIterator | TextIO | str, simulator: str, *args, **kwargs
     ) -> dict:
         """Read SOLVR block data."""
         solvr = {}
@@ -67,10 +63,9 @@ class SOLVR(DataBlock):
         """Write SOLVR block data."""
         if simulator == "tough4":
             lib = parameters["solver"].get("lib", "" if self.free_format else 0)
-            
-            if (
-                (self.free_format and isinstance(lib, int))
-                or (not self.free_format and isinstance(lib, str))
+
+            if (self.free_format and isinstance(lib, int)) or (
+                not self.free_format and isinstance(lib, str)
             ):
                 lib = self._tough4_solvers[lib]
 

@@ -25,7 +25,7 @@ class ELEME(DataBlock):
         label_length: int,
         simulator: str,
         *args,
-        **kwargs
+        **kwargs,
     ) -> dict:
         """Read ELEME block data."""
         eleme = {"elements": {}}
@@ -57,7 +57,11 @@ class ELEME(DataBlock):
 
                 if tmp["material"]:
                     tmp["material"] = tmp["material"].strip()
-                    tmp["material"] = int(tmp["material"]) if tmp["material"].isdigit() else tmp["material"]
+                    tmp["material"] = (
+                        int(tmp["material"])
+                        if tmp["material"].isdigit()
+                        else tmp["material"]
+                    )
 
                 eleme["elements"][label] = self.prune_values(tmp)
 
@@ -91,7 +95,7 @@ class ELEME(DataBlock):
         """Read a record in default format."""
         if "," in line:
             return self._read_record_tough4_free(line)
-            
+
         data = self.readers[label_length](line)
 
         return data[0], {
@@ -108,7 +112,7 @@ class ELEME(DataBlock):
         """Write ELEME block data."""
         # Label length
         label_length = len(max(parameters["elements"], key=len))
-        
+
         # Write records
         if simulator == "tough4":
             if self.free_format:
@@ -127,7 +131,7 @@ class ELEME(DataBlock):
             self.writers[key]([k, *get_values(v)])[0]
             for k, v in parameters["elements"].items()
         ]
-        
+
         return out
 
     @staticmethod
@@ -141,7 +145,7 @@ class ELEME(DataBlock):
             data.get("volume"),
             data.get("heat_exchange_area"),
             data.get("permeability_modifier"),
-            *data.get("center", [None, None, None])
+            *data.get("center", [None, None, None]),
         ]
 
     @staticmethod
@@ -157,7 +161,7 @@ class ELEME(DataBlock):
             data.get("volume"),
             data.get("heat_exchange_area"),
             data.get("permeability_modifier"),
-            *data.get("center", [None, None, None])
+            *data.get("center", [None, None, None]),
         ]
 
     def _write_conditions(self, parameters: dict, *args, **kwargs) -> bool:

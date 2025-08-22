@@ -11,18 +11,14 @@ class TIMBC(DataBlock):
         0: "5d,5s",
         "1/tough": "10s",
         "1/tough3": "10s",
-        "1/tough4": "10s,5d,5d",  
+        "1/tough4": "10s,5d,5d",
         2: "5d,5d",
         3: "10f,10f",
     }
     _space_between_blocks = True
 
     def _read(
-        self,
-        f: FileIterator | TextIO | str,
-        simulator: str,
-        *args,
-        **kwargs
+        self, f: FileIterator | TextIO | str, simulator: str, *args, **kwargs
     ) -> dict:
         """Read TIMBC block data."""
         timbc = {"boundary_conditions": []}
@@ -42,7 +38,7 @@ class TIMBC(DataBlock):
                 # Use a simple parser to handle this
                 tmp1 = [f.next().strip()]
                 data = tmp1 + tmp2
-            
+
             if len(data) < 2:
                 raise ValueError()
 
@@ -93,7 +89,9 @@ class TIMBC(DataBlock):
 
             # Record 2
             if simulator == "tough4":
-                out += self.writers[f"1/{simulator}"]([data["label"], nbcp, data["variable"]])
+                out += self.writers[f"1/{simulator}"](
+                    [data["label"], nbcp, data["variable"]]
+                )
 
             else:
                 # Record 3

@@ -9,15 +9,12 @@ class MOMOP(DataBlock):
     name = "MOMOP"
     formats = {1: ",".join(80 * ["1d"])}
 
-    def _read(
-        self,
-        f: FileIterator | TextIO | str,
-        *args,
-        **kwargs
-    ) -> dict:
+    def _read(self, f: FileIterator | TextIO | str, *args, **kwargs) -> dict:
         """Read MOMOP block data."""
         data = self.readers[1](f)
-        momop = {"more_options": {i + 1: x for i, x in enumerate(data) if x is not None}}
+        momop = {
+            "more_options": {i + 1: x for i, x in enumerate(data) if x is not None}
+        }
 
         return momop
 

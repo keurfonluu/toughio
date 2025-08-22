@@ -48,12 +48,7 @@ class DataBlock:
         self._free_format = free_format
         self._delimiter = delimiter
 
-    def read(
-        self,
-        f: FileIterator | TextIO | str,
-        *args,
-        **kwargs
-    ) -> dict:
+    def read(self, f: FileIterator | TextIO | str, *args, **kwargs) -> dict:
         """Read a data block."""
         if not hasattr(self, "readers"):
             self.readers = {
@@ -76,12 +71,7 @@ class DataBlock:
         """Update input file parameters given a data block."""
         parameters.update(data)
 
-    def write(
-        self,
-        parameters: Optional[dict] = None,
-        *args,
-        **kwargs
-    ) -> list[str]:
+    def write(self, parameters: Optional[dict] = None, *args, **kwargs) -> list[str]:
         """Write a data block."""
         if not self._write_conditions(parameters, *args, **kwargs):
             return []
@@ -131,7 +121,7 @@ class DataBlock:
         from .._common import prune_values
 
         return prune_values(data, value)
-        
+
     def read_model_record(
         self,
         f: FileIterator | TextIO | str,
@@ -196,7 +186,7 @@ class DataBlock:
         """Write model record defined by 'id' and 'parameters'."""
         if key in data:
             values = [data[key]["id"]]
-            
+
             if not writer.free_format:
                 values.append(None)
 

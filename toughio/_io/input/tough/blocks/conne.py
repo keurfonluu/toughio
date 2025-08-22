@@ -25,7 +25,7 @@ class CONNE(DataBlock):
         label_length: int,
         simulator: str,
         *args,
-        **kwargs
+        **kwargs,
     ) -> dict:
         """Read CONNE block data."""
         conne = {"connections": {}}
@@ -77,30 +77,40 @@ class CONNE(DataBlock):
         """Read a record in free format for TOUGH4."""
         data = self.readers["5/tough4-free"](line)
 
-        return data[0], data[1], {
-            "permeability_direction": data[2],
-            "nodal_distances": data[3:5],
-            "interface_area": data[5],
-            "gravity_cosine_angle": data[6],
-            "radiant_emittance_factor": data[7],
-        }
+        return (
+            data[0],
+            data[1],
+            {
+                "permeability_direction": data[2],
+                "nodal_distances": data[3:5],
+                "interface_area": data[5],
+                "gravity_cosine_angle": data[6],
+                "radiant_emittance_factor": data[7],
+            },
+        )
 
-    def _read_record_default(self, line: str, label_length: int) -> tuple[str, str, dict]:
+    def _read_record_default(
+        self, line: str, label_length: int
+    ) -> tuple[str, str, dict]:
         """Read a record in default format."""
         if "," in line:
             return self._read_record_tough4_free(line)
-            
+
         data = self.readers[label_length](line)
 
-        return data[0], data[1], {
-            "nseq": data[2],
-            "nadd": data[3:5],
-            "permeability_direction": data[5],
-            "nodal_distances": data[6:8],
-            "interface_area": data[8],
-            "gravity_cosine_angle": data[9],
-            "radiant_emittance_factor": data[10],
-        }
+        return (
+            data[0],
+            data[1],
+            {
+                "nseq": data[2],
+                "nadd": data[3:5],
+                "permeability_direction": data[5],
+                "nodal_distances": data[6:8],
+                "interface_area": data[8],
+                "gravity_cosine_angle": data[9],
+                "radiant_emittance_factor": data[10],
+            },
+        )
 
     def _write(self, parameters: dict, simulator: str, *args, **kwargs) -> list[str]:
         """Write CONNE block data."""

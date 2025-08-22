@@ -10,12 +10,7 @@ class COORD(DataBlock):
     formats = {1: ",".join(3 * ["20f"])}
     _space_between_blocks = True
 
-    def _read(
-        self,
-        f: FileIterator | TextIO | str,
-        *args,
-        **kwargs
-    ) -> dict:
+    def _read(self, f: FileIterator | TextIO | str, *args, **kwargs) -> dict:
         """Read COORD block data."""
         coord = []
 

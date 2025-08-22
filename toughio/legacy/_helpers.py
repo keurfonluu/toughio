@@ -36,7 +36,9 @@ def from_meshio(mesh: meshio.Mesh) -> Mesh:
     return Mesh(mesh)
 
 
-def from_pyvista(mesh: pv.ExplicitStructuredGrid | pv.StructuredGrid | pv.UnstructuredGrid) -> Mesh:
+def from_pyvista(
+    mesh: pv.ExplicitStructuredGrid | pv.StructuredGrid | pv.UnstructuredGrid,
+) -> Mesh:
     return Mesh(mesh)
 
 
@@ -49,7 +51,9 @@ def get_material_key(cell_data: dict) -> str:
     return key
 
 
-def read_mesh(filename: str | os.PathLike, file_format: Optional[str] = None) -> Mesh | dict:
+def read_mesh(
+    filename: str | os.PathLike, file_format: Optional[str] = None
+) -> Mesh | dict:
     """
     Read mesh from file.
 
@@ -115,11 +119,20 @@ def read_time_series(filename: str | os.PathLike) -> tuple[Mesh, list[dict], Arr
     return Mesh(points, cells), data, time_steps
 
 
-def register_mesh(file_format: str, extensions: list[str], reader: Callable, writer: Optional[Callable] = None):
-    meshio.register_format(file_format, extensions, reader, {file_format: writer} if writer else {})
+def register_mesh(
+    file_format: str,
+    extensions: list[str],
+    reader: Callable,
+    writer: Optional[Callable] = None,
+):
+    meshio.register_format(
+        file_format, extensions, reader, {file_format: writer} if writer else {}
+    )
 
 
-def write_mesh(filename: str | os.PathLike, mesh: Mesh, file_format: Optional[str] = None) -> None:
+def write_mesh(
+    filename: str | os.PathLike, mesh: Mesh, file_format: Optional[str] = None
+) -> None:
     """
     Write mesh to file.
 
@@ -131,7 +144,7 @@ def write_mesh(filename: str | os.PathLike, mesh: Mesh, file_format: Optional[st
         Mesh to export.
     file_format : str, optional
         Output file format.
-    
+
     """
     mesh.write(filename, file_format=file_format)
 
@@ -158,9 +171,8 @@ def write_time_series(
 
     """
     mesh = mesh.copy()
-    
+
     for k, v in data[0].items():
         mesh.add_data(k, v)
 
     mesh.to_xdmf(filename, other_data=data[1:], time_steps=time_steps)
-    

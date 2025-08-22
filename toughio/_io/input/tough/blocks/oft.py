@@ -58,7 +58,7 @@ def _write_oft(
     out = []
 
     for v in parameters[oft_to_key[oft]]:
-        data = v if isinstance(v, dict) else {"label": v }
+        data = v if isinstance(v, dict) else {"label": v}
 
         values = [data.get("label", "")]
         values += [None] if oft != "GOFT" else [None, None]
@@ -80,11 +80,7 @@ class FOFT(DataBlock):
     _space_between_blocks = True
 
     def _read(
-        self,
-        f: FileIterator | TextIO | str,
-        label_length: int,
-        *args,
-        **kwargs
+        self, f: FileIterator | TextIO | str, label_length: int, *args, **kwargs
     ) -> dict:
         """Read FOFT block data."""
         return _read_oft(f, "FOFT", label_length, self.readers)
@@ -118,11 +114,7 @@ class COFT(DataBlock):
     _space_between_blocks = True
 
     def _read(
-        self,
-        f: FileIterator | TextIO | str,
-        label_length: int,
-        *args,
-        **kwargs
+        self, f: FileIterator | TextIO | str, label_length: int, *args, **kwargs
     ) -> dict:
         """Read COFT block data."""
         return _read_oft(f, "COFT", label_length, self.readers)
@@ -156,11 +148,7 @@ class GOFT(DataBlock):
     _space_between_blocks = True
 
     def _read(
-        self,
-        f: FileIterator | TextIO | str,
-        label_length: int,
-        *args,
-        **kwargs
+        self, f: FileIterator | TextIO | str, label_length: int, *args, **kwargs
     ) -> dict:
         """Read GOFT block data."""
         return _read_oft(f, "GOFT", label_length, self.readers)

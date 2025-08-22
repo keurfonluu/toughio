@@ -12,12 +12,7 @@ class OUTPU(DataBlock):
     formats = {1: "20s", 2: "5d", 3: "20s,5d,5d"}
     _space_between_blocks = True
 
-    def _read(
-        self,
-        f: FileIterator | TextIO | str,
-        *args,
-        **kwargs
-    ) -> dict:
+    def _read(self, f: FileIterator | TextIO | str, *args, **kwargs) -> dict:
         """Read OUTPU block data."""
         outpu = {"output": {}}
 
@@ -84,12 +79,14 @@ class OUTPU(DataBlock):
 
         return out
 
-    def _write_conditions(self, parameters: dict, simulator: str, *args, **kwargs) -> bool:
+    def _write_conditions(
+        self, parameters: dict, simulator: str, *args, **kwargs
+    ) -> bool:
         """Check if OUTPU block should be written."""
         outpu = False
 
         for key in ["format", "variables"]:
             if parameters.get("output", {}).get(key) is not None:
                 outpu = True
-            
+
         return outpu and simulator != "toughreact"

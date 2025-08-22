@@ -1,19 +1,20 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import Literal, Optional, TYPE_CHECKING
-from typing_extensions import Self
-
 import os
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Literal, Optional
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import pvgridder as pvg
 import pyvista as pv
-import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 from numpy.typing import ArrayLike
+from typing_extensions import Self
 
 from .history_output import HistoryOutput
+
 
 if TYPE_CHECKING:
     import toughio
@@ -52,7 +53,7 @@ class Pipe:
     ) -> None:
         """Initialize a pipe section."""
         other_data = other_data if other_data is not None else {}
-        
+
         pipe = pv.MultipleLines(points)
         pipe.clear_data()
         pipe.cell_data["Material"] = np.atleast_1d(material)
@@ -61,14 +62,18 @@ class Pipe:
         self._pyvista = pipe
 
         if self.is_porous and material.upper().startswith(("W", "X")):
-            raise ValueError("could not create porous well section with material name starting with 'W' or 'X")
+            raise ValueError(
+                "could not create porous well section with material name starting with 'W' or 'X"
+            )
 
         elif not self.is_porous and not material.upper().startswith(("W", "X")):
-            raise ValueError("could not create well section with material name not starting with 'W' or 'X")
-        
+            raise ValueError(
+                "could not create well section with material name not starting with 'W' or 'X"
+            )
+
         for k, v in other_data.items():
             pipe.cell_data[k] = v
-    
+
     @property
     def inner_radius(self) -> float:
         """Return the inner radius of the pipe section."""
@@ -131,10 +136,7 @@ class Pipe:
 
 
 class WellCasing:
-    """
-    Class representing a well casing.
-
-    """
+    """Class representing a well casing."""
 
     __name__: str = "WellCasing"
     __qualname__: str = "toughio.WellCasing"
@@ -143,7 +145,7 @@ class WellCasing:
         """Initialize a well casing."""
         self._pipes = []
         self._metadata = {"Wellheads": [], "Connections": []}
-        
+
     def add_pipe(
         self,
         material: str,
@@ -183,7 +185,9 @@ class WellCasing:
 
         if self.pipes:
             if self.pipes[-1].inner_radius > inner_radius:
-                raise ValueError(f"could not add pipe with smaller inner radius than {self.pipes[-1].inner_radius}")
+                raise ValueError(
+                    f"could not add pipe with smaller inner radius than {self.pipes[-1].inner_radius}"
+                )
 
         self.pipes.append(pipe)
 
@@ -191,7 +195,16 @@ class WellCasing:
 
     def set_connection(
         self,
-        type_: Literal["backward", "branch", "forward", "gas", "heat", "liquid", "none", "perforation"],
+        type_: Literal[
+            "backward",
+            "branch",
+            "forward",
+            "gas",
+            "heat",
+            "liquid",
+            "none",
+            "perforation",
+        ],
         pipe1: Pipe,
         pipe2: Optional[Pipe] = None,
         zmin: Optional[float] = None,
@@ -215,14 +228,13 @@ class WellCasing:
             The upper depth interval.
 
         """
-        if (
-            pipe1 not in self.pipes
-            or (pipe2 is not None and pipe2 not in self.pipes)
-        ):
+        if pipe1 not in self.pipes or (pipe2 is not None and pipe2 not in self.pipes):
             raise ValueError("could not define connection with pipes not in the casing")
 
         elif type_ == "perforation" and pipe2 is not None:
-            raise ValueError("could not define a perforation connection with an end pipe")
+            raise ValueError(
+                "could not define a perforation connection with an end pipe"
+            )
 
         if pipe2 is not None:
             if type_ not in {"branch", "forward", "backward", "none"}:
@@ -235,7 +247,14 @@ class WellCasing:
             zmax = zmax if zmax is not None else min(pipe1.zmax, pipe2.zmax)
 
         else:
-            if type_ not in {"heat", "perforation", "gas", "liquid", "backward", "none"}:
+            if type_ not in {
+                "heat",
+                "perforation",
+                "gas",
+                "liquid",
+                "backward",
+                "none",
+            }:
                 raise ValueError(f"invalid well-formation connection type '{type_}'")
 
             zmin = zmin if zmin else pipe1.zmin
@@ -295,7 +314,7 @@ class WellCasing:
         well_only: bool = False,
         xscale: Optional[float] = None,
         zscale: Optional[float] = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         """
         Plot a well.
@@ -315,7 +334,7 @@ class WellCasing:
         mesh = self.to_pyvista(well_only=well_only)
 
         p = pv.Plotter(**kwargs)
-        
+
         if xscale or zscale:
             p.set_scale(xscale=xscale, zscale=zscale)
 
@@ -382,12 +401,16 @@ class WellOutput(HistoryOutput):
         """Initialize a well output."""
         super().__init__(obj, metadata)
 
-    def __call__(self, t: Optional[ArrayLike] = None, z: Optional[ArrayLike] = None) -> WellOutput:
+    def __call__(
+        self, t: Optional[ArrayLike] = None, z: Optional[ArrayLike] = None
+    ) -> WellOutput:
         """Interpolate a well output."""
         from scipy.interpolate import griddata
 
         if t is None and z is None:
-            raise ValueError("could not interpolate well output without time or depth data")
+            raise ValueError(
+                "could not interpolate well output without time or depth data"
+            )
 
         t = t if t is not None else self.time
         z = z if z is not None else self.depth
@@ -446,7 +469,7 @@ class WellOutput(HistoryOutput):
             Additional arguments to pass to the plot function.
         **kwargs
             Additional keyword arguments to pass to the plot function.
-        
+
         """
         ax = ax if ax is not None else plt.gca()
         t = self.time
@@ -473,7 +496,7 @@ class WellOutput(HistoryOutput):
             ax.yaxis.set_inverted(True)
             ax.set_xlabel("Time")
             ax.set_ylabel("Depth")
-            
+
         if logx:
             ax.set_xscale("log")
 
@@ -558,7 +581,10 @@ class WellTrajectory:
             arg = pv.read(arg)
 
         if isinstance(arg, pv.DataSet):
-            if isinstance(arg, pv.PolyData) and arg.user_dict.get("toughioType") == "WellTrajectory":
+            if (
+                isinstance(arg, pv.PolyData)
+                and arg.user_dict.get("toughioType") == "WellTrajectory"
+            ):
                 self._pipes = [
                     Pipe(
                         points=line.points,
@@ -569,7 +595,7 @@ class WellTrajectory:
                             k: v
                             for k, v in line.cell_data.items()
                             if k not in {"Material", "Radius", "Thickness"}
-                        }
+                        },
                     )
                     for line in pvg.split_lines(arg, as_lines=False)
                 ]
@@ -580,19 +606,17 @@ class WellTrajectory:
 
             else:
                 raise TypeError("could not initialize well trajectory")
-            
+
         elif isinstance(arg, (list, tuple, np.ndarray)) and np.ndim(arg) == 1:
             origin = arg
-            
+
             if wellhead_material is None or wellhead_inner_radius is None:
                 raise ValueError(
                     "could not initialize well trajectory from an origin points without wellhead material and inner radius"
                 )
 
             self.direction = (
-                (0.0, 0.0, -1.0)
-                if initial_direction is None
-                else initial_direction
+                (0.0, 0.0, -1.0) if initial_direction is None else initial_direction
             )
             self._pipes = [
                 Pipe(
@@ -665,7 +689,7 @@ class WellTrajectory:
         )
 
         return self.pipes[-1]
-    
+
     def intersect(
         self,
         mesh: pv.DataSet | toughio.Mesh,
@@ -693,11 +717,13 @@ class WellTrajectory:
         from .. import CylindricMesh, Mesh
 
         if isinstance(mesh, CylindricMesh):
-            raise ValueError("could not intersect a well trajectory with a cylindric mesh")
-        
+            raise ValueError(
+                "could not intersect a well trajectory with a cylindric mesh"
+            )
+
         elif isinstance(mesh, Mesh):
             mesh = mesh.pyvista
-        
+
         intersection = pvg.intersect_polyline(
             mesh,
             line=self.to_pyvista(as_lines=True),
@@ -710,12 +736,9 @@ class WellTrajectory:
         intersection.user_dict["toughioType"] = "WellTrajectory"
 
         return self.__class__(intersection)
-    
+
     def plot(
-        self,
-        plotter: Optional[pv.Plotter] = None,
-        show_points: bool = True,
-        **kwargs
+        self, plotter: Optional[pv.Plotter] = None, show_points: bool = True, **kwargs
     ) -> None:
         """
         Plot the well trajectory.
@@ -774,7 +797,7 @@ class WellTrajectory:
 
         """
         return self.__class__(self.to_pyvista().translate(vector))
-    
+
     def write(self, filename: str | os.PathLike) -> None:
         """
         Write the well trajectory to a file.
@@ -788,14 +811,14 @@ class WellTrajectory:
         self.to_pyvista().save(filename)
 
     save = write  # Alias to avoid confusion
-    
+
     def to_pyvista(
         self,
         as_lines: bool = False,
     ) -> pv.PolyData:
         """
         Return the PyVista representation of the well trajectory.
-        
+
         Parameters
         ----------
         as_lines : bool, default False
@@ -820,7 +843,7 @@ class WellTrajectory:
     def direction(self) -> ArrayLike:
         """Return the end direction of the well trajectory."""
         return self._direction
-    
+
     @direction.setter
     def direction(self, value: ArrayLike) -> None:
         """Set the end direction of the well trajectory."""

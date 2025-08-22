@@ -14,7 +14,7 @@ def write(
     mopr_10: int = 0,
     mopr_11: int = 0,
     verbose: bool = True,
-    **kwargs
+    **kwargs,
 ) -> None:
     """
     Write TOUGHREACT solute input file.

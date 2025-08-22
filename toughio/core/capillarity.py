@@ -17,12 +17,7 @@ class CapillarityModel(BaseCurve):
 
     def _eval(self, sl: ArrayLike, *args) -> None: ...
 
-    def plot(
-        self,
-        n: int = 100,
-        ax: Optional[Axes] = None,
-        **kwargs
-    ) -> None:
+    def plot(self, n: int = 100, ax: Optional[Axes] = None, **kwargs) -> None:
         """
         Plot capillary pressure curve.
 
@@ -120,7 +115,7 @@ class Pickens(CapillarityModel):
     def _eval(self, sl: ArrayLike, *args) -> ArrayLike:
         """Pickens et al function."""
         p0, slr, sl0, x = args
-        
+
         sl = sl.clip(1.001 * slr, 0.999 * sl0)
         A = (1.0 + sl / sl0) * (sl0 - slr) / (sl0 + slr)
         B = 1.0 - sl / sl0
@@ -149,7 +144,9 @@ class TRUST(CapillarityModel):
 
     """
 
-    def __init__(self, p0: float, slr: float, eta: float, pe: float, pmax: float) -> None:
+    def __init__(
+        self, p0: float, slr: float, eta: float, pe: float, pmax: float
+    ) -> None:
         """Initialize TRUST capillarity model."""
         if slr < 0.0:
             raise ValueError("slr must be greater than 0.0")
@@ -230,7 +227,9 @@ class vanGenuchten(CapillarityModel):
 
     """
 
-    def __init__(self, m: float, slr: float, alpha: float, pmax: float, sls: float) -> None:
+    def __init__(
+        self, m: float, slr: float, alpha: float, pmax: float, sls: float
+    ) -> None:
         """Initialize van Genuchten's capillarity model."""
         if pmax < 0.0:
             raise ValueError("pmax must be greater than 0.0")
@@ -246,7 +245,9 @@ class vanGenuchten(CapillarityModel):
         Seff = (sl - slr) / (sls - slr)
         mask = sl > slr
         pcap = np.full_like(sl, -abs(pmax))
-        pcap[mask] = (-1.0 / abs(alpha) * (Seff[mask] ** (-1.0 / m) - 1.0) ** (1.0 - m)).clip(-abs(pmax), None)
+        pcap[mask] = (
+            -1.0 / abs(alpha) * (Seff[mask] ** (-1.0 / m) - 1.0) ** (1.0 - m)
+        ).clip(-abs(pmax), None)
         pcap *= np.where(sl > 0.999, (1.0 - sl) / 0.001, 1.0)
 
         return pcap

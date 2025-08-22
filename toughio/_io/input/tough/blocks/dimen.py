@@ -10,12 +10,7 @@ class DIMEN(DataBlock):
     formats = {1: ",".join(8 * ["10d"])}
     multiples = {1}
 
-    def _read(
-        self,
-        f: FileIterator | TextIO | str,
-        *args,
-        **kwargs
-    ) -> dict:
+    def _read(self, f: FileIterator | TextIO | str, *args, **kwargs) -> dict:
         """Read DIMEN block data."""
         dimen = {"array_dimensions": {}}
 
@@ -54,7 +49,8 @@ class DIMEN(DataBlock):
     def _write(self, parameters: dict, *args, **kwargs) -> list[str]:
         """Write DIMEN block data."""
         values = [
-            parameters["array_dimensions"].get(key) for key in [
+            parameters["array_dimensions"].get(key)
+            for key in [
                 "n_rocks",
                 "n_times",
                 "n_generators",

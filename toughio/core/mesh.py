@@ -31,7 +31,7 @@ class BaseMesh(ABC):
     ) -> None:
         """Initialize a mesh."""
         if len(args) == 1:
-            mesh, = args
+            (mesh,) = args
 
             if isinstance(mesh, BaseMesh):
                 self._pyvista = mesh.pyvista
@@ -47,7 +47,9 @@ class BaseMesh(ABC):
 
             elif isinstance(mesh, meshio.Mesh):
                 if mesh.cell_sets:
-                    mesh.cell_data["Material"] = [np.full(len(c.data), -1, dtype=int) for c in mesh.cells]
+                    mesh.cell_data["Material"] = [
+                        np.full(len(c.data), -1, dtype=int) for c in mesh.cells
+                    ]
 
                     for i, (k, v) in enumerate(mesh.cell_sets.items()):
                         mesh.field_data[k] = np.array([i + 1, 3])
@@ -55,11 +57,13 @@ class BaseMesh(ABC):
                         for ii, vv in enumerate(v):
                             if vv is not None and len(vv):
                                 mesh.cell_data["Material"][ii][vv] = i + 1
-                
+
                 self._pyvista = pv.from_meshio(mesh)
 
                 if mesh.field_data:
-                    self.metadata["Material"] = {k: int(v[0]) for k, v in mesh.field_data.items()}
+                    self.metadata["Material"] = {
+                        k: int(v[0]) for k, v in mesh.field_data.items()
+                    }
 
             elif isinstance(mesh, (str, os.PathLike)):
                 if pathlib.Path(mesh).suffix == ".f3grid":
@@ -78,11 +82,15 @@ class BaseMesh(ABC):
             raise ValueError()
 
         if isinstance(self.pyvista, pv.UnstructuredGrid):
-            self._pyvista = pvg.extract_cells_by_dimension(self.pyvista, keep_empty_cells=True)
+            self._pyvista = pvg.extract_cells_by_dimension(
+                self.pyvista, keep_empty_cells=True
+            )
 
         # Cache user_dict in metadata for performance
         # Update user_dict with metadata when saving mesh
-        self._metadata = copy.deepcopy(metadata) if metadata else dict(self.pyvista.user_dict)
+        self._metadata = (
+            copy.deepcopy(metadata) if metadata else dict(self.pyvista.user_dict)
+        )
 
         try:
             material_key = self.material_key
@@ -109,7 +117,10 @@ class BaseMesh(ABC):
             return self.pyvista.get_cell(key)
 
         else:
-            mesh = self.__class__(self._cast_to_unstructured_grid(self.pyvista).extract_cells(key), metadata=self.metadata)
+            mesh = self.__class__(
+                self._cast_to_unstructured_grid(self.pyvista).extract_cells(key),
+                metadata=self.metadata,
+            )
             mesh.labels = self.labels[key]
 
             return mesh
@@ -158,7 +169,11 @@ class BaseMesh(ABC):
                 self.data[name] = arr[:n_cells]
 
             elif len(arr) == n_active:
-                self.data[name] = np.full((n_cells, arr.shape[1] if arr.ndim > 1 else 1), np.nan, dtype=arr.dtype)
+                self.data[name] = np.full(
+                    (n_cells, arr.shape[1] if arr.ndim > 1 else 1),
+                    np.nan,
+                    dtype=arr.dtype,
+                )
                 self.data[name][active] = arr
 
             else:
@@ -167,7 +182,7 @@ class BaseMesh(ABC):
         from .. import ElementOutput
 
         if len(args) == 1:
-            data, = args
+            (data,) = args
 
             if isinstance(data, ElementOutput):
                 data = data.data
@@ -198,10 +213,10 @@ class BaseMesh(ABC):
             Material name.
         imat : int, optional
             Material ID. Older materials with the same ID will be removed.
-        
+
         """
         material_key = self.material_key
-        
+
         if imat is None:
             imat = len(self.metadata[material_key])
 
@@ -213,7 +228,9 @@ class BaseMesh(ABC):
 
         self.metadata[material_key][material] = imat
 
-    def extract_cells_by_material(self, material: int | str | Sequence[int | str], invert: bool = False) -> Self:
+    def extract_cells_by_material(
+        self, material: int | str | Sequence[int | str], invert: bool = False
+    ) -> Self:
         """
         Extract cells with given material names or IDS.
 
@@ -223,7 +240,7 @@ class BaseMesh(ABC):
             List of material names or IDs to extract.
         invert : bool, default False
             If True, invert selection.
-        
+
         Returns
         -------
         toughio.Mesh
@@ -234,7 +251,9 @@ class BaseMesh(ABC):
 
         return self[mask]
 
-    def extract_slice(self, normal: str | ArrayLike, origin: Optional[ArrayLike] = None) -> Self:
+    def extract_slice(
+        self, normal: str | ArrayLike, origin: Optional[ArrayLike] = None
+    ) -> Self:
         """
         Extract cells along a plane defined by its origin and normal vector.
 
@@ -255,7 +274,9 @@ class BaseMesh(ABC):
 
         return Mesh(mesh, metadata=self.metadata)
 
-    def fuse_cells(self, ind: ArrayLike | Sequence[ArrayLike], inplace: bool = False) -> None | Self:
+    def fuse_cells(
+        self, ind: ArrayLike | Sequence[ArrayLike], inplace: bool = False
+    ) -> None | Self:
         """
         Fuse cells.
 
@@ -273,7 +294,7 @@ class BaseMesh(ABC):
 
         """
         mask = np.ones(self.n_cells, dtype=bool)
-            
+
         for ids in ind:
             mask[ids[1:]] = False
 
@@ -290,7 +311,9 @@ class BaseMesh(ABC):
 
             return mesh
 
-    def find_cells_by_material(self, material: int | str | Sequence[int | str], invert: bool = False) -> ArrayLike:
+    def find_cells_by_material(
+        self, material: int | str | Sequence[int | str], invert: bool = False
+    ) -> ArrayLike:
         """
         Find cells with given material names or IDS.
 
@@ -300,7 +323,7 @@ class BaseMesh(ABC):
             List of material names or IDs to query.
         invert : bool, default False
             If True, invert selection.
-        
+
         Returns
         -------
         ArrayLike
@@ -311,7 +334,9 @@ class BaseMesh(ABC):
 
         try:
             material_map = self.metadata[self.material_key]
-            material = np.unique([mat if isinstance(mat, int) else material_map[mat] for mat in material])
+            material = np.unique(
+                [mat if isinstance(mat, int) else material_map[mat] for mat in material]
+            )
 
         except KeyError as e:
             raise ValueError(f"invalid material {e}")
@@ -339,7 +364,7 @@ class BaseMesh(ABC):
             Coordinates of point(s) to query.
         material : int | str | Sequence[int | str], optional
             List of material names or IDs to query.
-        
+
         Returns
         -------
         ArrayLike
@@ -347,9 +372,7 @@ class BaseMesh(ABC):
 
         """
         mesh = (
-            self.extract_cells_by_material(material)
-            if material is not None
-            else self
+            self.extract_cells_by_material(material) if material is not None else self
         )
 
         ids = mesh.pyvista.find_containing_cell(points)
@@ -358,7 +381,7 @@ class BaseMesh(ABC):
             if material is not None
             else ids
         )
-            
+
         return np.int64(ids) if np.ndim(ids) == 0 else ids
 
     def find_nearest_cell(
@@ -375,7 +398,7 @@ class BaseMesh(ABC):
             Coordinates of point(s) to query.
         material : int | str | Sequence[int | str], optional
             List of material names or IDs to query.
-        
+
         Returns
         -------
         ArrayLike
@@ -383,9 +406,7 @@ class BaseMesh(ABC):
 
         """
         mesh = (
-            self.extract_cells_by_material(material)
-            if material is not None
-            else self
+            self.extract_cells_by_material(material) if material is not None else self
         )
         centers = mesh.centers
 
@@ -393,7 +414,7 @@ class BaseMesh(ABC):
         ids = KDTree(centers[mask]).query(points)[1]
         ids = np.arange(mesh.n_cells)[mask][ids]
         ids = mesh.data["vtkOriginalCellIds"][ids] if material is not None else ids
-            
+
         return ids
 
     near = find_nearest_cell
@@ -408,7 +429,7 @@ class BaseMesh(ABC):
             Name of data array to rename.
         new : str
             Name to rename the data array to.
-        
+
         """
         self.pyvista.rename_array(old, new, preference="cell")
 
@@ -422,7 +443,7 @@ class BaseMesh(ABC):
             Active state to set.
         ind : ArrayLike, optional
             Indices of cells for which active state will be assigned to.
-    
+
         """
         if "vtkGhostType" not in self.data:
             self.data["vtkGhostType"] = np.zeros(self.n_cells, dtype=np.uint8)
@@ -458,10 +479,12 @@ class BaseMesh(ABC):
             Cell label.
         ind : ArrayLike, optional
             Indice of cell for which label will be assigned to.
-    
+
         """
         if len(label) != self.label_length:
-            raise ValueError(f"could not set label of length {len(label)} (expected length {self.label_length})")
+            raise ValueError(
+                f"could not set label of length {len(label)} (expected length {self.label_length})"
+            )
 
         self.metadata["Label"][ind] = label
 
@@ -475,17 +498,17 @@ class BaseMesh(ABC):
             Material name.
         ind : ArrayLike, optional
             Indices of cells for which material will be assigned to.
-    
+
         """
         ind = ind if ind is not None else np.ones(self.n_cells, dtype=bool)
         material_key = self.material_key
 
         if material_key not in self.metadata:
             self.metadata[material_key] = {material: 0}
-        
+
         try:
             imat = self.metadata[material_key][material]
-        
+
         except KeyError:
             imat = len(self.metadata[material_key])
             self.metadata[material_key][material] = imat
@@ -512,7 +535,7 @@ class BaseMesh(ABC):
             Upper bound value. If None, default to +Infinity.
         axis : int, default 2
             Axis along which filter is applied.
-    
+
         """
         vmin = vmin if vmin is not None else -np.inf
         vmax = vmax if vmax is not None else np.inf
@@ -552,7 +575,7 @@ class BaseMesh(ABC):
         gravity: Optional[ArrayLike] = None,
         assume_orthogonal: bool = False,
         incon: bool = False,
-        **kwargs
+        **kwargs,
     ) -> dict | None:
         """
         Convert mesh to TOUGH mesh.
@@ -579,17 +602,22 @@ class BaseMesh(ABC):
             TOUGH mesh as a dict. Only provided if *filename* is None.
 
         """
+
         def dot(A: ArrayLike, B: ArrayLike) -> ArrayLike:
             """Calculate the dot product when arrays A and B have the same shape."""
             return (A * B).sum(axis=1)
 
-        def intersection_line_plane(centers: ArrayLike, lines: ArrayLike, points: ArrayLike, normals: ArrayLike) -> ArrayLike:
+        def intersection_line_plane(
+            centers: ArrayLike, lines: ArrayLike, points: ArrayLike, normals: ArrayLike
+        ) -> ArrayLike:
             """Calculate the intersection point between a line and a plane."""
             tmp = dot(points - centers, normals) / dot(lines, normals)
 
             return centers + lines * tmp[:, None]
 
-        def distance_point_plane(centers: ArrayLike, points: ArrayLike, normals: ArrayLike, mask: ArrayLike) -> ArrayLike:
+        def distance_point_plane(
+            centers: ArrayLike, points: ArrayLike, normals: ArrayLike, mask: ArrayLike
+        ) -> ArrayLike:
             """Calculate the orthogonal distance of a point to a plane."""
             return np.where(mask, 1.0e-9, np.abs(dot(centers - points, normals)))
 
@@ -612,7 +640,9 @@ class BaseMesh(ABC):
         inactive_labels = set(labels[inactive])
 
         # Connection data
-        connections, face_centers, face_normals, face_areas = mesh._compute_connection_properties()
+        connections, face_centers, face_normals, face_areas = (
+            mesh._compute_connection_properties()
+        )
         labels_1 = labels[connections[:, 0]]
         labels_2 = labels[connections[:, 1]]
         centers_1 = centers[connections[:, 0]]
@@ -627,30 +657,40 @@ class BaseMesh(ABC):
         # Nodal distances, permeability directions and gravity angles
         if not assume_orthogonal:
             fp = intersection_line_plane(centers_1, lines, face_centers, face_normals)
-            distances_1 = np.where(bounds_1, 1.0e-9, np.linalg.norm(centers_1 - fp, axis=1))
-            distances_2 = np.where(bounds_2, 1.0e-9, np.linalg.norm(centers_2 - fp, axis=1))
+            distances_1 = np.where(
+                bounds_1, 1.0e-9, np.linalg.norm(centers_1 - fp, axis=1)
+            )
+            distances_2 = np.where(
+                bounds_2, 1.0e-9, np.linalg.norm(centers_2 - fp, axis=1)
+            )
             permeability_directions = np.abs(lines).argmax(axis=1) + 1
             angles = lines @ gravity
 
         else:
-            distances_1 = distance_point_plane(centers_1, face_centers, face_normals, bounds_1)
-            distances_2 = distance_point_plane(centers_2, face_centers, face_normals, bounds_2)
+            distances_1 = distance_point_plane(
+                centers_1, face_centers, face_normals, bounds_1
+            )
+            distances_2 = distance_point_plane(
+                centers_2, face_centers, face_normals, bounds_2
+            )
             permeability_directions = np.abs(face_normals).argmax(axis=1) + 1
-            angles = np.sign((face_normals * lines).sum(axis=1)) * (face_normals @ gravity)
+            angles = np.sign((face_normals * lines).sum(axis=1)) * (
+                face_normals @ gravity
+            )
 
         # Write MESH file
         # Elements
         elements = {
             label: {
                 "material": (
-                    material_name[material]
-                    if material in material_name
-                    else material
+                    material_name[material] if material in material_name else material
                 ),
                 "volume": volume,
                 "center": center,
             }
-            for label, material, volume, center in zip(labels, materials, volumes, centers)
+            for label, material, volume, center in zip(
+                labels, materials, volumes, centers
+            )
             if label not in inactive_labels
         }
 
@@ -669,8 +709,12 @@ class BaseMesh(ABC):
             label = f"{l1}{l2}"
 
             if label in connections:
-                connections[label]["nodal_distances"][0] = min(connections[label]["nodal_distances"][0], d1)
-                connections[label]["nodal_distances"][1] = min(connections[label]["nodal_distances"][1], d2)
+                connections[label]["nodal_distances"][0] = min(
+                    connections[label]["nodal_distances"][0], d1
+                )
+                connections[label]["nodal_distances"][1] = min(
+                    connections[label]["nodal_distances"][1], d2
+                )
                 connections[label]["interface_area"] += face_area
 
             else:
@@ -701,10 +745,16 @@ class BaseMesh(ABC):
             )
             parameters["initial_conditions"] = {}
 
-            for label, phi, k, index, values in zip(labels, porosities, permeabilities, phase_compositions, initial_conditions):
+            for label, phi, k, index, values in zip(
+                labels,
+                porosities,
+                permeabilities,
+                phase_compositions,
+                initial_conditions,
+            ):
                 if label in inactive_labels:
                     continue
-                
+
                 tmp = {}
 
                 if phi != 0.0:
@@ -729,7 +779,12 @@ class BaseMesh(ABC):
             write_input(filename, parameters, block="mesh", **kwargs)
 
             if incon:
-                write_input(pathlib.Path(filename).parent / "INCON", parameters, block="incon", **kwargs)
+                write_input(
+                    pathlib.Path(filename).parent / "INCON",
+                    parameters,
+                    block="incon",
+                    **kwargs,
+                )
 
         else:
             return parameters
@@ -758,12 +813,16 @@ class BaseMesh(ABC):
         filename = pathlib.Path(filename)
         other_data = other_data if other_data else []
         data = [self.data, *other_data]
-        
+
         nt = len(data)
-        time_steps = np.asanyarray(time_steps) if time_steps is not None else np.arange(nt)
+        time_steps = (
+            np.asanyarray(time_steps) if time_steps is not None else np.arange(nt)
+        )
 
         if time_steps is not None and len(time_steps) != nt:
-            raise ValueError(f"inconsitent number of data ({nt}) and time steps ({len(time_steps)})")
+            raise ValueError(
+                f"inconsitent number of data ({nt}) and time steps ({len(time_steps)})"
+            )
 
         # Convert to meshio
         mesh = pv.to_meshio(self.pyvista)
@@ -808,7 +867,7 @@ class BaseMesh(ABC):
         gravity: Optional[ArrayLike] = None,
         assume_orthogonal: bool = False,
         incon: bool = False,
-        **kwargs
+        **kwargs,
     ) -> None:
         """
         Write mesh to TOUGH MESH file.
@@ -838,7 +897,9 @@ class BaseMesh(ABC):
             incon,
         )
 
-    def write(self, filename: str | os.PathLike, file_format: Optional[str] = None) -> None:
+    def write(
+        self, filename: str | os.PathLike, file_format: Optional[str] = None
+    ) -> None:
         """
         Write mesh to file.
 
@@ -867,7 +928,7 @@ class BaseMesh(ABC):
         parallel_projection: bool = False,
         enable_picking: bool = False,
         tolerance: float = 0.0,
-        **kwargs
+        **kwargs,
     ) -> None:
         """
         Plot a mesh.
@@ -985,7 +1046,7 @@ class BaseMesh(ABC):
     def _cast_to_unstructured_grid(mesh: pv.DataSet) -> pv.UnstructuredGrid:
         """
         Properly cast mesh to unstructured grid.
-        
+
         Note
         ----
         This method prevents the conversion of ghost cells to empty cells.
@@ -1006,12 +1067,13 @@ class BaseMesh(ABC):
 
         return mesh
 
-    def _compute_connection_properties(self) -> tuple[ArrayLike, ArrayLike, ArrayLike, ArrayLike]:
+    def _compute_connection_properties(
+        self,
+    ) -> tuple[ArrayLike, ArrayLike, ArrayLike, ArrayLike]:
         """Compute connection properties."""
-        poly = (
-            pvg.extract_cell_geometry(self.pyvista, remove_ghost_cells=True)
-            .compute_cell_sizes(length=True, area=True, volume=False)
-        )
+        poly = pvg.extract_cell_geometry(
+            self.pyvista, remove_ghost_cells=True
+        ).compute_cell_sizes(length=True, area=True, volume=False)
         mask = (poly["vtkOriginalCellIds"] >= 0).all(axis=1)
         connections = poly["vtkOriginalCellIds"][mask]
         centers = poly.cell_centers(vertex=False).points[mask]
@@ -1022,17 +1084,23 @@ class BaseMesh(ABC):
 
         else:
             normals = np.diff(
-                poly.points[np.delete(poly.lines.reshape((poly.n_lines, 3)), 0, axis=1)],
+                poly.points[
+                    np.delete(poly.lines.reshape((poly.n_lines, 3)), 0, axis=1)
+                ],
                 axis=1,
             ).squeeze()
-            normals = np.column_stack((normals[:, 2], np.zeros(poly.n_lines), -normals[:, 0]))
+            normals = np.column_stack(
+                (normals[:, 2], np.zeros(poly.n_lines), -normals[:, 0])
+            )
             normals /= np.linalg.norm(normals, axis=1)[:, np.newaxis]
             normals = normals[mask]
             lengths_or_areas = poly["Length"][mask]
 
         return connections, centers, normals, lengths_or_areas
 
-    def _get_property(self, name: str, default: Optional[ArrayLike] = None) -> ArrayLike:
+    def _get_property(
+        self, name: str, default: Optional[ArrayLike] = None
+    ) -> ArrayLike:
         """Get property data."""
         if name not in self.data:
             data = np.zeros(self.n_cells, dtype=float) if default is None else default
@@ -1043,7 +1111,10 @@ class BaseMesh(ABC):
     @property
     def active(self) -> ArrayLike:
         """Return active cell array."""
-        return self._get_property("vtkGhostType", np.zeros(self.n_cells, dtype=np.uint8)) == 0
+        return (
+            self._get_property("vtkGhostType", np.zeros(self.n_cells, dtype=np.uint8))
+            == 0
+        )
 
     @property
     def centers(self) -> ArrayLike:
@@ -1116,7 +1187,7 @@ class BaseMesh(ABC):
 
         except KeyError:
             pass
-        
+
         self.metadata["Material Key"] = value
 
     @property
@@ -1129,9 +1200,7 @@ class BaseMesh(ABC):
 
             return np.array(
                 [
-                    material_map[material]
-                    if material in material_map
-                    else material
+                    material_map[material] if material in material_map else material
                     for material in self.materials_digitized
                 ]
             )
@@ -1182,7 +1251,9 @@ class BaseMesh(ABC):
     @property
     def phase_compositions(self) -> ArrayLike:
         """Return phase composition array."""
-        return self._get_property("Phase Composition", np.zeros(self.n_cells, dtype=int))
+        return self._get_property(
+            "Phase Composition", np.zeros(self.n_cells, dtype=int)
+        )
 
     @phase_compositions.setter
     def phase_compositions(self, value: ArrayLike) -> None:
@@ -1215,13 +1286,17 @@ class BaseMesh(ABC):
         is3d = self.ndim == 3
         key = "Volume" if is3d else "Area"
 
-        return np.abs(self.pyvista.compute_cell_sizes(length=False, area=not is3d, volume=is3d)[key])
+        return np.abs(
+            self.pyvista.compute_cell_sizes(length=False, area=not is3d, volume=is3d)[
+                key
+            ]
+        )
 
 
 class Mesh(BaseMesh):
     """
     Mesh class.
-    
+
     Parameters
     ----------
     args : str | os.PathLike | GridLike | meshio.Mesh | toughio.Mesh | ArrayLike
@@ -1273,7 +1348,7 @@ class Mesh(BaseMesh):
         """
         if not isinstance(well, WellTrajectory):
             raise TypeError("could not add well: expected a WellTrajectory instance")
-        
+
         if "IntersectedCellIds" not in well.to_pyvista().cell_data:
             well = well.intersect(self, min_length, tolerance)
 
@@ -1311,7 +1386,7 @@ class Mesh(BaseMesh):
 
         """
         return Mesh(self.pyvista.clean(produce_merge_map=False))
-    
+
     def _add_well_to_tough(self, parameters: dict, gravity: ArrayLike) -> None:
         """
         Add well to TOUGH mesh parameters.
@@ -1323,6 +1398,7 @@ class Mesh(BaseMesh):
 
         """
         from scipy.spatial.transform import Rotation
+
         from . import Labeler
 
         offset = self.n_cells
@@ -1347,7 +1423,7 @@ class Mesh(BaseMesh):
                 length = line.cell_data["Length"][0]
                 material = line.cell_data["Material"][0]
                 intersected_cell_id = line.cell_data["IntersectedCellIds"][0]
-                area = np.pi * radius ** 2
+                area = np.pi * radius**2
                 interface_area = length * 2.0 * np.pi * radius
 
                 # Define well element
@@ -1371,7 +1447,9 @@ class Mesh(BaseMesh):
                     vol2 = parameters["elements"][l2]["volume"]
 
                     if vol1 >= vol2:
-                        raise ValueError("could not embed a well element in a rock element with smaller volume")
+                        raise ValueError(
+                            "could not embed a well element in a rock element with smaller volume"
+                        )
 
                     # Calculate gravity cosine angle rotating direction vector by 90 degrees
                     v1 = line.points[1] - line.points[0]
@@ -1389,7 +1467,7 @@ class Mesh(BaseMesh):
                         gravity_cosine_angle = (dvec / np.linalg.norm(dvec)) @ gravity
 
                     # Calculate nodal distance using equivalent mass approach
-                    r2 = ((vol2 - vol1) / (np.pi * length) + radius ** 2) ** 0.5
+                    r2 = ((vol2 - vol1) / (np.pi * length) + radius**2) ** 0.5
                     d2 = 0.5 * (r2 - radius)
 
                     well_rock_connections[f"{label}{l2}"] = {
@@ -1405,7 +1483,10 @@ class Mesh(BaseMesh):
             for l1, l2 in zip(well_labels[:-1], well_labels[1:]):
                 area1, area2 = well_sizes[l1]["area"], well_sizes[l2]["area"]
                 length1, length2 = well_sizes[l1]["length"], well_sizes[l2]["length"]
-                center1, center2 = well_elements[l1]["center"], well_elements[l2]["center"]
+                center1, center2 = (
+                    well_elements[l1]["center"],
+                    well_elements[l2]["center"],
+                )
 
                 dvec = center2 - center1
                 well_well_connections[f"{l1}{l2}"] = {
@@ -1449,7 +1530,7 @@ class CylindricMesh(BaseMesh):
     ) -> None:
         """
         Cylindric mesh class.
-        
+
         Parameters
         ----------
         args : str | os.PathLike | GridLike | toughio.Mesh
@@ -1479,13 +1560,19 @@ class CylindricMesh(BaseMesh):
 
         if not force:
             if not isinstance(self.pyvista, pv.StructuredGrid):
-                raise ValueError("could not initialize a cylindric mesh from an unstructured mesh")
+                raise ValueError(
+                    "could not initialize a cylindric mesh from an unstructured mesh"
+                )
 
             if self.pyvista.dimensions[1] != 1:
-                raise ValueError("could not initialize a cylindric mesh from a non vertical mesh")
+                raise ValueError(
+                    "could not initialize a cylindric mesh from a non vertical mesh"
+                )
 
             if x.size * z.size != np.prod(self.pyvista.dimensions):
-                raise ValueError("could not initialize a cylindric mesh from a non rectilinear mesh")
+                raise ValueError(
+                    "could not initialize a cylindric mesh from a non rectilinear mesh"
+                )
 
         self.points[:, 0] -= x[0]
         self.points[:, 1] = 0.0
@@ -1505,9 +1592,13 @@ class CylindricMesh(BaseMesh):
 
             return mesh
 
-    def _compute_connection_properties(self) -> tuple[ArrayLike, ArrayLike, ArrayLike, ArrayLike]:
+    def _compute_connection_properties(
+        self,
+    ) -> tuple[ArrayLike, ArrayLike, ArrayLike, ArrayLike]:
         """Compute connection properties."""
-        connections, centers, normals, lengths = super()._compute_connection_properties()
+        connections, centers, normals, lengths = (
+            super()._compute_connection_properties()
+        )
 
         # This is counterintuitive but the areas can be calculated with the same
         # instruction given the definitions of x (center) and L (length) for horizontal
@@ -1537,7 +1628,9 @@ class CylindricMesh(BaseMesh):
         x = np.unique(self.points[:, 0])
 
         if not np.isin(well.radii, x).all():
-            raise ValueError("could not generate wellbore with radius not matching radial discretization of porous medium")
+            raise ValueError(
+                "could not generate wellbore with radius not matching radial discretization of porous medium"
+            )
 
         well_domain = np.full(self.n_cells, -1)
         cells_to_fuse = []
@@ -1551,21 +1644,22 @@ class CylindricMesh(BaseMesh):
             self.set_material(pipe.material, mask)
             self.set_active(True, mask)
             well_domain[mask] = -id_ if pipe.is_porous else id_
-            
+
             # Find horizontally connected cells to be fused to ensure 1D vertical flow in wellbore
             pipe_centers = centers[mask]
 
             if not pipe.is_porous and np.ptp(pipe_centers[:, 0]) > 0.0:
                 for z in np.unique(pipe_centers[:, 2]):
-                    cells_to_fuse.append(np.flatnonzero(np.logical_and(mask, centers[:, 2] == z)))
+                    cells_to_fuse.append(
+                        np.flatnonzero(np.logical_and(mask, centers[:, 2] == z))
+                    )
 
         self.data["WellDomain"] = well_domain
 
         # Fuse cells (this will change the mesh to an unstructured grid)
         # Only fuse cells with the same material ID
         cells_to_fuse = [
-            ids for ids in cells_to_fuse
-            if np.ptp(self.materials_digitized[ids]) == 0
+            ids for ids in cells_to_fuse if np.ptp(self.materials_digitized[ids]) == 0
         ]
 
         if cells_to_fuse:
@@ -1601,7 +1695,9 @@ class CylindricMesh(BaseMesh):
 
         # Wellheads
         for i, wellhead in enumerate(well.wellheads):
-            whid = self.find_nearest_cell((wellhead.inner_radius, 0.0, wellhead.zmax), material=wellhead.material)
+            whid = self.find_nearest_cell(
+                (wellhead.inner_radius, 0.0, wellhead.zmax), material=wellhead.material
+            )
             self.set_label(f"#WH{i + 1:02d}", whid)
 
     def copy(self, deep: bool = True) -> Self:
@@ -1631,7 +1727,7 @@ class CylindricMesh(BaseMesh):
         gravity: Optional[ArrayLike] = None,
         assume_orthogonal: bool = True,
         incon: bool = False,
-        **kwargs
+        **kwargs,
     ) -> dict | None:
         """
         Convert mesh to TOUGH mesh.
@@ -1664,7 +1760,7 @@ class CylindricMesh(BaseMesh):
             gravity=gravity,
             assume_orthogonal=assume_orthogonal,
             incon=incon,
-            **kwargs
+            **kwargs,
         )
 
     def _add_well_to_tough(self, parameters: dict, **kwargs) -> None:
@@ -1685,7 +1781,13 @@ class CylindricMesh(BaseMesh):
             well_connections = self.metadata.get("WellConnection", {})
             well_isots = {
                 "well": {"branch": 3, "heat": -1, "forward": 4, "backward": 5},
-                "formation": {"heat": -1, "perforation": 1, "gas": 4, "liquid": 5, "backward": 6},
+                "formation": {
+                    "heat": -1,
+                    "perforation": 1,
+                    "gas": 4,
+                    "liquid": 5,
+                    "backward": 6,
+                },
             }
 
             # Update connections
@@ -1697,16 +1799,21 @@ class CylindricMesh(BaseMesh):
                 wid1, wid2 = int(well_domain[i1]), int(well_domain[i2])
 
                 # Well connections
-                if (wid1 >= 0 or wid2 >= 0):
+                if wid1 >= 0 or wid2 >= 0:
                     # Well-well connection
                     if f"{min(wid1, wid2)}-{max(wid1, wid2)}" in well_connections:
                         key = "well"
                         connection_key = f"{min(wid1, wid2)}-{max(wid1, wid2)}"
 
                     # Vertical well-formation connection
-                    elif f"{min(abs(wid1), abs(wid2))}-{max(abs(wid1), abs(wid2))}" in well_connections:
+                    elif (
+                        f"{min(abs(wid1), abs(wid2))}-{max(abs(wid1), abs(wid2))}"
+                        in well_connections
+                    ):
                         key = "formation"
-                        connection_key = f"{min(abs(wid1), abs(wid2))}-{max(abs(wid1), abs(wid2))}"
+                        connection_key = (
+                            f"{min(abs(wid1), abs(wid2))}-{max(abs(wid1), abs(wid2))}"
+                        )
 
                     # Well-formation connection
                     elif str(wid1) in well_connections or str(wid2) in well_connections:
@@ -1782,7 +1889,11 @@ class CylindricMesh(BaseMesh):
         """Return cell volume array."""
         get_min_max = lambda arr: (arr.min(), arr.max())
         cells = pvg.get_cell_connectivity(self._cast_to_unstructured_grid(self.pyvista))
-        xmin, xmax = np.transpose([get_min_max(self.points[:, 0][cell]) for cell in cells])
-        zmin, zmax = np.transpose([get_min_max(self.points[:, 2][cell]) for cell in cells])
-        
-        return np.pi * (xmax ** 2 - xmin ** 2) * (zmax - zmin)
+        xmin, xmax = np.transpose(
+            [get_min_max(self.points[:, 0][cell]) for cell in cells]
+        )
+        zmin, zmax = np.transpose(
+            [get_min_max(self.points[:, 2][cell]) for cell in cells]
+        )
+
+        return np.pi * (xmax**2 - xmin**2) * (zmax - zmin)

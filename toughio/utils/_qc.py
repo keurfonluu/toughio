@@ -21,7 +21,7 @@ def plot_eleme_conne(
     cmap: Optional[str] = None,
     point_size: int = 8,
     line_width: int = 4,
-    **kwargs
+    **kwargs,
 ) -> None:
     """
     Plot elements and/or connections in TOUGH MESH file.
@@ -56,7 +56,7 @@ def plot_eleme_conne(
 
     if not (show_elements or show_connections):
         raise ValueError()
-    
+
     if isinstance(parameters, (CylindricMesh, Mesh)):
         parameters = parameters.to_tough()
 
@@ -84,7 +84,7 @@ def plot_eleme_conne(
 
         except KeyError:
             continue
-        
+
         connections.setdefault(v["permeability_direction"], []).append(line)
 
     # Plot
@@ -101,7 +101,7 @@ def plot_eleme_conne(
             render_points_as_spheres=True,
             point_size=point_size,
         )
-    
+
     if show_connections:
         for k, v in connections.items():
             if k in {0, 1, 2, 3}:

@@ -46,7 +46,7 @@ class INCON(DataBlock):
         eos: str,
         simulator: str,
         *args,
-        **kwargs
+        **kwargs,
     ) -> dict:
         """Read INCON block data."""
         incon = {"initial_conditions": {}}
@@ -63,7 +63,9 @@ class INCON(DataBlock):
         flag = False
 
         if simulator == "toughreact":
-            read_record = partial(self._read_record_toughreact, label_length=label_length)
+            read_record = partial(
+                self._read_record_toughreact, label_length=label_length
+            )
 
         elif simulator == "tough4":
             if self.free_format:
@@ -73,7 +75,9 @@ class INCON(DataBlock):
                 read_record = self._read_record_tough4_fixed
 
         elif eos in {"eco2m", "tmvoc"}:
-            read_record = partial(self._read_record_eco2m_tmvoc, label_length=label_length)
+            read_record = partial(
+                self._read_record_eco2m_tmvoc, label_length=label_length
+            )
 
         else:
             read_record = partial(self._read_record_default, label_length=label_length)
@@ -148,7 +152,9 @@ class INCON(DataBlock):
             "permeability": permeability if permeability else None,
         }
 
-    def _read_record_eco2m_tmvoc(self, line: str, label_length: int) -> tuple[str, dict]:
+    def _read_record_eco2m_tmvoc(
+        self, line: str, label_length: int
+    ) -> tuple[str, dict]:
         """Read record 1 for ECO2M and TMVOC."""
         data = self.readers[f"{label_length}/eco2m"](line)
 
@@ -161,7 +167,7 @@ class INCON(DataBlock):
         """Read record 1 for default format."""
         if "," in line:
             return self._read_record_tough4_free(line)
-            
+
         data = self.readers[label_length](line)
         userx = self.prune_values(data[4:])
 
@@ -240,7 +246,7 @@ class INCON(DataBlock):
             data.get("phase_state"),
             *per,
         ]
-    
+
     @staticmethod
     def _get_values_tough4_fixed(data: dict) -> Sequence[Any]:
         """Get values of record 1 for TOUGH4 in fixed format."""

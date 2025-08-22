@@ -1,3 +1,5 @@
+"""Core classes."""
+
 from . import capillarity, relative_permeability
 from .data_block import DataBlock
 from .exceptions import ReadError

@@ -109,7 +109,18 @@ def read_buffer(f, time_steps=None):
 
                 for line in f:
                     line = line.strip().split(",")
-                    data.append(list(map(lambda x: None if not x.strip() else int(x) if x.isnumeric() else float(x), line)))
+                    data.append(
+                        list(
+                            map(
+                                lambda x: None
+                                if not x.strip()
+                                else int(x)
+                                if x.isnumeric()
+                                else float(x),
+                                line,
+                            )
+                        )
+                    )
 
                 zones.append({"data": data})
                 break

@@ -53,11 +53,7 @@ def read(filename: str | os.PathLike | TextIO, **kwargs):
     return parameters
 
 
-def write(
-    filename: str | os.PathLike | TextIO,
-    parameters: dict,
-    **kwargs
-):
+def write(filename: str | os.PathLike | TextIO, parameters: dict, **kwargs):
     """
     Export TOUGH parameters to json.
 
@@ -84,7 +80,7 @@ def write(
 
         elif isinstance(x, dict):
             return {k: jsonify(v) for k, v in x.items()}
-            
+
         else:
             return x
 

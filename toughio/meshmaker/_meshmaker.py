@@ -51,7 +51,9 @@ def structured_grid(
         raise ValueError("could not initialize structured grid with non 1D arrays")
 
     if (dx < 0.0).any() or (dy < 0.0).any() or (dz < 0.0).any():
-        raise ValueError("could not initialize structured grid with negative grid spacings")
+        raise ValueError(
+            "could not initialize structured grid with negative grid spacings"
+        )
 
     if not bottom_up:
         dz = dz[::-1]
@@ -142,7 +144,9 @@ def cylindric_grid(
         raise ValueError("could not initialize cylindric grid with non 1D arrays")
 
     if (dr < 0.0).any() or (dz < 0.0).any():
-        raise ValueError("could not initialize cylindric grid with negative grid spacings")
+        raise ValueError(
+            "could not initialize cylindric grid with negative grid spacings"
+        )
 
     mesh = structured_grid(
         dr,

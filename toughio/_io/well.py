@@ -6,8 +6,8 @@ from typing import TextIO
 import pandas as pd
 
 from .output.tecplot._tecplot import read_buffer
-from ..core import WellOutput
 from .._common import open_file
+from ..core import WellOutput
 
 
 def read(filename: str | os.PathLike | TextIO) -> WellOutput:
@@ -33,6 +33,8 @@ def read(filename: str | os.PathLike | TextIO) -> WellOutput:
     out = []
 
     for well_id, well_df in df.groupby("WellID"):
-        out.append(WellOutput(well_df.sort_values(["Time", "Depth"]).to_dict(orient="list")))
-    
+        out.append(
+            WellOutput(well_df.sort_values(["Time", "Depth"]).to_dict(orient="list"))
+        )
+
     return out

@@ -1,9 +1,5 @@
 from __future__ import annotations
 
-from collections.abc import Callable, Sequence
-from typing import Literal, Optional
-
-import numpy as np
 import os
 import pathlib
 import platform
@@ -13,9 +9,12 @@ import shutil
 import signal
 import subprocess
 import tempfile
-import time
 import threading
+import time
+from collections.abc import Callable, Sequence
+from typing import Literal, Optional
 
+import numpy as np
 import psutil
 from tqdm import tqdm
 
@@ -111,7 +110,9 @@ def run(
     other_filenames = (
         {k: k for k in other_filenames}
         if isinstance(other_filenames, (list, tuple))
-        else other_filenames if other_filenames else {}
+        else other_filenames
+        if other_filenames
+        else {}
     )
 
     ignore_patterns = list(ignore_patterns) if ignore_patterns else []
@@ -190,7 +191,9 @@ def run(
             shutil.copy(input_path, input_filename)
 
     else:
-        write_input(simulation_dir / "INFILE", input_filename, file_format=simulator, **kwargs)
+        write_input(
+            simulation_dir / "INFILE", input_filename, file_format=simulator, **kwargs
+        )
         input_filename = simulation_dir / "INFILE"
 
     # Copy other simulation files to working directory
@@ -255,7 +258,7 @@ def run(
 
             except ValueError:
                 tough4_args += ["-t", n_omp]
-        
+
         if tough4_args:
             cmd = f"{cmd} {' '.join(map(str, tough4_args))}"
 
@@ -393,7 +396,7 @@ def run(
 
             if not match_pattern:
                 move_file(filename, working_dir)
-            
+
         shutil.rmtree(simulation_dir, ignore_errors=True)
         os.remove(working_dir / "tempdir.txt")
 
@@ -413,11 +416,11 @@ def display_progress_bar(
     message = f"Starting {simulator.upper()} simulation"
     pattern1 = re.compile(
         r"At\s*\[\s*(\d+)\s*,\s*(\d+)\s*\]:\s*TimeStep\s*=\s*([+-]?\d*\.?\d+E[+-]?\d+|\d+)\s*MAX\{Residual\}\s*=\s*([+-]?\d*\.?\d+E[+-]?\d+|\d+)",
-        re.IGNORECASE
+        re.IGNORECASE,
     )
     pattern2 = re.compile(
         r"\(\s*(\d+)\s*,\s*(\d+)\s*\)\s*ST\s*=\s*([+-]?\d*\.?\d+E[+-]?\d+|\d+)\s*DT\s*=\s*([+-]?\d*\.?\d+E[+-]?\d+|\d+)",
-        re.IGNORECASE
+        re.IGNORECASE,
     )
 
     with tqdm(initial=t_ini, total=t_max, bar_format=f"{message}...") as pbar:
@@ -472,12 +475,12 @@ def display_progress_bar(
 
         pbar.bar_format = f"End of {simulator.upper()} simulation at t={pretty_time(pbar.n)} ({{elapsed}})"
         pbar.update(0.0)
-    
+
 
 def pretty_time(seconds: float) -> str:
     """
     Convert seconds to a human-readable format.
-    
+
     Parameters
     ----------
     seconds : float
@@ -494,7 +497,7 @@ def pretty_time(seconds: float) -> str:
 
     elif seconds < 86400.0:
         return f"{seconds / 3600.0:.2f} hr"
-        
+
     elif seconds < 31557600.0:
         return f"{seconds / 86400.0:.2f} day"
 

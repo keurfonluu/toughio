@@ -24,7 +24,7 @@ def triangulate(points, material="dfalt"):
 
     """
     from ..core import CellBlock, Mesh
-    
+
     try:
         from scipy.spatial import Delaunay
     except ImportError:
