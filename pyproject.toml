@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools >= 61.0"]
+requires = ["setuptools >= 77.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,8 +7,9 @@ name = "toughio"
 dynamic = ["version"]
 description = "Pre- and post-processing Python library for TOUGH"
 readme = {file = "README.rst", content-type = "text/x-rst"}
-requires-python = ">=3.8"
-license = {text = "BSD 3-Clause License"}
+requires-python = ">=3.9"
+license = "BSD-3-Clause"
+license-files = ["LICENSE"]
 authors = [
     {name = "Keurfon Luu", email = "keurfonluu@lbl.gov"}
 ]
@@ -22,7 +23,6 @@ keywords = [
     "tough4",
 ]
 classifiers = [
-    "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
     "Development Status :: 5 - Production/Stable",
     "Programming Language :: Python :: 3.8",
@@ -41,7 +41,7 @@ dependencies = [
     "numpy >= 1.13.0",
     "pandas",
     "pyvista >= 0.36",
-    "pyvista-gridder >= 0.4",
+    "pyvista-gridder >= 0.4.2",
     "psutil >= 5.0",
     "scipy >= 0.9",
     "tqdm",
@@ -68,7 +68,7 @@ version = {attr = "toughio.__about__.__version__"}
 
 [tool.ruff]
 line-length = 88
-target-version = "py38"
+target-version = "py39"
 
 exclude = [
     "toughio/__about__.py"
