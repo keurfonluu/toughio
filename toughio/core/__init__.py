@@ -9,4 +9,4 @@ from .mesh import CylindricMesh, Mesh
 from .output import ConnectionOutput, ElementOutput, Output
 from .particle_tracker import ParticleTracker
 from .record_formatter import RecordFormatter
-from .well import Pipe, WellCasing, WellOutput
+from .well import Pipe, WellCasing, WellOutput, WellTrajectory

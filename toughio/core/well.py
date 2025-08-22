@@ -1,7 +1,10 @@
 from __future__ import annotations
 
-from typing import Literal, Optional
+from collections.abc import Sequence
+from typing import Literal, Optional, TYPE_CHECKING
+from typing_extensions import Self
 
+import os
 import numpy as np
 import pandas as pd
 import pvgridder as pvg
@@ -12,58 +15,68 @@ from numpy.typing import ArrayLike
 
 from .history_output import HistoryOutput
 
+if TYPE_CHECKING:
+    import toughio
+
 
 class Pipe:
-    """Pipe class."""
+    """
+    Class representing a section of a wellbore.
+
+    Parameters
+    ----------
+    points : ArrayLike
+        3D coordinates of the points of the polyline representing the pipe.
+    material : str
+        Material of the pipe.
+    inner_radius : float
+        Inner radius of the pipe.
+    thickness : float, default 0.0
+        Thickness of the pipe. If non-zero, the pipe is treated as a porous medium.
+    other_data : dict, optional
+        Additional data to be stored in the pipe's cell data.
+
+    """
 
     __name__: str = "Pipe"
     __qualname__: str = "toughio.Pipe"
 
     def __init__(
         self,
-        radius: float,
-        zmin: float,
-        zmax: float,
+        points: ArrayLike,
         material: str,
+        inner_radius: float,
         thickness: float = 0.0,
+        other_data: Optional[dict] = None,
     ) -> None:
         """Initialize a pipe."""
-        self.radius = radius
-        self.zmin = zmin
-        self.zmax = zmax
-        self.material = material
-        self.thickness = thickness
+        other_data = other_data if other_data is not None else {}
+        
+        pipe = pv.MultipleLines(points)
+        pipe.clear_data()
+        pipe.cell_data["Material"] = material
+        pipe.cell_data["Radius"] = inner_radius
+        pipe.cell_data["Thickness"] = thickness
+        self._pyvista = pipe
 
         if self.is_porous and material.upper().startswith(("W", "X")):
             raise ValueError("could not create porous well section with material name starting with 'W' or 'X")
 
         elif not self.is_porous and not material.upper().startswith(("W", "X")):
             raise ValueError("could not create well section with material name not starting with 'W' or 'X")
+        
+        for k, v in other_data.items():
+            pipe.cell_data[k] = v
+    
+    @property
+    def inner_radius(self) -> float:
+        """Return pipe's inner radius."""
+        return self.pyvista.cell_data["Radius"][0]
 
-    def to_pyvista(self, resolution: int = 64) -> pv.PolyData:
-        """
-        Convert pipe to a PyVista mesh.
-
-        Parameters
-        ----------
-        resolution : int, default 64
-            Number of points on the circular face of the cylinder.
-
-        Returns
-        -------
-        pyvista.PolyData
-            Output mesh.
-
-        """
-        center = [0.0, 0.0, 0.5 * (self.zmin + self.zmax)]
-        pipe = (
-            pvg.CylindricalShell(self.radius, self.radius + self.thickness, self.length, 1, resolution, center=center).cast_to_unstructured_grid().clean(1.0e-8)
-            if self.is_porous
-            else pv.Cylinder(center, [0.0, 0.0, -1.0], self.radius, self.length, resolution, capping=False)
-        )
-        pipe.cell_data["Material"] = np.array([self.material] * resolution, dtype="<U5")
-
-        return pipe
+    @inner_radius.setter
+    def inner_radius(self, value: float) -> None:
+        """Set pipe's inner radius."""
+        self.pyvista.cell_data["Radius"] = value
 
     @property
     def is_porous(self) -> bool:
@@ -73,57 +86,47 @@ class Pipe:
     @property
     def length(self) -> float:
         """Return pipe's length."""
-        return self.zmax - self.zmin
+        return np.linalg.norm(np.diff(self.points, axis=0), axis=1).sum()
 
     @property
     def material(self) -> str:
         """Return pipe's material."""
-        return self._material
+        return self.pyvista.cell_data["Material"][0]
 
     @material.setter
     def material(self, value: str) -> None:
         """Set pipe's material."""
-        self._material = value
+        self.pyvista.cell_data["Material"] = value
 
     @property
-    def radius(self) -> float:
-        """Return pipe's radius."""
-        return self._radius
+    def points(self) -> ArrayLike:
+        """Return 3D coordinates of the pipe."""
+        return self.pyvista.points
 
-    @radius.setter
-    def radius(self, value: float) -> None:
-        """Set pipe's radius."""
-        self._radius = value
+    @property
+    def pyvista(self) -> pv.PolyData:
+        """Return underlying PyVista mesh."""
+        return self._pyvista
 
     @property
     def thickness(self) -> float:
         """Return pipe's thickness."""
-        return self._thickness
+        return self.pyvista.cell_data["Thickness"][0]
 
     @thickness.setter
     def thickness(self, value: float) -> None:
         """Set pipe's thickness."""
-        self._thickness = value
+        self.pyvista.cell_data["Thickness"] = value
 
     @property
     def zmin(self) -> float:
         """Return pipe's bottom depth."""
-        return self._zmin
-
-    @zmin.setter
-    def zmin(self, value: float) -> None:
-        """Set pipe's bottom depth."""
-        self._zmin = value
+        return self.points[:, 2].min()
 
     @property
     def zmax(self) -> float:
         """Return pipe's top depth."""
-        return self._zmax
-
-    @zmax.setter
-    def zmax(self, value: float) -> None:
-        """Set pipe's top depth."""
-        self._zmax = value
+        return self.points[:, 2].max()
 
 
 class WellCasing:
@@ -142,10 +145,10 @@ class WellCasing:
         
     def add_pipe(
         self,
-        radius: float,
+        material: str,
+        inner_radius: float,
         zmin: float,
         zmax: float,
-        material: str,
         thickness: float = 0.0,
     ) -> Pipe:
         """
@@ -153,14 +156,14 @@ class WellCasing:
 
         Parameters
         ----------
-        radius : float
-            Radius.
+        material : str
+            Material.
+        inner_radius : float
+            Inner radius.
         zmin : float
             Bottom depth.
         zmax : float
             Top depth.
-        material : str
-            Material.
         thickness : float, default 0.0
             Thickness. If non-zero, pipe is treated as a porous medium.
 
@@ -170,10 +173,14 @@ class WellCasing:
             Pipe section.
 
         """
-        pipe = Pipe(radius, zmin, zmax, material, thickness)
+        points = [
+            [0.0, 0.0, zmin],
+            [0.0, 0.0, zmax],
+        ]
+        pipe = Pipe(points, material, inner_radius, thickness)
 
         if self.pipes:
-            if self.pipes[-1].radius > radius:
+            if self.pipes[-1].radius > inner_radius:
                 raise ValueError()
 
         self.pipes.append(pipe)
@@ -506,3 +513,341 @@ class WellOutput(HistoryOutput):
         time_key = self._get_time_key()
 
         return np.unique(self[time_key]) if time_key else None
+
+
+class WellTrajectory:
+    """
+    Class representing the trajectory of a well.
+
+    Parameters
+    ----------
+    arg : str | PathLike | ArrayLike | pyvista.PolyData
+        Initialize a new well trajectory instance:
+
+         - From a file
+         - From a polyline
+         - From an array representing the origin point (usually the bottom of the wellhead)
+
+    wellhead_material : str
+        The material of the wellhead. Only used if *arg* is an array.
+    wellhead_inner_radius : float
+        The inner radius of the wellhead. Only used if *arg* is an array.
+    wellhead_height : float, default 1.0
+        The height of the wellhead. Only used if *arg* is an array.
+    initial_direction : ArrayLike, optional
+        The initial direction of the well trajectory (usually pointing downward). Only
+        used if *arg* is an array.
+
+    """
+
+    __name__: str = "WellTrajectory"
+    __qualname__: str = "toughio.WellTrajectory"
+
+    def __init__(
+        self,
+        arg: str | os.PathLike | ArrayLike | pv.PolyData,
+        wellhead_material: Optional[str] = None,
+        wellhead_inner_radius: Optional[float] = None,
+        wellhead_height: float = 1.0,
+        initial_direction: Optional[ArrayLike] = None,
+    ) -> None:
+        """Initialize the well trajectory."""
+        if isinstance(arg, (str, os.PathLike)):
+            arg = pv.read(arg)
+
+        if isinstance(arg, pv.DataSet):
+            if isinstance(arg, pv.PolyData) and arg.user_dict.get("toughioType") == "WellTrajectory":
+                self._pipes = [
+                    Pipe(
+                        points=line.points,
+                        material=line.cell_data["Material"][0],
+                        inner_radius=line.cell_data["Radius"][0],
+                        thickness=line.cell_data["Thickness"][0],
+                        other_data={
+                            k: v
+                            for k, v in line.cell_data.items()
+                            if k not in {"Material", "Radius", "Thickness"}
+                        }
+                    )
+                    for line in pvg.split_lines(arg, as_lines=False)
+                ]
+                self.direction = arg.user_dict.get(
+                    "DirectionVector",
+                    self.points[-1] - self.points[-2],
+                )
+
+            else:
+                raise TypeError("could not initialize well trajectory")
+            
+        elif isinstance(arg, (list, tuple, np.ndarray)) and np.ndim(arg) == 1:
+            origin = arg
+            
+            if wellhead_material is None or wellhead_inner_radius is None:
+                raise ValueError(
+                    "could not initialize well trajectory from an origin points without wellhead material and inner radius"
+                )
+
+            self.direction = (
+                (0.0, 0.0, -1.0)
+                if initial_direction is None
+                else initial_direction
+            )
+            self._pipes = [
+                Pipe(
+                    points=[
+                        origin - wellhead_height * self.direction,
+                        origin,
+                    ],
+                    material=wellhead_material,
+                    inner_radius=wellhead_inner_radius,
+                )
+            ]
+
+        else:
+            raise ValueError("could not initialize well trajectory")
+
+    def add_pipe(
+        self,
+        material: str,
+        inner_radius: float,
+        length: float,
+        resolution: int = 1,
+        end_direction: Optional[ArrayLike] = None,
+        curved: bool = False,
+    ) -> None:
+        """
+        Add a pipe to the well trajectory.
+
+        Parameters
+        ----------
+        material : str
+            The material of the pipe.
+        inner_radius : float
+            The inner radius of the pipe.
+        length : float
+            The length of the pipe.
+        resolution : int, optional
+            The resolution along the pipe (i.e., discretization).
+        end_direction : ArrayLike, optional
+            The end direction of the pipe.
+        curved : bool, default False
+            If True, incrementally deviate the pipe until end direction is reached.
+
+        """
+        origin = self.points[-1]
+        end_direction = end_direction if end_direction is not None else self.direction
+
+        points = (
+            pvg.CurvedLine(
+                origin=origin,
+                length=length,
+                start=self.direction,
+                end=end_direction,
+                resolution=resolution,
+            )
+            if curved
+            else pvg.CurvedLine(
+                origin=origin,
+                length=length,
+                start=end_direction,
+                resolution=resolution,
+            )
+        ).points
+        self.direction = end_direction
+        self.pipes.append(
+            Pipe(
+                points=points,
+                material=material,
+                inner_radius=inner_radius,
+            )
+        )
+
+        return self.pipes[-1]
+    
+    def intersect(
+        self,
+        mesh: pv.DataSet | toughio.Mesh,
+        min_length: float = 1.0e-4,
+        tolerance: float = 1.0e-8,
+    ) -> Self:
+        """
+        Intersect the well trajectory with a mesh.
+
+        Parameters
+        ----------
+        mesh : pyvista.DataSet | toughio.Mesh
+            The mesh to intersect with.
+        min_length : float, default 1.0e-4
+            The minimum length of an intersection.
+        tolerance : float, default 1.0e-8
+            The absolute tolerance to use to find cells along the trajectory.
+
+        Returns
+        -------
+        toughio.WellTrajectory
+            The intersected well trajectory.
+
+        """
+        from .. import CylindricMesh, Mesh
+
+        if isinstance(mesh, CylindricMesh):
+            raise ValueError("could not intersect a well trajectory with a cylindric mesh")
+        
+        elif isinstance(mesh, Mesh):
+            mesh = mesh.pyvista
+        
+        intersection = pvg.intersect_polyline(
+            mesh,
+            line=self.to_pyvista(as_lines=True),
+            min_length=min_length,
+            tolerance=tolerance,
+            pass_cell_data=True,
+            ignore_points_before_entry=False,
+            ignore_points_after_exit=True,
+        )
+        intersection.user_dict["toughioType"] = "WellTrajectory"
+
+        return self.__class__(intersection)
+    
+    def plot(
+        self,
+        plotter: Optional[pv.Plotter] = None,
+        show_points: bool = True,
+        **kwargs
+    ) -> None:
+        """
+        Plot the well trajectory.
+
+        Parameters
+        ----------
+        plotter : Optional[pyvista.Plotter], optional
+            Active plotter.
+        show_points : bool, default True
+            Whether to show the points along the well trajectory.
+        **kwargs
+            Additional keyword arguments to pass to the plotter.
+
+        """
+        mesh = self.to_pyvista()
+
+        if plotter is None:
+            p = pv.Plotter(**kwargs)
+
+        else:
+            p = plotter
+
+        p.add_mesh(
+            mesh,
+            color="black",
+            line_width=5,
+            render_lines_as_tubes=True,
+        )
+
+        if show_points:
+            p.add_mesh(
+                pv.PolyData(mesh.points),
+                color="red",
+                point_size=5,
+                render_points_as_spheres=True,
+            )
+
+        p.add_axes()
+
+        if plotter is None:
+            p.show()
+
+    def shift(self, vector: ArrayLike) -> Self:
+        """
+        Shift the well trajectory by a given vector.
+
+        Parameters
+        ----------
+        vector : ArrayLike
+            The vector by which to shift the well trajectory.
+
+        Returns
+        -------
+        toughio.WellTrajectory
+            The shifted well trajectory.
+
+        """
+        return self.__class__(self.to_pyvista().translate(vector))
+    
+    def write(self, filename: str | os.PathLike) -> None:
+        """
+        Write the well trajectory to a file.
+
+        Parameters
+        ----------
+        filename : str | PathLike
+            The output file name.
+
+        """
+        self.to_pyvista().save(filename)
+
+    save = write  # Alias to avoid confusion
+    
+    def to_pyvista(
+        self,
+        as_lines: bool = False,
+    ) -> pv.PolyData:
+        """
+        Return the PyVista representation of the well trajectory.
+        
+        Parameters
+        ----------
+        as_lines : bool, default False
+            If True, return the well trajectory as multiple lines.
+
+        Returns
+        -------
+        pyvista.PolyData
+            The PyVista representation of the well trajectory.
+
+        """
+        mesh = pvg.merge_lines(
+            [pipe.pyvista for pipe in self.pipes],
+            as_lines=as_lines,
+        )
+        mesh.user_dict["toughioType"] = "WellTrajectory"
+        mesh.user_dict["DirectionVector"] = self.direction.tolist()
+
+        return mesh
+
+    @property
+    def direction(self) -> ArrayLike:
+        """Return the end direction of the well trajectory."""
+        return self._direction
+    
+    @direction.setter
+    def direction(self, value: ArrayLike) -> None:
+        """Set the end direction of the well trajectory."""
+        self._direction = np.atleast_1d(value) / np.linalg.norm(value)
+
+    @property
+    def intersected_cell_ids(self) -> ArrayLike | None:
+        """Return intersected cell IDs."""
+        mesh = self.to_pyvista()
+        ids = mesh.cell_data.get("IntersectedCellIds")
+
+        return ids[ids >= 0] if ids is not None else None
+
+    @property
+    def length(self) -> float:
+        """Return the length of the well trajectory."""
+        return (np.linalg.norm(np.diff(self.points, axis=0), axis=1)).sum()
+
+    @property
+    def pipes(self) -> Sequence[Pipe]:
+        """Return the pipes along the well trajectory."""
+        return self._pipes
+
+    @property
+    def points(self) -> ArrayLike:
+        """Return the points of the well trajectory."""
+        return np.vstack(
+            [
+                self.pipes[0].points,
+                *[pipe.points[1:] for pipe in self.pipes[1:]],
+            ]
+        )

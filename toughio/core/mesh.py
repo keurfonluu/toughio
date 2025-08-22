@@ -3,7 +3,7 @@ from __future__ import annotations
 import copy
 import os
 import pathlib
-from abc import ABC
+from abc import ABC, abstractmethod
 from collections.abc import Sequence
 from typing import Optional
 
@@ -15,7 +15,7 @@ from numpy.typing import ArrayLike
 from scipy.spatial import KDTree
 from typing_extensions import Self
 
-from .well import Pipe, WellCasing
+from .well import WellCasing, WellTrajectory
 
 
 class BaseMesh(ABC):
@@ -722,6 +722,9 @@ class BaseMesh(ABC):
                 if tmp:
                     parameters["initial_conditions"][label] = tmp
 
+        # Add well parameters
+        self._add_well_to_tough(parameters, gravity=gravity)
+
         if filename:
             write_input(filename, parameters, block="mesh", **kwargs)
 
@@ -964,6 +967,19 @@ class BaseMesh(ABC):
 
         if plotter is None:
             p.show()
+
+    @abstractmethod
+    def _add_well_to_tough(self, parameters: dict, **kwargs) -> None:
+        """
+        Add well to TOUGH mesh parameters.
+
+        Parameters
+        ----------
+        parameters : dict
+            TOUGH mesh parameters.
+
+        """
+        pass
 
     @staticmethod
     def _cast_to_unstructured_grid(mesh: pv.DataSet) -> pv.UnstructuredGrid:
@@ -1232,6 +1248,36 @@ class Mesh(BaseMesh):
     ) -> None:
         """Initialize a mesh."""
         super().__init__(*args, metadata=metadata)
+        self._wells = []
+
+    def add_well(
+        self,
+        well: WellTrajectory,
+        min_length: float = 1.0e-4,
+        tolerance: float = 1.0e-8,
+    ) -> None:
+        """
+        Add a well trajectory.
+
+        Parameters
+        ----------
+        well : toughio.WellTrajectory
+            Well trajectory to add.
+        min_length : float, default 1.0e-4
+            The minimum length of an intersection. Only used if the well trajectory has
+            not been intersected yet.
+        tolerance : float, default 1.0e-8
+            The absolute tolerance to use to find cells along the trajectory. Only used
+            if the well trajectory has not been intersected yet.
+
+        """
+        if not isinstance(well, WellTrajectory):
+            raise TypeError("could not add well: expected a WellTrajectory instance")
+        
+        if "IntersectedCellIds" not in well.to_pyvista().cell_data:
+            well = well.intersect(self, min_length, tolerance)
+
+        self.wells.append(well)
 
     def extrude_to_3d(self, height: ArrayLike = 1.0, axis: int = 2) -> Mesh:
         """
@@ -1252,7 +1298,7 @@ class Mesh(BaseMesh):
         """
         from ..legacy import extrude_to_3d
 
-        return Mesh(extrude_to_3d(self.pyvista))
+        return Mesh(extrude_to_3d(self.pyvista, height, axis))
 
     def prune_duplicates(self) -> Mesh:
         """
@@ -1265,6 +1311,130 @@ class Mesh(BaseMesh):
 
         """
         return Mesh(self.pyvista.clean(produce_merge_map=False))
+    
+    def _add_well_to_tough(self, parameters: dict, gravity: ArrayLike) -> None:
+        """
+        Add well to TOUGH mesh parameters.
+
+        Parameters
+        ----------
+        parameters : dict
+            TOUGH mesh parameters.
+
+        """
+        from scipy.spatial.transform import Rotation
+        from . import Labeler
+
+        offset = self.n_cells
+        labels = self.labels
+
+        for i, well in enumerate(self.wells):
+            well = well.to_pyvista().compute_cell_sizes(
+                length=True, area=False, volume=False
+            )
+
+            # Define well labels
+            well_labels = Labeler(self.label_length)(well.n_cells, offset)
+            well_labels[0] = f"#WH{i + 1:02d}"
+
+            # Define well elements and well to rock connections
+            well_elements = {}
+            well_rock_connections = {}
+            well_sizes = {}
+
+            for label, line in zip(well_labels, pvg.split_lines(well, as_lines=True)):
+                radius = line.cell_data["Radius"][0]
+                length = line.cell_data["Length"][0]
+                material = line.cell_data["Material"][0]
+                intersected_cell_id = line.cell_data["IntersectedCellIds"][0]
+                area = np.pi * radius ** 2
+                interface_area = length * 2.0 * np.pi * radius
+
+                # Define well element
+                well_elements[label] = {
+                    "material": material,
+                    "volume": length * area,
+                    "center": np.array(line.center),
+                }
+                well_sizes[label] = {"length": length, "area": area}
+
+                # Well trajectory does not intersect the mesh
+                if intersected_cell_id == -1:
+                    well_elements[label]["heat_exchange_area"] = interface_area
+
+                # Well trajectory intersects the mesh
+                else:
+                    l2 = labels[intersected_cell_id]
+
+                    # Check volume
+                    vol1 = well_elements[label]["volume"]
+                    vol2 = parameters["elements"][l2]["volume"]
+
+                    if vol1 >= vol2:
+                        raise ValueError("could not embed a well element in a rock element with smaller volume")
+
+                    # Calculate gravity cosine angle rotating direction vector by 90 degrees
+                    v1 = line.points[1] - line.points[0]
+                    v2 = line.points[0] + gravity
+
+                    if abs(v1 @ v2) == 1.0:
+                        gravity_cosine_angle = 0.0
+
+                    else:
+                        v1 /= np.linalg.norm(v1)
+                        v2 /= np.linalg.norm(v2)
+                        rotvec = np.cross(v1, v2)
+                        rotvec /= np.linalg.norm(rotvec)
+                        dvec = Rotation.from_rotvec(0.5 * np.pi * rotvec).apply(v1)
+                        gravity_cosine_angle = (dvec / np.linalg.norm(dvec)) @ gravity
+
+                    # Calculate nodal distance using equivalent mass approach
+                    r2 = ((vol2 - vol1) / (np.pi * length) + radius ** 2) ** 0.5
+                    d2 = 0.5 * (r2 - radius)
+
+                    well_rock_connections[f"{label}{l2}"] = {
+                        "permeability_direction": 1,
+                        "nodal_distances": [0.01, d2],
+                        "interface_area": interface_area,
+                        "gravity_cosine_angle": gravity_cosine_angle,
+                    }
+
+            # Define well to well connections
+            well_well_connections = {}
+
+            for l1, l2 in zip(well_labels[:-1], well_labels[1:]):
+                area1, area2 = well_sizes[l1]["area"], well_sizes[l2]["area"]
+                length1, length2 = well_sizes[l1]["length"], well_sizes[l2]["length"]
+                center1, center2 = well_elements[l1]["center"], well_elements[l2]["center"]
+
+                dvec = center2 - center1
+                well_well_connections[f"{l1}{l2}"] = {
+                    "permeability_direction": 3,
+                    "nodal_distances": [0.5 * length1, 0.5 * length2],
+                    "interface_area": min(area1, area2),
+                    "gravity_cosine_angle": (dvec / np.linalg.norm(dvec)) @ gravity,
+                }
+
+            # Update parameters
+            parameters["elements"].update(well_elements)
+            parameters["connections"].update(well_well_connections)
+            parameters["connections"].update(well_rock_connections)
+
+            # Increment offset
+            offset += well.n_cells
+
+    @property
+    def wells(self) -> Sequence[WellTrajectory]:
+        """
+        Return well trajectories.
+
+        Returns
+        -------
+        Sequence[toughio.WellTrajectory]
+            List of well trajectories.
+
+        """
+        return self._wells
 
 
 class CylindricMesh(BaseMesh):
@@ -1365,13 +1535,6 @@ class CylindricMesh(BaseMesh):
         """
         centers = self.centers
         x = np.unique(self.points[:, 0])
-
-        def get_radii(pipe: Pipe) -> tuple[float, float]:
-            rout = pipe.radius + pipe.thickness
-            rind = np.flatnonzero(x == rout)[0]
-            rin = x[rind - 1] if rind else 0.0
-
-            return rin, rout
 
         if not np.isin(well.radii, x).all():
             raise ValueError("could not generate wellbore with radius not matching radial discretization of porous medium")
@@ -1495,7 +1658,7 @@ class CylindricMesh(BaseMesh):
             TOUGH mesh as a dict. Only provided if *filename* is None.
 
         """
-        parameters = super().to_tough(
+        return super().to_tough(
             filename=filename,
             material_name=material_name,
             gravity=gravity,
@@ -1503,6 +1666,17 @@ class CylindricMesh(BaseMesh):
             incon=incon,
             **kwargs
         )
+
+    def _add_well_to_tough(self, parameters: dict, **kwargs) -> None:
+        """
+        Add well to TOUGH mesh parameters.
+
+        Parameters
+        ----------
+        parameters : dict
+            TOUGH mesh parameters.
+
+        """
         well_domain = self.data.get("WellDomain", np.full(self.n_cells, -1))
 
         if (well_domain >= 0).any():
@@ -1602,8 +1776,6 @@ class CylindricMesh(BaseMesh):
                 connections[k] = v
 
             parameters["connections"] = connections
-
-        return parameters
 
     @property
     def volumes(self) -> ArrayLike:
