@@ -55,9 +55,9 @@ class Pipe:
         
         pipe = pv.MultipleLines(points)
         pipe.clear_data()
-        pipe.cell_data["Material"] = material
-        pipe.cell_data["Radius"] = inner_radius
-        pipe.cell_data["Thickness"] = thickness
+        pipe.cell_data["Material"] = np.atleast_1d(material)
+        pipe.cell_data["Radius"] = np.atleast_1d(inner_radius)
+        pipe.cell_data["Thickness"] = np.atleast_1d(thickness)
         self._pyvista = pipe
 
         if self.is_porous and material.upper().startswith(("W", "X")):
@@ -182,8 +182,8 @@ class WellCasing:
         pipe = Pipe(points, material, inner_radius, thickness)
 
         if self.pipes:
-            if self.pipes[-1].radius > inner_radius:
-                raise ValueError()
+            if self.pipes[-1].inner_radius > inner_radius:
+                raise ValueError(f"could not add pipe with smaller inner radius than {self.pipes[-1].inner_radius}")
 
         self.pipes.append(pipe)
 
@@ -350,7 +350,7 @@ class WellCasing:
     @property
     def radii(self) -> ArrayLike:
         """Return well radii."""
-        return np.array([pipe.radius for pipe in self.pipes])
+        return np.array([pipe.inner_radius for pipe in self.pipes])
 
     @property
     def wellheads(self) -> int:

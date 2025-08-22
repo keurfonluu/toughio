@@ -1544,7 +1544,7 @@ class CylindricMesh(BaseMesh):
 
         for id_, pipe in reversed(list(enumerate(well.pipes))):
             mask = (
-                (centers[:, 0] < pipe.radius + pipe.thickness)
+                (centers[:, 0] < pipe.inner_radius + pipe.thickness)
                 & (centers[:, 2] > pipe.zmin)
                 & (centers[:, 2] < pipe.zmax)
             )
@@ -1590,9 +1590,9 @@ class CylindricMesh(BaseMesh):
 
             connections.setdefault(key, []).append(
                 {
-                    "type": connection["type"],
-                    "zmin": connection["zmin"],
-                    "zmax": connection["zmax"],
+                    "type": str(connection["type"]),
+                    "zmin": float(connection["zmin"]),
+                    "zmax": float(connection["zmax"]),
                 }
             )
 
@@ -1601,7 +1601,7 @@ class CylindricMesh(BaseMesh):
 
         # Wellheads
         for i, wellhead in enumerate(well.wellheads):
-            whid = self.find_nearest_cell((wellhead.radius, 0.0, wellhead.zmax), material=wellhead.material)
+            whid = self.find_nearest_cell((wellhead.inner_radius, 0.0, wellhead.zmax), material=wellhead.material)
             self.set_label(f"#WH{i + 1:02d}", whid)
 
     def copy(self, deep: bool = True) -> Self:
