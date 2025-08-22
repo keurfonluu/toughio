@@ -26,15 +26,16 @@ class Pipe:
     Parameters
     ----------
     points : ArrayLike
-        3D coordinates of the points of the polyline representing the pipe.
+        3D coordinates of the polyline representing the pipe section.
     material : str
-        Material of the pipe.
+        The material of the pipe section.
     inner_radius : float
-        Inner radius of the pipe.
+        The inner radius of the pipe section.
     thickness : float, default 0.0
-        Thickness of the pipe. If non-zero, the pipe is treated as a porous medium.
+        The thickness of the pipe section. If non-zero, the pipe is treated as a porous
+        medium.
     other_data : dict, optional
-        Additional data to be stored in the pipe's cell data.
+        Additional cell data to be stored in the pipe.
 
     """
 
@@ -49,7 +50,7 @@ class Pipe:
         thickness: float = 0.0,
         other_data: Optional[dict] = None,
     ) -> None:
-        """Initialize a pipe."""
+        """Initialize a pipe section."""
         other_data = other_data if other_data is not None else {}
         
         pipe = pv.MultipleLines(points)
@@ -70,68 +71,68 @@ class Pipe:
     
     @property
     def inner_radius(self) -> float:
-        """Return pipe's inner radius."""
+        """Return the inner radius of the pipe section."""
         return self.pyvista.cell_data["Radius"][0]
 
     @inner_radius.setter
     def inner_radius(self, value: float) -> None:
-        """Set pipe's inner radius."""
+        """Set the inner radius of the pipe section."""
         self.pyvista.cell_data["Radius"] = value
 
     @property
     def is_porous(self) -> bool:
-        """Return True if pipe is treated as a porous medium."""
+        """Return whether the pipe section is treated as a porous medium."""
         return self.thickness > 0.0
 
     @property
     def length(self) -> float:
-        """Return pipe's length."""
+        """Return the length of the pipe section."""
         return np.linalg.norm(np.diff(self.points, axis=0), axis=1).sum()
 
     @property
     def material(self) -> str:
-        """Return pipe's material."""
+        """Return the material of the pipe section."""
         return self.pyvista.cell_data["Material"][0]
 
     @material.setter
     def material(self, value: str) -> None:
-        """Set pipe's material."""
+        """Set the material of the pipe section."""
         self.pyvista.cell_data["Material"] = value
 
     @property
     def points(self) -> ArrayLike:
-        """Return 3D coordinates of the pipe."""
+        """Return the 3D coordinates of the pipe section."""
         return self.pyvista.points
 
     @property
     def pyvista(self) -> pv.PolyData:
-        """Return underlying PyVista mesh."""
+        """Return the underlying PyVista mesh for the pipe section."""
         return self._pyvista
 
     @property
     def thickness(self) -> float:
-        """Return pipe's thickness."""
+        """Return the thickness of the pipe section."""
         return self.pyvista.cell_data["Thickness"][0]
 
     @thickness.setter
     def thickness(self, value: float) -> None:
-        """Set pipe's thickness."""
+        """Set the thickness of the pipe section."""
         self.pyvista.cell_data["Thickness"] = value
 
     @property
     def zmin(self) -> float:
-        """Return pipe's bottom depth."""
+        """Return the bottom depth (minimum z) of the pipe section."""
         return self.points[:, 2].min()
 
     @property
     def zmax(self) -> float:
-        """Return pipe's top depth."""
+        """Return the top depth (maximum z) of the pipe section."""
         return self.points[:, 2].max()
 
 
 class WellCasing:
     """
-    Well casing class.
+    Class representing a well casing.
 
     """
 
@@ -157,15 +158,16 @@ class WellCasing:
         Parameters
         ----------
         material : str
-            Material.
+            The material of the pipe section.
         inner_radius : float
-            Inner radius.
+            The inner radius of the pipe section.
         zmin : float
-            Bottom depth.
+            The bottom depth of the pipe section.
         zmax : float
-            Top depth.
+            The top depth of the pipe section.
         thickness : float, default 0.0
-            Thickness. If non-zero, pipe is treated as a porous medium.
+            The thickness of the pipe section. If non-zero, pipe is treated as a porous
+            medium.
 
         Returns
         -------
@@ -201,16 +203,16 @@ class WellCasing:
         Parameters
         ----------
         type_ : {'backward', 'branch', 'forward', 'gas', 'heat', 'liquid', 'none', 'perforation'}
-            Connection type.
+            The type of connection.
         pipe1 : toughio.Pipe
-            Starting pipe.
+            The starting pipe for the connection.
         pipe2 : toughio.Pipe, optional
-            Ending pipe for well-well connection. If None, define a well-formation
+            The ending pipe for well-well connection. If None, define a well-formation
             connection.
         zmin : float, optional
-            Lower depth interval.
+            The lower depth interval.
         zmax : float, optional
-            Upper depth interval.
+            The upper depth interval.
 
         """
         if (
@@ -255,7 +257,7 @@ class WellCasing:
         Parameters
         ----------
         pipe : toughio.Pipe
-            Wellhead pipe section.
+            The pipe section to set as wellhead.
 
         """
         if pipe not in self.pipes:
@@ -277,7 +279,7 @@ class WellCasing:
         Returns
         -------
         pyvista.PolyData
-            Output mesh.
+            The PyVista mesh representation of the well.
 
         """
         pipes = [
