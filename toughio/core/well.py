@@ -289,54 +289,82 @@ class WellCasing:
 
     def to_pyvista(
         self,
-        resolution: int = 64,
         well_only: bool = False,
     ) -> pv.PolyData:
         """
-        Convert well to a PyVista mesh.
+        Return the PyVista representation of the well casing.
+
+        Parameters
+        ----------
+        well_only : bool, default False
+            If True, only include well sections (i.e., non-porous).
 
         Returns
         -------
         pyvista.PolyData
-            The PyVista mesh representation of the well.
+            The PyVista mesh representation of the well casing.
 
         """
-        pipes = [
-            pipe.to_pyvista(resolution)
-            for pipe in self.pipes
-            if not (well_only and pipe.is_porous)
-        ]
+        pipes = []
+
+        for pipe in self.pipes:
+            if well_only and pipe.is_porous:
+                continue
+
+            center = [0.0, 0.0, 0.5 * (pipe.zmin + pipe.zmax)]
+            pipe_ = (
+                pvg.CylindricalShell(
+                    pipe.inner_radius,
+                    pipe.inner_radius + pipe.thickness,
+                    pipe.length,
+                    r_resolution=1,
+                    theta_resolution=64,
+                    center=center,
+                )
+                .cast_to_unstructured_grid()
+                .clean(tolerance=1.0e-8)
+                if pipe.is_porous
+                else pv.Cylinder(
+                    center=center,
+                    direction=[0.0, 0.0, -1.0],
+                    radius=pipe.inner_radius,
+                    height=pipe.length,
+                    resolution=64,
+                    capping=False,
+                )
+            )
+            pipe_.clear_data()
+            pipe_.cell_data["Material"] = [pipe.material] * 64
+            pipes.append(pipe_)
 
         return pv.merge(pipes)
 
     def plot(
         self,
+        plotter: Optional[pv.Plotter] = None,
         well_only: bool = False,
-        xscale: Optional[float] = None,
-        zscale: Optional[float] = None,
         **kwargs,
     ) -> None:
         """
-        Plot a well.
+        Plot the well casing.
 
         Parameters
         ----------
+        plotter : Optional[pyvista.Plotter], optional
+            Active plotter.
         well_only : bool, default False
             If True, only plot non-porous pipe sections.
-        xscale : float, optional
-            Scaling in the X direction.
-        zscale : float, optional
-            Scaling in the Z direction.
-        **kwargs : dict, optional
+        **kwargs
             Additional keyword arguments. See ``pyvista.Plotter`` for more details.
 
         """
         mesh = self.to_pyvista(well_only=well_only)
 
-        p = pv.Plotter(**kwargs)
+        if plotter is None:
+            p = pv.Plotter(**kwargs)
 
-        if xscale or zscale:
-            p.set_scale(xscale=xscale, zscale=zscale)
+        else:
+            p = plotter
 
         p.add_mesh(
             mesh,
@@ -344,7 +372,9 @@ class WellCasing:
             opacity=0.5,
         )
         p.add_axes()
-        p.show()
+
+        if plotter is None:
+            p.show()
 
     @property
     def connections(self) -> Sequence[dict]:
@@ -750,7 +780,7 @@ class WellTrajectory:
         show_points : bool, default True
             Whether to show the points along the well trajectory.
         **kwargs
-            Additional keyword arguments to pass to the plotter.
+            Additional keyword arguments. See ``pyvista.Plotter`` for more details.
 
         """
         mesh = self.to_pyvista()
