@@ -45,7 +45,9 @@ class Helpers:
                         assert self.allclose(x.cell_data, y.cell_data, atol=atol)
 
                 elif isinstance(x, (toughio.ElementOutput, toughio.ConnectionOutput)):
-                    assert isinstance(y, (toughio.ElementOutput, toughio.ConnectionOutput))
+                    assert isinstance(
+                        y, (toughio.ElementOutput, toughio.ConnectionOutput)
+                    )
 
                     assert self.allclose(x.time, y.time, atol=atol)
                     assert self.allclose(x.data, y.data, atol=atol)
@@ -87,7 +89,9 @@ class Helpers:
         temp_dir = tempfile.mkdtemp()
         return os.path.join(temp_dir, filename) if filename else temp_dir
 
-    def write_read(self, filename, obj, writer, reader, writer_kws=None, reader_kws=None):
+    def write_read(
+        self, filename, obj, writer, reader, writer_kws=None, reader_kws=None
+    ):
         writer_kws = writer_kws if writer_kws else {}
         reader_kws = reader_kws if reader_kws else {}
 
