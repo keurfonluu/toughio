@@ -107,7 +107,7 @@ class GENER(DataBlock):
                 gener["generators"].append(self.prune_values(tmp))
 
             else:
-                flag = line.startswith("+++")
+                flag = line.startswith(("+++", ":::"))
                 break
 
             try:

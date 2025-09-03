@@ -58,7 +58,7 @@ class CONNE(DataBlock):
                 conne["connections"][label] = self.prune_values(tmp)
 
             else:
-                flag = line.startswith("+++")
+                flag = line.startswith(("+++", ":::"))
                 break
 
             try:

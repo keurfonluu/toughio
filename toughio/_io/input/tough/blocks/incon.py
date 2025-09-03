@@ -98,7 +98,7 @@ class INCON(DataBlock):
                     n_variables = len(data)
 
             else:
-                flag = line.startswith("+++")
+                flag = line.startswith(("+++", ":::"))
                 break
 
             try:
