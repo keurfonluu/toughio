@@ -137,10 +137,6 @@ def read_buffer(
 
     if blocks:
         end_comments = block_readers["END COMMENTS"].read(fiter)
-
-        if flag:
-            end_comments["end_comments"].insert(0, "+++")
-
         block_readers["END COMMENTS"].update(parameters, end_comments)
 
     return parameters

@@ -146,6 +146,11 @@ def write_buffer(
         if block.name in blocks
     }
 
+    # Handle restart
+    if blocks == {"INCON", "END COMMENTS"} and parameters.get("end_comments", []):
+        block_writers["INCON"].space_between_blocks = False
+        block_writers["END COMMENTS"].flag = True
+
     if simulator == "tough4":
         if "SELEC" in blocks:
             block_writers["SELEC"].free_format = False

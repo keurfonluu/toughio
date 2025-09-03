@@ -13,6 +13,7 @@ class END_COMMENTS(DataBlock):
         """Initialize END_COMMENTS block."""
         super().__init__(*args, **kwargs)
         self._space_between_blocks = False
+        self.flag = False
 
     def _read(self, f: FileIterator | TextIO | str, *args, **kwargs) -> dict:
         """Read END COMMENTS block data."""
@@ -33,10 +34,14 @@ class END_COMMENTS(DataBlock):
 
         return {"end_comments": end_comments} if end_comments else {}
 
-    def _write(self, parameters: dict, *args, **kwargs) -> list[str]:
+    def _write(self, parameters: dict, simulator: str, *args, **kwargs) -> list[str]:
         """Write END COMMENTS block data."""
         end_comments = parameters.get("end_comments", [])
         end_comments = [end_comments] if isinstance(end_comments, str) else end_comments
+
+        if self.flag and not end_comments[0].startswith(("+++", ":::")):
+            end_comments = list(end_comments)
+            end_comments.insert(0, ":::" if simulator == "tough4" else "+++")
 
         return [f"{comment}\n" for comment in end_comments]
 
