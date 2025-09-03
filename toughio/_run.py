@@ -109,7 +109,7 @@ def run(
     # Additional files required for simulation
     other_filenames = (
         {k: k for k in other_filenames}
-        if isinstance(other_filenames, (list, tuple))
+        if isinstance(other_filenames, Sequence)
         else other_filenames
         if other_filenames
         else {}
@@ -283,7 +283,7 @@ def run(
         else:
             cwd = "${PWD}"
 
-        docker_args = docker_args if docker_args else []
+        docker_args = list(docker_args) if docker_args else []
         docker_args += [
             "--name",
             container_name,
@@ -310,6 +310,25 @@ def run(
         parameters = read_input(input_filename, blocks=["PARAM"])
         t_ini = parameters.get("options", {}).get("t_ini", 0.0)
         t_max = parameters.get("options", {}).get("t_max")
+
+        # Read t_ini from SAVE file
+        save_filename = other_filenames.get("INCON")
+
+        if save_filename:
+            if pathlib.Path(save_filename).name.startswith("SAVE"):
+                with open(save_filename) as f:
+                    for line in f:
+                        if line.startswith(("+++", ":::")):
+                            break
+
+                    end_comments = list(f)
+
+                for comment in end_comments:
+                    line = comment.strip().split()
+
+                    if line[0].startswith("time_to_this_point"):
+                        t_ini = float(line[-1].replace(",", ""))
+                        break
 
         # Delete log file if it exists
         log_filename.unlink(missing_ok=True)
@@ -447,10 +466,12 @@ def display_progress_bar(
                 else:
                     if line.strip().startswith("...ITERATING"):
                         match = pattern1.search(line)
-                        it = int(match.group(1))
-                        itr = int(match.group(2))
-                        dt = float(match.group(3))
-                        dt_update = 0.0
+
+                        if match:
+                            it = int(match.group(1))
+                            itr = int(match.group(2))
+                            dt = float(match.group(3))
+                            dt_update = 0.0
 
                     else:
                         match2 = pattern2.search(line)
