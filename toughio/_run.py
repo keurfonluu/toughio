@@ -51,7 +51,7 @@ def run(
     other_filenames : Sequence[str | PathLike] | dict, optional
         Other simulation files to copy to working directory (e.g., MESH, INCON, GENER)
         if not already present. If *other_filenames* is a dict, must be in the form
-        ``{old: new}``, where ``old`` is the current name of the file to copy, and
+        ``{new: old}``, where ``old`` is the current name of the file to copy, and
         ``new`` is the name of the file copied.
     simulator : {'tough2', 'tough3', 'tough4'}, default 'tough3'
         TOUGH simulator to use.
@@ -198,8 +198,8 @@ def run(
 
     # Copy other simulation files to working directory
     for k, v in other_filenames.items():
-        filename = pathlib.Path(k)
-        new_filename = pathlib.Path(v)
+        filename = pathlib.Path(v)
+        new_filename = pathlib.Path(k)
 
         if (
             filename.parent.resolve() != simulation_dir.resolve()
