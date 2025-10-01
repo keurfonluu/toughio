@@ -119,7 +119,7 @@ class RecordFormatter:
 
                 for token in self.format:
                     n = int(token[:-1].split(".")[0])
-                    tmp = data[i : i + n].strip()
+                    tmp = data[i : i + n].rstrip()
                     out.append(tokens[token[-1]]["converter"](tmp) if tmp else None)
                     i += n
 
