@@ -129,7 +129,7 @@ def _read_csv(f, file_type, time_steps=None):
             else:
                 labels[-1].append([l.replace('"', "").strip() for l in line[:ilab]])
 
-            data[-1].append([float(l.strip()) for l in line[ilab:]])
+            data[-1].append([_float(l.strip()) for l in line[ilab:]])
 
         line = f.readline()
 
@@ -207,3 +207,15 @@ def _count_time_steps(filename):
             count += int(line.startswith('"TIME [sec]'))
 
     return count
+
+
+def _float(s):
+    """Convert variable string to float."""
+    try:
+        return float(s.replace("d", "e"))
+
+    except ValueError:
+        # It's probably something like "0.0001-001"
+        significand, exponent = s[:-4], s[-4:]
+
+        return float(f"{significand}e{exponent}")
