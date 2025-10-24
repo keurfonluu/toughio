@@ -5,7 +5,7 @@ import os
 import pathlib
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
-from typing import Optional
+from typing import TYPE_CHECKING, Literal, Optional
 
 import meshio
 import numpy as np
@@ -16,6 +16,10 @@ from scipy.spatial import KDTree
 from typing_extensions import Self
 
 from .well import WellCasing, WellTrajectory
+
+
+if TYPE_CHECKING:
+    from toughio.core.output import ElementOutput
 
 
 class BaseMesh(ABC):
@@ -789,6 +793,77 @@ class BaseMesh(ABC):
         else:
             return parameters
 
+    def to_pvd(
+        self,
+        filename: str | os.PathLike,
+        outputs: Sequence[ElementOutput],
+        time_unit: Optional[Literal["second", "hour", "day", "year"]] = None,
+    ) -> None:
+        """
+        Write mesh and outputs to PVD file.
+
+        Parameters
+        ----------
+        filename : str | PathLike
+            Output file name.
+        outputs : Sequence[ElementOutput]
+            List of element outputs to export.
+        time_unit : {'second', 'hour', 'day', 'year'}, optional
+            Time steps unit.
+
+        """
+        import xml.etree.ElementTree as ET
+
+        filename = pathlib.Path(filename)
+
+        if not filename.name.endswith(".pvd"):
+            raise ValueError("could not write PVD file not ending with '.pvd'")
+
+        if filename.parent != pathlib.Path("."):
+            filename.parent.mkdir(parents=True, exist_ok=True)
+
+        # Sort outputs by time
+        outputs = sorted(outputs, key=lambda x: x.time)
+
+        # Write VTU files for all time steps
+        mesh_ = self.copy()
+        filenames, time_steps = [], []
+
+        factors = {
+            "second": 1.0,
+            "hour": 3600.0,
+            "day": 86400.0,
+            "year": 31557600.0,
+        }
+        factor = factors[time_unit] if time_unit else 1.0
+
+        for i, output in enumerate(outputs):
+            filename_ = filename.name.replace(".pvd", f"_{i}.vtu")
+            mesh_.add_data(output)
+            mesh_.write(filename.parent / filename_)
+
+            filenames.append(filename_)
+            time_steps.append(output.time / factor)
+
+        # Write PVD file
+        vtkfile = ET.Element(
+            "VTKFile", type="Collection", version="0.1", byte_order="LittleEndian"
+        )
+        collection = ET.SubElement(vtkfile, "Collection")
+
+        for filename_, time_step in zip(filenames, time_steps):
+            ET.SubElement(
+                collection,
+                "DataSet",
+                timestep=str(time_step),
+                group="",
+                part="0",
+                file=filename_,
+            )
+
+        tree = ET.ElementTree(vtkfile)
+        tree.write(filename, encoding="utf-8", xml_declaration=True)
+
     def to_xdmf(
         self,
         filename: str | os.PathLike,
@@ -917,6 +992,8 @@ class BaseMesh(ABC):
         else:
             self.pyvista.user_dict.update(self.metadata)
             self.pyvista.save(filename)
+
+    save = write  # alias
 
     def plot(
         self,
