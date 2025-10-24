@@ -93,8 +93,12 @@ def _read_csv(f, file_type, time_steps=None):
     line = f.readline()
 
     # Check third line (does it start with TIME?)
-    line = f.readline()
-    single = not line.startswith('"TIME [sec]')
+    if not line.split(",")[0] != '"                  "':
+        line = f.readline()
+        single = not line.startswith('"TIME [sec]')
+
+    else:
+        single = False
 
     # Read data
     if single:
