@@ -25,7 +25,9 @@ _check_exec = True  # Bool to be monkeypatched in tests
 def run(
     input_filename: str | os.PathLike | dict,
     other_filenames: Optional[Sequence[str | os.PathLike] | dict] = None,
-    simulator: Literal["tough2", "tough3", "tough4", "toughreact", "itough2"] = "tough3",
+    simulator: Literal[
+        "tough2", "tough3", "tough4", "toughreact", "itough2"
+    ] = "tough3",
     exec: Optional[str | os.PathLike] = None,
     command: Optional[Callable] = None,
     workers: Optional[int | tuple[int, int]] = None,
@@ -244,7 +246,10 @@ def run(
     if not docker and not wsl:
         exec = f'"{pathlib.Path(exec).absolute()}"'
 
-    if simulator in {"tough2", "toughreact"}:
+    if command is not None:
+        cmd = command(exec, str(input_filename.name), str(output_filename))
+
+    elif simulator in {"tough2", "toughreact"}:
         cmd = f"{exec} < {input_filename.name} > {output_filename}"
 
     elif simulator == "tough3":
@@ -271,10 +276,12 @@ def run(
 
         if eos is None:
             raise ValueError("could not run iTOUGH2 without specifying 'eos' keyword")
-        
+
         if not other_filenames:
-            raise ValueError("could not run iTOUGH2 without specifying command file name in 'other_filenames'")
-        
+            raise ValueError(
+                "could not run iTOUGH2 without specifying command file name in 'other_filenames'"
+            )
+
         it2_filename = list(other_filenames)[0]  # first file in other_filenames
 
         if is_cmd:
@@ -284,10 +291,7 @@ def run(
             cmd = f"{exec} <<< $'{it2_filename}\n{input_filename.name}\n{eos}\n'"
 
     else:
-        if command is None:
-            raise ValueError(f"could not run '{simulator}' without specifying 'command'")
-
-        cmd = command(exec, str(input_filename.name), str(output_filename))
+        raise ValueError(f"invalid simulator '{simulator}'")
 
     # Use MPI
     if n_mpi:
