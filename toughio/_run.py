@@ -25,7 +25,7 @@ _check_exec = True  # Bool to be monkeypatched in tests
 def run(
     input_filename: str | os.PathLike | dict,
     other_filenames: Optional[Sequence[str | os.PathLike] | dict] = None,
-    simulator: Optional[Literal["tough2", "tough3", "tough4", "toughreact"]] = None,
+    simulator: Literal["tough2", "tough3", "tough4", "toughreact", "itough2"] = "tough3",
     exec: Optional[str | os.PathLike] = None,
     command: Optional[Callable] = None,
     workers: Optional[int | tuple[int, int]] = None,
@@ -53,7 +53,7 @@ def run(
         if not already present. If *other_filenames* is a dict, must be in the form
         ``{new: old}``, where ``old`` is the current name of the file to copy, and
         ``new`` is the name of the file copied.
-    simulator : {'tough2', 'tough3', 'tough4'}, default 'tough3'
+    simulator : {'tough2', 'tough3', 'tough4', 'toughreact', 'itough2'}, default 'tough3'
         TOUGH simulator to use.
     exec : str | PathLike, optional
         Path to TOUGH executable. If None, use the environment variable:
@@ -100,7 +100,7 @@ def run(
     """
     from . import read_input, write_input
 
-    simulator = simulator if simulator else "tough3"
+    # Executable
     exec = exec if exec else os.getenv(f"TOUGHIO_{simulator.upper()}_EXEC")
 
     if not exec:
@@ -117,6 +117,10 @@ def run(
 
     ignore_patterns = list(ignore_patterns) if ignore_patterns else []
     ignore_patterns += [".OUTPUT*", "TABLE", "MESHA", "MESHB"]
+
+    # Operating system
+    is_windows = platform.system().startswith("Win")
+    is_cmd = is_windows and os.getenv("ComSpec", "").endswith("cmd.exe")
 
     # Executable
     exec = str(exec)
@@ -226,7 +230,7 @@ def run(
     n_mpi, n_omp = None, None
 
     if workers is not None:
-        if np.ndim(workers) == 0:
+        if isinstance(workers, int):
             if simulator == "tough4":
                 n_omp = workers
 
@@ -248,21 +252,41 @@ def run(
 
     elif simulator == "tough4":
         cmd = f"{exec} -f {input_filename.name}"
-        tough4_args = tough4_args if tough4_args else []
+        tough4_args = list(tough4_args) if tough4_args else []
 
         # Use OpenMP
         if n_omp:
             try:
                 i = tough4_args.index("-t")
-                tough4_args[i + 1] = n_omp
+                tough4_args[i + 1] = str(n_omp)
 
             except ValueError:
-                tough4_args += ["-t", n_omp]
+                tough4_args += ["-t", str(n_omp)]
 
         if tough4_args:
             cmd = f"{cmd} {' '.join(map(str, tough4_args))}"
 
+    elif simulator == "itough2":
+        eos = kwargs.get("eos")
+
+        if eos is None:
+            raise ValueError("could not run iTOUGH2 without specifying 'eos' keyword")
+        
+        if not other_filenames:
+            raise ValueError("could not run iTOUGH2 without specifying command file name in 'other_filenames'")
+        
+        it2_filename = list(other_filenames)[0]  # first file in other_filenames
+
+        if is_cmd:
+            cmd = f"(echo {it2_filename} & echo {input_filename.name} & echo {eos}) | {exec}"
+
+        else:
+            cmd = f"{exec} <<< $'{it2_filename}\n{input_filename.name}\n{eos}\n'"
+
     else:
+        if command is None:
+            raise ValueError(f"could not run '{simulator}' without specifying 'command'")
+
         cmd = command(exec, str(input_filename.name), str(output_filename))
 
     # Use MPI
@@ -270,19 +294,11 @@ def run(
         cmd = f"mpiexec -n {n_mpi} {cmd}"
 
     # Use Docker
-    is_windows = platform.system().startswith("Win")
-
     if docker:
         container_name = (
             container_name if container_name else f"toughio_{secrets.token_hex(4)}"
         )
-
-        if is_windows and os.getenv("ComSpec").endswith("cmd.exe"):
-            cwd = '"%cd%"'
-
-        else:
-            cwd = "${PWD}"
-
+        cwd = '"%cd%"' if is_cmd else "${PWD}"
         docker_args = list(docker_args) if docker_args else []
         docker_args += [
             "--name",
@@ -357,23 +373,24 @@ def run(
         stdout = []
         cr = False
 
-        for line in open(os.dup(p.stdout.fileno()), newline=""):
-            # Handle carriage return
-            # newline in open is converting \r\n as \r moving \r at the end of the previous string
-            # This is only an issue for Spyder
-            line = f"\r{line}" if cr else line
-            cr = line.endswith("\r")
-            line = line[:-2] if cr else line
+        if p.stdout is not None:
+            for line in open(os.dup(p.stdout.fileno()), newline=""):
+                # Handle carriage return
+                # newline in open is converting \r\n as \r moving \r at the end of the previous string
+                # This is only an issue for Spyder
+                line = f"\r{line}" if cr else line
+                cr = line.endswith("\r")
+                line = line[:-2] if cr else line
 
-            if not silent and simulator != "tough4":
-                print(line, end="", flush=True)
-                stdout.append(line)
+                if not silent and simulator != "tough4":
+                    print(line, end="", flush=True)
+                    stdout.append(line)
 
     except (KeyboardInterrupt, Exception) as e:
         # Stop Docker container
         if docker:
             status = subprocess.run(
-                ["docker", "stop", container_name],
+                ["docker", "stop", str(container_name)],
                 stdout=subprocess.PIPE,
                 universal_newlines=True,
             )
@@ -425,13 +442,12 @@ def run(
 def display_progress_bar(
     filename: str | os.PathLike,
     stop_event: threading.Event,
-    simulator: Optional[Literal["tough2", "tough3", "tough4", "toughreact"]] = None,
-    t_ini: Optional[float] = None,
-    t_max: Optional[float] = None,
+    simulator: Literal["tough", "tough2", "tough3", "tough4", "toughreact"] = "tough",
+    t_ini: float = 0.0,
+    t_max: float = np.inf,
 ) -> None:
     """Display a progress bar."""
     file = None
-    simulator = simulator if simulator else "tough"
     message = f"Starting {simulator.upper()} simulation"
     pattern1 = re.compile(
         r"At\s*\[\s*(\d+)\s*,\s*(\d+)\s*\]:\s*TimeStep\s*=\s*([+-]?\d*\.?\d+E[+-]?\d+|\d+)\s*MAX\{Residual\}\s*=\s*([+-]?\d*\.?\d+E[+-]?\d+|\d+)",

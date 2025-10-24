@@ -14,11 +14,14 @@ def read(
     file_format: Optional[
         Literal[
             "tough",
+            "tough2",
             "tough3",
             "tough4",
+            "toughreact",
             "toughreact-flow",
             "toughreact-solute",
             "toughreact-chemical",
+            "itough2",
             "json",
         ]
     ] = None,
@@ -31,7 +34,7 @@ def read(
     ----------
     filename : str | PathLike | TextIO
         Input file name or buffer.
-    file_format : {'tough', 'tough3', 'tough4', 'toughreact-flow', 'toughreact-solute', 'toughreact-chemical', 'json'}, optional
+    file_format : {'tough', 'tough2', 'tough3', 'tough4', 'toughreact', 'toughreact-flow', 'toughreact-solute', 'toughreact-chemical', 'itough2', 'json'}, optional
         Input file format.
     **kwargs, dict
         Additional keyword arguments passed to the reader function.
@@ -53,11 +56,14 @@ def write(
     file_format: Optional[
         Literal[
             "tough",
+            "tough2",
             "tough3",
             "tough4",
+            "toughreact",
             "toughreact-flow",
             "toughreact-solute",
             "toughreact-chemical",
+            "itough2",
             "json",
         ]
     ] = None,
@@ -72,7 +78,7 @@ def write(
         Output file name or buffer.
     parameters : dict
         Parameters to export.
-    file_format : {'tough', 'tough3', 'tough4', 'toughreact-flow', 'toughreact-solute', 'toughreact-chemical', 'json'}, optional
+    file_format : {'tough', 'tough2', 'tough3', 'tough4', 'toughreact', 'toughreact-flow', 'toughreact-solute', 'toughreact-chemical', 'itough2', 'json'}, optional
         Output file format.
     **kwargs, dict
         Additional keyword arguments passed to the writer function.
@@ -149,9 +155,12 @@ _filename_to_file_format = {
 
 _file_format_to_simulator = {
     "tough": "tough",
+    "toughreact": "toughreact",
     "toughreact-flow": "toughreact",
     "toughreact-solute": "toughreact",
     "toughreact-chemical": "toughreact",
+    "tough2": "tough",
     "tough3": "tough3",
     "tough4": "tough4",
+    "itough2": "tough",
 }
