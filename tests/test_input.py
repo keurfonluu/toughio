@@ -466,6 +466,7 @@ def test_eleme_conne(write_read, label_length, coord, helpers):
                 "heat_exchange_area": np.random.rand(),
                 "permeability_modifier": np.random.rand(),
                 "center": np.random.rand(3),
+                "permeability": np.random.rand(3),
             }
             for label in element_labels
         },

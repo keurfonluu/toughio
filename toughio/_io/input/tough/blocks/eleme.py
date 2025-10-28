@@ -4,18 +4,20 @@ from collections.abc import Sequence
 from functools import partial
 from typing import Any, TextIO
 
+import numpy as np
+
 from .....core import DataBlock, FileIterator
 
 
 class ELEME(DataBlock):
     name = "ELEME"
     formats = {
-        5: "5s,5d,5d,5s,10f,10f,10f,10f,10f,10f",
-        6: "6s,5d,4d,5s,10f,10f,10f,10f,10f,10f",
-        7: "7s,4d,4d,5s,10f,10f,10f,10f,10f,10f",
-        8: "8s,4d,3d,5s,10f,10f,10f,10f,10f,10f",
-        9: "9s,3d,3d,5s,10f,10f,10f,10f,10f,10f",
-        "5/tough4-free": "5s,5s,10f,10f,10f,10f,10f,10f",
+        5: "5s,5d,5d,5s,10f,10f,10f,10f,10f,10f,10f,10f,10f",
+        6: "6s,5d,4d,5s,10f,10f,10f,10f,10f,10f,10f,10f,10f",
+        7: "7s,4d,4d,5s,10f,10f,10f,10f,10f,10f,10f,10f,10f",
+        8: "8s,4d,3d,5s,10f,10f,10f,10f,10f,10f,10f,10f,10f",
+        9: "9s,3d,3d,5s,10f,10f,10f,10f,10f,10f,10f,10f,10f",
+        "5/tough4-free": "5s,5s,10f,10f,10f,10f,10f,10f,10f,10f,10f",
     }
     _space_between_blocks = True
 
@@ -63,6 +65,9 @@ class ELEME(DataBlock):
                         else tmp["material"]
                     )
 
+                if all(k == tmp["permeability"][0] for k in tmp["permeability"]):
+                    tmp["permeability"] = tmp["permeability"][0]
+
                 eleme["elements"][label] = self.prune_values(tmp)
 
             else:
@@ -89,6 +94,7 @@ class ELEME(DataBlock):
             "heat_exchange_area": data[3],
             "permeability_modifier": data[4],
             "center": data[5:8],
+            "permeability": data[8:11],
         }
 
     def _read_record_default(self, line: str, label_length) -> tuple[str, dict]:
@@ -106,12 +112,13 @@ class ELEME(DataBlock):
             "heat_exchange_area": data[5],
             "permeability_modifier": data[6],
             "center": data[7:10],
+            "permeability": data[10:13],
         }
 
     def _write(self, parameters: dict, simulator: str, *args, **kwargs) -> list[str]:
         """Write ELEME block data."""
         # Label length
-        label_length = len(max(parameters["elements"], key=len))
+        label_length = max(len(max(parameters["elements"], key=len)), 5)
 
         # Write records
         if simulator == "tough4":
@@ -139,6 +146,8 @@ class ELEME(DataBlock):
         """Get values for TOUGH4 free format."""
         material = data.get("material", "")
         material = f"{material:>5}" if isinstance(material, int) else material
+        per = data.get("permeability", [])
+        per = [per] * 3 if np.ndim(per) == 0 else per
 
         return [
             material,
@@ -146,6 +155,7 @@ class ELEME(DataBlock):
             data.get("heat_exchange_area"),
             data.get("permeability_modifier"),
             *data.get("center", [None, None, None]),
+            *per,
         ]
 
     @staticmethod
@@ -153,6 +163,8 @@ class ELEME(DataBlock):
         """Get values for default format."""
         material = data.get("material", "")
         material = f"{material:>5}" if isinstance(material, int) else material
+        per = data.get("permeability", [])
+        per = [per] * 3 if np.ndim(per) == 0 else per
 
         return [
             data.get("nseq"),
@@ -162,6 +174,7 @@ class ELEME(DataBlock):
             data.get("heat_exchange_area"),
             data.get("permeability_modifier"),
             *data.get("center", [None, None, None]),
+            *per,
         ]
 
     def _write_conditions(self, parameters: dict, *args, **kwargs) -> bool:
