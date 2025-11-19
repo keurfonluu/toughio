@@ -1554,6 +1554,9 @@ class Mesh(BaseMesh):
                         "gravity_cosine_angle": gravity_cosine_angle,
                     }
 
+                    # Remove embedded well volume from rock element
+                    parameters["elements"][l2]["volume"] -= vol1
+
             # Define well to well connections
             well_well_connections = {}
 
