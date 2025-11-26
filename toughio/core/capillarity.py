@@ -251,3 +251,126 @@ class vanGenuchten(CapillarityModel):
         pcap *= np.where(sl > 0.999, (1.0 - sl) / 0.001, 1.0)
 
         return pcap
+
+
+class vanGenuchtenModified(CapillarityModel):
+    """
+    Modified van Genuchten's function.
+    
+    After Luckner et al. (1989).
+
+    Parameters
+    ----------
+    n : scalar
+        Related to pore size distribution index (CP(1)).
+    p0 : scalar
+        Gas entry pressure (CP(2)).
+    eps : scalar
+        Linear extension or maximum capillary pressure (CP(3)).
+    m : scalar, default 0.0
+        Related to pore size distribution (CP(4)).
+    tref : scalar, default 0.0
+        Reference temperature to account for temperature dependence of capillary
+        pressure due to changes in surface tension (CP(5)).
+    slrc : scalar, default 0.0
+        Irreducible liquid saturation (CP(7)). If zero, slrc=slrk (RP(1)).
+
+    """
+    def __init__(
+        self,
+        n: float,
+        p0: float,
+        eps: float,
+        m: float = 0.0,
+        tref: float = 0.0,
+        slrc: float = 0.0,
+    ) -> None:
+        """Initialize modified van Genuchten's capillarity model."""
+        super().__init__(n, p0, eps, m, tref, None, slrc)
+        self._id = 11
+        self._name = "Modified van Genuchten"
+    
+    def _eval(self, sl: ArrayLike, *args) -> ArrayLike:
+        """Modified van Genuchten's function."""
+        from ..properties.water import surface_tension
+
+        sl = np.asanyarray(sl)
+        n, p0, eps, m, tref, _, slrc = args
+        ae = abs(p0)
+        se = (sl - slrc) / (1.0 - slrc)
+
+        if m == 0.0:
+            m = 1.0 - 1.0 / n
+
+        else:
+            n = 1.0 / (1.0 - m)
+        
+        if eps == 0.0:
+            epsl = -1.0
+            scut = slrc + epsl
+            pmax = 1.0e50
+
+        elif eps < 0.0:
+            epsl = eps
+            scut = slrc + abs(epsl)
+            pmax = 1.0e50
+
+        elif eps >= 1.0:
+            epsl = -1.0
+            scut = slrc + epsl
+            pmax = eps
+
+        else:
+            epsl = eps
+            scut = slrc + epsl
+            pmax = 1.0e50
+
+        # Capillary pressure
+        pcap = np.zeros_like(sl)
+
+        mask = sl > scut
+        if mask.any():
+            pcap[mask] = -np.where(
+                se[mask] <= 0.0,
+                pmax,
+                ae * (se[mask] ** (-1.0 / m) - 1.0) ** (1.0 / n),
+            )
+
+        mask = sl <= scut
+        if mask.any():
+            # Linear extension
+            if epsl > 0.0:
+                sbar = max(epsl, 1.0e-3) / (1.0 - slrc)
+                pce = ae * (sbar ** (-1.0 / m) - 1.0) ** (1.0 / n)
+                pcslope = (
+                    ae / ((1.0 - slrc) * n * m)
+                    * (sbar ** (-1.0 / m) - 1.0) ** (1.0 / n - 1.0)
+                    * sbar ** (-(1.0 + m) / m)
+                )
+                pcap[mask] = -pce + pcslope * (sl[mask] - slrc - epsl)
+
+            # Log-linear extension
+            else:
+                slstar = slrc + abs(epsl)
+                se_star = (slstar - slrc) / (1.0 - slrc)
+                pce = -ae * (se_star ** (-1.0 / m) - 1.0) ** (1.0 / n)
+                pcslope = (
+                    np.log10(np.e) / abs(epsl) * (1.0 - m) / m
+                    / (se_star ** (1.0 / m) - 1.0)
+                )
+                pcap[mask] = pce * 10.0 ** (pcslope * (sl[mask] - slstar))
+
+        if -1.0 <= tref < 0.0:
+            # Linear interpolation near fully liquid saturation
+            mask = se > 1.0 + tref
+            if mask.any():
+                pcap[mask] = pcap[mask] * (1.0 - se[mask]) / abs(tref)
+
+        elif tref < -1.0:
+            # Temperature correction
+            envg = -tref
+            st_envg = surface_tension(envg)
+            st_tref = surface_tension(tref)
+            pcap = pcap * (st_tref / st_envg - 0.0017 * (tref - envg))
+
+        return pcap

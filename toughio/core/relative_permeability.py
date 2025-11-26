@@ -242,6 +242,94 @@ class FattKlikoff(RelativePermeabilityModel):
         return kl, kg
 
 
+class vanGenuchtenModified(RelativePermeabilityModel):
+    """
+    Modified van Genuchten's function.
+
+    After Luckner et al. (1989).
+
+    Parameters
+    ----------
+    m : scalar
+        Related to pore size distribution (CP(4) or 1 - 1/CP(1)).
+    slrk : scalar
+        Irreducible liquid saturation (RP(1)).
+    sgr : scalar
+        Irreducible gas saturation (RP(2)).
+    flag : scalar, default 0.0
+        Flag for gas relative permeability model (RP(3)).
+    eta : scalar, default 0.5
+        Exponent for liquid relative permeability (RP(4)).
+    eps : scalar, default 0.0
+        Linear extension near full saturation (RP(5)).
+    zeta : scalar, default 1/3
+        Exponent for gas relative permeability (RP(7)).
+
+    Notes
+    -----
+    Active Fracture Model parameters are not supported (i.e., RP(6) is None, gamma is
+    zero).
+
+    """
+
+    def __init__(
+        self,
+        m: float,
+        slrk: float,
+        sgr: float,
+        flag: float = 0.0,
+        eta: float = 0.5,
+        eps: float = 0.0,
+        zeta: float = 1.0 / 3.0,
+    ) -> None:
+        """Initialize modified van Genuchten's relative permeability model."""
+        super().__init__(slrk, sgr, flag, eta, eps, None, zeta)
+        self._id = 11
+        self._name = "Modified van Genuchten"
+        self._m = m
+
+    def _eval(self, sl: ArrayLike, *args) -> tuple[ArrayLike, ArrayLike]:
+        """Modified van Genuchten's function."""
+        sl = np.asanyarray(sl)
+        slrk, sgr, flag, eta, eps, _, zeta = args
+        m = self._m
+
+        eta = 0.5 if eta == 0.0 else eta
+        zeta = 1.0 / 3.0 if zeta == 0.0 else zeta
+
+        # Liquid relative permeability
+        Sekl = (sl - slrk) / (1.0 - slrk)
+
+        kl = np.zeros_like(sl)
+        kl[Sekl >= 1.0] = 1.0
+        
+        mask = np.logical_and(Sekl > 0.0, Sekl <= 1.0 - eps)
+        if mask.any():
+            kl[mask] = Sekl[mask] ** eta * (1.0 - (1.0 - Sekl[mask] ** (1.0 / m)) ** m) ** 2
+
+        mask = np.logical_and(Sekl > 1.0 - eps, Sekl < 1.0)
+        if mask.any():
+            c1 = 1.0 - eps
+            c2 = c1 ** eta * (1.0 - (1.0 - c1 ** (1.0 / m)) ** m) ** 2
+            kl[mask] = c2 + (Sekl[mask] - c1) * (1.0 - c2) / eps
+
+        # Gas relative permeability
+        if flag > 1.0e-10:
+            kg = 1.0 - kl
+
+        else:
+            Sekg = sl / (1.0 - sgr)
+
+            kg = np.zeros_like(sl)
+            kg[Sekg < 0.0] = 1.0
+
+            mask = np.logical_and(Sekg >= 0.0, Sekg <= 1.0)
+            if mask.any():
+                kg = (1.0 - Sekg[mask]) ** zeta * (1.0 - Sekg[mask] ** (1.0 / m)) ** (2 * m)
+
+        return kl, kg
+
+
 class vanGenuchtenMualem(RelativePermeabilityModel):
     """
     van Genuchten-Mualem's function.
