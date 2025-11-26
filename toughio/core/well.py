@@ -10,13 +10,14 @@ import pandas as pd
 import pvgridder as pvg
 import pyvista as pv
 from matplotlib.axes import Axes
-from numpy.typing import ArrayLike
 from typing_extensions import Self
 
 from .history_output import HistoryOutput
 
 
 if TYPE_CHECKING:
+    from numpy.typing import ArrayLike, NDArray
+    
     import toughio
 
 
@@ -52,6 +53,7 @@ class Pipe:
         other_data: Optional[dict] = None,
     ) -> None:
         """Initialize a pipe section."""
+        points = np.asanyarray(points)
         other_data = other_data if other_data is not None else {}
 
         pipe = pv.MultipleLines(points)
@@ -82,7 +84,7 @@ class Pipe:
     @inner_radius.setter
     def inner_radius(self, value: float) -> None:
         """Set the inner radius of the pipe section."""
-        self.pyvista.cell_data["Radius"] = value
+        self.pyvista.cell_data["Radius"] = np.asanyarray(value)
 
     @property
     def is_porous(self) -> bool:
@@ -105,7 +107,7 @@ class Pipe:
         self.pyvista.cell_data["Material"] = value
 
     @property
-    def points(self) -> ArrayLike:
+    def points(self) -> NDArray:
         """Return the 3D coordinates of the pipe section."""
         return self.pyvista.points
 
@@ -122,7 +124,7 @@ class Pipe:
     @thickness.setter
     def thickness(self, value: float) -> None:
         """Set the thickness of the pipe section."""
-        self.pyvista.cell_data["Thickness"] = value
+        self.pyvista.cell_data["Thickness"] = np.asanyarray(value)
 
     @property
     def zmin(self) -> float:
@@ -322,7 +324,7 @@ class WellCasing:
                     center=center,
                 )
                 .cast_to_unstructured_grid()
-                .clean(tolerance=1.0e-8)
+                .clean(tolerance=1.0e-8)  # pyright: ignore
                 if pipe.is_porous
                 else pv.Cylinder(
                     center=center,
@@ -371,18 +373,18 @@ class WellCasing:
             scalars="Material",
             opacity=0.5,
         )
-        p.add_axes()
+        p.add_axes()  # pyright: ignore
 
         if plotter is None:
             p.show()
 
     @property
-    def connections(self) -> Sequence[dict]:
+    def connections(self) -> list[dict]:
         """Return well connections."""
         return self.metadata["Connections"]
 
     @property
-    def materials(self) -> ArrayLike:
+    def materials(self) -> NDArray:
         """Return well materials."""
         return np.array([pipe.material for pipe in self.pipes])
 
@@ -392,17 +394,17 @@ class WellCasing:
         return self._metadata
 
     @property
-    def pipes(self) -> Sequence[Pipe]:
+    def pipes(self) -> list[Pipe]:
         """Return pipe sections."""
         return self._pipes
 
     @property
-    def radii(self) -> ArrayLike:
+    def radii(self) -> NDArray:
         """Return well radii."""
         return np.array([pipe.inner_radius for pipe in self.pipes])
 
     @property
-    def wellheads(self) -> int:
+    def wellheads(self) -> list[Pipe]:
         """Return wellheads."""
         return self.metadata["Wellheads"]
 
@@ -444,6 +446,12 @@ class WellOutput(HistoryOutput):
 
         t = t if t is not None else self.time
         z = z if z is not None else self.depth
+
+        if t is None:
+            raise ValueError(
+                "could not interpolate well output without time data"
+            )
+
         T, Z = np.meshgrid(t, z)
 
         tp = self.data["Time"]
@@ -505,6 +513,9 @@ class WellOutput(HistoryOutput):
         t = self.time
         z = self.depth
 
+        if t is None:
+            raise ValueError("could not plot well output without time data")
+
         if t.size == 1:
             ax.plot(self.data[key], z, *args, **kwargs)
             ax.set_xlabel(key)
@@ -558,12 +569,12 @@ class WellOutput(HistoryOutput):
         return super().to_dict(unit=False)
 
     @property
-    def depth(self) -> ArrayLike:
+    def depth(self) -> NDArray:
         """Return depth data."""
         return np.unique(self.data["Depth"])
 
     @property
-    def time(self) -> ArrayLike | None:
+    def time(self) -> NDArray | None:
         """Return time data."""
         time_key = self._get_time_key()
 
@@ -600,7 +611,7 @@ class WellTrajectory:
 
     def __init__(
         self,
-        arg: str | os.PathLike | ArrayLike | pv.PolyData,
+        arg: str | os.PathLike | ArrayLike | pv.DataObject | pv.PolyData,
         wellhead_material: Optional[str] = None,
         wellhead_inner_radius: Optional[float] = None,
         wellhead_height: float = 1.0,
@@ -608,9 +619,9 @@ class WellTrajectory:
     ) -> None:
         """Initialize the well trajectory."""
         if isinstance(arg, (str, os.PathLike)):
-            arg = pv.read(arg)
+            arg = pv.read(str(arg))
 
-        if isinstance(arg, pv.DataSet):
+        if isinstance(arg, (pv.DataObject, pv.DataSet)):
             if (
                 isinstance(arg, pv.PolyData)
                 and arg.user_dict.get("toughioType") == "WellTrajectory"
@@ -638,7 +649,7 @@ class WellTrajectory:
                 raise TypeError("could not initialize well trajectory")
 
         elif isinstance(arg, (list, tuple, np.ndarray)) and np.ndim(arg) == 1:
-            origin = arg
+            origin = np.asanyarray(arg)
 
             if wellhead_material is None or wellhead_inner_radius is None:
                 raise ValueError(
@@ -670,7 +681,7 @@ class WellTrajectory:
         resolution: int = 1,
         end_direction: Optional[ArrayLike] = None,
         curved: bool = False,
-    ) -> None:
+    ) -> Pipe:
         """
         Add a pipe to the well trajectory.
 
@@ -688,6 +699,11 @@ class WellTrajectory:
             The end direction of the pipe.
         curved : bool, default False
             If True, incrementally deviate the pipe until end direction is reached.
+
+        Returns
+        -------
+        toughio.Pipe
+            The added pipe.
 
         """
         origin = self.points[-1]
@@ -806,18 +822,18 @@ class WellTrajectory:
                 render_points_as_spheres=True,
             )
 
-        p.add_axes()
+        p.add_axes()  # pyright: ignore
 
         if plotter is None:
             p.show()
 
-    def shift(self, vector: ArrayLike) -> Self:
+    def shift(self, vector: Sequence[float]) -> Self:
         """
         Shift the well trajectory by a given vector.
 
         Parameters
         ----------
-        vector : ArrayLike
+        vector : Sequence[float]
             The vector by which to shift the well trajectory.
 
         Returns
@@ -870,7 +886,7 @@ class WellTrajectory:
         return mesh
 
     @property
-    def direction(self) -> ArrayLike:
+    def direction(self) -> NDArray:
         """Return the end direction of the well trajectory."""
         return self._direction
 
@@ -893,12 +909,12 @@ class WellTrajectory:
         return (np.linalg.norm(np.diff(self.points, axis=0), axis=1)).sum()
 
     @property
-    def pipes(self) -> Sequence[Pipe]:
+    def pipes(self) -> list[Pipe]:
         """Return the pipes along the well trajectory."""
         return self._pipes
 
     @property
-    def points(self) -> ArrayLike:
+    def points(self) -> NDArray:
         """Return the points of the well trajectory."""
         return np.vstack(
             [
