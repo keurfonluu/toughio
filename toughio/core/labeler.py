@@ -1,9 +1,14 @@
 from __future__ import annotations
 
 from string import ascii_uppercase
+from typing import TYPE_CHECKING
 
 import numpy as np
-from numpy.typing import ArrayLike
+
+if TYPE_CHECKING:
+    from typing import Optional
+
+    from numpy.typing import NDArray
 
 
 class Labeler:
@@ -12,7 +17,7 @@ class Labeler:
 
     Parameters
     ----------
-    label_length : int, default 5
+    label_length : int, optional
         Number of characters.
 
     """
@@ -20,11 +25,11 @@ class Labeler:
     __name__: str = "Labeler"
     __qualname__: str = "toughio.Labeler"
 
-    def __init__(self, label_length: int = 5) -> None:
+    def __init__(self, label_length: Optional[int] = None) -> None:
         """Initialize a labeler."""
-        self.label_length = label_length
+        self.label_length = label_length if label_length else 5
 
-    def __call__(self, n: int, offset: int = 0) -> ArrayLike:
+    def __call__(self, n: int, offset: int = 0) -> NDArray:
         """
         Generate *n* labels.
 
