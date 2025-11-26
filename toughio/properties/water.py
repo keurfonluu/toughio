@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Literal, Optional
 
 import numpy as np
-from numpy.typing import ArrayLike
+from numpy.typing import ArrayLike, NDArray
 
 
 def density(
@@ -107,6 +107,28 @@ def density(
 
     else:
         raise ValueError(f"invalid method '{method}'")
+
+
+def surface_tension(temperature: ArrayLike) -> NDArray:
+    """
+    Calculate surface tension of water.
+
+    Parameters
+    ----------
+    temperature : ArrayLike
+        Temperature(s) (in °C).
+
+    Returns
+    -------
+    NDArray
+        Surface tension (in N/m).
+
+    """
+    temperature = np.asanyarray(temperature)
+    ts = 1.0 - (temperature + 273.15) / 647.3
+    sigma = 0.2358 * ts ** 1.256 * (1.0 - 0.625 * ts)
+
+    return sigma
 
 
 def vapor_saturation_pressure(
