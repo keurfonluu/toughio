@@ -77,6 +77,25 @@ class Pipe:
             pipe.cell_data[k] = v
 
     @property
+    def initial_conditions(self) -> NDArray | None:
+        """Return the initial conditions of the pipe section."""
+        return (
+            self.pyvista.cell_data["Initial Conditions"].squeeze()
+            if "Initial Conditions" in self.pyvista.cell_data
+            else None
+        )
+
+    @initial_conditions.setter
+    def initial_conditions(self, value: ArrayLike) -> None:
+        """Set the initial conditions of the pipe section."""
+        value = np.asanyarray(value)
+
+        if value.ndim != 1:
+            raise ValueError("could not add initial conditions with invalid shape")
+        
+        self.pyvista.cell_data["Initial Conditions"] = np.atleast_2d(value)
+
+    @property
     def inner_radius(self) -> float:
         """Return the inner radius of the pipe section."""
         return self.pyvista.cell_data["Radius"][0]
@@ -324,7 +343,7 @@ class WellCasing:
                     center=center,
                 )
                 .cast_to_unstructured_grid()
-                .clean(tolerance=1.0e-8)  # pyright: ignore
+                .clean(tolerance=1.0e-8)  # type: ignore
                 if pipe.is_porous
                 else pv.Cylinder(
                     center=center,
@@ -373,7 +392,7 @@ class WellCasing:
             scalars="Material",
             opacity=0.5,
         )
-        p.add_axes()  # pyright: ignore
+        p.add_axes()  # type: ignore
 
         if plotter is None:
             p.show()
@@ -768,10 +787,13 @@ class WellTrajectory:
             )
 
         elif isinstance(mesh, Mesh):
-            mesh = mesh.pyvista
+            mesh_ = mesh.pyvista
+
+        else:
+            mesh_ = mesh
 
         intersection = pvg.intersect_polyline(
-            mesh,
+            mesh_,  # type: ignore
             line=self.to_pyvista(as_lines=True),
             min_length=min_length,
             tolerance=tolerance,
@@ -822,7 +844,7 @@ class WellTrajectory:
                 render_points_as_spheres=True,
             )
 
-        p.add_axes()  # pyright: ignore
+        p.add_axes()  # type: ignore
 
         if plotter is None:
             p.show()
@@ -884,6 +906,13 @@ class WellTrajectory:
         mesh.user_dict["DirectionVector"] = self.direction.tolist()
 
         return mesh
+    
+    @property
+    def centers(self) -> NDArray:
+        """Return the centers of the pipes along the well trajectory."""
+        points = self.points
+        
+        return 0.5 * (points[:-1] + points[1:])
 
     @property
     def direction(self) -> NDArray:
@@ -894,6 +923,43 @@ class WellTrajectory:
     def direction(self, value: ArrayLike) -> None:
         """Set the end direction of the well trajectory."""
         self._direction = np.atleast_1d(value) / np.linalg.norm(value)
+
+    @property
+    def initial_conditions(self) -> NDArray | None:
+        """Return initial conditions along the well trajectory."""
+        initial_conditions = [
+            pipe.initial_conditions
+            if pipe.initial_conditions is not None
+            else []
+            for pipe in self.pipes
+        ]
+
+        # Pad with NaNs to make sure all arrays have the same length
+        max_length = max(len(ic) for ic in initial_conditions)
+        initial_conditions = np.hstack(
+            [
+                np.pad(ic, (0, max_length - len(ic)), constant_values=np.nan)
+                for ic in initial_conditions
+            ]
+        )
+
+        return initial_conditions if not np.isnan(initial_conditions).all() else None
+        
+    @initial_conditions.setter
+    def initial_conditions(self, value: ArrayLike) -> None:
+        """Set initial conditions along the well trajectory."""
+        value = np.asanyarray(value)
+
+        if value.ndim != 2:
+            raise ValueError("could not set initial conditions with invalid shape")
+        
+        if value.shape[0] != self.size:
+            raise ValueError(
+                "could not set initial conditions with mismatched number of pipe sections"
+            )
+        
+        for pipe, value_ in zip(self.pipes, value):
+            pipe.initial_conditions = value_
 
     @property
     def intersected_cell_ids(self) -> ArrayLike | None:
@@ -922,3 +988,8 @@ class WellTrajectory:
                 *[pipe.points[1:] for pipe in self.pipes[1:]],
             ]
         )
+    
+    @property
+    def size(self) -> int:
+        """Return the number of pipe sections along the well trajectory."""
+        return len(self.pipes)
