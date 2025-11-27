@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Literal, Optional
+from typing import TYPE_CHECKING, cast
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -16,6 +16,8 @@ from .history_output import HistoryOutput
 
 
 if TYPE_CHECKING:
+    from typing import Literal, Optional
+
     from numpy.typing import ArrayLike, NDArray
     
     import toughio
@@ -61,7 +63,7 @@ class Pipe:
         pipe.cell_data["Material"] = np.atleast_1d(material)
         pipe.cell_data["Radius"] = np.atleast_1d(inner_radius)
         pipe.cell_data["Thickness"] = np.atleast_1d(thickness)
-        self._pyvista = pipe
+        self._pyvista = cast(pv.PolyData, pipe)
 
         if self.is_porous and material.upper().startswith(("W", "X")):
             raise ValueError(
@@ -973,6 +975,16 @@ class WellTrajectory:
     def length(self) -> float:
         """Return the length of the well trajectory."""
         return (np.linalg.norm(np.diff(self.points, axis=0), axis=1)).sum()
+    
+    @property
+    def materials(self) -> NDArray:
+        """Return the materials along the well trajectory."""
+        return np.array([pipe.material for pipe in self.pipes])
+    
+    @property
+    def n_cells(self) -> int:
+        """Return the number of cells along the well trajectory."""
+        return self.size
 
     @property
     def pipes(self) -> list[Pipe]:
