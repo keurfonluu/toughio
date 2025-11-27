@@ -694,7 +694,7 @@ class BaseMesh(ABC):
         centers = mesh.centers
 
         # Labels of inactive elements
-        inactive = not mesh.active
+        inactive = ~mesh.active
         inactive_labels = set(labels[inactive])
 
         # Connection data
@@ -1462,7 +1462,7 @@ class Mesh(BaseMesh):
         well: WellTrajectory,
         min_length: float = 1.0e-4,
         tolerance: float = 1.0e-8,
-    ) -> None:
+    ) -> WellTrajectory:
         """
         Add a well trajectory.
 
@@ -1477,6 +1477,11 @@ class Mesh(BaseMesh):
             The absolute tolerance to use to find cells along the trajectory. Only used
             if the well trajectory has not been intersected yet.
 
+        Returns
+        -------
+        toughio.WellTrajectory
+            The intersected well trajectory.
+
         """
         if not isinstance(well, WellTrajectory):
             raise TypeError("could not add well: expected a WellTrajectory instance")
@@ -1485,6 +1490,8 @@ class Mesh(BaseMesh):
             well = well.intersect(self, min_length, tolerance)
 
         self.wells.append(well)
+
+        return well
 
     def extrude_to_3d(self, height: ArrayLike = 1.0, axis: int = 2) -> Self:
         """
@@ -1535,6 +1542,7 @@ class Mesh(BaseMesh):
 
         offset = self.n_cells
         labels = self.labels
+        incon = "initial_conditions" in parameters
 
         for i, well in enumerate(self.wells):
             well = well.to_pyvista().compute_cell_sizes(
@@ -1547,8 +1555,10 @@ class Mesh(BaseMesh):
             well_labels[0] = f"#WH{i + 1:02d}"
 
             # Define well elements and well to rock connections
+            # Define initial conditions if any
             well_elements = {}
             well_rock_connections = {}
+            well_initial_conditions = {}
             well_sizes = {}
 
             for label, line in zip(well_labels, pvg.split_lines(well, as_lines=True)):
@@ -1587,13 +1597,13 @@ class Mesh(BaseMesh):
                     # Calculate gravity cosine angle rotating direction vector by 90 degrees
                     v1 = line.points[1] - line.points[0]
                     v2 = line.points[0] + gravity
+                    v1 /= np.linalg.norm(v1)
+                    v2 /= np.linalg.norm(v2)
 
                     if abs(v1 @ v2) == 1.0:
                         gravity_cosine_angle = 0.0
 
                     else:
-                        v1 /= np.linalg.norm(v1)
-                        v2 /= np.linalg.norm(v2)
                         rotvec = np.cross(v1, v2)
                         rotvec /= np.linalg.norm(rotvec)
                         dvec = Rotation.from_rotvec(0.5 * np.pi * rotvec).apply(v1)
@@ -1612,6 +1622,17 @@ class Mesh(BaseMesh):
 
                     # Remove embedded well volume from rock element
                     parameters["elements"][l2]["volume"] -= vol1
+
+                # Initial conditions
+                if incon:
+                    well_initial_conditions[label] = {
+                        "values": list(
+                            map(
+                                lambda x: None if np.isnan(x) else x,
+                                line.cell_data["Initial Conditions"][0],
+                            ),
+                        ),
+                    }
 
             # Define well to well connections
             well_well_connections = {}
@@ -1636,6 +1657,9 @@ class Mesh(BaseMesh):
             parameters["elements"].update(well_elements)
             parameters["connections"].update(well_well_connections)
             parameters["connections"].update(well_rock_connections)
+
+            if incon:
+                parameters["initial_conditions"].update(well_initial_conditions)
 
             # Increment offset
             offset += well.n_cells
