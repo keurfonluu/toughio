@@ -2,12 +2,15 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from collections.abc import Sequence
-from typing import Any, Optional, TextIO
+from typing import TYPE_CHECKING
 
 import numpy as np
 
 from .file import FileIterator
 from .record_formatter import RecordFormatter
+
+if TYPE_CHECKING:
+    from typing import Any, Optional, TextIO
 
 
 class DataBlock:
@@ -33,6 +36,7 @@ class DataBlock:
     name: str
     formats: dict
     multiples: set = set()  # Flag for record formatters that write multiple records
+    _format: str
     _space_between_blocks: bool = False
 
     def __init__(
@@ -67,7 +71,7 @@ class DataBlock:
         self,
         parameters: dict,
         data: dict,
-    ) -> dict:
+    ) -> None:
         """Update input file parameters given a data block."""
         parameters.update(data)
 
@@ -138,7 +142,7 @@ class DataBlock:
 
     @staticmethod
     def read_primary_variables(
-        f: FileIterator | TextIO | str,
+        f: FileIterator,
         reader: RecordFormatter,
         n_variables: int | Sequence[int],
     ) -> list[Any]:
@@ -198,16 +202,12 @@ class DataBlock:
         return writer(values)
 
     @abstractmethod
-    def _read(self, f: FileIterator | TextIO | str, *args, **kwargs) -> dict:
-        """Read a data block."""
-        pass
+    def _read(self, f: FileIterator | TextIO | str, *args, **kwargs) -> dict: ...
 
     @abstractmethod
-    def _write(self, parameters: dict, *args, **kwargs) -> list[str]:
-        """Write a data block."""
-        pass
+    def _write(self, parameters: Optional[dict] = None, *args, **kwargs) -> list[str]: ...
 
-    def _write_conditions(self, parameters: dict, *args, **kwargs) -> bool:
+    def _write_conditions(self, parameters: Optional[dict] = None, *args, **kwargs) -> bool:
         """Write conditions for a data block."""
         return True
 

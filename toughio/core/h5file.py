@@ -2,19 +2,23 @@ from __future__ import annotations
 
 import os
 import pathlib
-from collections.abc import Sequence
-from types import TracebackType
-from typing import Literal, Optional
+from typing import TYPE_CHECKING
 
 import h5py
 import numpy as np
 import pvgridder as pvg
 import pyvista as pv
-from numpy.typing import ArrayLike
 
 from .history_output import HistoryOutput
 from .mesh import Mesh
 from .output import ConnectionOutput, ElementOutput
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from types import TracebackType
+    from typing import Literal, Optional
+
+    from numpy.typing import ArrayLike, NDArray
 
 
 class H5File:

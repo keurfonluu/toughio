@@ -1,13 +1,17 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import TYPE_CHECKING
 
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.axes import Axes
-from numpy.typing import ArrayLike
 
 from ._curve import BaseCurve
+
+if TYPE_CHECKING:
+    from typing import Optional
+
+    from numpy.typing import ArrayLike, NDArray
 
 
 class CapillarityModel(BaseCurve):
@@ -68,8 +72,9 @@ class Linear(CapillarityModel):
         self._id = 1
         self._name = "Linear"
 
-    def _eval(self, sl: ArrayLike, *args) -> ArrayLike:
+    def _eval(self, sl: ArrayLike, *args) -> NDArray:
         """Linear function."""
+        sl = np.asanyarray(sl)
         pmax, smin, smax = args
 
         pcap = np.where(sl < smax, -pmax * (smax - sl) / (smax - smin), 0.0)
@@ -112,8 +117,9 @@ class Pickens(CapillarityModel):
         self._id = 2
         self._name = "Pickens"
 
-    def _eval(self, sl: ArrayLike, *args) -> ArrayLike:
+    def _eval(self, sl: ArrayLike, *args) -> NDArray:
         """Pickens et al function."""
+        sl = np.asanyarray(sl)
         p0, slr, sl0, x = args
 
         sl = sl.clip(1.001 * slr, 0.999 * sl0)
@@ -158,8 +164,9 @@ class TRUST(CapillarityModel):
         self._id = 3
         self._name = "TRUST"
 
-    def _eval(self, sl: ArrayLike, *args) -> ArrayLike:
+    def _eval(self, sl: ArrayLike, *args) -> NDArray:
         """TRUST capillary pressure."""
+        sl = np.asanyarray(sl)
         p0, slr, eta, pe, pmax = args
 
         mask = sl > slr
@@ -194,8 +201,9 @@ class Milly(CapillarityModel):
         self._id = 4
         self._name = "Milly"
 
-    def _eval(self, sl: ArrayLike, *args) -> ArrayLike:
+    def _eval(self, sl: ArrayLike, *args) -> NDArray:
         """Milly's function."""
+        sl = np.asanyarray(sl)
         (slr,) = args
 
         sl = sl.clip(1.001 * slr, 1.0)
@@ -238,8 +246,9 @@ class vanGenuchten(CapillarityModel):
         self._id = 7
         self._name = "van Genuchten"
 
-    def _eval(self, sl: ArrayLike, *args) -> ArrayLike:
+    def _eval(self, sl: ArrayLike, *args) -> NDArray:
         """Van Genuchten's function."""
+        sl = np.asanyarray(sl)
         m, slr, alpha, pmax, sls = args
 
         Seff = (sl - slr) / (sls - slr)

@@ -1,13 +1,17 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import TYPE_CHECKING
 
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.axes import Axes
-from numpy.typing import ArrayLike
 
 from ._curve import BaseCurve
+
+if TYPE_CHECKING:
+    from typing import Optional
+
+    from numpy.typing import ArrayLike, NDArray
 
 
 class RelativePermeabilityModel(BaseCurve):
@@ -75,8 +79,9 @@ class Linear(RelativePermeabilityModel):
         self._id = 1
         self._name = "Linear"
 
-    def _eval(self, sl: ArrayLike, *args) -> tuple[ArrayLike, ArrayLike]:
+    def _eval(self, sl: ArrayLike, *args) -> tuple[NDArray, NDArray]:
         """Linear function."""
+        sl = np.asanyarray(sl)
         slmin, sgmin, slmax, sgmax = args
         sg = 1.0 - sl
 
@@ -110,8 +115,9 @@ class Pickens(RelativePermeabilityModel):
         self._id = 2
         self._name = "Pickens"
 
-    def _eval(self, sl: ArrayLike, *args) -> tuple[ArrayLike, ArrayLike]:
+    def _eval(self, sl: ArrayLike, *args) -> tuple[NDArray, NDArray]:
         """Gas perfect mobile function."""
+        sl = np.asanyarray(sl)
         (x,) = args
 
         kl = np.power(sl, x)
@@ -144,8 +150,9 @@ class Corey(RelativePermeabilityModel):
         self._id = 3
         self._name = "Corey"
 
-    def _eval(self, sl: ArrayLike, *args) -> tuple[ArrayLike, ArrayLike]:
+    def _eval(self, sl: ArrayLike, *args) -> tuple[NDArray, NDArray]:
         """Corey's curve."""
+        sl = np.asanyarray(sl)
         slr, sgr = args
         sg = 1.0 - sl
 
@@ -187,8 +194,9 @@ class Grant(RelativePermeabilityModel):
         self._id = 4
         self._name = "Grant"
 
-    def _eval(self, sl: ArrayLike, *args) -> tuple[ArrayLike, ArrayLike]:
+    def _eval(self, sl: ArrayLike, *args) -> tuple[NDArray, NDArray]:
         """Grant's curve."""
+        sl = np.asanyarray(sl)
         slr, sgr = args
         sg = 1.0 - sl
 
@@ -228,8 +236,9 @@ class FattKlikoff(RelativePermeabilityModel):
         self._id = 6
         self._name = "Fatt-Klikoff"
 
-    def _eval(self, sl: ArrayLike, *args) -> tuple[ArrayLike, ArrayLike]:
+    def _eval(self, sl: ArrayLike, *args) -> tuple[NDArray, NDArray]:
         """Fatt and Klikoff's function."""
+        sl = np.asanyarray(sl)
         (slr,) = args
 
         mask = sl > slr
@@ -288,7 +297,7 @@ class vanGenuchtenModified(RelativePermeabilityModel):
         self._name = "Modified van Genuchten"
         self._m = m
 
-    def _eval(self, sl: ArrayLike, *args) -> tuple[ArrayLike, ArrayLike]:
+    def _eval(self, sl: ArrayLike, *args) -> tuple[NDArray, NDArray]:
         """Modified van Genuchten's function."""
         sl = np.asanyarray(sl)
         slrk, sgr, flag, eta, eps, _, zeta = args
@@ -355,8 +364,9 @@ class vanGenuchtenMualem(RelativePermeabilityModel):
         self._id = 7
         self._name = "van Genuchten-Mualem"
 
-    def _eval(self, sl: ArrayLike, *args) -> tuple[ArrayLike, ArrayLike]:
+    def _eval(self, sl: ArrayLike, *args) -> tuple[NDArray, NDArray]:
         """Van Genuchten-Mualem's function."""
+        sl = np.asanyarray(sl)
         m, slr, sls, sgr = args
 
         Seff = (sl - slr) / (sls - slr)
@@ -405,8 +415,9 @@ class Verma(RelativePermeabilityModel):
         self._id = 8
         self._name = "Verma"
 
-    def _eval(self, sl: ArrayLike, *args) -> tuple[ArrayLike, ArrayLike]:
+    def _eval(self, sl: ArrayLike, *args) -> tuple[NDArray, NDArray]:
         """Verma's function."""
+        sl = np.asanyarray(sl)
         slr, sls, a, b, c = args
 
         Shat = ((sl - slr) / (sls - slr)).clip(0.0, 1.0)

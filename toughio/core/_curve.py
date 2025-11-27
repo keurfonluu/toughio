@@ -1,15 +1,22 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
 import numpy as np
-from numpy.typing import ArrayLike
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from numpy.typing import ArrayLike, NDArray
 
 
 class BaseCurve(ABC):
     """Base class for curve models."""
 
-    _short: str = None
+    _id: int
+    _name: str
+    _short: str
 
     def __init__(self, *args) -> None:
         """Initialize a curve."""
@@ -27,7 +34,7 @@ class BaseCurve(ABC):
 
         return "\n".join(out)
 
-    def __call__(self, sl: ArrayLike) -> ArrayLike:
+    def __call__(self, sl: ArrayLike) -> NDArray:
         """Compute curve data given liquid saturation."""
         sl = np.asanyarray(sl)
 
@@ -37,14 +44,10 @@ class BaseCurve(ABC):
         return self._eval(sl, *self.parameters)
 
     @abstractmethod
-    def _eval(self, sl: ArrayLike, *args) -> None:
-        """Evaluate model at query points."""
-        pass
+    def _eval(self, sl: ArrayLike, *args) -> NDArray: ...
 
     @abstractmethod
-    def plot(*args) -> None:
-        """Plot a curve."""
-        pass
+    def plot(*args) -> None: ...
 
     @property
     def id(self) -> int:
@@ -57,11 +60,11 @@ class BaseCurve(ABC):
         return self._name
 
     @property
-    def parameters(self) -> ArrayLike:
+    def parameters(self) -> list[float]:
         """Return model parameters."""
         return self._parameters
 
     @parameters.setter
-    def parameters(self, value: ArrayLike) -> None:
+    def parameters(self, value: Sequence[float]) -> None:
         """Set model parameters."""
-        self._parameters = value
+        self._parameters = list(value)
