@@ -9,6 +9,7 @@ import numpy as np
 from .file import FileIterator
 from .record_formatter import RecordFormatter
 
+
 if TYPE_CHECKING:
     from typing import Any, Optional, TextIO
 
@@ -205,9 +206,13 @@ class DataBlock:
     def _read(self, f: FileIterator | TextIO | str, *args, **kwargs) -> dict: ...
 
     @abstractmethod
-    def _write(self, parameters: Optional[dict] = None, *args, **kwargs) -> list[str]: ...
+    def _write(
+        self, parameters: Optional[dict] = None, *args, **kwargs
+    ) -> list[str]: ...
 
-    def _write_conditions(self, parameters: Optional[dict] = None, *args, **kwargs) -> bool:
+    def _write_conditions(
+        self, parameters: Optional[dict] = None, *args, **kwargs
+    ) -> bool:
         """Write conditions for a data block."""
         return True
 

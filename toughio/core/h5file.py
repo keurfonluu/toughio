@@ -13,12 +13,13 @@ from .history_output import HistoryOutput
 from .mesh import Mesh
 from .output import ConnectionOutput, ElementOutput
 
+
 if TYPE_CHECKING:
     from collections.abc import Sequence
     from types import TracebackType
     from typing import Literal, Optional
 
-    from numpy.typing import ArrayLike, NDArray
+    from numpy.typing import ArrayLike
 
 
 class H5File:

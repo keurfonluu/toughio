@@ -6,6 +6,7 @@ import numpy as np
 
 from .file import FileIterator
 
+
 if TYPE_CHECKING:
     from collections.abc import Sequence
     from typing import Any, Literal, Optional

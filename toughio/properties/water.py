@@ -126,7 +126,7 @@ def surface_tension(temperature: ArrayLike) -> NDArray:
     """
     temperature = np.asanyarray(temperature)
     ts = 1.0 - (temperature + 273.15) / 647.3
-    sigma = 0.2358 * ts ** 1.256 * (1.0 - 0.625 * ts)
+    sigma = 0.2358 * ts**1.256 * (1.0 - 0.625 * ts)
 
     return sigma
 

@@ -4,7 +4,7 @@ import copy
 import os
 import pathlib
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, cast, overload
+from typing import TYPE_CHECKING, Union, cast, overload
 
 import meshio
 import numpy as np
@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import ArrayLike, NDArray
     from typing_extensions import Self
-    
+
     from toughio.core.output import ElementOutput
 
 
@@ -31,12 +31,7 @@ class BaseMesh(ABC):
     __name__: str = "BaseMesh"
     __qualname__: str = "toughio.BaseMesh"
 
-    def __init__(
-        self,
-        *args,
-        metadata: Optional[dict] = None,
-        **kwargs
-    ) -> None:
+    def __init__(self, *args, metadata: Optional[dict] = None, **kwargs) -> None:
         """Initialize a mesh."""
         if len(args) == 1:
             (mesh,) = args
@@ -67,7 +62,9 @@ class BaseMesh(ABC):
                             if vv is not None and len(vv):
                                 materials[ii][vv] = i + 1
 
-                    mesh.cell_data["Material"] = [np.asanyarray(material) for material in materials]
+                    mesh.cell_data["Material"] = [
+                        np.asanyarray(material) for material in materials
+                    ]
 
                 self._pyvista = pv.from_meshio(mesh)
 
@@ -319,6 +316,7 @@ class BaseMesh(ABC):
         """
         mask = np.ones(self.n_cells, dtype=bool)
         ind_ = [ind] if np.ndim(ind[0]) == 0 else ind
+        ind_ = cast(Sequence[Sequence[int]], ind_)
 
         for ids in ind_:
             ids = np.asanyarray(ids)
@@ -468,7 +466,7 @@ class BaseMesh(ABC):
 
         """
         ind = np.asanyarray(ind)
-        
+
         if "vtkGhostType" not in self.data:
             self.data["vtkGhostType"] = np.zeros(self.n_cells, dtype=np.uint8)
 
@@ -524,7 +522,9 @@ class BaseMesh(ABC):
             Indices of cells for which material will be assigned to.
 
         """
-        ind = np.asanyarray(ind) if ind is not None else np.ones(self.n_cells, dtype=bool)
+        ind = (
+            np.asanyarray(ind) if ind is not None else np.ones(self.n_cells, dtype=bool)
+        )
         material_key = self.material_key
 
         if material_key not in self.metadata:
@@ -590,8 +590,10 @@ class BaseMesh(ABC):
             Output mesh.
 
         """
-        return cast(pv.StructuredGrid | pv.UnstructuredGrid, self.pyvista.copy(deep=True))
-    
+        return cast(
+            Union[pv.StructuredGrid, pv.UnstructuredGrid], self.pyvista.copy(deep=True)
+        )
+
     @overload
     def to_tough(
         self,
@@ -1229,12 +1231,14 @@ class BaseMesh(ABC):
 
         return connections, centers, normals, lengths_or_areas
 
-    def _get_property(
-        self, name: str, default: Optional[ArrayLike] = None
-    ) -> NDArray:
+    def _get_property(self, name: str, default: Optional[ArrayLike] = None) -> NDArray:
         """Get property data."""
         if name not in self.data:
-            data = np.zeros(self.n_cells, dtype=float) if default is None else np.asanyarray(default)
+            data = (
+                np.zeros(self.n_cells, dtype=float)
+                if default is None
+                else np.asanyarray(default)
+            )
             self.data[name] = data
 
         return self.data[name]
@@ -1410,7 +1414,7 @@ class BaseMesh(ABC):
     @property
     def pyvista(self) -> pv.StructuredGrid | pv.UnstructuredGrid:
         """Return underlying PyVista mesh."""
-        return cast(pv.StructuredGrid | pv.UnstructuredGrid, self._pyvista)
+        return cast(Union[pv.StructuredGrid, pv.UnstructuredGrid], self._pyvista)
 
     @property
     def volumes(self) -> NDArray:
@@ -1419,9 +1423,9 @@ class BaseMesh(ABC):
         key = "Volume" if is3d else "Area"
 
         return np.abs(
-            self.pyvista
-            .compute_cell_sizes(length=False, area=not is3d, volume=is3d)
-            .cell_data[key]
+            self.pyvista.compute_cell_sizes(
+                length=False, area=not is3d, volume=is3d
+            ).cell_data[key]
         )
 
 
@@ -1890,7 +1894,7 @@ class CylindricMesh(BaseMesh):
         mesh.metadata.update(self.metadata)
 
         return mesh
-    
+
     @overload
     def to_tough(
         self,

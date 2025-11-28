@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from typing import Literal, Optional
 
     from numpy.typing import ArrayLike, NDArray
-    
+
     import toughio
 
 
@@ -94,7 +94,7 @@ class Pipe:
 
         if value.ndim != 1:
             raise ValueError("could not add initial conditions with invalid shape")
-        
+
         self.pyvista.cell_data["Initial Conditions"] = np.atleast_2d(value)
 
     @property
@@ -469,9 +469,7 @@ class WellOutput(HistoryOutput):
         z = z if z is not None else self.depth
 
         if t is None:
-            raise ValueError(
-                "could not interpolate well output without time data"
-            )
+            raise ValueError("could not interpolate well output without time data")
 
         T, Z = np.meshgrid(t, z)
 
@@ -908,12 +906,12 @@ class WellTrajectory:
         mesh.user_dict["DirectionVector"] = self.direction.tolist()
 
         return mesh
-    
+
     @property
     def centers(self) -> NDArray:
         """Return the centers of the pipes along the well trajectory."""
         points = self.points
-        
+
         return 0.5 * (points[:-1] + points[1:])
 
     @property
@@ -930,9 +928,7 @@ class WellTrajectory:
     def initial_conditions(self) -> NDArray | None:
         """Return initial conditions along the well trajectory."""
         initial_conditions = [
-            pipe.initial_conditions
-            if pipe.initial_conditions is not None
-            else []
+            pipe.initial_conditions if pipe.initial_conditions is not None else []
             for pipe in self.pipes
         ]
 
@@ -946,7 +942,7 @@ class WellTrajectory:
         )
 
         return initial_conditions if not np.isnan(initial_conditions).all() else None
-        
+
     @initial_conditions.setter
     def initial_conditions(self, value: ArrayLike) -> None:
         """Set initial conditions along the well trajectory."""
@@ -954,12 +950,12 @@ class WellTrajectory:
 
         if value.ndim != 2:
             raise ValueError("could not set initial conditions with invalid shape")
-        
+
         if value.shape[0] != self.size:
             raise ValueError(
                 "could not set initial conditions with mismatched number of pipe sections"
             )
-        
+
         for pipe, value_ in zip(self.pipes, value):
             pipe.initial_conditions = value_
 
@@ -975,12 +971,12 @@ class WellTrajectory:
     def length(self) -> float:
         """Return the length of the well trajectory."""
         return (np.linalg.norm(np.diff(self.points, axis=0), axis=1)).sum()
-    
+
     @property
     def materials(self) -> NDArray:
         """Return the materials along the well trajectory."""
         return np.array([pipe.material for pipe in self.pipes])
-    
+
     @property
     def n_cells(self) -> int:
         """Return the number of cells along the well trajectory."""
@@ -1000,7 +996,7 @@ class WellTrajectory:
                 *[pipe.points[1:] for pipe in self.pipes[1:]],
             ]
         )
-    
+
     @property
     def size(self) -> int:
         """Return the number of pipe sections along the well trajectory."""

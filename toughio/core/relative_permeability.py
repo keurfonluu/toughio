@@ -8,6 +8,7 @@ from matplotlib.axes import Axes
 
 from ._curve import BaseCurve
 
+
 if TYPE_CHECKING:
     from typing import Optional
 
@@ -311,15 +312,17 @@ class vanGenuchtenModified(RelativePermeabilityModel):
 
         kl = np.zeros_like(sl)
         kl[Sekl >= 1.0] = 1.0
-        
+
         mask = np.logical_and(Sekl > 0.0, Sekl <= 1.0 - eps)
         if mask.any():
-            kl[mask] = Sekl[mask] ** eta * (1.0 - (1.0 - Sekl[mask] ** (1.0 / m)) ** m) ** 2
+            kl[mask] = (
+                Sekl[mask] ** eta * (1.0 - (1.0 - Sekl[mask] ** (1.0 / m)) ** m) ** 2
+            )
 
         mask = np.logical_and(Sekl > 1.0 - eps, Sekl < 1.0)
         if mask.any():
             c1 = 1.0 - eps
-            c2 = c1 ** eta * (1.0 - (1.0 - c1 ** (1.0 / m)) ** m) ** 2
+            c2 = c1**eta * (1.0 - (1.0 - c1 ** (1.0 / m)) ** m) ** 2
             kl[mask] = c2 + (Sekl[mask] - c1) * (1.0 - c2) / eps
 
         # Gas relative permeability
@@ -334,7 +337,9 @@ class vanGenuchtenModified(RelativePermeabilityModel):
 
             mask = np.logical_and(Sekg >= 0.0, Sekg <= 1.0)
             if mask.any():
-                kg = (1.0 - Sekg[mask]) ** zeta * (1.0 - Sekg[mask] ** (1.0 / m)) ** (2 * m)
+                kg = (1.0 - Sekg[mask]) ** zeta * (1.0 - Sekg[mask] ** (1.0 / m)) ** (
+                    2 * m
+                )
 
         return kl, kg
 

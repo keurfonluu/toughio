@@ -8,6 +8,7 @@ from matplotlib.axes import Axes
 
 from ._curve import BaseCurve
 
+
 if TYPE_CHECKING:
     from typing import Optional
 
@@ -265,7 +266,7 @@ class vanGenuchten(CapillarityModel):
 class vanGenuchtenModified(CapillarityModel):
     """
     Modified van Genuchten's function.
-    
+
     After Luckner et al. (1989).
 
     Parameters
@@ -285,6 +286,7 @@ class vanGenuchtenModified(CapillarityModel):
         Irreducible liquid saturation (CP(7)). If zero, slrc=slrk (RP(1)).
 
     """
+
     def __init__(
         self,
         n: float,
@@ -298,7 +300,7 @@ class vanGenuchtenModified(CapillarityModel):
         super().__init__(n, p0, eps, m, tref, None, slrc)
         self._id = 11
         self._name = "Modified van Genuchten"
-    
+
     def _eval(self, sl: ArrayLike, *args) -> ArrayLike:
         """Modified van Genuchten's function."""
         from ..properties.water import surface_tension
@@ -313,7 +315,7 @@ class vanGenuchtenModified(CapillarityModel):
 
         else:
             n = 1.0 / (1.0 - m)
-        
+
         if eps == 0.0:
             epsl = -1.0
             scut = slrc + epsl
@@ -352,7 +354,8 @@ class vanGenuchtenModified(CapillarityModel):
                 sbar = max(epsl, 1.0e-3) / (1.0 - slrc)
                 pce = ae * (sbar ** (-1.0 / m) - 1.0) ** (1.0 / n)
                 pcslope = (
-                    ae / ((1.0 - slrc) * n * m)
+                    ae
+                    / ((1.0 - slrc) * n * m)
                     * (sbar ** (-1.0 / m) - 1.0) ** (1.0 / n - 1.0)
                     * sbar ** (-(1.0 + m) / m)
                 )
@@ -364,7 +367,10 @@ class vanGenuchtenModified(CapillarityModel):
                 se_star = (slstar - slrc) / (1.0 - slrc)
                 pce = -ae * (se_star ** (-1.0 / m) - 1.0) ** (1.0 / n)
                 pcslope = (
-                    np.log10(np.e) / abs(epsl) * (1.0 - m) / m
+                    np.log10(np.e)
+                    / abs(epsl)
+                    * (1.0 - m)
+                    / m
                     / (se_star ** (1.0 / m) - 1.0)
                 )
                 pcap[mask] = pce * 10.0 ** (pcslope * (sl[mask] - slstar))
