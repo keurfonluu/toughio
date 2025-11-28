@@ -289,9 +289,9 @@ class BaseMesh(ABC):
             Mesh with extracted slice.
 
         """
-        normal = np.asanyarray(normal)
+        normal = np.asanyarray(normal) if not isinstance(normal, str) else normal
         origin = np.asanyarray(origin) if origin is not None else None
-        mesh = self.pyvista.slice(normal, origin=origin).cast_to_unstructured_grid()
+        mesh = self.pyvista.slice(normal, origin=origin).cast_to_unstructured_grid()  # type: ignore
 
         return self.__class__(mesh, metadata=self.metadata)
 
