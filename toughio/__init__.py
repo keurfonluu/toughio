@@ -9,7 +9,7 @@ from .legacy import *
 from .utils import *
 
 
-__all__ = [x for x in dir() if not x.startswith("_")]
+__all__ = [x for x in dir() if not x.startswith("_")]  # type: ignore
 __all__ += [
     "__version__",
 ]
