@@ -4,6 +4,7 @@ import copy
 import os
 import pathlib
 from abc import ABC, abstractmethod
+from collections.abc import Sequence
 from typing import TYPE_CHECKING, Union, cast, overload
 
 import meshio
@@ -16,7 +17,6 @@ from .well import WellCasing, WellTrajectory
 
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
     from typing import Literal, Optional
 
     from numpy.typing import ArrayLike, NDArray
