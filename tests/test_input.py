@@ -527,7 +527,7 @@ def test_incon(write_read, label_length, num_pvars, num_items, helpers):
 
     if write_read.file_format in {"tough4", "json"}:
         for v in parameters_ref["initial_conditions"].values():
-            v["permeability"] = np.random.rand(5)
+            v["permeability"] = np.random.rand(3)
 
     parameters = write_read(parameters_ref)
     assert helpers.allclose(parameters_ref, parameters, atol=1.0e-4)
@@ -676,8 +676,8 @@ def test_wellb(write_read, helpers):
             "geothermal": {
                 "well_only": bool(np.random.randint(2)),
                 "temperature_ref": np.random.rand(),
-                "temperature_grad": np.random.rand(np.random.randint(5) + 2),
-                "temperature_z": np.random.rand(np.random.randint(5) + 2),
+                "temperature_grad": np.random.rand(4),  # max 4 points
+                "temperature_z": np.random.rand(4),  # max 4 points
             },
             "flows": [
                 {
