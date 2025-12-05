@@ -1,4 +1,11 @@
+from __future__ import annotations
+
+import os
+from collections.abc import Sequence
+from typing import Literal, Optional, TextIO
+
 import numpy as np
+from numpy.typing import ArrayLike
 
 from ..._common import filetype_from_filename, open_file, register_format
 from ...core import Output
@@ -37,31 +44,33 @@ def register(file_format, extensions, reader, writer=None):
 
 
 def read(
-    filename,
-    file_format=None,
-    labels_order=None,
-    time_steps=None,
-    connection=False,
-):
+    filename: str | os.PathLike | TextIO,
+    file_format: Optional[
+        Literal["csv", "petrasim", "save", "tecplot", "tough"]
+    ] = None,
+    labels_order: Optional[Sequence[ArrayLike]] = None,
+    time_steps: Optional[int | Sequence[int]] = None,
+    connection: bool = False,
+) -> Output | list[Output]:
     """
     Read TOUGH SAVE or output file for each time step.
 
     Parameters
     ----------
-    filename : str, pathlike or buffer
+    filename : str | PathLike | TextIO
         Input file name or buffer.
-    file_format : {'csv', 'petrasim', 'save', 'tecplot', 'tough'} or None, optional, default None
+    file_format : {'csv', 'petrasim', 'save', 'tecplot', 'tough'}, optional
         Input file format.
-    labels_order : sequence of array_like or None, optional, default None
+    labels_order : Sequence[ArrayLike], optional
         List of labels. If None, output will be assumed ordered.
-    time_steps : int or sequence of int
+    time_steps : int | Sequence[int], optional
         List of time steps to read. If None, all time steps will be read.
-    connection : bool, optional, default False
+    connection : bool, default False
         Only for standard TOUGH output file. If `True`, return data related to connections.
 
     Returns
     -------
-    :class:`toughio.ElementOutput`, :class:`toughio.ConnectionOutput`, sequence of :class:`toughio.ElementOutput` or sequence of :class:`toughio.ConnectionOutput`
+    toughio.ElementOutput | toughio.ConnectionOutput | list[toughio.ElementOutput] | list[toughio.ConnectionOutput]
         Output data for each time step.
 
     """

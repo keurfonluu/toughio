@@ -21,7 +21,7 @@ def read(filename: str | os.PathLike | TextIO) -> WellOutput:
 
     Returns
     -------
-    :class:`toughio.WellOutput`
+    toughio.WellOutput
         Well output data.
 
     """
