@@ -180,6 +180,8 @@ def allclose(x, y, atol=1.0e-8, ignore_keys=None, ignore_none=False):
                 assert x == y
 
             elif isinstance(x, (Sequence, np.ndarray)):
+                assert len(x) == len(y)
+
                 for xx, yy in zip(x, y):
                     assert allclose(xx, yy, atol=atol, ignore_none=ignore_none)
 

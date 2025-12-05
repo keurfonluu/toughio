@@ -60,6 +60,8 @@ class Helpers:
                     assert x == y
 
                 elif isinstance(x, (Sequence, np.ndarray)):
+                    assert len(x) == len(y)
+                    
                     for xx, yy in zip(x, y):
                         assert self.allclose(xx, yy, atol=atol, ignore_none=ignore_none)
 
