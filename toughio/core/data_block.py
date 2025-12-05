@@ -149,19 +149,27 @@ class DataBlock:
     ) -> list[Any]:
         """Read primary variables."""
         data = []
+        i = f.tell()
+        line = f.next()
+
+        # So far, we read up to 12 variables in a single record
+        data += reader(line)
+
+        # TOUGH4 free-format
+        if "," in line:
+            return data
+
+        # In fixed-format, a record can contain up to 4 variables only
+        data = data[:4]
 
         if n_variables:
             if not isinstance(n_variables, int):
                 n_variables = len(n_variables)
 
-            n = (
-                -n_variables
-                if n_variables < 0
-                else int(np.ceil(n_variables / len(reader.format)))
-            )
+            n = -n_variables if n_variables < 0 else int(np.ceil(n_variables / 4))
 
-            for _ in range(n):
-                data += reader(f)
+            for _ in range(n - 1):
+                data += reader(f)[:4]
 
         else:
             while True:
@@ -170,7 +178,7 @@ class DataBlock:
 
                 if line.strip():
                     try:
-                        data += reader(line)
+                        data += reader(line)[:4]
 
                     except ValueError:
                         break
@@ -201,6 +209,31 @@ class DataBlock:
             values = []
 
         return writer(values)
+
+    @staticmethod
+    def write_primary_variables(
+        values: Sequence[Any],
+        writer: RecordFormatter,
+        n_variables: Optional[int | Sequence[int]] = None,
+    ) -> list[str]:
+        """Write primary variables."""
+        n_variables = n_variables if n_variables is not None else len(values)
+
+        if not isinstance(n_variables, int):
+            n_variables = len(n_variables)
+
+        indices = (np.arange(n_variables // 4) + 1) * 4
+        values = [
+            values[i1:i2]
+            for i1, i2 in zip(np.insert(indices, 0, 0), np.append(indices, len(values)))
+        ]
+        data = []
+
+        for chunk in values:
+            if len(chunk) > 0:
+                data += writer(chunk)
+
+        return data
 
     @abstractmethod
     def _read(self, f: FileIterator | TextIO | str, *args, **kwargs) -> dict: ...

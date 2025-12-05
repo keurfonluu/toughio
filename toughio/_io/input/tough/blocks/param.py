@@ -16,7 +16,7 @@ class PARAM(DataBlock):
         "2/tough4-free": "10f,10f,10f,10f,5s,10f,10f,10f",
         3: ",".join(8 * ["10f"]),
         4: "10f,10f,10s,10f,10f,10f",
-        5: ",".join(4 * ["20f"]),
+        5: ",".join(12 * ["20f"]),
         6: "5d",
         7: "5s",
     }
@@ -230,11 +230,14 @@ class PARAM(DataBlock):
             )
 
         # Record 5
-        out += self.writers[5](
-            parameters.get("default", {}).get(
-                "initial_condition", [None for _ in range(6)]
-            )
-        )
+        values = parameters.get("default", {}).get("initial_condition")
+
+        if values is not None:
+            if simulator == "tough4" and self.free_format:
+                out += self.writers[5](values)
+
+            else:
+                out += self.write_primary_variables(values, self.writers[5])
 
         return out
 

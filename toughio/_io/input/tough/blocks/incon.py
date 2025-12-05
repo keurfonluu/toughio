@@ -12,7 +12,7 @@ from .....core import DataBlock, FileIterator
 class INCON(DataBlock):
     name = "INCON"
     formats = {
-        0: ",".join(4 * ["20f"]),
+        0: ",".join(12 * ["20f"]),
         5: "5s,5d,5d,15f,10f,10f,10f,10f,10f,10f",
         6: "6s,5d,4d,15f,10f,10f,10f,10f,10f,10f",
         7: "7s,4d,4d,15f,10f,10f,10f,10f,10f,10f",
@@ -213,12 +213,28 @@ class INCON(DataBlock):
             get_values = self._get_values_default
             key = label_length
 
+        n_variables = None
+
         for k, v in parameters["initial_conditions"].items():
             # Record 1
             out += self.writers[key]([k, *get_values(v)])
 
             # Record 2
-            out += self.writers[0](v.get("values", [None] * 4))
+            values = v.get("values")
+
+            if values is None:
+                continue
+
+            if simulator == "tough4" and self.free_format:
+                out += self.writers[0](values)
+
+            else:
+                if n_variables is None:
+                    n_variables = len(values)
+
+                out += self.write_primary_variables(
+                    values, self.writers[0], n_variables
+                )
 
         return out
 

@@ -9,7 +9,7 @@ from .....core import DataBlock, FileIterator
 class INDOM(DataBlock):
     name = "INDOM"
     formats = {
-        0: ",".join(4 * ["20f"]),
+        0: ",".join(12 * ["20f"]),
         5: "5s,5d",
     }
     multiples = {0}
@@ -57,7 +57,14 @@ class INDOM(DataBlock):
             "n_variables": n_variables,
         }
 
-    def _write(self, parameters: dict, eos: str, *args, **kwargs) -> list[str]:
+    def _write(
+        self,
+        parameters: dict,
+        eos: str,
+        simulator: str = "tough",
+        *args,
+        **kwargs,
+    ) -> list[str]:
         """Write INDOM block data."""
         # Write records
         out = []
@@ -82,8 +89,15 @@ class INDOM(DataBlock):
 
                 out += self.writers[5](values)
 
+                # Record 2
                 if cond1:
-                    out += self.writers[0](v["initial_condition"])
+                    values = v.get("initial_condition")
+
+                    if simulator == "tough4" and self.free_format:
+                        out += self.writers[0](values)
+
+                    else:
+                        out += self.write_primary_variables(values, self.writers[0])
 
                 else:
                     out += ["\n"]
