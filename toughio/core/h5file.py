@@ -32,6 +32,8 @@ class H5File:
         H5 container file name.
     mode : {'r', 'w'}, default 'r'
         File opening mode.
+    compression : {'gzip', 'lzf'}, default 'lzf'
+        Compression algorithm to use.
     compression_opts : int, default 4
         Compression level for gzip compression. May be an integer from 0 to 9.
     exist_ok : bool, default False
@@ -46,12 +48,14 @@ class H5File:
         self,
         filename: str | os.PathLike,
         mode: Literal["r", "w"] = "r",
+        compression: Literal["gzip", "lzf"] = "lzf",
         compression_opts: int = 4,
         exist_ok: bool = False,
     ) -> None:
         """Initialize an H5 file."""
         self.filename = filename
         self.mode = mode
+        self.compression = compression
         self.compression_opts = compression_opts
         self.exist_ok = exist_ok
 
@@ -660,7 +664,7 @@ class H5File:
             node.create_dataset(
                 name,
                 data=data,
-                compression="gzip",
+                compression=self.compression,
                 compression_opts=self.compression_opts,
             )
 
@@ -707,10 +711,13 @@ class H5File:
         self, name: str, data: dict, node: Optional[h5py.Group] = None, **kwargs
     ) -> None:
         """Dump a dict."""
+        name = name.replace("/", "-")
         node = node if node else self._h5file
         node = self._get_node(name, node=node)
 
         for k, v in data.items():
+            k = k.replace("/", "-")
+
             if isinstance(v, dict):
                 self._dump_dict(k, v, node=node, **kwargs)
 
@@ -759,6 +766,16 @@ class H5File:
     def mode(self, value: Literal["r", "w"]) -> None:
         """Set mode."""
         self._mode = value
+
+    @property
+    def compression(self) -> str:
+        """Return compression algorithm."""
+        return self._compression
+    
+    @compression.setter
+    def compression(self, value: Literal["gzip", "lzf"]) -> None:
+        """Set compression algorithm."""
+        self._compression = value
 
     @property
     def compression_opts(self) -> int:

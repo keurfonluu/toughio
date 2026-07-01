@@ -4,7 +4,7 @@ import glob
 import os
 import pathlib
 import tarfile
-from typing import Optional
+from typing import Literal, Optional
 
 import numpy as np
 
@@ -21,6 +21,7 @@ def dump_outputs(
     element_history_pattern: Optional[str] = None,
     generator_history_pattern: Optional[str] = None,
     rock_history_pattern: Optional[str] = None,
+    compression: Optional[Literal["gzip", "lzf"]] = None,
     compression_opts: Optional[int] = None,
     exist_ok: bool = False,
     tar: bool = False,
@@ -49,6 +50,8 @@ def dump_outputs(
         Pattern used to find generator history file names.
     rock_history_pattern : str, optional
         Pattern used to find rock history file names.
+    compression : {'gzip', 'lzf'}, optional, default 'lzf'
+        Compression algorithm to use.
     compression_opts : int, optional, default 4
         Compression level for gzip compression. May be an integer from 0 to 9.
     exist_ok : bool, default False
@@ -114,7 +117,11 @@ def dump_outputs(
         raise ValueError(f"could not find any output file in '{str(path)}'")
 
     with H5File(
-        filename, mode="w", compression_opts=compression_opts, exist_ok=exist_ok
+        filename,
+        mode="w",
+        compression=compression,
+        compression_opts=compression_opts,
+        exist_ok=exist_ok,
     ) as f:
         if with_mesh:
             f.dump(Mesh(with_mesh))
