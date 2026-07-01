@@ -55,10 +55,10 @@ class Pipe:
         other_data: Optional[dict] = None,
     ) -> None:
         """Initialize a pipe section."""
-        points = np.asanyarray(points)
+        points = np.asanyarray(points, dtype=np.float64)
         other_data = other_data if other_data is not None else {}
 
-        pipe = pv.MultipleLines(points)
+        pipe = pv.lines_from_points(points).strip()
         pipe.clear_data()
         pipe.cell_data["Material"] = np.atleast_1d(material)
         pipe.cell_data["Radius"] = np.atleast_1d(inner_radius)
@@ -614,9 +614,9 @@ class WellTrajectory:
          - From an array representing the origin point (usually the bottom of the wellhead)
 
     wellhead_material : str
-        The material of the wellhead. Only used if *arg* is an array.
+        The material of the wellhead. Only used if *arg* is an array and *wellhead_height* is greater than 0.
     wellhead_inner_radius : float
-        The inner radius of the wellhead. Only used if *arg* is an array.
+        The inner radius of the wellhead. Only used if *arg* is an array and *wellhead_height* is greater than 0.
     wellhead_height : float, default 1.0
         The height of the wellhead. Only used if *arg* is an array.
     initial_direction : ArrayLike, optional
@@ -668,26 +668,30 @@ class WellTrajectory:
                 raise TypeError("could not initialize well trajectory")
 
         elif isinstance(arg, (list, tuple, np.ndarray)) and np.ndim(arg) == 1:
-            origin = np.asanyarray(arg)
-
-            if wellhead_material is None or wellhead_inner_radius is None:
-                raise ValueError(
-                    "could not initialize well trajectory from an origin points without wellhead material and inner radius"
-                )
-
+            self._origin = np.asanyarray(arg)
             self.direction = (
                 (0.0, 0.0, -1.0) if initial_direction is None else initial_direction
             )
-            self._pipes = [
-                Pipe(
-                    points=[
-                        origin - wellhead_height * self.direction,
-                        origin,
-                    ],
-                    material=wellhead_material,
-                    inner_radius=wellhead_inner_radius,
-                )
-            ]
+
+            if wellhead_height > 0.0:
+                if wellhead_material is None or wellhead_inner_radius is None:
+                    raise ValueError(
+                        "could not initialize well trajectory from an origin points without wellhead material and inner radius"
+                    )
+                
+                self._pipes = [
+                    Pipe(
+                        points=[
+                            self._origin - wellhead_height * self.direction,
+                            self._origin,
+                        ],
+                        material=wellhead_material,
+                        inner_radius=wellhead_inner_radius,
+                    )
+                ]
+
+            else:
+                self._pipes = []
 
         else:
             raise ValueError("could not initialize well trajectory")
@@ -725,7 +729,7 @@ class WellTrajectory:
             The added pipe.
 
         """
-        origin = self.points[-1]
+        origin = self.points[-1] if self.pipes else self._origin
         end_direction = end_direction if end_direction is not None else self.direction
 
         points = (
