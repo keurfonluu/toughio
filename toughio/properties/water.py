@@ -10,7 +10,7 @@ def density(
     temperature: ArrayLike = 25.0,
     pressure: ArrayLike = 101325.0,
     method: Literal["IFC67"] = "IFC67",
-) -> ArrayLike:
+) -> NDArray:
     """
     Calculate the density of water.
 
@@ -133,7 +133,7 @@ def surface_tension(temperature: ArrayLike) -> NDArray:
 
 def vapor_saturation_pressure(
     temperature: ArrayLike,
-) -> ArrayLike:
+) -> NDArray:
     """
     Calculate vapor saturation pressure.
 
@@ -148,6 +148,7 @@ def vapor_saturation_pressure(
         Saturation pressure (in Pa).
 
     """
+    temperature = np.asanyarray(temperature)
     A67 = [
         -7.691234564,
         -26.08023696,
@@ -181,7 +182,7 @@ def viscosity(
     pressure: ArrayLike = 101325.0,
     saturation_pressure: Optional[ArrayLike] = None,
     kinematic: bool = False,
-) -> ArrayLike:
+) -> NDArray:
     """
     Calculate the viscosity of water.
 

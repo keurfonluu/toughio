@@ -18,8 +18,8 @@ class RecordFormatter:
 
     Parameters
     ----------
-    fmt : str
-        Format string for the records. Each token should be separated by a comma.
+    fmt : str | Sequence[str]
+        Format string for the records. If string, each token should be separated by a comma.
     mode : {'r', 'w'}, default 'r'
         Mode of the formatter. 'r' for reading, 'w' for writing.
     free_format : bool, default False
@@ -38,7 +38,7 @@ class RecordFormatter:
 
     def __init__(
         self,
-        fmt: str,
+        fmt: str | Sequence[str],
         mode: Literal["r", "w"] = "r",
         free_format: bool = False,
         space_between_values: bool = False,
@@ -52,7 +52,8 @@ class RecordFormatter:
         self._multiple = multiple
         self._delimiter = delimiter
 
-        fmt = [x.strip() for x in fmt.split(",")]
+        if isinstance(fmt, str):
+            fmt = [x.strip() for x in fmt.split(",")]
 
         if mode == "r":
             self._format = fmt
