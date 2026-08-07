@@ -557,3 +557,51 @@ class HistoryOutput(UserDict):
             self.metadata["units"] = {}
 
         return self.metadata["units"]
+
+
+class RockHistoryOutput(HistoryOutput):
+    """
+    Rock history output class.
+
+    Parameters
+    ----------
+    obj : dict, optional
+        Data dict.
+    metadata : dict, optional
+        Output metadata.
+
+    """
+
+    __name__: str = "RockHistoryOutput"
+    __qualname__: str = "toughio.RockHistoryOutput"
+
+    def __init__(
+        self,
+        obj: Optional[dict] = None,
+        metadata: Optional[dict] = None,
+    ) -> None:
+        """Initialize a rock history output."""
+        super().__init__(obj=obj, metadata=metadata)
+
+    def compute_cumulative(self) -> RockHistoryOutput:
+        """
+        Compute cumulative flow data.
+        
+        Returns
+        -------
+        toughio.RockHistoryOutput
+            Rock history output with cumulative flow data.
+
+        """
+        from scipy.integrate import cumulative_simpson
+
+        roft = self.copy()
+
+        for k, v in roft.data.items():
+            if k == "TIME":
+                continue
+
+            factor = -1.0 if k.endswith("_TOT") else 1.0
+            roft.data[k] = cumulative_simpson(v * factor, x=roft.data["TIME"], initial=0.0)
+
+        return roft
