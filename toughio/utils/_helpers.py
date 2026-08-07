@@ -1,14 +1,21 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import glob
+import numpy as np
 import os
 import pathlib
 import tarfile
-from typing import Literal, Optional
-
-import numpy as np
 
 from ..core import H5File, Mesh
+
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from typing import Literal, Optional
+
+    from .. import RockHistoryOutput
 
 
 def dump_outputs(
@@ -167,3 +174,71 @@ def dump_outputs(
 
     if return_dumped_filenames:
         return filenames_to_dump
+
+
+def load_rock_history(
+    filename: str | os.PathLike | Sequence[str | os.PathLike],
+    interfaces: Sequence[tuple[str, str]] | dict[str, Sequence[tuple[str, str]]],
+) -> dict[str, RockHistoryOutput]:
+    """
+    Load and aggregate rock history outputs from one or more H5 files.
+
+    Parameters
+    ----------
+    filename : str | PathLike | Sequence[str | PathLike]
+        H5 filename(s) to load rock history outputs from. Files must be sorted in
+        chronological order.
+    interfaces : Sequence[tuple[str, str]] | dict[str, Sequence[tuple[str, str]]]
+        Interfaces to load rock history outputs for.
+
+    Returns
+    -------
+    dict[str, RockHistoryOutput]
+        Dictionary of aggregated rock history outputs for each interface.
+    
+    """
+    from .. import H5File, RockHistoryOutput
+
+    # Normalize inputs
+    filenames = [filename] if isinstance(filename, (str, os.PathLike)) else filename
+
+    if not isinstance(interfaces, dict):
+        interfaces_ = {"-".join(interface): [interface] for interface in interfaces}
+
+    else:
+        interfaces_ = {k: list(v) for k, v in interfaces.items()}
+
+    # Loop over files and interfaces
+    roft = {}
+
+    for filename in filenames:
+        with H5File(filename) as f:
+            roft_list = f.list_rock_history()
+
+            for k, v in interfaces_.items():
+                for connection in v:
+                    name = "-".join(connection)
+
+                    if name in roft_list:
+                        roft_ = roft.setdefault(k, {}).setdefault(name, RockHistoryOutput())
+                        roft_ += f.load_rock_history(name)
+
+                    else:
+                        raise ValueError(f"could not find rock history for interface '{name}' in '{filename}'")
+
+    # Aggregate data for each interface
+    result = {}
+
+    for k, v in roft.items():
+        first = next(iter(v.values()))
+        data = {
+            "TIME": first.data["TIME"],
+            **{
+                k: np.sum([vv.data[k] for vv in v.values()], axis=0)
+                for k in first.data
+                if k != "TIME"
+            }
+        }
+        result[k] = RockHistoryOutput(data)
+
+    return result
