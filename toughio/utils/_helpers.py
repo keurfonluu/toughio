@@ -178,7 +178,8 @@ def dump_outputs(
 
 def load_element_history(
     filename: str | os.PathLike | Sequence[str | os.PathLike],
-    names: Sequence[str] | dict[str, str]
+    names: Sequence[str] | dict[str, str],
+    ignore_errors: bool = False,
 ) -> dict[str, HistoryOutput]:
     """
     Load and aggregate element history outputs from one or more H5 files.
@@ -190,6 +191,8 @@ def load_element_history(
         chronological order.
     names : Sequence[str] | dict[str, str]
         Labels of element to load element history outputs for.
+    ignore_errors : bool, default False
+        If True, ignore errors when loading element history outputs.
 
     Returns
     -------
@@ -218,6 +221,9 @@ def load_element_history(
                 v = v.replace(" ", "_")
 
                 if v not in foft_list:
+                    if ignore_errors:
+                        continue
+
                     raise ValueError(f"could not find element history for label '{v}' in '{filename}'")
 
                 foft_ = foft.setdefault(k, HistoryOutput())
@@ -229,6 +235,7 @@ def load_element_history(
 def load_rock_history(
     filename: str | os.PathLike | Sequence[str | os.PathLike],
     names: Sequence[tuple[str, str]] | dict[str, Sequence[tuple[str, str]]],
+    ignore_errors: bool = False,
 ) -> dict[str, RockHistoryOutput]:
     """
     Load and aggregate rock history outputs from one or more H5 files.
@@ -240,6 +247,8 @@ def load_rock_history(
         chronological order.
     names : Sequence[tuple[str, str]] | dict[str, Sequence[tuple[str, str]]]
         Interfaces to load rock history outputs for.
+    ignore_errors : bool, default False
+        If True, ignore errors when loading rock history outputs.
 
     Returns
     -------
@@ -269,6 +278,9 @@ def load_rock_history(
                     name = "-".join(connection)
 
                     if name not in roft_list:
+                        if ignore_errors:
+                            continue
+
                         raise ValueError(f"could not find rock history for interface '{name}' in '{filename}'")
 
                     roft_ = roft.setdefault(k, {}).setdefault(name, RockHistoryOutput())
