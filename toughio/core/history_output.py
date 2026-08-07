@@ -1,17 +1,23 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, overload
+
 import copy
 import re
 from collections import UserDict
-from collections.abc import Sequence
-from typing import Literal, Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from matplotlib.axes import Axes
-from numpy.typing import ArrayLike
-from typing_extensions import Self
+
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator, Sequence
+    from typing import Literal, Optional
+    from typing_extensions import Self
+
+    from numpy.typing import ArrayLike, NDArray
 
 
 class HistoryOutput(UserDict):
@@ -41,7 +47,10 @@ class HistoryOutput(UserDict):
 
     def _repr_html_(self) -> str:
         """Represent an history output as an HTML dataframe."""
-        return self.to_dataframe()._repr_html_() if self.ndim else repr(self)
+        if not self.ndim:
+            return repr(self)
+
+        return self.to_dataframe().to_html()
 
     def __contains__(self, key: str) -> bool:
         """Return True if history output contains a key."""
@@ -56,13 +65,13 @@ class HistoryOutput(UserDict):
 
             return key in set(self.keys())
 
-    def __getitem__(self, key: str) -> ArrayLike:
+    def __getitem__(self, key: str) -> NDArray:
         """Slice an history output."""
         try:
             return super().__getitem__(key)
 
         except KeyError:
-            key, unit = self._get_key_unit(key)
+            key, _ = self._get_key_unit(key)
 
             return super().__getitem__(key)
 
@@ -86,7 +95,7 @@ class HistoryOutput(UserDict):
 
         # Add data
         key, unit = self._get_key_unit(key)
-        value = np.asarray(value) if ndim == 1 else value
+        value = np.asanyarray(value) if ndim == 1 else value
         super().__setitem__(key, value)
 
         # Add unit
@@ -117,6 +126,7 @@ class HistoryOutput(UserDict):
 
     def __call__(self, x: ArrayLike) -> HistoryOutput:
         """Interpolate an history output."""
+        x = np.asanyarray(x)
         xp = self.time
 
         if xp is None or np.size(xp) == 1:
@@ -145,7 +155,7 @@ class HistoryOutput(UserDict):
             Data unit.
 
         """
-        self.data[name] = data
+        self.data[name] = np.asanyarray(data)
         self.units[name] = unit
 
     def copy(self, deep: bool = True) -> Self:
@@ -165,11 +175,19 @@ class HistoryOutput(UserDict):
         """
         copy_ = copy.deepcopy if deep else copy.copy
 
-        return self.__class__(copy_(self), copy_(self.metadata))
+        return self.__class__(copy_(self.data), copy_(self.metadata))
+
+    @overload
+    def items(self, unit: Literal[False] = False) -> Iterator[tuple[str, NDArray]]:
+        ...
+
+    @overload
+    def items(self, unit: Literal[True] = True) -> Iterator[tuple[str, NDArray, str | None]]:
+        ...
 
     def items(
         self, unit: bool = False
-    ) -> tuple[str, ArrayLike] | tuple[str, ArrayLike, str | None]:
+    ) -> Iterator[tuple[str, NDArray] | tuple[str, NDArray, str | None]]:
         """
         Iterate over (key, value) pairs or (key, value, unit) trios.
 
@@ -191,12 +209,12 @@ class HistoryOutput(UserDict):
         if unit:
             for key, value in super().items():
                 try:
-                    unit = self.units[key]
+                    data_unit = self.units[key]
 
                 except KeyError:
-                    unit = None
+                    data_unit = None
 
-                yield key, value, unit
+                yield key, value, data_unit
 
         else:
             for key, value in super().items():
@@ -222,7 +240,18 @@ class HistoryOutput(UserDict):
 
         """
         if not self:
-            return obj.copy()
+            if isinstance(obj, HistoryOutput):
+                return obj.copy()
+
+            if not obj:
+                return self.copy()
+
+            output = obj[0].copy()
+
+            for x in obj[1:]:
+                output = output.concatenate(x, shift)
+
+            return output
 
         elif not obj:
             return self.copy()
@@ -243,6 +272,7 @@ class HistoryOutput(UserDict):
 
             if shift:
                 obj2 = obj2.shift(time1[-1])
+                assert obj2 is not None
                 mask2 = np.ones_like(time2, dtype=bool)
 
             else:
@@ -318,16 +348,17 @@ class HistoryOutput(UserDict):
         xscale = xscale if xscale else 1.0
         yscale = yscale if yscale else 1.0
         time_unit = time_unit if time_unit else "second"
+        x_data: NDArray | None = None
 
         if x:
             key, unit = self._get_key_unit(x)
-            x = self[key]
+            x_data = self[key]
             xlabel = f"{key} ({unit})" if unit else key
 
         else:
-            x = self.time
+            x_data = self.time
 
-            if x is None:
+            if x_data is None:
                 raise ValueError("could not plot without time data")
 
             if time_unit == "second":
@@ -347,6 +378,9 @@ class HistoryOutput(UserDict):
 
             xlabel = f"Time ({time_unit})"
 
+        if x_data is None:
+            raise ValueError("could not plot without x data")
+
         try:
             unit = self.units[y]
 
@@ -354,7 +388,7 @@ class HistoryOutput(UserDict):
             unit = None
 
         ylabel = f"{y} ({unit})" if unit else y
-        ax.plot(x * xscale, self.data[y] * yscale, *args, **kwargs)
+        ax.plot(x_data * xscale, self.data[y] * yscale, *args, **kwargs)
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
 
@@ -467,7 +501,7 @@ class HistoryOutput(UserDict):
         return time_key
 
     @staticmethod
-    def _get_key_unit(key: str) -> tuple[str, str]:
+    def _get_key_unit(key: str) -> tuple[str, str | None]:
         """Split a key to (key, unit) pair."""
         match = re.match(r"^(.*?)(?:\(([^()]+)\))?$", key)
 
@@ -478,8 +512,11 @@ class HistoryOutput(UserDict):
         else:
             raise ValueError(f"invalid key '{key}'")
 
-        key = key.strip() if key else None
+        key = key.strip() if key else ""
         unit = unit.strip() if unit else None
+
+        if not key:
+            raise ValueError("invalid empty key")
 
         return key, unit
 
@@ -528,12 +565,12 @@ class HistoryOutput(UserDict):
             self.metadata["type"] = value
 
     @property
-    def ndim(self) -> int:
+    def ndim(self) -> int | None:
         """Return data dimension."""
         return np.ndim(self[list(self.keys())[0]]) if len(self) else None
 
     @property
-    def size(self) -> int:
+    def size(self) -> int | None:
         """Return data size."""
         return (
             len(self[list(self.keys())[0]])
@@ -544,11 +581,14 @@ class HistoryOutput(UserDict):
         )
 
     @property
-    def time(self) -> ArrayLike | None:
+    def time(self) -> NDArray:
         """Return time data."""
         time_key = self._get_time_key()
 
-        return self[time_key] if time_key else None
+        if time_key is None:
+            raise ValueError("could not get time data")
+
+        return self[time_key]
 
     @property
     def units(self) -> dict:
