@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
     from typing import Literal, Optional
 
-    from .. import RockHistoryOutput
+    from .. import HistoryOutput, RockHistoryOutput
 
 
 def dump_outputs(
@@ -174,6 +174,49 @@ def dump_outputs(
 
     if return_dumped_filenames:
         return filenames_to_dump
+
+
+def load_element_history(
+    filename: str | os.PathLike | Sequence[str | os.PathLike],
+    names: Sequence[str] | dict[str, str]
+) -> dict[str, HistoryOutput]:
+    """
+    Load and aggregate element history outputs from one or more H5 files.
+
+    Parameters
+    ----------
+    filename : str | PathLike | Sequence[str | PathLike]
+        H5 filename(s) to load element history outputs from. Files must be sorted in
+        chronological order.
+    names : Sequence[str] | dict[str, str]
+        Labels of element to load element history outputs for.
+
+    Returns
+    -------
+    dict[str, toughio.HistoryOutput]
+        Dictionary of aggregated element history outputs for each label.
+    
+    """
+    from .. import H5File, HistoryOutput
+
+    # Normalize inputs
+    filenames = [filename] if isinstance(filename, (str, os.PathLike)) else filename
+    names_ = (
+        {name: name for name in names}
+        if not isinstance(names, dict)
+        else names
+    )
+
+    # Loop over files and names
+    foft = {}
+
+    for filename in filenames:
+        with H5File(filename) as f:
+            for k, v in names_.items():
+                foft_ = foft.setdefault(k, HistoryOutput())
+                foft_ += f.load_element_history(v.replace(" ", "_"))
+
+    return foft
 
 
 def load_rock_history(
