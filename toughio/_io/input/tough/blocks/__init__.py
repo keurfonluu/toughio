@@ -1,3 +1,4 @@
+from .aporo import APORO
 from .chemp import CHEMP
 from .conne import CONNE
 from .coord import COORD
@@ -44,6 +45,7 @@ registered_blocks = [
     MODDE,
     WELLB,
     REACT,
+    APORO,
     FLAC,
     CHEMP,
     NCGAS,
