@@ -51,7 +51,9 @@ class APORO(DataBlock):
         out = []
 
         for k, v in parameters["rocks"].items():
-            porosity_factors = v.get("porosity_factor", [])
+            data = parameters.get("default", {}).copy()
+            data.update(v)
+            porosity_factors = data.get("porosity_factor", [])
 
             for factor in porosity_factors:
                 factor_values = factor.get("values", [])
@@ -67,15 +69,15 @@ class APORO(DataBlock):
 
     def _write_conditions(self, parameters: dict, *args, **kwargs) -> bool:
         """Check if APORO block should be written."""
-        aporo = False
+        if "porosity_factor" in parameters.get("default", {}):
+            return True
 
         for rock in parameters.get("rocks", {}).values():
             if "porosity_factor" in rock:
                 if any(x is not None for x in rock["porosity_factor"]):
-                    aporo = True
-                    break
+                    return True
 
-        return aporo
+        return False
 
     def update(
         self,
