@@ -364,7 +364,7 @@ class ConnectionOutput(Output):
         ]
 
         # Identify linear and volumetric data
-        data = np.row_stack(list(self.data.values()))
+        data = np.vstack(list(self.data.values()))
         linear, volume = [], []
 
         for i, k in enumerate(self.data):
