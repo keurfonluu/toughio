@@ -176,6 +176,87 @@ def dump_outputs(
         return filenames_to_dump
 
 
+def generate_template(eos: str) -> dict:
+    """
+    Generate a template dictionary for a given equation of state (EOS).
+
+    Parameters
+    ----------
+    eos : str
+        Equation of state identifier.
+
+    Returns
+    -------
+    dict
+        Dictionary containing the template configuration for the specified EOS.
+
+    """
+    years = 24.0 * 3600.0 * 365.25
+
+    if eos in {"eos1", "eos2", "eos3", "eos4", "eos5"}:
+        n_component = 2
+        n_phase = 2
+
+    elif eos in {"eos7"}:
+        n_component = 3
+        n_phase = 2
+
+    elif eos in {"eos7r"}:
+        n_component = 5
+        n_phase = 2
+
+    elif eos in {"eos9"}:
+        n_component = 1
+        n_phase = 1
+
+    elif eos in {"eos8", "ewasg", "eco2n", "eco2m"}:
+        n_component = 3
+        n_phase = 3
+
+    else:
+        n_component = 2
+        n_phase = 2
+
+    return {
+        "eos": eos,
+        "n_component": n_component,
+        "n_phase": n_phase,
+        "label_length": 5,
+        "isothermal": False,
+        "do_wellbore": False,
+        "do_diffusion": False,
+        "start": True,
+        "options": {
+            "n_iteration": 8,
+            "verbosity": 2,
+            "n_cycle": -16,
+            "n_cycle_print": -16,
+            "t_steps": 1.0e3,
+            "t_step_max": 1.0e5 * years,
+            "gravity": 9.80665,
+            "eps1": 1.0e-5,
+        },
+        "extra_options": {
+            1: 1,
+            10: 1,
+            11: 2,
+            16: 4,
+            21: 8,
+        },
+        "default": {
+            "relative_permeability": {"id": 1, "parameters": [0.0, 0.0, 1.0, 1.0]},
+            "capillarity": {"id": 1, "parameters": [0.0, 0.0, 1.0]},
+        },
+        "more_options": {
+            1: 2,
+            17: 1,
+            25: 1,
+            34: 2,
+            40: 9,
+        },
+    }
+
+
 def load_element_history(
     filename: str | os.PathLike | Sequence[str | os.PathLike],
     names: Sequence[str] | dict[str, str],
