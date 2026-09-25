@@ -8,95 +8,93 @@ import toughio
 
 np.random.seed(42)
 
-tet_mesh = toughio.Mesh(
-    points=np.array(
-        [
-            [0.0, 0.0, 0.0],
-            [1.0, 0.0, 0.0],
-            [1.0, 1.0, 0.0],
-            [0.0, 1.0, 0.0],
-            [0.5, 0.5, 0.5],
-        ]
-    ),
-    cells=[("tetra", np.array([[0, 1, 2, 4], [0, 2, 3, 4]]))],
-    point_data={"a": np.random.rand(5), "b": np.random.rand(5)},
-    cell_data={"c": np.random.rand(2), "material": np.ones(2, dtype=np.int64)},
-)
+# tet_mesh = toughio.Mesh(
+#     points=np.array(
+#         [
+#             [0.0, 0.0, 0.0],
+#             [1.0, 0.0, 0.0],
+#             [1.0, 1.0, 0.0],
+#             [0.0, 1.0, 0.0],
+#             [0.5, 0.5, 0.5],
+#         ]
+#     ),
+#     cells=[("tetra", np.array([[0, 1, 2, 4], [0, 2, 3, 4]]))],
+#     cell_data={"c": np.random.rand(2), "material": np.ones(2, dtype=np.int64)},
+# )
 
-hex_mesh = toughio.Mesh(
-    points=np.array(
-        [
-            [0.0, 0.0, 0.0],
-            [1.0, 0.0, 0.0],
-            [1.0, 1.0, 0.0],
-            [0.0, 1.0, 0.0],
-            [0.0, 0.0, 1.0],
-            [1.0, 0.0, 1.0],
-            [1.0, 1.0, 1.0],
-            [0.0, 1.0, 1.0],
-        ]
-    ),
-    cells=[("hexahedron", np.array([[0, 1, 2, 3, 4, 5, 6, 7]]))],
-    point_data={"a": np.random.rand(8), "b": np.random.rand(8)},
-    cell_data={"c": np.random.rand(1), "material": np.ones(1, dtype=np.int64)},
-)
+# hex_mesh = toughio.Mesh(
+#     points=np.array(
+#         [
+#             [0.0, 0.0, 0.0],
+#             [1.0, 0.0, 0.0],
+#             [1.0, 1.0, 0.0],
+#             [0.0, 1.0, 0.0],
+#             [0.0, 0.0, 1.0],
+#             [1.0, 0.0, 1.0],
+#             [1.0, 1.0, 1.0],
+#             [0.0, 1.0, 1.0],
+#         ]
+#     ),
+#     cells=[("hexahedron", np.array([[0, 1, 2, 3, 4, 5, 6, 7]]))],
+#     cell_data={"c": np.random.rand(1), "material": np.ones(1, dtype=np.int64)},
+# )
 
-hybrid_mesh = toughio.Mesh(
-    points=np.array(
-        [
-            [0.0, 0.0, 0.0],
-            [1.0, 0.0, 0.0],
-            [1.0, 1.0, 0.0],
-            [0.0, 1.0, 0.0],
-            [0.0, 0.0, 1.0],
-            [1.0, 0.0, 1.0],
-            [1.0, 1.0, 1.0],
-            [0.0, 1.0, 1.0],
-            [0.5, 0.5, 1.5],
-            [0.0, 0.5, 1.5],
-            [1.0, 0.5, 1.5],
-            [2.0, 0.0, 0.0],
-            [2.0, 1.0, 0.0],
-            [-1.0, 0.0, 0.0],
-            [-1.0, 1.0, 0.0],
-        ]
-    ),
-    cells=[
-        ("hexahedron", np.array([[0, 1, 2, 3, 4, 5, 6, 7]])),
-        ("pyramid", np.array([[4, 5, 6, 7, 8]])),
-        ("tetra", np.array([[4, 8, 7, 9], [5, 6, 8, 10]])),
-        ("wedge", np.array([[1, 11, 5, 2, 12, 6], [13, 0, 4, 14, 3, 7]])),
-    ],
-    point_data={"a": np.random.rand(15), "b": np.random.rand(15)},
-    cell_data={"c": np.random.rand(6), "material": np.ones(6, dtype=np.int64)},
-)
+# hybrid_mesh = toughio.Mesh(
+#     points=np.array(
+#         [
+#             [0.0, 0.0, 0.0],
+#             [1.0, 0.0, 0.0],
+#             [1.0, 1.0, 0.0],
+#             [0.0, 1.0, 0.0],
+#             [0.0, 0.0, 1.0],
+#             [1.0, 0.0, 1.0],
+#             [1.0, 1.0, 1.0],
+#             [0.0, 1.0, 1.0],
+#             [0.5, 0.5, 1.5],
+#             [0.0, 0.5, 1.5],
+#             [1.0, 0.5, 1.5],
+#             [2.0, 0.0, 0.0],
+#             [2.0, 1.0, 0.0],
+#             [-1.0, 0.0, 0.0],
+#             [-1.0, 1.0, 0.0],
+#         ]
+#     ),
+#     cells=[
+#         ("hexahedron", np.array([[0, 1, 2, 3, 4, 5, 6, 7]])),
+#         ("pyramid", np.array([[4, 5, 6, 7, 8]])),
+#         ("tetra", np.array([[4, 8, 7, 9], [5, 6, 8, 10]])),
+#         ("wedge", np.array([[1, 11, 5, 2, 12, 6], [13, 0, 4, 14, 3, 7]])),
+#     ],
+#     point_data={"a": np.random.rand(15), "b": np.random.rand(15)},
+#     cell_data={"c": np.random.rand(6), "material": np.ones(6, dtype=np.int64)},
+# )
 
 output_eleme = [
     toughio.ElementOutput(
-        float(time),
-        {
+        data={
             "X": np.random.rand(10),
             "Y": np.random.rand(10),
             "Z": np.random.rand(10),
             "PRES": np.random.rand(10),
             "TEMP": np.random.rand(10),
         },
-        np.array([f"AAA0{i}" for i in range(10)]),
+        time=float(time),
+        labels=np.array([f"AAA0{i}" for i in range(10)]),
     )
     for time in range(3)
 ]
 
 output_conne = [
     toughio.ConnectionOutput(
-        float(time),
-        {
+        data={
             "X": np.random.rand(10),
             "Y": np.random.rand(10),
             "Z": np.random.rand(10),
             "HEAT": np.random.rand(10),
             "FLOW": np.random.rand(10),
         },
-        np.array([[f"AAA0{i}", f"AAA0{i}"] for i in range(10)]),
+        time=float(time),
+        labels=np.array([[f"AAA0{i}", f"AAA0{i}"] for i in range(10)]),
     )
     for time in range(3)
 ]
@@ -182,6 +180,8 @@ def allclose(x, y, atol=1.0e-8, ignore_keys=None, ignore_none=False):
                 assert x == y
 
             elif isinstance(x, (Sequence, np.ndarray)):
+                assert len(x) == len(y)
+
                 for xx, yy in zip(x, y):
                     assert allclose(xx, yy, atol=atol, ignore_none=ignore_none)
 

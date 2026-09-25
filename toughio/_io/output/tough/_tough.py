@@ -2,9 +2,10 @@ from functools import partial
 
 import numpy as np
 
-from ...._common import open_file
-from ..._common import read_record, to_float
 from .._common import to_output
+from ..._common import read_record, to_float
+from ...._common import open_file
+
 
 __all__ = [
     "read",
@@ -32,9 +33,12 @@ def read(filename, file_type, labels_order=None, time_steps=None):
         Output data for each time step.
 
     """
+    return_list = True
+
     if time_steps is not None:
         if isinstance(time_steps, int):
             time_steps = [time_steps]
+            return_list = False
 
         if any(i < 0 for i in time_steps):
             n_steps = _count_time_steps(filename)
@@ -62,7 +66,7 @@ def read(filename, file_type, labels_order=None, time_steps=None):
                 iend = tmp.index(" ")
 
                 if iend < 2:
-                    tmp = f"{tmp[:iend]}0{tmp[iend + 1:]}"
+                    tmp = f"{tmp[:iend]}0{tmp[iend + 1 :]}"
 
                 else:
                     break
@@ -89,7 +93,15 @@ def read(filename, file_type, labels_order=None, time_steps=None):
         labels = [labels.copy() for _ in data]
         data = np.array([[v[2:] for v in data] for data in data])
 
-    return to_output(file_type, labels_order, headers, times, labels, data)
+    return to_output(
+        file_type,
+        labels_order,
+        headers,
+        times,
+        labels,
+        data,
+        return_list,
+    )
 
 
 def _read_table(f, file_type, time_steps=None):

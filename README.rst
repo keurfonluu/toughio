@@ -136,11 +136,8 @@ TOUGH simulation output can also be imported into Python as a list of *namedtupl
 
 **toughio** is mainly intended to be used as a Python scripting library for TOUGH. Nevertheless, several utility command line scripts are available for users who are not familiar with Python. From a console or terminal, the user can execute the following scripts:
 
--  ``toughio-co2tab``: copy file *CO2TAB* to the target directory,
 -  ``toughio-export``: export TOUGH simulation results to a file for visualization (VTK, VTU, Tecplot or XDMF),
--  ``toughio-extract``: extract results from TOUGH main output file and reformat as a TOUGH3 element or connection output file (mostly useful for TOUGH2 output *before* calling ``toughio-export``),
--  ``toughio-merge``: merge input file, GENER and/or MESH and/or INCON into a single file,
--  ``toughio-save2incon``: convert a *SAVE* file to an *INCON* file (mostly useful to automatically restart a simulation and reset the counters).
+-  ``toughio-extract``: extract results from TOUGH main output file and reformat as a TOUGH3 element or connection output file (mostly useful for TOUGH2 output *before* calling ``toughio-export``).
 
 Contributing
 ------------

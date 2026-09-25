@@ -1,6 +1,3 @@
-import numpy as np
-
-
 def read_record(data, fmt):
     """Parse string to data given format."""
     token_to_type = {
@@ -23,28 +20,6 @@ def read_record(data, fmt):
     return out
 
 
-def write_record(data, fmt, space_between_values=False, multi=False):
-    """Return a list of record strings given format."""
-    if not multi:
-        data = [to_str(d, f, space_between_values) for d, f in zip(data, fmt)]
-        out = [f"{''.join(data):80}\n"]
-
-    else:
-        n = len(data)
-        ncol = len(fmt)
-        data = [
-            data[ncol * i : min(ncol * i + ncol, n)]
-            for i in range(int(np.ceil(n / ncol)))
-        ]
-
-        out = []
-        for d in data:
-            d = [to_str(dd, f, space_between_values) for dd, f in zip(d, fmt)]
-            out += [f"{''.join(d):80}\n"]
-
-    return out
-
-
 def to_float(s):
     """Convert variable string to float."""
     try:
@@ -59,6 +34,8 @@ def to_float(s):
 
 def to_str(x, fmt, space_between_values=False):
     """Convert variable to string."""
+    from .. import scientific_notation
+
     x = "" if x is None else x
 
     if not isinstance(x, str):
@@ -85,31 +62,3 @@ def to_str(x, fmt, space_between_values=False):
 
     else:
         return fmt.replace("g", "").replace("f", "").format(x)
-
-
-def scientific_notation(x, n):
-    """
-    Scientific notation with fixed number of characters.
-
-    Note
-    ----
-    This function maximizes accuracy given a fixed number of characters.
-
-    """
-    tmp = np.format_float_scientific(
-        x,
-        unique=True,
-        trim="0",
-        exp_digits=0,
-        sign=False,
-    )
-    tmp = tmp.replace("+", "")
-
-    if len(tmp) > n:
-        significand, exponent = tmp.split("e")
-        significand = significand[: n - len(tmp)]
-
-        return f"{significand}e{exponent}"
-
-    else:
-        return tmp

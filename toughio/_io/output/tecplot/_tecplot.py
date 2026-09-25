@@ -1,7 +1,8 @@
 import numpy as np
 
-from ...._common import open_file
 from .._common import to_output
+from ...._common import open_file
+
 
 __all__ = [
     "read",
@@ -49,9 +50,12 @@ def read(filename, file_type, labels_order=None, time_steps=None):
         Output data for each time step.
 
     """
+    return_list = True
+
     if time_steps is not None:
         if isinstance(time_steps, int):
             time_steps = [time_steps]
+            return_list = False
 
         if any(i < 0 for i in time_steps):
             n_steps = _count_time_steps(filename)
@@ -70,7 +74,15 @@ def read(filename, file_type, labels_order=None, time_steps=None):
         labels.append([])
         data.append(zone["data"])
 
-    return to_output(file_type, labels_order, headers, times, labels, data)
+    return to_output(
+        file_type,
+        labels_order,
+        headers,
+        times,
+        labels,
+        data,
+        return_list,
+    )
 
 
 def read_buffer(f, time_steps=None):
@@ -91,8 +103,27 @@ def read_buffer(f, time_steps=None):
         elif line.upper().startswith("ZONE"):
             zone = _read_zone(line)
 
+            # Read data all at once
             if "I" not in zone:
-                raise ValueError()
+                data = []
+
+                for line in f:
+                    line = line.strip().split(",")
+                    data.append(
+                        list(
+                            map(
+                                lambda x: None
+                                if not x.strip()
+                                else int(x)
+                                if x.isnumeric()
+                                else float(x),
+                                line,
+                            )
+                        )
+                    )
+
+                zones.append({"data": data})
+                break
 
             else:
                 t_step += 1

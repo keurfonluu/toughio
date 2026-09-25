@@ -1,6 +1,5 @@
 import numpy as np
 
-from .._mesh._mesh import CellBlock, Mesh
 
 __all__ = [
     "triangulate",
@@ -24,6 +23,8 @@ def triangulate(points, material="dfalt"):
         Output triangulated mesh.
 
     """
+    from ..core import CellBlock, Mesh
+
     try:
         from scipy.spatial import Delaunay
     except ImportError:

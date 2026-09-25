@@ -1,24 +1,15 @@
-from .h5 import write as write_h5
-from .input import read as read_input
-from .input import register as register_input
-from .input import write as write_input
-from .output import ConnectionOutput, ElementOutput
-from .output import read as read_output
-from .output import register as register_output
-from .output import write as write_output
-from .table import read as read_table
-from .table import register as register_table
-
-__all__ = [
-    "ElementOutput",
-    "ConnectionOutput",
-    "register_input",
-    "register_output",
-    "read_input",
-    "write_h5",
-    "write_input",
-    "read_output",
-    "write_output",
-    "read_table",
-    "register_table",
-]
+from .input import (
+    read as read_input,
+    register as register_input,
+    write as write_input,
+)
+from .output import (
+    read as read_output,
+    register as register_output,
+    write as write_output,
+)
+from .table import (
+    read as read_table,
+    register as register_table,
+)
+from .well import read as read_well_output

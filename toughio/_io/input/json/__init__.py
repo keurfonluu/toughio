@@ -1,10 +1,5 @@
-from .._helpers import register
 from ._json import read, write
-
-__all__ = [
-    "read",
-    "write",
-]
+from .._helpers import register
 
 
 register("json", [".json"], read, write)

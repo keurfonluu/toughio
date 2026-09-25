@@ -1,5 +1,7 @@
+from .._common import to_output
 from ...._common import open_file
-from .._common import ElementOutput, to_output
+from ....core import ElementOutput
+
 
 __all__ = [
     "read",
@@ -51,9 +53,12 @@ def read(filename, file_type, labels_order=None, time_steps=None):
         Output data for each time step.
 
     """
+    return_list = True
+
     if time_steps is not None:
         if isinstance(time_steps, int):
             time_steps = [time_steps]
+            return_list = False
 
         if any(i < 0 for i in time_steps):
             n_steps = _count_time_steps(filename)
@@ -64,7 +69,15 @@ def read(filename, file_type, labels_order=None, time_steps=None):
     with open_file(filename, "r") as f:
         headers, times, labels, data = _read_csv(f, file_type, time_steps)
 
-        return to_output(file_type, labels_order, headers, times, labels, data)
+    return to_output(
+        file_type,
+        labels_order,
+        headers,
+        times,
+        labels,
+        data,
+        return_list,
+    )
 
 
 def _read_csv(f, file_type, time_steps=None):
@@ -80,8 +93,12 @@ def _read_csv(f, file_type, time_steps=None):
     line = f.readline()
 
     # Check third line (does it start with TIME?)
-    line = f.readline()
-    single = not line.startswith('"TIME [sec]')
+    if not line.split(",")[0] != '"                  "':
+        line = f.readline()
+        single = not line.startswith('"TIME [sec]')
+
+    else:
+        single = False
 
     # Read data
     if single:
@@ -116,7 +133,7 @@ def _read_csv(f, file_type, time_steps=None):
             else:
                 labels[-1].append([l.replace('"', "").strip() for l in line[:ilab]])
 
-            data[-1].append([float(l.strip()) for l in line[ilab:]])
+            data[-1].append([_float(l.strip()) for l in line[ilab:]])
 
         line = f.readline()
 
@@ -194,3 +211,15 @@ def _count_time_steps(filename):
             count += int(line.startswith('"TIME [sec]'))
 
     return count
+
+
+def _float(s):
+    """Convert variable string to float."""
+    try:
+        return float(s.replace("d", "e"))
+
+    except ValueError:
+        # It's probably something like "0.0001-001"
+        significand, exponent = s[:-4], s[-4:]
+
+        return float(f"{significand}e{exponent}")

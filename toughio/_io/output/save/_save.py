@@ -1,7 +1,8 @@
 import numpy as np
 
 from ...input import tough
-from .._common import ElementOutput
+from ....core import ElementOutput
+
 
 __all__ = [
     "read",
@@ -50,6 +51,10 @@ def read(filename, file_type=None, labels_order=None, time_steps=None):
     except Exception:
         time = None
 
-    output = ElementOutput(time, data, labels)
+    output = ElementOutput(
+        data=data,
+        time=time,
+        labels=labels,
+    )
 
     return output

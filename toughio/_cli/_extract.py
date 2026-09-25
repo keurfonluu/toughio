@@ -1,8 +1,10 @@
 import numpy as np
 
-from .._io.output import read as read_output
-from .._io.output import write as write_output
-from .._mesh import read as read_mesh
+from .._io.output import (
+    read as read_output,
+    write as write_output,
+)
+
 
 __all__ = [
     "extract",
@@ -18,6 +20,8 @@ format_to_ext = {
 
 def extract(argv=None):
     import os
+
+    from .. import read_mesh
 
     parser = _get_parser()
     args = parser.parse_args(argv)
@@ -41,6 +45,7 @@ def extract(argv=None):
 
     # Read TOUGH output file
     output = read_output(args.infile, connection=args.connection)
+    output = output if isinstance(output, list) else [output]
 
     try:
         if not args.connection:
@@ -70,7 +75,9 @@ def extract(argv=None):
     filename = (
         args.output_file
         if args.output_file is not None
-        else f"OUTPUT_ELEME{ext}" if not args.connection else f"OUTPUT_CONNE{ext}"
+        else f"OUTPUT_ELEME{ext}"
+        if not args.connection
+        else f"OUTPUT_CONNE{ext}"
     )
     if not args.split or len(output) == 1:
         write_output(filename, output, file_format=args.file_format)

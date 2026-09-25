@@ -1,11 +1,7 @@
-from .._helpers import register
 from ._read import read
 from ._write import write
-
-__all__ = [
-    "read",
-    "write",
-]
+from .._helpers import register
 
 
-register("tough", [""], read, write)
+for file_format in ("tough4", "tough3", "tough"):
+    register(file_format, [""], read, write)
