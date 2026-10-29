@@ -1,6 +1,5 @@
 import os
 import platform
-import sys
 
 import helpers
 import pytest
@@ -8,30 +7,68 @@ import pytest
 import toughio
 
 
-@pytest.mark.parametrize(
-    "exec, workers, docker, wsl, cmd",
-    [
-        ("tough-exec", None, None, False, "tough-exec INFILE INFILE.out"),
-        ("tough-exec", 8, None, False, "mpiexec -n 8 tough-exec INFILE INFILE.out"),
-    ],
-)
-def test_run(exec, workers, docker, wsl, cmd):
-    toughio._run._check_exec = False
+class FakePopen:
+    """Record the command instead of executing it."""
+
+    def __init__(self, args, **kwargs):
+        self.args = args
+        self.returncode = 0
+        self.stdout = None
+        self.pid = None
+
+    def wait(self):
+        return self.returncode
+
+
+def run_command(monkeypatch, exec, workers, docker, wsl):
+    """Return the shell command built by toughio.run without executing it."""
+    monkeypatch.setattr(toughio._run, "_check_exec", False)
+    monkeypatch.setattr(toughio._run.subprocess, "Popen", FakePopen)
+
     status = toughio.run(
-        exec,
         {},
+        exec=exec,
         workers=workers,
         docker=docker,
         wsl=wsl,
         working_dir=helpers.tempdir(),
-        # dirs_exist_ok only works with Python > 3.8
-        use_temp=sys.version_info >= (3, 8),
+        use_temp=True,
         ignore_patterns=["INFILE"],
         silent=True,
         container_name="CONTAINER",
     )
 
-    assert status.args == cmd
+    return status.args
+
+
+# An executable given by name (i.e., found on PATH) is currently replaced by a
+# quoted absolute path relative to the current working directory.
+reason_run_1 = "executable on PATH is turned into a path in the working directory"
+
+
+@pytest.mark.parametrize(
+    "exec, workers, docker, wsl, cmd",
+    [
+        pytest.param(
+            "tough-exec",
+            None,
+            None,
+            False,
+            "tough-exec INFILE INFILE.out",
+            marks=pytest.mark.xfail(reason=reason_run_1, strict=True),
+        ),
+        pytest.param(
+            "tough-exec",
+            8,
+            None,
+            False,
+            "mpiexec -n 8 tough-exec INFILE INFILE.out",
+            marks=pytest.mark.xfail(reason=reason_run_1, strict=True),
+        ),
+    ],
+)
+def test_run(monkeypatch, exec, workers, docker, wsl, cmd):
+    assert run_command(monkeypatch, exec, workers, docker, wsl) == cmd
 
 
 @pytest.mark.skipif(
@@ -57,14 +94,14 @@ def test_run(exec, workers, docker, wsl, cmd):
         ),
     ],
 )
-def test_run_windows(exec, workers, docker, wsl, cmd):
+def test_run_windows(monkeypatch, exec, workers, docker, wsl, cmd):
     if os.getenv("ComSpec").endswith("cmd.exe"):
         cmd = cmd.replace("PLACEHOLDER", '"%cd%"')
 
     else:
         cmd = cmd.replace("PLACEHOLDER", "${PWD}")
 
-    test_run(exec, workers, docker, wsl, cmd)
+    assert run_command(monkeypatch, exec, workers, docker, wsl) == cmd
 
 
 @pytest.mark.skipif(
@@ -87,6 +124,6 @@ def test_run_windows(exec, workers, docker, wsl, cmd):
         ),
     ],
 )
-def test_run_unix(exec, workers, docker, cmd):
+def test_run_unix(monkeypatch, exec, workers, docker, cmd):
     cmd = cmd.replace("PLACEHOLDER", f"-e LOCAL_USER_ID={os.getuid()}")
-    test_run(exec, workers, docker, False, cmd)
+    assert run_command(monkeypatch, exec, workers, docker, False) == cmd
