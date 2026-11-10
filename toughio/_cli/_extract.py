@@ -37,9 +37,7 @@ def extract(argv=None):
         raise ValueError(f"MESH file '{args.mesh}' not found.")
 
     # Read MESH and extract X, Y and Z
-    parameters = read_mesh(
-        args.mesh, file_format="tough", label_length=args.label_length
-    )
+    parameters = read_mesh(args.mesh, file_format="tough")
     if "elements" not in parameters:
         raise ValueError(f"Invalid MESH file '{args.mesh}'.")
 
@@ -129,16 +127,6 @@ def _get_parser():
         choices=("csv", "tecplot", "petrasim"),
         default="csv",
         help="exported file format",
-    )
-
-    # Label length
-    parser.add_argument(
-        "--label-length",
-        "-l",
-        type=int,
-        choices=(5, 6, 7, 8, 9),
-        default=None,
-        help="number of characters in cell labels",
     )
 
     # Split or not
