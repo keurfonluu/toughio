@@ -52,8 +52,9 @@ def test_triangulate(ndim):
     points = np.random.rand(100, ndim)
     mesh = toughio.meshmaker.triangulate(points)
 
-    assert helpers.allclose(points, mesh.points)
-    assert mesh.cells[0].type == ("triangle" if ndim == 2 else "tetra")
+    assert helpers.allclose(points, mesh.points[:, :ndim])
+    assert mesh.to_meshio().cells[0].type == ("triangle" if ndim == 2 else "tetra")
+    assert (mesh.materials == "dfalt").all()
 
 
 def test_voxelize():
