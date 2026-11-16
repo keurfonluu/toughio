@@ -240,10 +240,13 @@ class ConnectionOutput(Output):
             else:
                 return {k: v[islice] for k, v in self.data.items()}
 
-        elif np.shape(islice) == (2,):
+        elif np.shape(islice) == (2,) and all(isinstance(i, str) for i in islice):
             islice = self.index(*islice)
 
             return {k: v[islice] for k, v in self.data.items()}
+
+        elif np.ndim(islice) == 1:
+            islice = [self.index(i) if isinstance(i, str) else i for i in islice]
 
         elif np.ndim(islice) == 2:
             islice = [self.index(*i) if np.ndim(i) == 1 else i for i in islice]
