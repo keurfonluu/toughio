@@ -42,6 +42,9 @@ def test_structured_grid(ndim):
 
     assert helpers.allclose(origin, mesh.points.min(axis=0)[:ndim])
 
+    if ndim == 2:
+        assert np.allclose(mesh.points[:, 2], 0.0)
+
     if ndim == 3:
         volumes_ref = dx.sum() * dy.sum() * dz.sum()
         assert helpers.allclose(volumes_ref, mesh.volumes.sum())

@@ -45,7 +45,18 @@ def structured_grid(
     dx = np.asarray(dx)
     dy = np.asarray(dy)
     dz = np.asarray(dz) if dz is not None else np.zeros(1)
-    origin = origin if origin is not None else (0.0, 0.0, -dz.sum())
+    origin = (
+        np.asarray(origin, dtype=float)
+        if origin is not None
+        else np.array([0.0, 0.0, -dz.sum()])
+    )
+    if origin.shape == (2,):
+        origin = np.append(origin, 0.0)
+
+    if origin.shape != (3,):
+        raise ValueError(
+            "could not initialize structured grid: origin must have 2 or 3 coordinates"
+        )
 
     if dx.ndim != 1 or dy.ndim != 1 or dz.ndim != 1:
         raise ValueError("could not initialize structured grid with non 1D arrays")
@@ -97,7 +108,6 @@ def structured_grid(
         Z = np.flip(Z, axis=zaxis)
 
     grid = pv.StructuredGrid(X, Y, Z).translate(origin)
-    grid = grid if origin is not None else grid
     mesh = Mesh(grid)
     mesh.set_material(material)
 
