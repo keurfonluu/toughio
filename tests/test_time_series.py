@@ -32,3 +32,21 @@ def test_time_series():
         assert helpers.allclose(cdata["cells"], cdata_ref["cells"])
 
     assert helpers.allclose(time_steps, time_steps_ref)
+
+
+def test_time_series_no_ghost_type():
+    # add_data must not create a vtkGhostType array as a side effect
+    mesh = helpers.hybrid_mesh.copy()
+    mesh.add_data("cells", np.random.rand(mesh.n_cells))
+    assert "vtkGhostType" not in mesh.data
+    assert mesh.active.all()
+
+    # Every time step must contain the same data arrays
+    num_steps = 3
+    cell_data_ref = [{"cells": np.random.rand(mesh.n_cells)} for _ in range(num_steps)]
+
+    filepath = helpers.tempdir("test.xdmf")
+    toughio.write_time_series(filepath, mesh, cell_data_ref)
+    _, cell_data, _ = toughio.read_time_series(filepath)
+
+    assert all(list(cdata) == ["cells"] for cdata in cell_data)

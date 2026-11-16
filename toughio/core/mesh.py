@@ -1246,10 +1246,10 @@ class BaseMesh(ABC):
     @property
     def active(self) -> NDArray:
         """Return active cell array."""
-        return (
-            self._get_property("vtkGhostType", np.zeros(self.n_cells, dtype=np.uint8))
-            == 0
-        )
+        if "vtkGhostType" not in self.data:
+            return np.ones(self.n_cells, dtype=bool)
+
+        return self.data["vtkGhostType"] == 0
 
     @property
     def centers(self) -> NDArray:
