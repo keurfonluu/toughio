@@ -65,10 +65,13 @@ def test_voxelize():
     dy = np.array([1.0, 2.0, 3.0])
     dz = np.array([1.0, 2.0])
     origin = np.random.rand(3)
-    mesh_ref = toughio.meshmaker.structured_grid(dx, dy, dz, origin=origin)
+    mesh_ref = toughio.meshmaker.structured_grid(
+        dx, dy, dz, origin=origin, bottom_up=True
+    )
 
     mesh = toughio.meshmaker.voxelize(mesh_ref.centers, origin=origin)
-    helpers.allclose(mesh_ref, mesh)
+    assert helpers.allclose(mesh_ref.points, mesh.points)
+    assert helpers.allclose(mesh_ref.volumes, mesh.volumes)
 
 
 def test_layer():
