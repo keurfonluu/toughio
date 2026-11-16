@@ -91,7 +91,7 @@ def export(argv=None):
             sys.stdout.flush()
 
             mesh = voxelize(points, args.origin, layer=args.layer)
-            mesh.cell_dada = {}
+            mesh.data.clear()
 
             idx = np.arange(len(points))
             idx = np.array(
@@ -120,7 +120,7 @@ def export(argv=None):
             sys.stdout.flush()
 
             mesh = triangulate(points[:, axis])
-            mesh.cell_data = {}
+            mesh.data.clear()
 
             if args.file_format != "xdmf":
                 for label, data in output.data.items():
@@ -130,7 +130,7 @@ def export(argv=None):
                     if args.ignore_elements:
                         data = data[mask]
 
-                    mesh.add_point_data(label, data)
+                    mesh.pyvista.point_data[label] = data
 
     else:
         print(f"Reading mesh file '{args.mesh}' ...", end="")
@@ -141,13 +141,9 @@ def export(argv=None):
         except Exception as e:
             raise ValueError(f"Unable to read mesh file {args.mesh}: {e}.")
 
+        mesh.data.clear()
         if args.file_format != "xdmf":
-            mesh.point_data = {}
-            mesh.cell_data = {}
-            mesh.field_data = {}
-            mesh.point_sets = {}
-            mesh.cell_sets = {}
-            mesh.read_output(output)
+            mesh.add_data(output[mesh.labels])
         else:
             output = [out[mesh.labels] for out in output]
     print(" Done!")
@@ -180,20 +176,10 @@ def export(argv=None):
         time_steps = [out.time for out in output]
 
         if with_mesh or voxelized:
-            write_time_series(
-                filename,
-                mesh.points,
-                mesh.cells,
-                cell_data=data,
-                time_steps=time_steps,
-            )
+            write_time_series(filename, mesh, data, time_steps)
         else:
-            write_time_series(
-                filename,
-                mesh.points,
-                mesh.cells,
-                point_data=data,
-                time_steps=time_steps,
+            raise NotImplementedError(
+                "XDMF export of a triangulated mesh (point data) is not supported."
             )
 
     print(" Done!")

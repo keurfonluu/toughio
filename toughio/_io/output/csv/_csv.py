@@ -2,6 +2,7 @@ from .._common import to_output
 from ...._common import open_file
 from ....core import ElementOutput
 
+
 __all__ = [
     "read",
     "write",
