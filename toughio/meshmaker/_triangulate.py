@@ -23,7 +23,7 @@ def triangulate(points, material="dfalt"):
         Output triangulated mesh.
 
     """
-    from ..core import CellBlock, Mesh
+    from ..core import Mesh
 
     try:
         from scipy.spatial import Delaunay
@@ -42,9 +42,6 @@ def triangulate(points, material="dfalt"):
     points = np.asarray(points)
     connectivity = Delaunay(points).simplices
     cell_type = "triangle" if points.shape[1] == 2 else "tetra"
-    cells = [CellBlock(cell_type, connectivity)]
-    mesh = Mesh(points, cells)
-    mesh.add_cell_data("material", np.ones(mesh.n_cells, dtype=np.int64))
-    mesh.add_material(material, 1)
-
+    mesh = Mesh(points, [(cell_type, connectivity)])
+    mesh.set_material(material)
     return mesh

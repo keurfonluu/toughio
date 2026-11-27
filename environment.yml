@@ -1,0 +1,25 @@
+name: toughio
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12.15
+  - pip=26.2.1
+  # runtime (pyproject.toml)
+  - h5py=3.16.0
+  - matplotlib=3.10.9
+  - meshio=5.3.5
+  - numpy=2.5.4
+  - pandas=3.0.6
+  - psutil=7.2.2
+  - pyvista=0.49.1
+  - scipy=1.18.1
+  - tqdm=4.70.1
+  - vtk=9.4.2
+  # testing / development (requirements-dev.txt)
+  - pytest=9.1.1
+  - pytest-cov=7.1.0
+  - ruff=0.17.0
+  - pip:
+      - pyvista-gridder==0.6.0
+variables:
+  PYTHONNOUSERSITE: "1"

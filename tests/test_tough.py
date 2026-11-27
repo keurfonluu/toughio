@@ -1,3 +1,5 @@
+import os
+
 import helpers
 import numpy as np
 import pytest
@@ -6,19 +8,15 @@ import toughio
 
 
 @pytest.mark.parametrize(
-    "nodal_distance, bound, coord",
+    "assume_orthogonal, bound",
     [
-        ("line", True, False),
-        ("line", False, False),
-        ("orthogonal", True, False),
-        ("orthogonal", False, False),
-        ("line", True, True),
-        ("line", False, True),
-        ("orthogonal", True, True),
-        ("orthogonal", False, True),
+        (False, True),
+        (False, False),
+        (True, True),
+        (True, False),
     ],
 )
-def test_mesh(nodal_distance, bound, coord):
+def test_mesh(assume_orthogonal, bound):
     # Create 3D mesh
     dx = np.arange(3) + 1
     dy = np.arange(4) + 1
@@ -28,23 +26,21 @@ def test_mesh(nodal_distance, bound, coord):
     )
 
     idx = np.random.choice(mesh.n_cells, mesh.n_cells // 2, replace=False)
-    mesh.cell_data["material"][idx] = 2
-    mesh.field_data[helpers.random_string(5)] = np.array([2, 3])
+    mesh.set_material(helpers.random_string(5), idx)
 
-    idx = np.random.choice(mesh.n_cells, mesh.n_cells // 2, replace=False)
     boundary_condition = (
         (np.random.rand(mesh.n_cells) < np.random.rand()).astype(int)
         if bound
-        else np.zeros(mesh.n_cells)
+        else np.zeros(mesh.n_cells, dtype=int)
     )
-    mesh.add_cell_data("boundary_condition", boundary_condition)
+    mesh.dirichlet = boundary_condition
 
     parameters = helpers.write_read(
         filename="MESH",
         obj=None,
         writer=mesh.write_tough,
         reader=toughio.read_mesh,
-        writer_kws={"nodal_distance": nodal_distance, "coord": coord},
+        writer_kws={"assume_orthogonal": assume_orthogonal},
         reader_kws={"file_format": "tough"},
     )
 
@@ -66,13 +62,10 @@ def test_mesh(nodal_distance, bound, coord):
         for label, bcond in zip(mesh.labels, boundary_condition)
         if bcond
     ]
-    assert helpers.allclose(mesh.volumes[boundary_condition == 1] * 1.0e50, volumes)
+    assert helpers.allclose(np.full(boundary_condition.sum(), 1.0e50), volumes)
 
     centers = [parameters["elements"][label]["center"] for label in mesh.labels]
     assert helpers.allclose(mesh.centers, centers)
-
-    # Check block COORD
-    assert parameters["coordinates"] == coord
 
     # Check block CONNE
     nx, ny, nz = len(dx), len(dy), len(dz)
@@ -130,10 +123,10 @@ def test_incon(anisotropic):
     )
 
     initial_condition = np.random.rand(mesh.n_cells, 4)
-    mesh.add_cell_data("initial_condition", initial_condition)
+    mesh.initial_conditions = initial_condition
 
     porosity = np.random.rand(mesh.n_cells)
-    mesh.add_cell_data("porosity", porosity)
+    mesh.porosities = porosity
 
     if anisotropic is not None:
         permeability = (
@@ -141,14 +134,13 @@ def test_incon(anisotropic):
             if anisotropic
             else np.random.rand(mesh.n_cells)
         )
-        mesh.add_cell_data("permeability", permeability)
+        mesh.permeabilities = permeability
 
-    parameters = helpers.write_read(
-        filename="INCON",
-        obj=None,
-        writer=mesh.write_incon,
-        reader=toughio.read_mesh,
-        reader_kws={"file_format": "tough"},
+    # INCON is written next to MESH when incon=True
+    filename = helpers.tempdir("MESH")
+    mesh.write_tough(filename, incon=True)
+    parameters = toughio.read_mesh(
+        os.path.join(os.path.dirname(filename), "INCON"), file_format="tough"
     )
 
     # Check block INCON
@@ -157,18 +149,16 @@ def test_incon(anisotropic):
     values = [
         parameters["initial_conditions"][label]["values"] for label in mesh.labels
     ]
-    assert helpers.allclose(mesh.cell_data["initial_condition"], values)
+    assert helpers.allclose(initial_condition, values)
 
     porosity = [
         parameters["initial_conditions"][label]["porosity"] for label in mesh.labels
     ]
-    assert helpers.allclose(mesh.cell_data["porosity"], porosity)
+    assert helpers.allclose(mesh.porosities, porosity)
 
     if anisotropic is not None:
         userx = np.array(
             [parameters["initial_conditions"][label]["userx"] for label in mesh.labels]
         )
         permeability = userx[:, :3] if anisotropic else userx[:, 0]
-        assert helpers.allclose(
-            mesh.cell_data["permeability"], permeability, atol=1.0e-4
-        )
+        assert helpers.allclose(mesh.permeabilities, permeability, atol=1.0e-4)

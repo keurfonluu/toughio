@@ -16,8 +16,6 @@ import toughio
         ("OUTPUT_ELEME.csv", False, False, "vtu"),
         ("OUTPUT_ELEME.tec", False, False, "vtu"),
         # ("OUTPUT_ELEME.csv", True, False, "xdmf"),
-        ("OUTPUT_ELEME.csv", False, False, "xdmf"),
-        ("OUTPUT_ELEME.tec", False, False, "xdmf"),
         ("OUTPUT_ELEME.csv", True, True, "vtu"),
         ("OUTPUT_ELEME.csv", False, True, "vtu"),
         ("OUTPUT_ELEME.tec", False, True, "vtu"),
@@ -78,43 +76,34 @@ def test_export(filename, mesh, voxelize, ext):
                 assert (
                     helpers.allclose(v, mesh_in.cell_data[k])
                     if mesh or voxelize
-                    else helpers.allclose(v, mesh_in.point_data[k])
+                    else helpers.allclose(v, mesh_in.pyvista.point_data[k])
                 )
     else:
-        mesh_in = toughio.read_time_series(output_filename)
-        points, cells, point_data, cell_data, time_steps = mesh_in
+        mesh_in, data, time_steps = toughio.read_time_series(output_filename)
 
         centers_ref = np.column_stack(
             [outputs[-1].data[dim] for dim in ["X", "Y", "Z"]]
         )
-        assert (
-            helpers.allclose(
-                centers_ref,
-                np.concatenate([points[c.data].mean(axis=1) for c in cells]),
-            )
-            if mesh or voxelize
-            else helpers.allclose(centers_ref[:, :2], points[:, :2])
-        )
+        assert helpers.allclose(centers_ref, mesh_in.centers)
 
-        assert len(point_data) == len(outputs)
-        assert len(cell_data) == len(outputs)
-
-        assert (
-            all(pdata == {} for pdata in point_data)
-            if mesh or voxelize
-            else all(cdata == {} for cdata in cell_data)
-        )
-
-        for t, pdata in enumerate(point_data):
-            for k, v in pdata.items():
-                assert helpers.allclose(v, outputs[t].data[k])
-
-        for t, cdata in enumerate(cell_data):
+        assert len(data) == len(outputs)
+        for t, cdata in enumerate(data):
             for k, v in cdata.items():
                 assert helpers.allclose(v, outputs[t].data[k])
 
         time_steps_ref = [output.time for output in outputs]
         assert helpers.allclose(time_steps, time_steps_ref)
+
+
+@pytest.mark.parametrize("filename", ["OUTPUT_ELEME.csv", "OUTPUT_ELEME.tec"])
+def test_export_triangulate_xdmf(filename):
+    # Triangulated meshes carry point data, which XDMF export does not support
+    this_dir = os.path.dirname(os.path.abspath(__file__))
+    filename = os.path.join(this_dir, "support_files", "outputs", filename)
+    output_filename = f"{helpers.tempdir(helpers.random_string(10))}.xdmf"
+
+    with pytest.raises(ValueError, match="requires cell data"):
+        toughio._cli.export([filename, "-o", output_filename, "-f", "xdmf"])
 
 
 @pytest.mark.parametrize(

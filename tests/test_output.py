@@ -164,6 +164,7 @@ def test_save():
         (helpers.output_eleme[0], ["AAA00", "AAA02"]),
         (helpers.output_conne[0], 0),
         (helpers.output_conne[0], [0, 2]),
+        (helpers.output_conne[0], [0, 1, 2]),
         (helpers.output_conne[0], "AAA00"),
     ],
 )

@@ -63,6 +63,8 @@ def voxelize(points, origin, layer=False, material="dfalt"):
     dx = np.diff(x)
     dy = np.diff(y)
     dz = np.diff(z)
-    mesh = structured_grid(dx, dy, dz, origin=origin, layer=layer, material=material)
+    mesh = structured_grid(
+        dx, dy, dz, origin=origin, layer=layer, bottom_up=True, material=material
+    )
 
     return mesh
