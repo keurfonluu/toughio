@@ -8,18 +8,17 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
 
     steps:
     - name: Checkout code
-      # uses: actions/checkout@v2
-      uses: nschloe/action-cached-lfs-checkout@v1
+      uses: actions/checkout@v4
     # Cache for LFS to limit usage of GitHub LFS monthly bandwidth
     # See <https://github.com/actions/checkout/issues/165>
     - name: Create LFS file list
       run: git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
     - name: Restore LFS cache
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       id: lfs-cache
       with:
         path: .git/lfs
@@ -27,7 +26,7 @@ jobs:
     - name: Git LFS Pull
       run: git lfs pull
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install system dependencies
@@ -37,14 +36,15 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install .[full]
+        pip install .
     - name: Test with pytest
       run: |
         pip install pytest
         pip install coverage
         coverage run -m pytest
     - name: Submit coverage
-      if: ${{ matrix.python-version == '3.8' }}
+      if: ${{ matrix.python-version == '3.12' }}
+      continue-on-error: true
       run: |
         pip install codecov
         codecov --token=${{ secrets.CODECOV_TOKEN }}
