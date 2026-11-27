@@ -16,20 +16,6 @@ import toughio
         ("OUTPUT_ELEME.csv", False, False, "vtu"),
         ("OUTPUT_ELEME.tec", False, False, "vtu"),
         # ("OUTPUT_ELEME.csv", True, False, "xdmf"),
-        pytest.param(
-            "OUTPUT_ELEME.csv",
-            False,
-            False,
-            "xdmf",
-            marks=pytest.mark.xfail(raises=NotImplementedError, strict=True),
-        ),
-        pytest.param(
-            "OUTPUT_ELEME.tec",
-            False,
-            False,
-            "xdmf",
-            marks=pytest.mark.xfail(raises=NotImplementedError, strict=True),
-        ),
         ("OUTPUT_ELEME.csv", True, True, "vtu"),
         ("OUTPUT_ELEME.csv", False, True, "vtu"),
         ("OUTPUT_ELEME.tec", False, True, "vtu"),
@@ -107,6 +93,17 @@ def test_export(filename, mesh, voxelize, ext):
 
         time_steps_ref = [output.time for output in outputs]
         assert helpers.allclose(time_steps, time_steps_ref)
+
+
+@pytest.mark.parametrize("filename", ["OUTPUT_ELEME.csv", "OUTPUT_ELEME.tec"])
+def test_export_triangulate_xdmf(filename):
+    # Triangulated meshes carry point data, which XDMF export does not support
+    this_dir = os.path.dirname(os.path.abspath(__file__))
+    filename = os.path.join(this_dir, "support_files", "outputs", filename)
+    output_filename = f"{helpers.tempdir(helpers.random_string(10))}.xdmf"
+
+    with pytest.raises(ValueError, match="requires cell data"):
+        toughio._cli.export([filename, "-o", output_filename, "-f", "xdmf"])
 
 
 @pytest.mark.parametrize(

@@ -178,8 +178,8 @@ def export(argv=None):
         if with_mesh or voxelized:
             write_time_series(filename, mesh, data, time_steps)
         else:
-            raise NotImplementedError(
-                "XDMF export of a triangulated mesh (point data) is not supported."
+            raise ValueError(
+                "XDMF export requires cell data, use option --voxelize or --mesh."
             )
 
     print(" Done!")
@@ -207,7 +207,7 @@ def _get_parser():
         "-m",
         type=str,
         default=None,
-        help="pickled toughio.Mesh",
+        help="mesh file (any format supported by toughio.read_mesh)",
     )
 
     # Time step
